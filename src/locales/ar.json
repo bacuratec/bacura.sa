@@ -1,0 +1,969 @@
+{
+  "question": {
+    "faqTitle": "الاسئله الشائعه",
+    "questionLabel": "السؤال",
+    "questionPlaceholder": "اكتب السؤال",
+    "answerLabel": "الإجابة",
+    "answerPlaceholder": "اكتب الإجابة",
+    "deleteButton": "حذف",
+    "addQuestionButton": "إضافة سؤال آخر",
+    "saveButton": "حفظ",
+    "submitting": "جارٍ الإرسال...",
+    "successMessage": "تم الإضافة بنجاح",
+    "errorMessage": "حدث خطأ أثناء الإضافة",
+    "validation": {
+      "questionRequired": "السؤال مطلوب",
+      "answerRequired": "الإجابة مطلوبة"
+    },
+
+    "faqManagement": "إدارة الأسئلة",
+    "addQuestion": "إضافة سؤال",
+    "question": "السؤال",
+    "answer": "الإجابة",
+    "actions": "إجراء",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "deleteSuccess": "تم حذف السؤال بنجاح",
+    "deleteError": "حدث خطأ أثناء الحذف",
+
+    "deleteConfirmationTitle": "هل أنت متأكد أنك تريد حذف السؤال؟",
+    "confirmDelete": "حذف",
+    "cancel": "إلغاء",
+    "deleting": "جارٍ الحذف...",
+
+    "editQuestion": "تعديل السؤال",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ...",
+    "updateSuccess": "تم التحديث بنجاح",
+    "updateError": "حدث خطأ أثناء التحديث",
+    "loadingData": "جارٍ تحميل البيانات..."
+  },
+  "partners": {
+    "titlePage": "شركاؤنا",
+    "description": "هنا يمكنك إدارة وعرض جميع شركاء المنصة",
+
+    "titleHero": "شركاؤنا",
+    "addPartner": "إضافة شريك",
+    "partnerName": "اسم الشريك",
+    "partnerNamePlaceholder": "اكتب اسم الشريك",
+    "image": "الصورة",
+    "submit": "حفظ",
+    "submitting": "جارٍ الإرسال...",
+    "addSuccess": "تم إضافة الشريك بنجاح",
+    "addError": "حدث خطأ أثناء الإضافة",
+    "validation": {
+      "nameRequired": "اسم الشريك مطلوب",
+      "imageRequired": "الصورة مطلوبة"
+    },
+    "modalDelete": {
+      "title": "هل أنت متأكد أنك تريد حذف الشريك؟",
+      "delete": "حذف",
+      "deleting": "جارٍ الحذف...",
+      "cancel": "إلغاء"
+    },
+
+    "title": "إدارة الشركاء",
+    "name": "الاسم",
+    "actions": "إجراء",
+    "deleteSuccess": "تم حذف الشريك بنجاح",
+    "deleteError": "حدث خطأ أثناء الحذف",
+
+    "upsertPartner": {
+      "titleAdd": "إضافة شريك",
+      "titleEdit": "تعديل الشريك",
+      "partnerName": "اسم الشريك",
+      "enterPartnerName": "اكتب اسم الشريك",
+      "image": "الصورة",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ...",
+      "successAdd": "تم إضافة الشريك بنجاح",
+      "successUpdate": "تم تحديث الشريك بنجاح",
+      "error": "حدث خطأ، حاول مرة أخرى",
+      "imageRequired": "الصورة مطلوبة",
+      "nameRequired": "اسم الشريك مطلوب",
+      "loading": "جارٍ تحميل البيانات..."
+    }
+  },
+  "customers": {
+    "titlePage": "عملاؤنا",
+    "description": "هنا يمكنك إدارة وعرض جميع عملاء المنصة",
+
+    "titleHero": "عملاؤنا",
+    "addCustomer": "إضافة عميل",
+    "customerName": "اسم العميل",
+    "customerNamePlaceholder": "اكتب اسم العميل",
+    "image": "الصورة",
+    "submit": "حفظ",
+    "submitting": "جارٍ الإرسال...",
+    "addSuccess": "تم إضافة العميل بنجاح",
+    "addError": "حدث خطأ أثناء الإضافة",
+
+    "validation": {
+      "nameRequired": "اسم العميل مطلوب",
+      "imageRequired": "الصورة مطلوبة"
+    },
+
+    "modalDelete": {
+      "title": "هل أنت متأكد أنك تريد حذف العميل؟",
+      "delete": "حذف",
+      "deleting": "جارٍ الحذف...",
+      "cancel": "إلغاء"
+    },
+
+    "title": "إدارة العملاء",
+    "name": "الاسم",
+    "actions": "إجراء",
+    "deleteSuccess": "تم حذف العميل بنجاح",
+    "deleteError": "حدث خطأ أثناء الحذف",
+
+    "upsertCustomer": {
+      "titleAdd": "إضافة عميل",
+      "titleEdit": "تعديل العميل",
+      "customerName": "اسم العميل",
+      "enterCustomerName": "اكتب اسم العميل",
+      "image": "الصورة",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ...",
+      "successAdd": "تم إضافة العميل بنجاح",
+      "successUpdate": "تم تحديث العميل بنجاح",
+      "error": "حدث خطأ، حاول مرة أخرى",
+      "imageRequired": "الصورة مطلوبة",
+      "nameRequired": "اسم العميل مطلوب",
+      "loading": "جارٍ تحميل البيانات..."
+    }
+  },
+  "projects": {
+    "pageTitle": "إدارة المشاريع",
+    "pageDescription": "هنا تجد المشاريع الخاصه بطالبين الخدمات",
+
+    "projectDetailsTitle": "تفاصيل المشروع رقم",
+    "projectManagement": "إدارة المشاريع",
+    "projectDetails": "تفاصيل المشروع",
+    "projectAttachments": "المرفقات الخاصة بالمشروع",
+    "requesterAttachments": "المرفقات الخاصة بطالب الخدمة",
+
+    "attachments": "المرفقات",
+    "action": "إجراء",
+    "preview": "معاينه",
+    "orderDescription": "وصف الطلب",
+
+    "startDate": "تاريخ البداية",
+    "endDate": "تاريخ النهاية",
+    "userNotes": "ملاحظات طالب الخدمة",
+    "servicePrice": "سعر الخدمة",
+    "serviceType": "نوع الخدمة",
+    "provider": "مزود الخدمة",
+    "orderStatus": "حالة الطلب",
+
+    "all": "الكل",
+    "waitingApproval": "في انتظار الموافقة",
+    "waitingStart": "في انتظار البدء",
+    "processing": "تحت المعالجه",
+    "completed": "مكتمل",
+    "ended": "منتهي",
+    "rejected": "مرفوض",
+    "expired": "انتهت صلاحيته",
+    "orderNumber": "رقم الطلب",
+    "requester": "مقدم الطلب",
+    "viewOrder": "عرض الطلب",
+
+    "confirmRequest": "تأكيد الطلب",
+    "providerLabel": "مقدم الخدمة",
+    "providerPlaceholder": "اختر مقدم الخدمة",
+    "submit": "تأكيد",
+    "submitting": "جاري الإرسال...",
+    "successMessage": "تم تنفيذ العملية بنجاح",
+    "errorMessage": "حدث خطأ أثناء تنفيذ العملية",
+    "providerRequired": "يجب اختيار مقدم خدمة"
+  },
+
+  "providersTable": {
+    "tabs": {
+      "all": "الكل",
+      "active": "المكتملة",
+      "pending": "قيد المراجعه",
+      "suspended": "موقوف",
+      "blocked": "المحظرون"
+    },
+    "columns": {
+      "name": "الاسم",
+      "entityType": "نوع الجهة",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الجوال",
+      "region": "المنطقة",
+      "status": "حالة الحساب",
+      "action": "إجراء",
+      "view": "عرض"
+    }
+  },
+
+  "requestersTable": {
+    "tabs": {
+      "all": "الكل",
+      "active": "المكتملة",
+      "pending": "قيد المراجعه",
+      "suspended": "موقوف",
+      "blocked": "المحظرون"
+    },
+    "columns": {
+      "name": "الاسم",
+      "entityType": "نوع الجهة",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الجوال",
+      "region": "المنطقة",
+      "status": "حالة الحساب",
+      "action": "إجراء",
+      "view": "عرض"
+    }
+  },
+
+  "request": {
+    "name": "الاسم",
+    "registrationDate": "تاريخ التسجيل",
+    "price": "السعر",
+    "requestDescription": "وصف الطلب",
+    "notes": "ملاحظات:",
+
+    "all": "الكل",
+    "newRequest": "طلب جديد",
+    "underProcessing": "تحت المعالجة",
+    "initialApproval": "موافقة مبدأية",
+    "awaitingPayment": "بإنتظار الدفع",
+    "rejected": "مرفوض",
+    "completed": "مكتمل",
+
+    "requestNumber": "رقم الطلب",
+    "requesterName": "مقدم الطلب",
+    "requestDate": "تاريخ الطلب",
+    "requestStatus": "حالة الطلب",
+    "viewRequest": "عرض الطلب",
+
+    "actions": "إجراء"
+  },
+  "services": {
+    "title": "خدمات تكاملية نوعية .. اطلب خدمتك الآن",
+    "description": "نخدمكم في جميع أنظمة التيار الخفيف من توريد وتأسيس وتركيب وبرمجة وصيانة واستشارات وتدريب",
+    "serviceTitle": "عنوان الخدمة",
+    "price": "السعر",
+    "status": "الحالة",
+    "actions": "إجراء",
+    "edit": "تعديل",
+
+    "update_price": "تحديث السعر",
+    "enter_new_price": "أدخل السعر الجديد",
+    "update": "تحديث",
+    "back": "عودة",
+    "toast_invalid_price": "من فضلك أدخل سعر صالح",
+    "toast_success_update": "تم تحديث السعر بنجاح",
+    "toast_error_update": "حدث خطأ أثناء تحديث السعر"
+  },
+
+  "tickets": {
+    "title": "الدعم الفني",
+    "description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك",
+    "ticket_details": "تفاصيل الشكوى",
+    "closing_ticket": "جاري الإغلاق...",
+    "opening_ticket": "جاري الفتح...",
+    "close_ticket": "إغلاق التيكت",
+    "reopen_ticket": "إعادة فتح التيكت",
+    "user_name": "اسم المستخدم",
+    "ticket_status": "حالة التيكت",
+    "ticket_title": "عنوان الشكوى",
+    "ticket_description": "وصف الشكوى",
+    "no_description": "لا يوجد وصف",
+
+    "username": "اسم المستخدم",
+    "complaint_title": "عنوان الشكوى",
+    "complaint_status": "حالة الشكوى",
+    "view": "عرض",
+    "actions": "إجراء"
+  },
+
+  "user": {
+    "name": "الاسم",
+    "email": "البريد الالكتروني",
+    "phone_number": "رقم الهاتف",
+    "registration_date": "تاريخ التسجيل",
+    "commercial_registration": "السجل التجاري",
+    "commercial_registration_confirmation_date": "تاريخ التاكيد السنوي للسجل التجاري",
+    "entity_type": "نوع الكيان",
+    "city": "منطقة العمل",
+    "block": "حظر",
+    "activate": "تفعيل",
+    "user_blocked_success": "تم حظر المستخدم بنجاح!",
+    "user_activated_success": "تم تفعيل المستخدم بنجاح!"
+  },
+
+  "about": {
+    "metaTitle": "من نحن - تعرف على أهدافنا ورؤيتنا",
+    "metaDescription": "اكتشف المزيد عن رسالتنا وقيمنا وخدماتنا في منصةنا التي تهدف إلى تقديم الأفضل.",
+    "title": "من نحن – باكورة أعمال",
+    "intro": "منصة رقمية سعودية تابعة لشركة باكورة التقنيات ؛ متخصصة في مجال المقاولات التقنية لأنظمة التيار الخفيف لمشاريع المنشآت الحكومية والتجارية ، حيث نقدم خدمات ومنتجات وحلول تقنية وذكية وأمنية ؛ من تشخيص للمشاريع وتوريد بالجملة وتأسيس وتركيب وبرمجة وصيانة وتدريب واستشارات ؛ وخدمات مساندة من إدارة وتشغيل وإشراف على المشاريع ، نقدم خدماتنا للمنشآت الحكومية والتجارية ، ملتزمون بالجودة والكفاءة وسرعة الاستجابة والدعم الفني ، تشرفنا بخدمة الكثير من المنشآت الحكومية والتجارية وكسبنا ثقتهم وولائهم وشكرهم ، متواجدون في المدن الرئيسية بالسعودية.",
+    "visionTitle": "رؤيتنا:",
+    "visionText": "ريادة وطنية تقنية في مجال المقاولات لأنظمة التيار الخفيف للمساهمة في رفع كفاءة وجودة المشاريع وفق معايير عالمية، تدعم رؤية المملكة 2030.",
+    "missionTitle": "رسالتنا:",
+    "missionText": "جودة حياة تقنية ذكية وآمنة.",
+    "valuesTitle": "قيمنا:",
+    "valuesText": "ثقة وجودة دائمة، تطوير ورضا عالي.",
+    "goalsTitle": "أهدافنا:",
+    "goals": [
+      "رفع كفاءة وجودة المشاريع الحكومية والتجارية بمعايير عالمية.",
+      "تمكين الكفاءات الوطنية وفتح الفرص الوظيفية لهم.",
+      "تقديم خدمات مبتكرة تعزز رضا العملاء وولائهم.",
+      "توعية المجتمع بأهمية الحلول التقنية والذكية.",
+      "صناعة منتجات محلية تنافس في الأسواق العالمية."
+    ],
+    "whyTitle": "لماذا أطلقنا منصة باكورة أعمال:",
+    "whyIntro": "إيماناً منا بالشراكة مع الجهات الحكومية والتجارية، وإدراكاً لحجم الحاجة في السوق، تم إطلاق المنصة للأسباب التالية:",
+    "whyPoints": [
+      "حجم العمل في المجال يتزايد مع رؤية المملكة 2030.",
+      "أنظمة التيار الخفيف أساسية في معظم المشاريع.",
+      "تقليل التكاليف وتخفيف الأعباء على المنشآت.",
+      "نقص الخبرة لدى بعض المقاولين بالباطن.",
+      "التخصص والاحترافية من أبرز أولوياتنا.",
+      "سرعة الاستجابة مطلوبة في عدة خدمات.",
+      "وجود معايير مهنية والتزامات يضمن جودة التنفيذ."
+    ],
+    "commitment": "نلتزم في المنصة بتحقيق الكفاءة والإنتاجية وتقليل التكاليف والمخاطر عبر حلول مبتكرة ومعايير عالية.",
+    "featuresTitle": "مميزات المنصة:",
+    "features": [
+      "خفض التكاليف (مال، وقت، جهد).",
+      "خدمات تكاملية (تشخيص، توريد، تركيب، برمجة، صيانة، استشارات... إلخ).",
+      "سرعة في تنفيذ الخدمات ودعم ما بعد البيع.",
+      "توريد المشتريات بسعر الجملة.",
+      "ضمانات واضحة والتزامات على جميع الخدمات.",
+      "خصوصية وأمان تام في الخدمات التي تتطلب سرية."
+    ],
+    "fieldsTitle": "مجالات العمل:",
+    "fields": [
+      "أنظمة كاميرات المراقبة.",
+      "أنظمة الشبكات والاتصالات السلكية واللاسلكية.",
+      "أنظمة التحكم الذكية وإنترنت الأشياء.",
+      "أنظمة الإنذار ضد السرقة.",
+      "أنظمة السنترالات والبصمة.",
+      "الأقفال الإلكترونية.",
+      "أنظمة الدوائر التلفزيونية.",
+      "أنظمة البوابات الأمنية.",
+      "الأنظمة الصوتية.",
+      "أنظمة الطاقة الشمسية.",
+      "أنظمة حفظ الطاقة (UPS).",
+      "شواحن السيارات الكهربائية."
+    ],
+    "servicesTitle": "خدماتنا:",
+    "services": [
+      "توريد المشتريات بسعر الجملة.",
+      "تنفيذ عقود المشاريع باحترافية وخدمات ما بعد البيع.",
+      "عقود صيانة عامة ودورية.",
+      "تشخيص مشاريع أنظمة التيار الخفيف عبر مختصين.",
+      "الإشراف والإدارة على المشاريع من البداية حتى التسليم.",
+      "إدارة قسم مشاريع التيار الخفيف للجهات الحكومية والتجارية.",
+      "استشارات من خبراء مختصين.",
+      "تدريب المهندسين والفنيين والإداريين."
+    ],
+    "more": "المزيد عن باكوره الاعمال"
+  },
+
+  "review": {
+    "add_review": "إضافة تقييم",
+    "write_review_placeholder": "اكتب تقييمك هنا...",
+    "submit": "إضافة",
+    "back": "عـودة",
+    "review_success": "شكراً لتقييمك المنتج",
+    "review_error": "حدث خطأ في إرسال التقييم"
+  },
+
+  "requestsUser": {
+    "my_requests": "طلباتي",
+    "request_number": "رقم الطلب",
+    "requester_name": "مقدم الطلب",
+    "request_date": "تاريخ الطلب",
+    "request_status": "حالة الطلب",
+    "view_request": "عرض الطلب",
+    "status_all": "الكل",
+    "status_new": "طلب جديد",
+    "status_processing": "تحت المعالجة",
+    "status_initial_approval": "موافقة مبدأية",
+    "status_waiting_payment": "بإنتظار الدفع",
+    "status_rejected": "مرفوض",
+    "status_completed": "مكتمل",
+    "action": "إجراء"
+  },
+
+  "faq": "الأسئلة الشائعة",
+
+  "hero": {
+    "title": "باكورة أعمال - Bacura Bussiness",
+    "registerNow": "سجل الآن",
+    "requestService": "طلب خدمة",
+    "seeMore": "عرض المزيد"
+  },
+
+  "howItWorks": {
+    "metaDescription": "تعرف على خطوات استخدام المنصة لطلب الخدمة بسهولة وسرعة في خطوات بسيطة وواضحة.",
+    "title": "كيف تعمل المنصة؟",
+    "step1": "سجّل حسابك",
+    "step2": "قدّم طلباتك",
+    "step3": "تابع طلباتك واستلم تقرير عن كل طلب",
+    "requestService": "طلب خدمة",
+    "subscribeNow": "اشترك الان"
+  },
+
+  "join": {
+    "title": "انضم إلينا كطالب خدمة",
+    "description": "للمنشآت الحكومية والتجارية؛ نتشرف بتلبية طلباتكم باحترافية ومهنية عالية. نخدمكم في جميع أنظمة التيار الخفيف من توريد وتأسيس وتركيب وبرمجة وصيانة واستشارات وتدريب.",
+    "request": "طلب خدمة",
+    "signup": "سجل الآن"
+  },
+  "loginContent": {
+    "welcome": "مرحباً بك من جديد في باكورة أعمال",
+    "subtitle": "قم بتسجيل الدخول للوصول إلى حسابك، متابعة طلباتك، تنفيذ المشاريع.",
+    "description": "نوفر لك تجربة آمنة وسلسة لإدارة خدماتك وتنفيذ مشاريعك بثقة."
+  },
+  "loginForm": {
+    "welcome": "اهلا بيك في",
+    "brand": "باكوره الاعمال",
+    "noAccount": "ليس لدي حساب",
+    "createAccount": "انشاء حساب",
+    "loginTitle": "تسجيل الدخول",
+    "email": "البريد الالكتروني",
+    "password": "كلمه المرور",
+    "loginButton": "تسجيل الدخول",
+    "loggingIn": "جاري الدخول...",
+    "validation": {
+      "invalidEmail": "البريد الالكتروني غير صحيح",
+      "required": "مطلوب",
+      "passwordMin": "كلمة المرور يجب أن تكون على الأقل 6 أحرف"
+    }
+  },
+  "exploreRequests": {
+    "pageTitle": "تصفح الطلبات",
+    "columns": {
+      "projectName": "اسم المشروع",
+      "serviceType": "نوع الخدمة",
+      "requestDate": "تاريخ الطلب",
+      "status": "الحالة"
+    },
+    "status": {
+      "new": "جديد",
+      "old": "قديم",
+      "other": "أخرى"
+    }
+  },
+  "messages": {
+    "title": "اخر الرسائل",
+    "noMessages": "لا توجد رسائل حالياً",
+    "goToMessages": "اذهب الي الرسائل"
+  },
+  "servicesLanding": {
+    "title": "الخدمات",
+    "items": [
+      {
+        "title": "طلب خدمة جديدة",
+        "description": "قدّم طلب جديد بسهولة وخلّنا نوصله للمناسبين"
+      },
+      {
+        "title": "طلباتي السابقة",
+        "description": "تابع حالة الطلبات اللي قدّمتها مسبقاً"
+      },
+      {
+        "title": "المشاريع الجارية",
+        "description": "استعرض المشاريع اللي تم قبولها وجاري تنفيذها"
+      },
+      {
+        "title": "التقييمات",
+        "description": "شوف تقييماتك للمشاريع اللي خلصت"
+      }
+    ]
+  },
+  "support": {
+    "title": "الدعم الفني و المساعدة",
+    "description": "هل لديك أسئلة؟ فريق الدعم لدينا هنا للمساعدة.",
+    "whatsapp": "واتساب",
+    "submitComplaint": "إرسال طلب",
+    "email": "راسلنا عبر البريد:"
+  },
+  "ticket": {
+    "pageTitle": "الرسائل والدعم",
+    "pageDescription": "سرعة الاستجابة قيمة نفتخر بها ؛ أرسل ملاحظتك وسيتم التواصل معك عاجلا",
+    "listTitle": "قائمة الرسائل",
+    "sendTicket": "إرسال طلب",
+    "noTicketsTitle": "لا يوجد رسائل حتى الآن",
+    "noTicketsDescription": "يمكنك إرسال طلب جديدة من الزر بالأعلى",
+
+    "title": "إرسال طلب",
+    "form": {
+      "title": "عنوان الشكوى",
+      "titlePlaceholder": "أدخل عنوان الشكوى",
+      "description": "وصف الشكوى",
+      "descriptionPlaceholder": "أدخل تفاصيل الشكوى"
+    },
+    "submit": "إرسال",
+    "sending": "جارٍ الإرسال...",
+    "cancel": "عـودة",
+    "success": "تم إرسال الشكوى بنجاح",
+    "error": "حدث خطأ أثناء إرسال الشكوى",
+    "errors": {
+      "titleRequired": "عنوان الشكوى مطلوب",
+      "descriptionRequired": "وصف الشكوى مطلوب"
+    }
+  },
+  "profile": {
+    "dashboard": "الداشبورد",
+    "suspendAccount": "تعليق حسابي",
+    "stats": {
+      "totalOrders": "إجمالي الطلبات",
+      "waitingApproval": "طلبات في انتظار الموافقة",
+      "waitingStart": "طلبات بانتظار البدء",
+      "ongoing": "طلبات جارية",
+      "completed": "طلبات مكتملة",
+      "servicesCompleted": "خدمات مكتملة"
+    },
+
+    "editData": "تعديل البيانات",
+    "providerDetails": "تفاصيل مزود الخدمة",
+    "requesterDetails": "تفاصيل طالب الخدمة",
+    "adminDetails": "تفاصيل المدير",
+    "providerNav": "إدارة مزودي الخدمة",
+    "requesterNav": "إدارة طالبي الخدمة",
+    "adminNav": "لوحة التحكم",
+
+    "welcome": "مرحباً بك {{name}}",
+    "subtitle": "تصفح طلبات الخدمة أو تتبع مشاريعك الجارية أدناه.",
+    "joinedSince": "مشترك منذ: {{date}}",
+
+    "fullName": "الاسم بالكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الجوال",
+    "address": "المدينة / العنوان",
+    "institutionType": "نوع المؤسسة",
+    "crNumber": "رقم السجل التجاري",
+    "crDate": "تاريخ تأكيد السجل التجاري",
+    "attachments": "قم برفع المرفقات",
+    "confirm": "تأكيـد",
+    "cancel": "عودة",
+    "cameraPreview": "معاينة الصورة",
+    "captureImage": "التقاط الصورة",
+    "selectCity": "اختر المدينة",
+    "selectType": "اختر النوع",
+    "requiredFullName": "الاسم مطلوب",
+    "requiredEmail": "البريد الإلكتروني مطلوب",
+    "invalidEmail": "بريد إلكتروني غير صالح",
+    "requiredPhone": "رقم الهاتف مطلوب",
+    "requiredAddress": "العنوان مطلوب",
+    "requiredInstitution": "نوع المؤسسة مطلوب",
+    "cameraAccessFailed": "فشل الوصول إلى الكاميرا",
+    "unknownUserRole": "نوع المستخدم غير معروف",
+    "profileUpdateSuccess": "تم تحديث البيانات بنجاح",
+    "profileUpdateFailed": "حدث خطأ أثناء التحديث"
+  },
+  "reviews": {
+    "title": "التقييمات",
+    "projectName": "اسم المشروع",
+    "clientName": "اسم العميل",
+    "rating": "التقييم (نجوم)",
+    "notes": "ملاحظات العميل"
+  },
+  "signup": {
+    "title": "إنشاء حساب جديد في باكورة أعمال",
+    "description1": "قم بإنشاء حساب جديد للوصول إلى خدماتنا، متابعة طلباتك، تنفيذ مشاريعك.",
+    "description2": "نوفر لك تجربة آمنة وسلسة لإدارة خدماتك وتنفيذ مشاريعك بثقة."
+  },
+  "payment": {
+    "success": "تم إنشاء الطلب والدفع بنجاح",
+    "processing": "جاري المعالجة...",
+    "payNow": "ادفع الآن",
+    "failed": "فشل إنشاء الأوردر أو عملية الدفع",
+    "notConfirmed": "لم يتم تأكيد الدفع بعد.",
+    "succeeded": "تم الدفع بنجاح"
+  },
+  "signupForm": {
+    "welcome": "اهلا بيك في",
+    "appName": "باكوره الاعمال",
+    "haveAccount": "لدي حساب",
+    "login": "تسجيل دخول",
+    "title": "انشاء حساب",
+    "fullName": "اسم المنشأة",
+    "fullNamePlaceholder": "الاسم الكامل",
+    "entityType": "نوع الكيان",
+    "entityTypePlaceholder": "اختر نوع الكيان",
+    "email": "البريد الالكتروني",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "phone": "رقم الجوال",
+    "region": "منطقه العمل",
+    "regionPlaceholder": "اختر المنطقة",
+    "commercialRecord": "السجل التجاري",
+    "commercialRecordPlaceholder": "السجل التجاري",
+    "commercialDate": "تاريخ التاكيد السنوي لسجل التجري",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+    "uploadAttachments": "قم برفع المرفقات",
+    "uploadProfilePicture": "قم برفع صورة الملف الشخصي",
+    "agreeToTerms": "أوافق على",
+    "terms": "الشروط والأحكام",
+    "submitProvider": "تسجيل كمزود خدمة",
+    "submitRequester": "تسجيل كطالب خدمة",
+    "submitting": "جاري التسجيل...",
+    "registerSuccess": "تم التسجيل ورفع المرفقات بنجاح برجاء تسجيل الدخول",
+    "registerError": "حدث خطأ أثناء التسجيل، تأكد من صحة البيانات",
+    "validation": {
+      "phoneInvalid": "رقم الجوال غير صالح",
+      "fullNameRequired": "الاسم مطلوب",
+      "entityTypeRequired": "نوع الكيان مطلوب",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "بريد غير صالح",
+      "phoneRequired": "رقم الجوال مطلوب",
+      "regionRequired": "المنطقة مطلوبة",
+      "commercialRecordRequired": "السجل التجاري مطلوب",
+      "commercialDateRequired": "تاريخ التسجيل مطلوب",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordShort": "كلمة المرور قصيرة",
+      "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
+      "confirmPasswordMismatch": "كلمة المرور غير متطابقة",
+      "agreeRequired": "يجب الموافقة على الشروط والأحكام"
+    }
+  },
+  "header": {
+    "goodMorning": "صباح الخير",
+    "role": "مسؤول",
+    "logout": "تسجيل الخروج",
+    "serviceProvider": "مزود خدمة"
+  },
+  "nav": {
+    "home": "الصفحه الرئيسية",
+    "providers": "مزودي الخدمة",
+    "requesters": "طالبي الخدمة",
+    "requests": "الطلبات",
+    "projects": "المشاريع",
+    "rates": "التقييمات",
+    "services": "الخدمات",
+    "tickets": "الدعم الفني",
+    "faqs": "الأسئلة الشائعة",
+    "partners": "شركاؤنا",
+    "customers": "عملاؤنا",
+    "admin": "مسؤول"
+  },
+  "navProvider": {
+    "home": "الصفحه الرئيسية",
+    "availableOrders": "الطلبات المتاحه",
+    "myProjects": "مشاريعي",
+    "myRatings": "تقييماتي",
+    "reports": "الدعم الفني",
+    "serviceProvider": "مزود خدمة"
+  },
+  "profileInfo": {
+    "submit": "تأكيد",
+    "uploading": "جاري رفع الملف..."
+  },
+  "footer": {
+    "profile": "الملف التعريفي",
+
+    "importantLinks": "روابط مهمة",
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "services": "خدماتنا",
+    "howItWorks": "كيف نعمل",
+    "faq": "الاسئلة",
+    "joinAsProvider": "انضم كمزود خدمة",
+    "cookies": "إعدادات ملفات تعريف الارتباط",
+    "terms": "شروط الخدمة",
+    "privacy": "سياسة الخصوصية",
+    "rights": "© 2025 منصة باكورة أعمال. جميع الحقوق محفوظة."
+  },
+  "headerLanding": {
+    "about": "من نحن",
+    "services": "خدماتنا",
+    "faq": "الأسئلة",
+    "support": "الدعم الفني",
+    "requestService": "طلب خدمة",
+    "logout": "تسجيل الخروج",
+    "signup": "اشتراك",
+    "login": "تسجيل الدخول"
+  },
+  "mobileMenu": {
+    "requestService": "طلب خدمة",
+    "myProfile": "صفحتي الشخصية",
+    "logout": "تسجيل الخروج",
+    "signup": "اشتراك",
+    "login": "تسجيل الدخول"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات حالياً"
+  },
+  "orders": {
+    "columns": {
+      "orderNumber": "رقم الطلب",
+      "requester": "مقدم الطلب",
+      "provider": "مزود الخدمة",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
+      "status": "حالة الطلب",
+      "action": "إجراء"
+    },
+    "buttons": {
+      "viewOrder": "عرض الطلب"
+    },
+    "tabs": {
+      "all": "الكل",
+      "waitingForApproval": "في انتظار الموافقة",
+      "waitingToStart": "في انتظار البدء",
+      "ongoing": "تحت المعالجه",
+      "completedService": "مكتمل",
+      "finished": "منتهي",
+      "rejected": "مرفوض",
+      "expired": "انتهت صلاحيته"
+    }
+  },
+  "rates": {
+    "projectNumber": "رقم المشروع",
+    "projectName": "اسم المشروع",
+    "clientName": "اسم العميل",
+    "ratingStars": "التقييم (نجوم)",
+    "clientNotes": "ملاحظات العميل"
+  },
+  "AdminAttachmentForm": {
+    "sendPricingFiles": "إرسال ملفات التسعير",
+    "uploadAttachments": "قم برفع المرفقات",
+    "price": "السعر",
+    "enterPrice": "أدخل السعر",
+    "reject": "رفض",
+    "sendingReject": "جاري الإلغاء...",
+    "acceptAndSend": "قبول وإرسال المرفقات",
+    "sendingApproval": "جاري الإرسال...",
+    "errorRequiredNumber": "يجب أن يكون رقمًا",
+    "errorPriceRequired": "سعر الخدمة مطلوب عند القبول",
+    "errorPriceNegative": "لا يمكن أن يكون السعر سالبًا",
+    "operationSuccess": "تم تنفيذ العملية بنجاح",
+    "operationError": "حدث خطأ أثناء تنفيذ العملية"
+  },
+  "AdminCompleteRequest": {
+    "confirmRequest": "تأكيد الطلب",
+    "requestTitle": "عنوان الطلب",
+    "enterRequestTitle": "أدخل عنوان الطلب",
+    "price": "السعر",
+    "enterOrderPrice": "أدخل سعر الطلب",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "provider": "مقدم الخدمة",
+    "selectProvider": "اختر مقدم الخدمة",
+    "uploadAttachments": "قم برفع المرفقات",
+    "confirm": "تأكيد",
+    "sending": "جاري الإرسال...",
+    "operationSuccess": "تم تنفيذ العملية بنجاح",
+    "operationError": "حدث خطأ أثناء تنفيذ العملية",
+    "errorRequestTitleRequired": "عنوان الطلب مطلوب",
+    "errorStartDateRequired": "تاريخ البدء مطلوب",
+    "errorEndDateRequired": "تاريخ الانتهاء مطلوب",
+    "errorEndDateMin": "تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء",
+    "errorProviderRequired": "يجب اختيار مقدم خدمة",
+    "errorPriceType": "يجب أن يكون السعر رقمًا",
+    "errorPriceRequired": "السعر مطلوب",
+    "errorPriceMin": "السعر لا يمكن أن يكون أقل من 0"
+  },
+  "RequestAttachment": {
+    "attachments": "المرفقات",
+    "serviceRequestFiles": "ملفات طلب الخدمة",
+    "adminPricingFilesForYou": "ملفات التسعير الخاصة بك",
+    "adminPricingFilesForAdmin": "ملفات التسعير الخاصة بالمسؤول",
+    "requesterReceiptForYou": "إيصال التحويل الخاص بك",
+    "requesterReceiptForRequester": "إيصال التحويل الخاص بطالب الخدمة"
+  },
+  "attachmentForm": {
+    "title": "إرسال إيصال التحويل",
+    "uploadPrompt": "قم برفع المرفقات",
+    "pricingNotesLabel": "ملاحظات التسعير",
+    "pricingNotesPlaceholder": "أدخل ملاحظات التسعير هنا",
+    "reject": "رفض",
+    "rejecting": "جاري الإلغاء...",
+    "approve": "قبول وإرسال المرفقات",
+    "approving": "جاري الإرسال...",
+    "success": "تم تنفيذ العملية بنجاح",
+    "error": "حدث خطأ أثناء تنفيذ العملية",
+    "pricingNotesRequired": "ملاحظات التسعير مطلوبة"
+  },
+  "loading": "جاري تحميل البيانات...",
+  "searchPlaceholder": "ابحث...",
+  "uploadAdminAttachments": {
+    "attachmentsLabel": "مرفقات الطلب",
+    "uploadPrompt": "قم برفع المرفقات الخاصة بك",
+    "submitButton": "إكمال الطلب",
+    "completeTask": "إنهاء المهمة",
+    "uploadSuccess": "تم رفع المرفقات بنجاح",
+    "uploadFailed": "فشل في رفع المرفقات",
+    "uploadError": "حدث خطأ أثناء رفع الملفات",
+    "completeSuccess": "تم إنهاء المهمة بنجاح",
+    "completeError": "حدث خطأ أثناء إنهاء المهمة"
+  },
+  "userData": {
+    "fullName": "الاسم",
+    "email": "البريد الالكتروني",
+    "phone": "رقم الهاتف",
+    "registrationDate": "تاريخ التسجيل",
+    "commercialNumber": "السجل التجاري",
+    "commercialDate": "تاريخ التأكيد",
+    "entityType": "نوع الكيان",
+    "workRegion": "منطقة العمل"
+  },
+  "suspend": {
+    "title": "هل أنت متأكد أنك تريد تعليق حسابك؟",
+    "description": "لن تتمكن من استخدام الحساب بعد التعليق إلا إذا قمت بالتواصل مع الدعم.",
+    "cancel": "إلغاء",
+    "confirm": "موافق",
+    "loading": "جارٍ التعليق...",
+    "success": "تم تعليق الحساب بنجاح",
+    "error": "حدث خطأ أثناء تعليق الحساب"
+  },
+  "faqs": {
+    "title": "الأسئلة الشائعة",
+    "description": "هنا تجد جميع الأسئلة الشائعة"
+  },
+  "homeAdmin": {
+    "title": "الصفحه الرئيسية",
+    "description": "مرحبًا بك في باكورة – مسؤول",
+    "financialTransactions": "المعاملات المالية",
+    "requests": "الطلبات",
+    "users": "المستخدمين",
+    "totalUsers": "المستخدمين",
+    "requesters": "طالبين خدمة",
+    "providers": "مزودين خدمة",
+    "totalRequests": "جميع الطلبات",
+    "newRequest": "طلب جديد",
+    "diagnosis": "طلب تشخيص مشاريع",
+    "consultations": "طلب إستشارات",
+    "maintenanceContracts": "طلب عقود صيانة",
+    "training": "طلب تدريب",
+    "supervision": "طلب إشراف مشاريع",
+    "executionContracts": "طلب عقود تنفيذ",
+    "management": "طلب إدارة مشاريع",
+    "wholesale": "طلب توريد جملة",
+    "totalAmount": "إجمالي المبالغ",
+    "consultationAmount": "مبالغ الاستشارات",
+    "otherAmount": "غير ذلك"
+  },
+  "ourRates": {
+    "title": "تقييماتي",
+    "description": "هنا تجد التقييمات التي تركها العملاء لك"
+  },
+  "providers": {
+    "pageTitle": "إدارة مزودي الخدمة",
+    "pageDescription": "هنا تجد مزودين الخدمة القادرين على تنفيذ الطلب بناءً على التخصص"
+  },
+  "requestDetails": {
+    "title": "تفاصيل طلب الخدمة",
+    "nav1": "إدارة الطلبات",
+    "nav2": "تفاصيل الطلب"
+  },
+  "requesters": {
+    "title": "إدارة طالبي الخدمة",
+    "description": "هنا تجد مقدمين طلب الخدمة"
+  },
+  "requests": {
+    "title": "إدارة الطلبات",
+    "description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك"
+  },
+  "servicesAdmin": {
+    "title": "إدارة الخدمات",
+    "description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك"
+  },
+  "ticketsDetails": {
+    "title": "تفاصيل الطلب",
+    "nav1": "الدعم الفني",
+    "nav2": "تفاصيل الطلب"
+  },
+  "userDetails": {
+    "providerDetails": "تفاصيل مزود الخدمة",
+    "requesterDetails": "تفاصيل طالب الخدمة",
+    "manageProviders": "إدارة مزودي الخدمة",
+    "manageRequesters": "إدارة طالبي الخدمة",
+    "providerStats": "إحصائيات مزود الخدمة",
+    "requesterStats": "إحصائيات طالب الخدمة",
+    "totalOrders": "إجمالي الطلبات",
+    "waitingApproval": "طلبات في انتظار الموافقة",
+    "ongoingOrders": "طلبات جارية",
+    "completedOrders": "طلبات مكتملة",
+    "rejectedOrders": "طلبات مرفوضة",
+    "averageRating": "متوسط التقييم"
+  },
+  "explore": {
+    "metaTitle": "تصفح الطلبات",
+    "metaDescription": "استعرض أحدث الطلبات"
+  },
+  "home": {
+    "metaTitle": "الرئيسية"
+  },
+  "projectDetails": {
+    "title": "تفاصيل المشروع رقم",
+    "nav1": "إدارة المشاريع",
+    "nav2": "تفاصيل المشروع",
+    "projectAttachments": "المرفقات الخاصة بالمشروع",
+    "requesterAttachments": "المرفقات الخاصة بطالب الخدمة",
+    "addReview": "إضافة تقييم"
+  },
+  "notFound": {
+    "message": "عذرًا! الصفحة التي تبحث عنها غير موجودة.",
+    "back": "العودة إلى الصفحة الرئيسية"
+  },
+  "activeOrders": {
+    "title": "الطلبات المتاحة",
+    "description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك"
+  },
+  "providerHome": {
+    "activeOrders.title": "الطلبات المتاحه",
+    "activeOrders.description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك",
+
+    "title": "الصفحه الرئيسية",
+    "description": "مرحبًا بك في باكورة – مزود خدمة",
+
+    "statisticsTitle": "احصائيات",
+    "totalOrders": "إجمالي الطلبات",
+    "waitingApproval": "في انتظار الموافقة",
+    "waitingStart": "بانتظار البدء",
+    "ongoing": "طلبات قيد التنفيذ",
+    "completed": "طلبات مكتملة",
+    "rejected": "طلبات مرفوضة",
+    "serviceCompleted": "الخدمة مكتملة",
+    "expired": "طلبات منتهية",
+    "averageRating": "متوسط التقييم"
+  },
+  "providerProjectsDetails": {
+    "projectDetails": "تفاصيل المشروع رقم #{{number}}",
+    "projectNav1": "إدارة المشاريع",
+    "projectNav2": "تفاصيل المشروع",
+    "projectDescriptionTitle": "الوصف",
+    "attachmentsTitle": "المرفقات الخاصة بالمشروع",
+    "reject": "رفض",
+    "approve": "قبول",
+    "rejectedStatus": "مرفوض",
+    "start": "بدء التنفيذ",
+    "complete": "إكمال الطلب"
+  },
+  "formRequest": {
+    "requestTitle": "ابدأ بإنجاز مشروعك",
+    "requestDescription": "تستطيع إنجاز مشروعك بالشكل الذي تريده من خلال باكوره، أدخل تفاصيل المشروع والميزانية والمدة المتوقعة ليتم مراجعته ونشره مجاناً، بعد ذلك سيظهر للمستقبلين الطلبات في صفحة المشاريع ويقدموا عروضهم عليه لتختار العرض الأنسب لك ويبدأ المستقل بتنفيذ المشروع",
+    "requestService": "طلب خدمة",
+    "requiredServices": "الخدمات المطلوبة",
+    "descriptionLabel": "وصف الطلب",
+    "descriptionPlaceholder": "وصف الطلب",
+    "attachmentsLabel": "مرفقات الطلب",
+    "attachmentsPlaceholder": "قم برفع المرفقات",
+    "budgetLabel": "الميزانية",
+    "budgetPlaceholder": "أدخل الميزانية",
+    "agreeTerms": "أوافق على",
+    "termsAndConditions": "الشروط والأحكام",
+    "submitButton": "إرسال الطلب",
+    "submitting": "جاري الإرسال...",
+    "validation": {
+      "selectAtLeastOne": "يجب اختيار خدمة واحدة على الأقل",
+      "descriptionRequired": "الوصف مطلوب",
+      "agreeRequired": "يجب الموافقة على الشروط والأحكام",
+      "fileTooLarge": "حجم الملف كبير جداً"
+    },
+    "messages": {
+      "successUpload": "تم التسجيل ورفع المرفقات بنجاح",
+      "errorUpload": "حدث خطأ أثناء التسجيل، تأكد من صحة البيانات",
+      "registrationError": "خطأ في التسجيل أو رفع الملفات:"
+    }
+  }
+}
