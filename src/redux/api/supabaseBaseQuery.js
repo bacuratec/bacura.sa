@@ -18,24 +18,8 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
   } = args;
 
   try {
-    // التأكد من وجود جلسة نشطة للعمليات التي تحتاج مصادقة
-    // Supabase يتعامل مع هذا تلقائياً، لكن نتأكد من أن الجلسة موجودة
-    if (method !== "GET") {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      
-      if (!session) {
-        return {
-          error: {
-            status: "UNAUTHORIZED",
-            data: { message: "No active session" },
-            message: "يجب تسجيل الدخول أولاً",
-          },
-        };
-      }
-    }
-
+    // Supabase يتعامل مع الجلسة تلقائياً
+    // لا نضيف قيود إضافية هنا لأن RLS policies في Supabase تتعامل مع الأمان
     let query = supabase.from(table);
 
     // Apply joins if needed (for related data)
