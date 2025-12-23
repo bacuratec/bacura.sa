@@ -69,6 +69,7 @@ import { LanguageContext } from "./context/LanguageContext";
 import i18n from "./i18n";
 import ProfileInfo from "./pages/admin/profile-info/ProfileInfo";
 import RatingsAdmin from "./pages/admin/ratings/Ratings";
+import AddService from "./components/admin-components/services/AddService";
 // import UpdateQuestion from "./components/admin-components/faqs/UpdateQuestion";
 
 // Reusable Suspense wrapper
@@ -200,6 +201,7 @@ const router = createBrowserRouter([
 
       // Services
       { path: "services", element: withSuspense(<ServicesPage />) },
+      { path: "add-service", element: withSuspense(<AddService />) },
 
       // Projects
       { path: "projects", element: withSuspense(<ProjectsAdmin />) },
