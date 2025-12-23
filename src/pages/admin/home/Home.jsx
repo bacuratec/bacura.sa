@@ -1,7 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Statistics from "@/components/admin-components/home/statistics/Statistics";
 import HeadTitle from "@/components/shared/head-title/HeadTitle";
-import { useGetAdminStatisticsQuery } from "../../../redux/api/adminStatisticsApi";
 import activeRequest from "@/assets/icons/activeRequest.svg";
 import pendingRequest from "@/assets/icons/pendingRequest.svg";
 import completedProjects from "@/assets/icons/completedProjects.svg";
@@ -19,16 +18,76 @@ import {
   // Truck,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { supabase } from "@/lib/supabaseClient";
+
 const Home = () => {
   const { t } = useTranslation();
+  const [adminStats, setAdminStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const { data: AdminStats } = useGetAdminStatisticsQuery();
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+
+        const [usersRes, requestersRes, providersRes, requestsRes] =
+          await Promise.all([
+            supabase
+              .from("users")
+              .select("id", { count: "exact", head: true }),
+            supabase
+              .from("requesters")
+              .select("id", { count: "exact", head: true }),
+            supabase
+              .from("providers")
+              .select("id", { count: "exact", head: true }),
+            supabase
+              .from("requests")
+              .select("id", { count: "exact", head: true }),
+          ]);
+
+        setAdminStats({
+          users: {
+            totalUsersCount: usersRes.count || 0,
+            totalRequestersCount: requestersRes.count || 0,
+            totalProvidersCount: providersRes.count || 0,
+          },
+          requests: {
+            totalRequests: requestsRes.count || 0,
+            // الحقول المتبقية يمكن حسابها لاحقًا عند نقل منطق أنواع الطلبات
+            totalRequestsRequesters: 0,
+            projectsDiagnosisRequests: 0,
+            consultationsRequests: 0,
+            maintenanceContractsRequests: 0,
+            trainingRequests: 0,
+            projectsSupervisionRequests: 0,
+            executionContractsRequests: 0,
+            projectsManagementRequests: 0,
+            wholesaleSupplyRequests: 0,
+          },
+          financialAmounts: {
+            totalFinancialAmounts: 0,
+            consultationsFinancialAmounts: 0,
+          },
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching admin statistics from Supabase:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const usersStats = [
     {
-      number: AdminStats?.users?.totalUsersCount ?? 0,
+      number: adminStats?.users?.totalUsersCount ?? 0,
       title: t("homeAdmin.users"),
       icon: activeRequest,
       color: "#F9FDF1",
@@ -36,19 +95,19 @@ const Home = () => {
   ];
   const usersStatistics = [
     {
-      number: AdminStats?.users?.totalUsersCount ?? 0,
+      number: adminStats?.users?.totalUsersCount ?? 0,
       title: "المستخدمين",
       icon: activeRequest,
       color: "#F9FDF1",
     },
     {
-      number: AdminStats?.users?.totalRequestersCount ?? 0,
+      number: adminStats?.users?.totalRequestersCount ?? 0,
       title: t("homeAdmin.requesters"),
       icon: activeRequest,
       color: "#F9FDF1",
     },
     {
-      number: AdminStats?.users?.totalProvidersCount ?? 0,
+      number: adminStats?.users?.totalProvidersCount ?? 0,
       title: t("homeAdmin.providers"),
       icon: activeRequest,
       color: "#F9FDF1",
@@ -56,7 +115,7 @@ const Home = () => {
   ];
   const requestsStats = [
     {
-      number: AdminStats?.requests?.totalRequests ?? 0,
+      number: adminStats?.requests?.totalRequests ?? 0,
       title: t("homeAdmin.totalRequests"),
       icon: activeRequest,
       color: "#F9FDF1",
@@ -64,61 +123,61 @@ const Home = () => {
   ];
   const requestsStatistics = [
     {
-      number: AdminStats?.requests?.totalRequests ?? 0,
+      number: adminStats?.requests?.totalRequests ?? 0,
       title: "جميع الطلبات",
       icon: activeRequest,
       color: "#F9FDF1",
     },
     {
-      number: AdminStats?.requests?.totalRequestsRequesters ?? 0,
+      number: adminStats?.requests?.totalRequestsRequesters ?? 0,
       title: t("homeAdmin.newRequest"),
       icon: pendingRequest,
       color: "#FFDD031A",
     },
     {
-      number: AdminStats?.requests?.projectsDiagnosisRequests ?? 0,
+      number: adminStats?.requests?.projectsDiagnosisRequests ?? 0,
       title: t("homeAdmin.diagnosis"),
       icon: completedProjects,
       color: "#0071FF1A",
     },
     {
-      number: AdminStats?.requests?.consultationsRequests ?? 0,
+      number: adminStats?.requests?.consultationsRequests ?? 0,
       title: t("homeAdmin.consultations"),
       icon: completedProjects,
       color: "#E0F7FA",
     },
     {
-      number: AdminStats?.requests?.maintenanceContractsRequests ?? 0,
+      number: adminStats?.requests?.maintenanceContractsRequests ?? 0,
       title: t("homeAdmin.maintenanceContracts"),
       icon: paidReciet,
       color: "#7D99BC1A",
     },
     {
-      number: AdminStats?.requests?.trainingRequests ?? 0,
+      number: adminStats?.requests?.trainingRequests ?? 0,
       title: t("homeAdmin.training"),
       icon: completedProjects,
       color: "#FF62001A",
     },
     {
-      number: AdminStats?.requests?.projectsSupervisionRequests ?? 0,
+      number: adminStats?.requests?.projectsSupervisionRequests ?? 0,
       title: t("homeAdmin.supervision"),
       icon: pendingRequest,
       color: "#FFDD031A",
     },
     {
-      number: AdminStats?.requests?.executionContractsRequests ?? 0,
+      number: adminStats?.requests?.executionContractsRequests ?? 0,
       title: t("homeAdmin.executionContracts"),
       icon: completedProjects,
       color: "#D1C4E9",
     },
     {
-      number: AdminStats?.requests?.projectsManagementRequests ?? 0,
+      number: adminStats?.requests?.projectsManagementRequests ?? 0,
       title: t("homeAdmin.management"),
       icon: activeRequest,
       color: "#FCE4EC",
     },
     {
-      number: AdminStats?.requests?.wholesaleSupplyRequests ?? 0,
+      number: adminStats?.requests?.wholesaleSupplyRequests ?? 0,
       title: t("homeAdmin.wholesale"),
       icon: pendingRequest,
       color: "#C8E6C9",
@@ -126,7 +185,7 @@ const Home = () => {
   ];
   const financialStats = [
     {
-      number: AdminStats?.financialAmounts?.totalFinancialAmounts ?? 0,
+      number: adminStats?.financialAmounts?.totalFinancialAmounts ?? 0,
       title: t("homeAdmin.totalAmount"),
       icon: <Wallet />,
       color: "#F9FDF1",
@@ -135,14 +194,14 @@ const Home = () => {
   ];
   const financialStatistics = [
     {
-      number: AdminStats?.financialAmounts?.totalFinancialAmounts ?? 0,
+      number: adminStats?.financialAmounts?.totalFinancialAmounts ?? 0,
       title: "إجمالي المبالغ",
       icon: <Wallet />,
       color: "#F9FDF1",
       ic: true,
     },
     {
-      number: AdminStats?.financialAmounts?.consultationsFinancialAmounts ?? 0,
+      number: adminStats?.financialAmounts?.consultationsFinancialAmounts ?? 0,
       title: t("homeAdmin.consultationAmount"),
       icon: <MessageCircleQuestion />,
       color: "#FFF3E0",
