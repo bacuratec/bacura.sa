@@ -90,12 +90,39 @@ const LoginForm = () => {
       // أولوية 1: الدور من user_metadata (Supabase Auth)
       let userRole = user.user_metadata?.role || null;
       
+      // محاولة جلب role من JWT token مباشرة
+      if (!userRole && session?.access_token) {
+        try {
+          // فك تشفير JWT token للحصول على role
+          const tokenParts = session.access_token.split('.');
+          if (tokenParts.length === 3) {
+            const payload = JSON.parse(atob(tokenParts[1]));
+            // eslint-disable-next-line no-console
+            console.log("JWT payload:", payload);
+            if (payload.role) {
+              userRole = payload.role;
+              // eslint-disable-next-line no-console
+              console.log("Role found in JWT token:", userRole);
+            } else if (payload.user_metadata?.role) {
+              userRole = payload.user_metadata.role;
+              // eslint-disable-next-line no-console
+              console.log("Role found in JWT user_metadata:", userRole);
+            }
+          }
+        } catch (jwtError) {
+          // eslint-disable-next-line no-console
+          console.warn("Error decoding JWT:", jwtError);
+        }
+      }
+      
       // eslint-disable-next-line no-console
-      console.log("Initial role from user_metadata:", userRole);
+      console.log("Initial role from user_metadata/JWT:", userRole);
       // eslint-disable-next-line no-console
       console.log("User ID:", user.id);
       // eslint-disable-next-line no-console
       console.log("User email:", user.email);
+      // eslint-disable-next-line no-console
+      console.log("Full user object:", user);
 
       // أولوية 2: التحقق من جدول users أولاً (لأن الأدمن موجود في users table)
       if (!userRole) {
@@ -140,20 +167,21 @@ const LoginForm = () => {
             // eslint-disable-next-line no-console
             console.log("Role not found in users table, checking other tables...");
             // نحاول التحقق من وجود المستخدم في جداول admins, requesters, providers
+            // نبحث باستخدام id و user_id و email
             const [adminResult, requesterResult, providerResult] = await Promise.allSettled([
-              // التحقق من admins table
+              // التحقق من admins table - نبحث بـ id و user_id
               supabase
                 .from("admins")
                 .select("id, user_id")
                 .or(`id.eq.${user.id},user_id.eq.${user.id}`)
                 .maybeSingle(),
-              // التحقق من requesters table
+              // التحقق من requesters table - نبحث بـ id و user_id
               supabase
                 .from("requesters")
                 .select("id, user_id")
                 .or(`id.eq.${user.id},user_id.eq.${user.id}`)
                 .maybeSingle(),
-              // التحقق من providers table
+              // التحقق من providers table - نبحث بـ id و user_id
               supabase
                 .from("providers")
                 .select("id, user_id")
@@ -163,9 +191,21 @@ const LoginForm = () => {
 
             // eslint-disable-next-line no-console
             console.log("Other tables check results:", {
-              admin: adminResult,
-              requester: requesterResult,
-              provider: providerResult,
+              admin: {
+                status: adminResult.status,
+                data: adminResult.status === "fulfilled" ? adminResult.value.data : null,
+                error: adminResult.status === "fulfilled" ? adminResult.value.error : adminResult.reason,
+              },
+              requester: {
+                status: requesterResult.status,
+                data: requesterResult.status === "fulfilled" ? requesterResult.value.data : null,
+                error: requesterResult.status === "fulfilled" ? requesterResult.value.error : requesterResult.reason,
+              },
+              provider: {
+                status: providerResult.status,
+                data: providerResult.status === "fulfilled" ? providerResult.value.data : null,
+                error: providerResult.status === "fulfilled" ? providerResult.value.error : providerResult.reason,
+              },
             });
 
             // أولوية للأدمن
@@ -181,7 +221,52 @@ const LoginForm = () => {
               userRole = "Provider";
               // eslint-disable-next-line no-console
               console.log("Provider role detected");
+          } else {
+            // إذا لم نجد في أي جدول، نحاول البحث في users table باستخدام email
+            // eslint-disable-next-line no-console
+            console.log("User not found in any table, trying to search by email in users table...");
+            try {
+              const emailSearch = await supabase
+                .from("users")
+                .select("role, id, email")
+                .eq("email", user.email)
+                .maybeSingle();
+              
+              // eslint-disable-next-line no-console
+              console.log("Email search result:", emailSearch);
+              
+              if (emailSearch.data && emailSearch.data.role) {
+                const normalizedRole = emailSearch.data.role.charAt(0).toUpperCase() + emailSearch.data.role.slice(1).toLowerCase();
+                userRole = normalizedRole;
+                // eslint-disable-next-line no-console
+                console.log("Role detected from users table using email:", emailSearch.data.role, "-> normalized to:", userRole);
+              } else if (!emailSearch.data) {
+                // إذا لم نجد المستخدم في users table أيضاً، قد يكون المستخدم موجود في جدول admins مباشرة
+                // نحاول البحث في admins table مرة أخرى بشكل مختلف
+                // eslint-disable-next-line no-console
+                console.log("User not found in users table by email either. Trying alternative admin search...");
+                
+                // محاولة البحث في admins table بدون user_id (ربما id هو نفسه user_id)
+                const adminAlternativeSearch = await supabase
+                  .from("admins")
+                  .select("id")
+                  .eq("id", user.id)
+                  .maybeSingle();
+                
+                // eslint-disable-next-line no-console
+                console.log("Alternative admin search result:", adminAlternativeSearch);
+                
+                if (adminAlternativeSearch.data) {
+                  userRole = "Admin";
+                  // eslint-disable-next-line no-console
+                  console.log("Admin role detected from alternative admin search");
+                }
+              }
+            } catch (emailError) {
+              // eslint-disable-next-line no-console
+              console.error("Error searching by email:", emailError);
             }
+          }
           }
         } catch (e) {
           // eslint-disable-next-line no-console
