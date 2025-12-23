@@ -297,6 +297,7 @@ const LoginForm = () => {
               }
             }
           }
+        }
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error("Error fetching role:", e);
