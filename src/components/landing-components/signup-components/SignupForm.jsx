@@ -49,17 +49,23 @@ const SignupForm = () => {
           }))
         );
 
-        // جلب أنواع الكيان من lookup_values حسب نوع المستخدم
+        // جلب أنواع الكيان من lookup_values حسب نوع المستخدم (بخطوتين لتفادي مشاكل الـ join)
         const lookupCode = isProvider
           ? "provider-entity-types"
           : "requester-entity-types";
 
+        const { data: lookupType, error: lookupTypeError } = await supabase
+          .from("lookup_types")
+          .select("id")
+          .eq("code", lookupCode)
+          .single();
+
+        if (lookupTypeError) throw lookupTypeError;
+
         const { data: typesData, error: typesError } = await supabase
           .from("lookup_values")
-          .select(
-            "id, name_ar, name_en, lookup_types!inner(code)"
-          )
-          .eq("lookup_types.code", lookupCode);
+          .select("id, name_ar, name_en")
+          .eq("lookup_type_id", lookupType.id);
 
         if (typesError) throw typesError;
 
@@ -143,62 +149,26 @@ const SignupForm = () => {
   const onSubmit = async (values) => {
     setIsLoading(true);
     try {
-      // رفع صورة الملف الشخصي (اختياري) إلى Supabase Storage
-      let profilePicturePath = null;
-      if (profilePicture) {
-        const uploadPath = `profile-pictures/${Date.now()}-${
-          profilePicture.name
-        }`;
-        const { error: uploadError } = await supabase.storage
-          .from("profile-pictures")
-          .upload(uploadPath, profilePicture);
+      // بيانات الميتاداتا الأساسية للمستخدم
+      const baseMetadata = {
+        role,
+        fullName: values.fullName,
+        entityTypeId: values.entityType,
+        phone: values.phone,
+        regionId: values.region,
+        commercialRecord: values.commercialRecord,
+        commercialRegistrationDate: values.commercialRegistrationDate,
+      };
 
-        if (uploadError) {
-          toast.error(t("signupForm.registerError"));
-          // eslint-disable-next-line no-console
-          console.error("Supabase profile picture upload error:", uploadError);
-          return;
-        }
-        profilePicturePath = uploadPath;
-      }
-
-      // رفع المرفقات (اختياري) إلى Supabase Storage
-      const attachmentsPaths = [];
-      if (selectedFiles && selectedFiles.length > 0) {
-        for (let i = 0; i < selectedFiles.length; i++) {
-          const file = selectedFiles[i];
-          const uploadPath = `attachments/${Date.now()}-${file.name}`;
-          const { error: uploadError } = await supabase.storage
-            .from("attachments")
-            .upload(uploadPath, file);
-          if (uploadError) {
-            toast.error(t("signupForm.registerError"));
-            // eslint-disable-next-line no-console
-            console.error("Supabase attachment upload error:", uploadError);
-            return;
-          }
-          attachmentsPaths.push(uploadPath);
-        }
-      }
-
-      // إنشاء مستخدم في Supabase Auth مع تخزين البيانات في user_metadata
-      const { error: supabaseError } = await supabase.auth.signUp({
-        email: values.email,
-        password: values.password,
-        options: {
-          data: {
-            role,
-            fullName: values.fullName,
-            entityTypeId: values.entityType,
-            phone: values.phone,
-            regionId: values.region,
-            commercialRecord: values.commercialRecord,
-            commercialRegistrationDate: values.commercialRegistrationDate,
-            profilePicturePath,
-            attachmentsPaths,
+      // 1) إنشاء المستخدم أولاً في Supabase Auth
+      const { data: signUpData, error: supabaseError } =
+        await supabase.auth.signUp({
+          email: values.email,
+          password: values.password,
+          options: {
+            data: baseMetadata,
           },
-        },
-      });
+        });
 
       if (supabaseError) {
         toast.error(
@@ -207,6 +177,87 @@ const SignupForm = () => {
         // eslint-disable-next-line no-console
         console.error("Supabase signUp error:", supabaseError);
         return;
+      }
+
+      // 2) الحصول على المستخدم بعد التسجيل (للحصول على uid للاستخدام في مسارات الملفات)
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        // في حال لم يكن هناك جلسة بعد التسجيل (مثلاً لو التفعيل عبر رابط بريد)
+        // نكمل بدون رفع الملفات حتى لا نفشل التسجيل بالكامل
+        // eslint-disable-next-line no-console
+        console.warn("User not authenticated after signUp:", userError);
+        toast.success(t("signupForm.registerSuccess"));
+        navigate("/login");
+        return;
+      }
+
+      const uid = user.id;
+
+      // 3) رفع صورة الملف الشخصي (اختياري) بعد أن أصبح المستخدم authenticated
+      let profilePicturePath = null;
+      if (profilePicture) {
+        const fileName = profilePicture.name || "avatar.png";
+        const uploadPath = `${uid}/${Date.now()}-${fileName}`;
+        const { error: uploadError } = await supabase.storage
+          .from("profile-pictures")
+          .upload(uploadPath, profilePicture, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          // eslint-disable-next-line no-console
+          console.error(
+            "Supabase profile picture upload error:",
+            uploadError
+          );
+        } else {
+          profilePicturePath = uploadPath;
+        }
+      }
+
+      // 4) رفع المرفقات (اختياري) بعد التسجيل
+      const attachmentsPaths = [];
+      if (selectedFiles && selectedFiles.length > 0) {
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          const fileName = file.name || `attachment-${i}`;
+          const uploadPath = `${uid}/${Date.now()}-${fileName}`;
+          const { error: uploadError } = await supabase.storage
+            .from("attachments")
+            .upload(uploadPath, file, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+          if (uploadError) {
+            // eslint-disable-next-line no-console
+            console.error(
+              "Supabase attachment upload error:",
+              uploadError
+            );
+          } else {
+            attachmentsPaths.push(uploadPath);
+          }
+        }
+      }
+
+      // 5) تحديث user_metadata بالمسارات بعد الرفع
+      if (profilePicturePath || attachmentsPaths.length > 0) {
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: {
+            ...baseMetadata,
+            profilePicturePath,
+            attachmentsPaths,
+          },
+        });
+        if (updateError) {
+          // eslint-disable-next-line no-console
+          console.error("Supabase updateUser error:", updateError);
+        }
       }
 
       toast.success(t("signupForm.registerSuccess"));
