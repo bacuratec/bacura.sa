@@ -47,6 +47,7 @@ const LoginForm = () => {
         toast.error(
           error.message || t("loginForm.errors.invalidCredentials")
         );
+        setLoading(false);
         return;
       }
 
@@ -60,14 +61,15 @@ const LoginForm = () => {
       }
 
       // التأكد من أن الجلسة معينة في Supabase client
-      // Supabase يقوم بذلك تلقائياً، لكن نتأكد بشكل صريح
+      // Supabase يقوم بذلك تلقائياً بعد signInWithPassword
+      // لكن نتأكد من أن الجلسة جاهزة قبل تنفيذ أي استعلامات
+      // نتحقق من الجلسة بشكل صريح
       const {
-        data: { session: currentSession },
-        error: sessionError,
+        data: { session: verifiedSession },
       } = await supabase.auth.getSession();
 
-      if (sessionError || !currentSession) {
-        // إذا لم تكن الجلسة معينة، نعيد تعيينها
+      if (!verifiedSession || verifiedSession.access_token !== session.access_token) {
+        // إذا لم تكن الجلسة معينة بشكل صحيح، نعيد تعيينها
         const { error: setSessionError } = await supabase.auth.setSession({
           access_token: session.access_token,
           refresh_token: session.refresh_token,
@@ -76,11 +78,14 @@ const LoginForm = () => {
         if (setSessionError) {
           // eslint-disable-next-line no-console
           console.error("Error setting session:", setSessionError);
-          toast.error(t("loginForm.errors.unknownError"));
+          toast.error("فشل في تعيين جلسة المستخدم. يرجى المحاولة مرة أخرى.");
           setLoading(false);
           return;
         }
       }
+
+      // انتظار قصير للتأكد من أن الجلسة جاهزة
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       // أولوية 1: الدور من user_metadata (Supabase Auth)
       let userRole = user.user_metadata?.role || null;
@@ -101,51 +106,38 @@ const LoginForm = () => {
           } else if (dbError) {
             // eslint-disable-next-line no-console
             console.warn("Could not fetch role from users table:", dbError.message);
-            // إذا فشل جلب الـ role، نحاول جلبها من جدول requesters أو providers أو admins
-            // بناءً على معرف المستخدم
-            try {
-              // محاولة جلب من requesters
-              const { data: requesterData } = await supabase
-                .from("requesters")
-                .select("id")
-                .eq("id", user.id)
-                .maybeSingle();
-              
-              if (requesterData) {
-                userRole = "Requester";
-              } else {
-                // محاولة جلب من providers
-                const { data: providerData } = await supabase
-                  .from("providers")
-                  .select("id")
-                  .eq("id", user.id)
-                  .maybeSingle();
-                
-                if (providerData) {
-                  userRole = "Provider";
-                } else {
-                  // محاولة جلب من admins
-                  const { data: adminData } = await supabase
-                    .from("admins")
-                    .select("id")
-                    .eq("id", user.id)
-                    .maybeSingle();
-                  
-                  if (adminData) {
-                    userRole = "Admin";
-                  }
-                }
-              }
-            } catch (fallbackError) {
-              // eslint-disable-next-line no-console
-              console.warn("Error in fallback role detection:", fallbackError);
+            
+            // إذا فشل جلب الـ role من users، نحاول تحديده من خلال الجداول الأخرى
+            // نتحقق من وجود المستخدم في كل جدول
+            const [requesterResult, providerResult, adminResult] = await Promise.allSettled([
+              supabase.from("requesters").select("id").eq("id", user.id).maybeSingle(),
+              supabase.from("providers").select("id").eq("id", user.id).maybeSingle(),
+              supabase.from("admins").select("id").eq("id", user.id).maybeSingle(),
+            ]);
+
+            if (requesterResult.status === "fulfilled" && requesterResult.value.data) {
+              userRole = "Requester";
+            } else if (providerResult.status === "fulfilled" && providerResult.value.data) {
+              userRole = "Provider";
+            } else if (adminResult.status === "fulfilled" && adminResult.value.data) {
+              userRole = "Admin";
             }
           }
         } catch (e) {
           // eslint-disable-next-line no-console
-          console.warn("Error fetching role from users table:", e);
-          // لا نوقف العملية
+          console.warn("Error fetching role:", e);
+          // لا نوقف العملية - يمكن للمستخدم المتابعة بدون role
         }
+      }
+
+      // إذا لم نتمكن من تحديد role، نعرض رسالة تحذير
+      if (!userRole) {
+        toast.error(
+          "لم يتم العثور على صلاحيات المستخدم. يرجى التواصل مع الدعم الفني.",
+          { duration: 5000 }
+        );
+        setLoading(false);
+        return;
       }
 
       dispatch(
@@ -166,6 +158,7 @@ const LoginForm = () => {
         navigate(from || "/", { replace: true });
       } else {
         // في حال لم يوجد role واضح، نرجع للصفحة الرئيسية
+        toast.warning("دور المستخدم غير معروف. سيتم توجيهك للصفحة الرئيسية.");
         navigate("/", { replace: true });
       }
     } catch (err) {
