@@ -209,8 +209,8 @@ const Home = () => {
     },
     {
       number:
-        AdminStats?.financialAmounts?.totalFinancialAmounts -
-          AdminStats?.financialAmounts?.consultationsFinancialAmounts || 0,
+        adminStats?.financialAmounts?.totalFinancialAmounts -
+          adminStats?.financialAmounts?.consultationsFinancialAmounts || 0,
       title: t("homeAdmin.otherAmount"),
       icon: <Stethoscope />,
       color: "#E3F2FD",
