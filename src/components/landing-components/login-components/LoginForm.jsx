@@ -58,6 +58,10 @@ const LoginForm = () => {
         return;
       }
 
+      // Supabase يقوم بتعيين الجلسة تلقائياً بعد signInWithPassword
+      // لكن ننتظر قليلاً للتأكد من أن الجلسة جاهزة قبل تنفيذ الاستعلامات
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
       // أولوية 1: الدور من user_metadata (Supabase Auth)
       let userRole = user.user_metadata?.role || null;
 
@@ -73,10 +77,16 @@ const LoginForm = () => {
 
           if (!dbError && dbUser?.role) {
             userRole = dbUser.role;
+          } else if (dbError) {
+            // eslint-disable-next-line no-console
+            console.warn("Could not fetch role from users table:", dbError.message);
+            // لا نوقف العملية إذا فشل جلب الـ role من قاعدة البيانات
+            // يمكن للمستخدم المتابعة بدون role وسيتم توجيهه للصفحة الرئيسية
           }
         } catch (e) {
           // eslint-disable-next-line no-console
-          console.error("Error fetching role from users table:", e);
+          console.warn("Error fetching role from users table:", e);
+          // لا نوقف العملية
         }
       }
 
