@@ -88,9 +88,15 @@ const LoginForm = () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       // أولوية 1: الدور من user_metadata (Supabase Auth)
+      // نتجاهل role: 'authenticated' لأنه ليس الـ role الفعلي
       let userRole = user.user_metadata?.role || null;
       
-      // محاولة جلب role من JWT token مباشرة
+      // نتأكد من أن role ليس 'authenticated' (هذا ليس role فعلي)
+      if (userRole === 'authenticated' || userRole === 'anon') {
+        userRole = null;
+      }
+      
+      // محاولة جلب role من JWT token مباشرة (لكن نتجاهل 'authenticated')
       if (!userRole && session?.access_token) {
         try {
           // فك تشفير JWT token للحصول على role
@@ -99,11 +105,11 @@ const LoginForm = () => {
             const payload = JSON.parse(atob(tokenParts[1]));
             // eslint-disable-next-line no-console
             console.log("JWT payload:", payload);
-            if (payload.role) {
-              userRole = payload.role;
-              // eslint-disable-next-line no-console
-              console.log("Role found in JWT token:", userRole);
-            } else if (payload.user_metadata?.role) {
+            
+            // نبحث عن role في user_metadata فقط، نتجاهل role الأساسي لأنه 'authenticated'
+            if (payload.user_metadata?.role && 
+                payload.user_metadata.role !== 'authenticated' && 
+                payload.user_metadata.role !== 'anon') {
               userRole = payload.user_metadata.role;
               // eslint-disable-next-line no-console
               console.log("Role found in JWT user_metadata:", userRole);
@@ -111,18 +117,16 @@ const LoginForm = () => {
           }
         } catch (jwtError) {
           // eslint-disable-next-line no-console
-          console.warn("Error decoding JWT:", jwtError);
+          console.error("Error decoding JWT:", jwtError);
         }
       }
       
       // eslint-disable-next-line no-console
-      console.log("Initial role from user_metadata/JWT:", userRole);
+      console.log("Initial role from user_metadata/JWT (after filtering 'authenticated'):", userRole);
       // eslint-disable-next-line no-console
       console.log("User ID:", user.id);
       // eslint-disable-next-line no-console
       console.log("User email:", user.email);
-      // eslint-disable-next-line no-console
-      console.log("Full user object:", user);
 
       // أولوية 2: التحقق من جدول users أولاً (لأن الأدمن موجود في users table)
       if (!userRole) {
@@ -323,17 +327,60 @@ const LoginForm = () => {
         console.log("Role from user_metadata:", userRole);
       }
 
-      // إذا لم نتمكن من تحديد role، نعرض رسالة تحذير مع معلومات إضافية
+      // إذا لم نتمكن من تحديد role، نحاول طريقة أخيرة: البحث في جميع الجداول بشكل شامل
       if (!userRole) {
         // eslint-disable-next-line no-console
-        console.error("Failed to detect user role. User info:", {
+        console.log("Role not found, attempting comprehensive search...");
+        try {
+          // محاولة شاملة: البحث في users table باستخدام email
+          const comprehensiveUsersSearch = await supabase
+            .from("users")
+            .select("role, id, email")
+            .eq("email", user.email)
+            .maybeSingle();
+          
+          // eslint-disable-next-line no-console
+          console.log("Comprehensive users search by email:", comprehensiveUsersSearch);
+          
+          if (comprehensiveUsersSearch.data?.role) {
+            const normalizedRole = comprehensiveUsersSearch.data.role.charAt(0).toUpperCase() + comprehensiveUsersSearch.data.role.slice(1).toLowerCase();
+            userRole = normalizedRole;
+            // eslint-disable-next-line no-console
+            console.log("Role found in comprehensive search:", userRole);
+          } else {
+            // إذا لم نجد في users، نحاول البحث في admins مباشرة
+            const comprehensiveAdminSearch = await supabase
+              .from("admins")
+              .select("id, user_id")
+              .eq("id", user.id)
+              .maybeSingle();
+            
+            // eslint-disable-next-line no-console
+            console.log("Comprehensive admin search:", comprehensiveAdminSearch);
+            
+            if (comprehensiveAdminSearch.data) {
+              userRole = "Admin";
+              // eslint-disable-next-line no-console
+              console.log("Admin role found in comprehensive search");
+            }
+          }
+        } catch (comprehensiveError) {
+          // eslint-disable-next-line no-console
+          console.error("Comprehensive search failed:", comprehensiveError);
+        }
+      }
+      
+      // إذا لم نتمكن من تحديد role بعد كل المحاولات، نعرض رسالة تحذير
+      if (!userRole) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to detect user role after all attempts. User info:", {
           id: user.id,
           email: user.email,
           user_metadata: user.user_metadata,
         });
         toast.error(
-          `لم يتم العثور على صلاحيات المستخدم. يرجى التواصل مع الدعم الفني.\nUser ID: ${user.id}\nEmail: ${user.email}`,
-          { duration: 7000 }
+          `لم يتم العثور على صلاحيات المستخدم في قاعدة البيانات.\nيرجى التأكد من أن المستخدم موجود في جدول users.\nUser ID: ${user.id}\nEmail: ${user.email}`,
+          { duration: 8000 }
         );
         setLoading(false);
         return;
