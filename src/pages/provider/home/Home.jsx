@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import NewOrders from "../../../components/provider-components/home-components/new-orders/NewOrders";
 import HeadTitle from "../../../components/shared/head-title/HeadTitle";
-import { useGetProviderOrderStatisticsQuery } from "../../../redux/api/adminStatisticsApi";
 import {
   ListChecks,
   Hourglass,
@@ -22,7 +21,7 @@ const Home = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const { data: ProviderStats } = useGetProviderOrderStatisticsQuery();
+  const ProviderStats = null;
 
   const ordersStatistics = [
     {

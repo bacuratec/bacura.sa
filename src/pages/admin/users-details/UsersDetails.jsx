@@ -10,8 +10,6 @@ import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";
 import AttachmentsTable from "../../../components/admin-components/projects/AttachmentsTable";
 import Statistics from "@/components/admin-components/home/statistics/Statistics";
-import { useGetProviderOrderStatisticsQuery } from "../../../redux/api/adminStatisticsApi";
-import { useGetProjectStatisticsQuery } from "../../../redux/api/projectsApi";
 import { Wallet, Clock3, Check, Star, Ban } from "lucide-react"; // أيقونات افتراضية
 import { useTranslation } from "react-i18next";
 
@@ -38,25 +36,10 @@ const UsersDetails = () => {
     isLoading: loadingRequester,
   } = useGetRequesterDetailsQuery(id, { skip: isProvider });
 
-  const { data: providerStats, isLoading: loadingProviderStats } =
-    useGetProviderOrderStatisticsQuery(
-      { providerId: id },
-      { skip: !isProvider }
-    );
-
-  const { data: requesterStats, isLoading: loadingRequesterStats } =
-    useGetProjectStatisticsQuery({ userId: id }, { skip: isProvider });
-
-  if (
-    (isProvider && loadingProvider) ||
-    (!isProvider && loadingRequester) ||
-    (isProvider && loadingProviderStats) ||
-    (!isProvider && loadingRequesterStats)
-  ) {
+  if ((isProvider && loadingProvider) || (!isProvider && loadingRequester)) {
     return <LoadingPage />;
   }
   const data = isProvider ? providerData : requesterData;
-  const statsData = isProvider ? providerStats : requesterStats;
 
   if (!data) {
     return <NotFound />;
@@ -64,42 +47,42 @@ const UsersDetails = () => {
 
   const financialStats = [
     {
-      number: statsData.totalOrdersCount ?? 0,
+      number: 0,
       title: t("userDetails.totalOrders"),
       icon: <Wallet />,
       color: "#F9FDF1",
       ic: true,
     },
     {
-      number: statsData.waitingForApprovalOrdersCount ?? 0,
+      number: 0,
       title: t("userDetails.waitingApproval"),
       icon: <Clock3 />,
       color: "#FFF7ED",
       ic: true,
     },
     {
-      number: statsData.ongoingOrdersCount ?? 0,
+      number: 0,
       title: t("userDetails.ongoingOrders"),
       icon: <Clock3 />,
       color: "#E0F2FE",
       ic: true,
     },
     {
-      number: statsData.completedOrdersCount ?? 0,
+      number: 0,
       title: t("userDetails.completedOrders"),
       icon: <Check />,
       color: "#DCFCE7",
       ic: true,
     },
     {
-      number: statsData.rejectedOrdersCount ?? 0,
+      number: 0,
       title: t("userDetails.rejectedOrders"),
       icon: <Ban />,
       color: "#FEE2E2",
       ic: true,
     },
     {
-      number: statsData.averageRating ?? 0,
+      number: 0,
       title: t("userDetails.averageRating"),
       icon: <Star />,
       color: "#FEF9C3",
