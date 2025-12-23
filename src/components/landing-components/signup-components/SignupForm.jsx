@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
+import { supabase } from "@/lib/supabaseClient";
 
 const SignupForm = () => {
   const { t } = useTranslation();
@@ -124,7 +125,7 @@ const SignupForm = () => {
   };
   const onSubmit = async (values) => {
     try {
-      // 1. إنشاء Group Key
+      // 1. إنشاء Group Key (باستخدام الـ API الحالي للمرفقات)
       const groupRes = await axios.get(
         `${
           import.meta.env.VITE_APP_BASE_URL
@@ -167,11 +168,34 @@ const SignupForm = () => {
           uploadFormData
         );
       }
-      // 3. التسجيل
+      // 3. التسجيل في الـ API الحالي
       if (role === "Provider") {
         await registerProvider(formData).unwrap();
       } else {
         await registerRequester(formData).unwrap();
+      }
+
+      // 4. إنشاء مستخدم في Supabase Auth مع تخزين البيانات الناقصة في user_metadata
+      const { error: supabaseError } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            role,
+            fullName: values.fullName,
+            entityTypeId: values.entityType,
+            phone: values.phone,
+            regionId: values.region,
+            commercialRecord: values.commercialRecord,
+            commercialRegistrationDate: values.commercialRegistrationDate,
+          },
+        },
+      });
+
+      if (supabaseError) {
+        // نحذر فقط لأن حساب الـ API الأساسي تم إنشاؤه بالفعل
+        // eslint-disable-next-line no-console
+        console.warn("Supabase signUp error:", supabaseError.message);
       }
 
       toast.success(t("signupForm.registerSuccess"));
