@@ -9,7 +9,7 @@ const statisticsBaseQuery = async (args, api, extraOptions) => {
     let result;
 
     switch (type) {
-      case "requesters":
+      case "requesters": {
         // Count requesters, active/inactive
         const [totalRequesters, activeRequesters] = await Promise.all([
           supabase.from("requesters").select("id", { count: "exact", head: true }),
@@ -24,8 +24,9 @@ const statisticsBaseQuery = async (args, api, extraOptions) => {
           inactiveRequestersCount: (totalRequesters.count || 0) - (activeRequesters.count || 0),
         };
         break;
+      }
 
-      case "providers":
+      case "providers": {
         const [totalProviders, activeProviders] = await Promise.all([
           supabase.from("providers").select("id", { count: "exact", head: true }),
           supabase
@@ -39,19 +40,21 @@ const statisticsBaseQuery = async (args, api, extraOptions) => {
           inactiveProvidersCount: (totalProviders.count || 0) - (activeProviders.count || 0),
         };
         break;
+      }
 
-      case "requests":
+      case "requests": {
         // Count requests by status
-        const requestsCount = await supabase
+        const requestsCountResult = await supabase
           .from("requests")
           .select("status_id", { count: "exact" });
         // Group by status would need RPC or manual processing
         result = {
-          totalRequests: requestsCount.count || 0,
+          totalRequests: requestsCountResult.count || 0,
         };
         break;
+      }
 
-      case "admin":
+      case "admin": {
         // Platform-wide statistics
         const [usersCount, requestersCount, providersCount, requestsCount, ordersCount] =
           await Promise.all([
@@ -69,8 +72,9 @@ const statisticsBaseQuery = async (args, api, extraOptions) => {
           totalOrders: ordersCount.count || 0,
         };
         break;
+      }
 
-      case "providerOrders":
+      case "providerOrders": {
         // Provider-specific order statistics
         const providerOrders = await supabase
           .from("orders")
@@ -80,6 +84,7 @@ const statisticsBaseQuery = async (args, api, extraOptions) => {
           totalOrders: providerOrders.count || 0,
         };
         break;
+      }
 
       default:
         throw new Error(`Unknown statistics type: ${type}`);
