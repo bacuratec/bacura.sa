@@ -67,7 +67,6 @@ import UpsertPartner from "./components/admin-components/partners/UpsertPartner"
 import UpsertCustomer from "./components/admin-components/customers/UpsertCustomer";
 import { LanguageContext } from "./context/LanguageContext";
 import i18n from "./i18n";
-import TokenRefresher from "./components/TokenRefresher";
 import ProfileInfo from "./pages/admin/profile-info/ProfileInfo";
 // import UpdateQuestion from "./components/admin-components/faqs/UpdateQuestion";
 
@@ -249,7 +248,6 @@ function App() {
   }, [lang]);
   return (
     <div className={lang === "ar" ? "dir-rtl" : "dir-ltr"}>
-      <TokenRefresher />
       <BackToTopButton />
       <RouterProvider router={router} />
     </div>

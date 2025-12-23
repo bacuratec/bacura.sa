@@ -1,23 +1,25 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useLoginMutation } from "../../../redux/api/authApi";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { supabase } from "@/lib/supabaseClient";
+import { setCredentials } from "@/redux/slices/authSlice";
 
 const LoginForm = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const role = useSelector((state) => state.auth.role);
 
   const from = location.state?.from?.pathname || "/";
 
-  const [login, { isLoading: loading }] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const initialValues = {
     email: "",
@@ -34,13 +36,56 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
-      await login({ Email: values.email, Password: values.password }).unwrap();
-      if (from && role === "Requester") {
-        navigate(from, { replace: true });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (error) {
+        toast.error(
+          error.message || t("loginForm.errors.invalidCredentials")
+        );
+        return;
+      }
+
+      const session = data?.session;
+      const user = data?.user;
+
+      if (!session || !user) {
+        toast.error(t("loginForm.errors.unknownError"));
+        return;
+      }
+
+      const userRole = user.user_metadata?.role || null;
+
+      dispatch(
+        setCredentials({
+          token: session.access_token,
+          refreshToken: session.refresh_token || null,
+          role: userRole,
+          userId: user.id,
+        })
+      );
+
+      // توجيه حسب الدور
+      if (userRole === "Admin") {
+        navigate("/admin", { replace: true });
+      } else if (userRole === "Provider") {
+        navigate("/provider", { replace: true });
+      } else if (userRole === "Requester") {
+        navigate(from || "/", { replace: true });
+      } else {
+        // في حال لم يوجد role واضح، نرجع للصفحة الرئيسية
+        navigate("/", { replace: true });
       }
     } catch (err) {
-      toast.error(err.error.data.Message);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      toast.error(t("loginForm.errors.unknownError"));
+    } finally {
+      setLoading(false);
     }
   };
 
