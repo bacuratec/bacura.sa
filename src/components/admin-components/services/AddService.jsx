@@ -64,7 +64,6 @@ const AddService = () => {
       refetch?.();
       navigate("/admin/services");
     } catch (err) {
-      console.error(err);
       toast.error(
         err?.data?.message ||
           t("services.addService.error") ||

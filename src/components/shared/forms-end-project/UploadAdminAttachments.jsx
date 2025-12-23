@@ -80,7 +80,6 @@ const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
           );
           groupKey = groupRes.data ?? "";
         } catch (err) {
-          console.error("فشل في جلب group key جديد:", err);
           throw err;
         }
       } else {
@@ -121,8 +120,9 @@ const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
         onSuccess(); // تنفذ لو محتاج تعيد تحميل حاجة أو تعرض رسالة معينة
       }
     } catch (error) {
-      console.error("رفع المرفقات فشل:", error.data.Message);
-      toast.error(t("uploadAdminAttachments.uploadError"));
+      toast.error(
+        error?.data?.Message || t("uploadAdminAttachments.uploadError") || "حدث خطأ أثناء رفع المرفقات"
+      );
     }
   };
 

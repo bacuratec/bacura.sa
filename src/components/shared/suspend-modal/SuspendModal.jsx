@@ -34,8 +34,9 @@ export default function SuspendModal({ open, setOpen }) {
       toast.success(t("suspend.success"));
       dispatch(logout());
     } catch (error) {
-      console.log(error);
-      toast.error(t("suspend.error"));
+      toast.error(
+        error?.data?.message || t("suspend.error") || "حدث خطأ أثناء تعليق الحساب"
+      );
     }
   };
 

@@ -25,8 +25,9 @@ const ReassignRequest = ({ refetch }) => {
       refetch();
       resetForm();
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(t("projects.errorMessage"));
+      toast.error(
+        error?.data?.message || t("projects.errorMessage") || "حدث خطأ أثناء إعادة تعيين الطلب"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -49,7 +50,6 @@ const ReassignRequest = ({ refetch }) => {
 
         callback(options);
       } catch (error) {
-        console.error("خطأ أثناء جلب مقدمي الخدمة:", error);
         callback([]);
       }
     },

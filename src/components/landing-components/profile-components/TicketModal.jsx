@@ -20,8 +20,9 @@ export default function TicketModal({ open, setOpen, refetch }) {
       handleClose();
       refetch();
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(t("ticket.error"));
+      toast.error(
+        error?.data?.message || t("ticket.error") || "حدث خطأ أثناء إرسال التذكرة"
+      );
     } finally {
       setSubmitting(false);
     }

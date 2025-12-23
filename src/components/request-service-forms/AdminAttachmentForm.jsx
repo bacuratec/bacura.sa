@@ -61,8 +61,9 @@ const AdminAttachmentForm = ({ data, refetch }) => {
       resetForm(); // بيرجع الفورم لقيمته الأولية
       setSelectedFiles([]); // نمسح الملفات المرفوعة من الواجهة
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(t("AdminAttachmentForm.operationError"));
+      toast.error(
+        error?.data?.message || t("AdminAttachmentForm.operationError") || "حدث خطأ أثناء إضافة المرفقات"
+      );
     } finally {
       setSubmitting(false);
     }

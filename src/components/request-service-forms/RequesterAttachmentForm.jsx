@@ -53,8 +53,9 @@ const RequesterAttachmentForm = ({ data, refetch }) => {
       resetForm(); // بيرجع الفورم لقيمته الأولية
       setSelectedFiles([]); // نمسح الملفات المرفوعة من الواجهة
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(t("attachmentForm.error"));
+      toast.error(
+        error?.data?.message || t("attachmentForm.error") || "حدث خطأ أثناء إضافة المرفقات"
+      );
     } finally {
       setSubmitting(false);
     }

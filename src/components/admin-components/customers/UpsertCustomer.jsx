@@ -50,16 +50,35 @@ const UpsertCustomer = () => {
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      const formData = new FormData();
-      formData.append("name", values.name);
-      if (values.image) formData.append("image", values.image);
+      let logoUrl = data?.logo_url || null;
+
+      // Upload image if new image is provided
+      if (values.image) {
+        const { uploadImageToStorage } = await import("../../../utils/imageUpload");
+        const uploadedUrl = await uploadImageToStorage(
+          values.image,
+          "images",
+          "customers"
+        );
+        if (uploadedUrl) {
+          logoUrl = uploadedUrl;
+        } else {
+          return; // Stop if upload failed
+        }
+      }
+
+      const body = {
+        name: values.name,
+        logoUrl: logoUrl,
+        description: data?.description || null,
+      };
 
       if (isEdit) {
-        await updateCustomer({ id, body: formData }).unwrap();
+        await updateCustomer({ id, body }).unwrap();
         toast.success(t("customers.upsertCustomer.successUpdate"));
         refetch?.();
       } else {
-        await createCustomer(formData).unwrap();
+        await createCustomer(body).unwrap();
         toast.success(t("customers.upsertCustomer.successAdd"));
         resetForm();
         setPreview(null);
@@ -68,13 +87,14 @@ const UpsertCustomer = () => {
 
       navigate("/admin/customers");
     } catch (err) {
-      console.error(err);
-      toast.error(t("customers.upsertCustomer.error"));
+      toast.error(
+        err?.data?.message || t("customers.upsertCustomer.error") || "حدث خطأ أثناء حفظ العميل"
+      );
     }
   };
   useEffect(() => {
-    if (isEdit && data?.imageBase64) {
-      setPreview(data.imageBase64);
+    if (isEdit && data?.logo_url) {
+      setPreview(data.logo_url);
     }
   }, [isEdit, data]);
 

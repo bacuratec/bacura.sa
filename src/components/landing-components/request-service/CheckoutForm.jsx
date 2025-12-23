@@ -115,8 +115,9 @@ export default function CheckoutForm({ refetch }) {
         setMessage(t("payment.notConfirmed"));
       }
     } catch (err) {
-      console.error("فشل في إنشاء الأوردر أو الدفع:", err);
-      toast.error(t("payment.failed"));
+      toast.error(
+        err?.data?.message || t("payment.failed") || "حدث خطأ أثناء الدفع"
+      );
     } finally {
       setLoading(false);
     }

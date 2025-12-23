@@ -22,8 +22,9 @@ export default function UpdatePriceModal({ open, setOpen, onSubmit, refetch }) {
       setPrice("");
       refetch();
     } catch (error) {
-      console.error(error);
-      toast.error(t("services.toast_error_update"));
+      toast.error(
+        error?.data?.message || t("services.toast_error_update") || "حدث خطأ أثناء تحديث السعر"
+      );
     }
   };
 

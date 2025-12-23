@@ -16,7 +16,6 @@ const Footer = () => {
   const role = useSelector((state) => state.auth.role);
 
   const { data } = useGetProfileInfoQuery();
-  console.log(data);
 
   const socials = [
     { icon: facebook, url: "https://www.facebook.com/Bacuratec?locale=ar_AR" },

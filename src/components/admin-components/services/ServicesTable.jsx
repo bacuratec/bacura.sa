@@ -82,7 +82,9 @@ const ServicesTable = () => {
         await ActiveServiceStatus({ id: service.id }).unwrap();
       }
     } catch (err) {
-      console.error("فشل تغيير الحالة:", err);
+      toast.error(
+        err?.data?.message || t("services.statusChangeError") || "فشل تغيير الحالة"
+      );
 
       // Rollback if API fails
       const rollbackServices = localData?.map((s) =>

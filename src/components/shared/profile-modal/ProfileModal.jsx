@@ -98,8 +98,9 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
         await videoRef.current.play();
       }
     } catch (error) {
-      console.error("Error accessing camera:", error);
-      toast.error(t("profile.cameraAccessFailed"));
+      toast.error(
+        t("profile.cameraAccessFailed") || "فشل الوصول إلى الكاميرا"
+      );
     }
   }, []);
 
@@ -225,9 +226,8 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                   toast.success(t("profile.profileUpdateSuccess"));
                   setOpen(false);
                 } catch (error) {
-                  console.log(error);
                   toast.error(
-                    error?.data?.Message || t("profile.profileUpdateFailed")
+                    error?.data?.Message || t("profile.profileUpdateFailed") || "حدث خطأ أثناء تحديث الملف الشخصي"
                   );
                 } finally {
                   setSubmitting(false);
@@ -317,7 +317,6 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                           {errors.FullName}
                         </div>
                       )}
-                      {errors && console.log(errors)}
                     </div>
 
                     {/* حقل البريد الإلكتروني */}

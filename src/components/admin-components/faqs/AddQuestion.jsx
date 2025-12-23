@@ -37,8 +37,9 @@ const AddQuestion = () => {
       refetch();
       resetForm();
     } catch (err) {
-      console.error(err);
-      alert(t("question.errorMessage"));
+      toast.error(
+        err?.data?.message || t("question.errorMessage") || "حدث خطأ أثناء إضافة السؤال"
+      );
     }
   };
 

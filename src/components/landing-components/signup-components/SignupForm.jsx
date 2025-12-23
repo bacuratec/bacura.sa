@@ -79,9 +79,9 @@ const SignupForm = () => {
 
         setRole(isProvider ? "Provider" : "Requester");
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Lookup fetch error:", error);
-        toast.error(t("signupForm.lookupError"));
+        toast.error(
+          error?.data?.message || t("signupForm.lookupError") || "حدث خطأ أثناء جلب البيانات"
+        );
       }
     };
 
@@ -172,10 +172,8 @@ const SignupForm = () => {
 
       if (supabaseError) {
         toast.error(
-          supabaseError.message || t("signupForm.registerError")
+          supabaseError.message || t("signupForm.registerError") || "حدث خطأ أثناء التسجيل"
         );
-        // eslint-disable-next-line no-console
-        console.error("Supabase signUp error:", supabaseError);
         return;
       }
 
@@ -188,9 +186,7 @@ const SignupForm = () => {
       if (userError || !user) {
         // في حال لم يكن هناك جلسة بعد التسجيل (مثلاً لو التفعيل عبر رابط بريد)
         // نكمل بدون رفع الملفات حتى لا نفشل التسجيل بالكامل
-        // eslint-disable-next-line no-console
-        console.warn("User not authenticated after signUp:", userError);
-        toast.success(t("signupForm.registerSuccess"));
+        toast.success(t("signupForm.registerSuccess") || "تم التسجيل بنجاح");
         navigate("/login");
         return;
       }
@@ -211,10 +207,7 @@ const SignupForm = () => {
 
         if (uploadError) {
           // eslint-disable-next-line no-console
-          console.error(
-            "Supabase profile picture upload error:",
-            uploadError
-          );
+          // تجاهل خطأ رفع الصورة الشخصية
         } else {
           profilePicturePath = uploadPath;
         }
@@ -234,11 +227,7 @@ const SignupForm = () => {
               upsert: false,
             });
           if (uploadError) {
-            // eslint-disable-next-line no-console
-            console.error(
-              "Supabase attachment upload error:",
-              uploadError
-            );
+            // تجاهل خطأ رفع المرفقات
           } else {
             attachmentsPaths.push(uploadPath);
           }
@@ -255,17 +244,16 @@ const SignupForm = () => {
           },
         });
         if (updateError) {
-          // eslint-disable-next-line no-console
-          console.error("Supabase updateUser error:", updateError);
+          // تجاهل خطأ تحديث user_metadata
         }
       }
 
       toast.success(t("signupForm.registerSuccess"));
       navigate("/login");
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Signup error:", error);
-      toast.error(t("signupForm.registerError"));
+      toast.error(
+        error?.message || t("signupForm.registerError") || "حدث خطأ أثناء التسجيل"
+      );
     } finally {
       setIsLoading(false);
     }

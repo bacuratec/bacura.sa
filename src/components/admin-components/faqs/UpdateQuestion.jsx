@@ -32,8 +32,9 @@ const UpdateQuestion = () => {
       refetch();
       navigate("/admin/faqs");
     } catch (err) {
-      console.error(err);
-      toast.error(t("question.updateError"));
+      toast.error(
+        err?.data?.message || t("question.updateError") || "حدث خطأ أثناء تحديث السؤال"
+      );
     }
   };
 

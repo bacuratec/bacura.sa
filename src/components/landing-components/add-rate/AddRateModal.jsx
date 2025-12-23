@@ -39,8 +39,9 @@ export default function AddReviewModal({ open, setOpen, orderId, refetch }) {
       setReview({ orderRating: 0, ratingNotes: "" });
       refetch();
     } catch (error) {
-      console.log(error);
-      toast.error(t("review.review_error"));
+      toast.error(
+        error?.data?.message || t("review.review_error") || "حدث خطأ أثناء إضافة التقييم"
+      );
     }
   };
 

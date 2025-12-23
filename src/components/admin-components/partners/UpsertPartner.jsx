@@ -48,16 +48,37 @@ const UpsertPartner = () => {
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      const formData = new FormData();
-      formData.append("name", values.name);
-      if (values.image) formData.append("image", values.image);
+      let logoUrl = data?.logo_url || null;
+
+      // Upload image if new image is provided
+      if (values.image) {
+        const { uploadImageToStorage } = await import("../../../utils/imageUpload");
+        const uploadedUrl = await uploadImageToStorage(
+          values.image,
+          "images",
+          "partners"
+        );
+        if (uploadedUrl) {
+          logoUrl = uploadedUrl;
+        } else {
+          return; // Stop if upload failed
+        }
+      }
+
+      const body = {
+        name: values.name,
+        logoUrl: logoUrl,
+        websiteUrl: data?.website_url || null,
+        description: data?.description || null,
+        isActive: data?.is_active !== undefined ? data.is_active : true,
+      };
 
       if (isEdit) {
-        await updatePartner({ id, body: formData }).unwrap();
+        await updatePartner({ id, body }).unwrap();
         toast.success(t("partners.upsertPartner.successUpdate"));
         refetch?.();
       } else {
-        await createPartner(formData).unwrap();
+        await createPartner(body).unwrap();
         toast.success(t("partners.upsertPartner.successAdd"));
         resetForm();
         setPreview(null);
@@ -66,13 +87,14 @@ const UpsertPartner = () => {
 
       navigate("/admin/partners");
     } catch (err) {
-      console.error(err);
-      toast.error(t("partners.upsertPartner.error"));
+      toast.error(
+        err?.data?.message || t("partners.upsertPartner.error") || "حدث خطأ أثناء حفظ الشريك"
+      );
     }
   };
   useEffect(() => {
-    if (isEdit && data?.imageBase64) {
-      setPreview(data.imageBase64);
+    if (isEdit && data?.logo_url) {
+      setPreview(data.logo_url);
     }
   }, [isEdit, data]);
 

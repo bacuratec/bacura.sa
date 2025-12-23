@@ -51,7 +51,9 @@ const UserData = ({ data, refetch }) => {
       );
       refetch();
     } catch (error) {
-      console.error("Toggle failed:", error);
+      toast.error(
+        error?.data?.message || t("user.toggleError") || "حدث خطأ أثناء تغيير حالة المستخدم"
+      );
     }
   };
   const base = import.meta.env.VITE_APP_BASE_URL;

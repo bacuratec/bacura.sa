@@ -76,8 +76,9 @@ const AdminCompleteRequest = ({ data, refetch }) => {
       refetch();
       resetForm();
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(t("AdminCompleteRequest.operationError"));
+      toast.error(
+        error?.data?.message || t("AdminCompleteRequest.operationError") || "حدث خطأ أثناء إتمام الطلب"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -100,7 +101,6 @@ const AdminCompleteRequest = ({ data, refetch }) => {
 
         callback(options);
       } catch (error) {
-        console.error("خطأ أثناء جلب مقدمي الخدمة:", error);
         callback([]);
       }
     },

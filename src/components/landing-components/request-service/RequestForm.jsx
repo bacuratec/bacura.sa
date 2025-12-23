@@ -142,7 +142,9 @@ const RequestForm = ({ services }) => {
       }
       navigate("/");
     } catch (error) {
-      console.error(t("formRequest.messages.registrationError"), error);
+      toast.error(
+        error?.data?.message || t("formRequest.messages.registrationError") || "حدث خطأ أثناء إنشاء الطلب"
+      );
       if (error?.data?.errors) {
         // setApiErrors(error.data.errors);
       } else if (error?.data) {

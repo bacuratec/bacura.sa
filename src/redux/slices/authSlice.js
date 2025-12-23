@@ -21,7 +21,7 @@ if (stored) {
       initialState.userId = parsed.userId;
     }
   } catch (err) {
-    console.log(err);
+    // تجاهل خطأ parsing localStorage
   }
 }
 const authSlice = createSlice({
