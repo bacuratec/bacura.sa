@@ -131,19 +131,47 @@ const LoginForm = () => {
       // أولوية 2: التحقق من جدول users أولاً (لأن الأدمن موجود في users table)
       if (!userRole) {
         try {
-          // أولاً: نحاول جلب role من جدول users مباشرة
+          // محاولة استخدام RPC function أولاً (إذا كانت موجودة) لتجاوز RLS
           // eslint-disable-next-line no-console
-          console.log("Attempting to fetch role from users table...");
-          const { data: dbUser, error: dbError } = await supabase
-            .from("users")
-            .select("role, id, email")
-            .eq("id", user.id)
-            .maybeSingle();
+          console.log("Attempting to fetch role using RPC function...");
+          const { data: rpcRole, error: rpcError } = await supabase.rpc('get_user_role', {
+            user_id: user.id
+          });
+          
+          if (!rpcError && rpcRole) {
+            userRole = rpcRole;
+            // eslint-disable-next-line no-console
+            console.log("Role found via RPC function:", userRole);
+          } else if (rpcError) {
+            // eslint-disable-next-line no-console
+            console.log("RPC function not available or failed:", rpcError.message);
+          }
+          
+          // إذا لم نجد من RPC، نحاول من جدول users مباشرة
+          if (!userRole) {
+            // eslint-disable-next-line no-console
+            console.log("Attempting to fetch role from users table...");
+            const { data: dbUser, error: dbError } = await supabase
+              .from("users")
+              .select("role, id, email")
+              .eq("id", user.id)
+              .maybeSingle();
 
-          // eslint-disable-next-line no-console
-          console.log("Users table query result:", { dbUser, dbError });
+            // eslint-disable-next-line no-console
+            console.log("Users table query result:", { dbUser, dbError });
 
-          if (!dbError && dbUser) {
+            if (dbError) {
+              // eslint-disable-next-line no-console
+              console.error("Error fetching from users table:", dbError);
+              // eslint-disable-next-line no-console
+              console.error("Error details:", JSON.stringify(dbError, null, 2));
+              
+              // إذا كان الخطأ متعلق بـ RLS أو permissions
+              if (dbError.code === 'PGRST116' || dbError.message?.includes('permission') || dbError.message?.includes('policy')) {
+                // eslint-disable-next-line no-console
+                console.warn("RLS policy may be blocking access. User might exist but cannot be read.");
+              }
+            } else if (dbUser) {
             // إذا كان role موجود في users، نستخدمه مباشرة
             // نتعامل مع حالات مختلفة (Admin, admin, ADMIN)
             if (dbUser.role) {
@@ -156,14 +184,11 @@ const LoginForm = () => {
               // eslint-disable-next-line no-console
               console.warn("User found in users table but role is null or empty");
             }
-          } else if (dbError) {
-            // eslint-disable-next-line no-console
-            console.error("Error fetching from users table:", dbError);
-            // eslint-disable-next-line no-console
-            console.error("Error details:", JSON.stringify(dbError, null, 2));
           } else {
             // eslint-disable-next-line no-console
             console.warn("No user found in users table with id:", user.id);
+            // eslint-disable-next-line no-console
+            console.warn("This might be due to RLS policies blocking access. User may exist but cannot be read.");
           }
 
           // إذا لم نجد role من users table، نحاول من الجداول الأخرى
@@ -225,11 +250,11 @@ const LoginForm = () => {
               userRole = "Provider";
               // eslint-disable-next-line no-console
               console.log("Provider role detected");
-          } else {
-            // إذا لم نجد في أي جدول، نحاول البحث في users table باستخدام email
-            // eslint-disable-next-line no-console
-            console.log("User not found in any table, trying to search by email in users table...");
-            try {
+            } else {
+              // إذا لم نجد في أي جدول، نحاول البحث في users table باستخدام email
+              // eslint-disable-next-line no-console
+              console.log("User not found in any table, trying to search by email in users table...");
+              try {
               const emailSearch = await supabase
                 .from("users")
                 .select("role, id, email")
@@ -266,11 +291,11 @@ const LoginForm = () => {
                   console.log("Admin role detected from alternative admin search");
                 }
               }
-            } catch (emailError) {
-              // eslint-disable-next-line no-console
-              console.error("Error searching by email:", emailError);
+              } catch (emailError) {
+                // eslint-disable-next-line no-console
+                console.error("Error searching by email:", emailError);
+              }
             }
-          }
           }
         } catch (e) {
           // eslint-disable-next-line no-console
@@ -379,8 +404,8 @@ const LoginForm = () => {
           user_metadata: user.user_metadata,
         });
         toast.error(
-          `لم يتم العثور على صلاحيات المستخدم في قاعدة البيانات.\nيرجى التأكد من أن المستخدم موجود في جدول users.\nUser ID: ${user.id}\nEmail: ${user.email}`,
-          { duration: 8000 }
+          `لم يتم العثور على صلاحيات المستخدم.\nالمشكلة: RLS (Row Level Security) policies تمنع قراءة البيانات.\nالحل: يجب تعديل RLS policies في Supabase للسماح للمستخدم بقراءة صفه من جدول users.\nUser ID: ${user.id}\nEmail: ${user.email}`,
+          { duration: 10000 }
         );
         setLoading(false);
         return;
