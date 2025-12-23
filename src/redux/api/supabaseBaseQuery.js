@@ -22,13 +22,20 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
     // لا نضيف قيود إضافية هنا لأن RLS policies في Supabase تتعامل مع الأمان
     let result;
 
+    // التحقق من أن Supabase client موجود
+    if (!supabase) {
+      throw new Error("Supabase client is not initialized");
+    }
+
     // تحديد select string للاستخدام في الاستعلامات
-    const selectString =
-      joins.length > 0
-        ? select === "*"
-          ? `${select},${joins.join(",")}`
-          : `${select},${joins.join(",")}`
-        : select;
+    let selectString = select;
+    if (joins.length > 0) {
+      if (select === "*") {
+        selectString = `${select},${joins.join(",")}`;
+      } else {
+        selectString = `${select},${joins.join(",")}`;
+      }
+    }
 
     switch (method) {
       case "GET": {
@@ -38,10 +45,17 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
         // Apply joins if needed (for related data)
         if (joins.length > 0) {
           // Supabase joins syntax: "foreign_table!inner(column1,column2)"
-          const selectWithJoins =
-            select === "*"
-              ? `${select},${joins.join(",")}`
-              : `${select},${joins.join(",")}`;
+          // بناء select string بشكل صحيح - Supabase يتطلب تنسيق محدد
+          let selectWithJoins;
+          if (select === "*") {
+            // إذا كان select = "*", نضيف joins بعدها مباشرة بدون فاصلة إضافية
+            selectWithJoins = `*,${joins.join(",")}`;
+          } else {
+            // إذا كان select محدد، نضيف joins بعد الحقول المحددة
+            selectWithJoins = `${select},${joins.join(",")}`;
+          }
+          
+          // استخدام select بدون options إضافية لتجنب مشاكل 406
           query = query.select(selectWithJoins);
         } else {
           query = query.select(select);
@@ -133,13 +147,35 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
       const errorMessage =
         result.error.message || "حدث خطأ أثناء تنفيذ العملية";
       
-      // إذا كان الخطأ 406، قد يكون بسبب مشكلة في الـ headers أو الـ session
-      if (result.error.code === "PGRST116" || result.error.status === 406) {
+      // إذا كان الخطأ 406، قد يكون بسبب مشكلة في الـ headers أو الـ session أو الـ select query
+      if (result.error.code === "PGRST116" || result.error.status === 406 || result.error.code === "PGRST301") {
+        console.error("Supabase 406 error:", {
+          table,
+          selectString,
+          joins,
+          error: result.error
+        });
+        
+        // محاولة إعادة المحاولة بدون joins إذا فشلت
+        if (joins.length > 0 && method === "GET") {
+          try {
+            const simpleQuery = supabase.from(table).select(select === "*" ? "*" : select);
+            if (id) {
+              const simpleResult = await simpleQuery.eq("id", id).single();
+              if (!simpleResult.error) {
+                return { data: simpleResult.data };
+              }
+            }
+          } catch (retryError) {
+            // تجاهل خطأ إعادة المحاولة
+          }
+        }
+        
         return {
           error: {
             status: "NOT_ACCEPTABLE",
             data: result.error,
-            message: "خطأ في تنسيق الطلب. يرجى المحاولة مرة أخرى",
+            message: "خطأ في تنسيق الطلب. قد تكون هناك مشكلة في الاستعلام أو الصلاحيات.",
           },
         };
       }
@@ -160,12 +196,13 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
       error?.message || error?.toString() || "حدث خطأ غير متوقع";
     
     // إذا كان الخطأ يتعلق بـ undefined.match، فهذا يعني مشكلة في Supabase client
-    if (errorMessage.includes("match") || errorMessage.includes("undefined")) {
+    if (errorMessage.includes("match") || errorMessage.includes("undefined") || error?.message?.includes("match")) {
+      console.error("Supabase client error:", error);
       return {
         error: {
           status: "CLIENT_ERROR",
           data: error,
-          message: "خطأ في إعدادات الاتصال. يرجى تحديث الصفحة",
+          message: "خطأ في إعدادات الاتصال. يرجى التحقق من إعدادات Supabase وتحديث الصفحة",
         },
       };
     }

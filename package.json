@@ -5,10 +5,11 @@
   "type": "module",
   "homepage": "/",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "next start"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -26,9 +27,10 @@
     "jwt-decode": "^4.0.0",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.522.0",
-    "react": "^19.1.0",
+    "next": "^16.1.1",
+    "react": "^19.2.3",
     "react-data-table-component": "^7.7.0",
-    "react-dom": "^19.1.0",
+    "react-dom": "^19.2.3",
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^15.6.1",
     "react-icons": "^5.5.0",

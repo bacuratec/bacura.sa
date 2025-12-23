@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import PaymentForm from "./PaymentForm";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
+import { createAttachmentGroupKey, uploadAttachmentsToStorage } from "@/utils/attachmentUtils";
 
 const RequestForm = ({ services }) => {
   const location = useLocation();
@@ -86,13 +87,12 @@ const RequestForm = ({ services }) => {
     try {
       const hasPricedService = isAnyPricedSelected(values.selectedServices);
 
-      // 1. إنشاء Group Key
-      const groupRes = await axios.get(
-        `${
-          import.meta.env.VITE_APP_BASE_URL
-        }api/attachments/new-attachments-group-key`
-      );
-      const groupKey = groupRes.data;
+      // 1. إنشاء Group Key باستخدام Supabase RPC
+      const groupKey = await createAttachmentGroupKey();
+      if (!groupKey) {
+        toast.error("فشل في إنشاء group key للمرفقات");
+        return;
+      }
 
       // 2. جهز بيانات الريجيستر كـ FormData
       const payload = {
@@ -105,18 +105,15 @@ const RequestForm = ({ services }) => {
 
       // 3. ارفع الملفات فقط لو فيه ملفات
       if (selectedFiles && selectedFiles.length > 0) {
-        const uploadFormData = new FormData();
-        uploadFormData.append("attachmentUploaderLookupId", 702);
-        uploadFormData.append("requestPhaseLookupId", 800);
-        for (let i = 0; i < selectedFiles.length; i++) {
-          uploadFormData.append("files", selectedFiles[i]);
-        }
-        await axios.post(
-          `${
-            import.meta.env.VITE_APP_BASE_URL
-          }api/attachments?groupKey=${groupKey}`,
-          uploadFormData
+        const uploadSuccess = await uploadAttachmentsToStorage(
+          selectedFiles,
+          groupKey,
+          702, // attachmentUploaderLookupId للـ Requester
+          800  // requestPhaseLookupId لمرحلة الطلب الأولية
         );
+        if (!uploadSuccess) {
+          toast.error("فشل في رفع بعض الملفات");
+        }
       }
 
       // ******************** stripe  *********************
