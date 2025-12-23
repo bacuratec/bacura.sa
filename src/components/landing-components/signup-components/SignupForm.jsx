@@ -5,11 +5,6 @@ import "react-phone-input-2/lib/style.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import fileUpload from "../../../assets/icons/fileUpload.svg";
-import axios from "axios";
-import {
-  useRegisterProviderMutation,
-  useRegisterRequesterMutation,
-} from "../../../redux/api/authApi";
 import {
   useGetProviderEntityTypesQuery,
   useGetRequesterEntityTypesQuery,
@@ -26,22 +21,17 @@ const SignupForm = () => {
   const { lang } = useContext(LanguageContext);
 
   // const [show, setShow] = useState(false);
-  const [apiErrors, setApiErrors] = useState({});
+  const [apiErrors] = useState({});
   const [role, setRole] = useState("");
   const location = useLocation();
   const [types, setTypes] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const isProvider = location.pathname === "/signup-provider";
 
   const navigate = useNavigate();
 
-  const [registerProvider, { isLoading: loadingProv }] =
-    useRegisterProviderMutation();
-  const [registerRequester, { isLoading: loadingReq }] =
-    useRegisterRequesterMutation();
-
-  const isLoading = isProvider ? loadingProv : loadingReq;
   const buttonText = isProvider
     ? t("signupForm.submitProvider")
     : t("signupForm.submitRequester");
@@ -124,58 +114,47 @@ const SignupForm = () => {
     setProfilePicture(file);
   };
   const onSubmit = async (values) => {
+    setIsLoading(true);
     try {
-      // 1. إنشاء Group Key (باستخدام الـ API الحالي للمرفقات)
-      const groupRes = await axios.get(
-        `${
-          import.meta.env.VITE_APP_BASE_URL
-        }api/attachments/new-attachments-group-key`
-      );
-      const groupKey = groupRes.data;
+      // رفع صورة الملف الشخصي (اختياري) إلى Supabase Storage
+      let profilePicturePath = null;
+      if (profilePicture) {
+        const uploadPath = `profile-pictures/${Date.now()}-${
+          profilePicture.name
+        }`;
+        const { error: uploadError } = await supabase.storage
+          .from("profile-pictures")
+          .upload(uploadPath, profilePicture);
 
-      // 2. جهز بيانات الريجيستر كـ FormData
-      const formData = new FormData();
-      formData.append("Role", role);
-      formData.append("FullName", values.fullName);
-      formData.append("InstitutionTypeLookupId", values.entityType);
-      formData.append("Email", values.email);
-      formData.append("PhoneNumber", values.phone);
-      formData.append("Address", values.region);
-      formData.append("CommercialRegistrationNumber", values.commercialRecord);
-      formData.append(
-        "CommercialRegistrationDate",
-        values.commercialRegistrationDate
-      );
-      formData.append("Password", values.password);
-      formData.append("ConfirmPassword", values.confirmPassword);
-      formData.append("ProfilePicture", profilePicture);
-      formData.append("AttachmentsGroupKey", groupKey);
-      // 4. ارفع الملفات فقط لو فيه ملفات
-      if (selectedFiles && selectedFiles.length > 0) {
-        const uploadFormData = new FormData();
-        uploadFormData.append(
-          "attachmentUploaderLookupId",
-          role === "Requester" ? 702 : 701 // فرضًا: أرقام مختلفة للصورة
-        );
-        for (let i = 0; i < selectedFiles.length; i++) {
-          uploadFormData.append("files", selectedFiles[i]);
+        if (uploadError) {
+          toast.error(t("signupForm.registerError"));
+          // eslint-disable-next-line no-console
+          console.error("Supabase profile picture upload error:", uploadError);
+          return;
         }
-
-        await axios.post(
-          `${
-            import.meta.env.VITE_APP_BASE_URL
-          }api/attachments?groupKey=${groupKey}`,
-          uploadFormData
-        );
-      }
-      // 3. التسجيل في الـ API الحالي
-      if (role === "Provider") {
-        await registerProvider(formData).unwrap();
-      } else {
-        await registerRequester(formData).unwrap();
+        profilePicturePath = uploadPath;
       }
 
-      // 4. إنشاء مستخدم في Supabase Auth مع تخزين البيانات الناقصة في user_metadata
+      // رفع المرفقات (اختياري) إلى Supabase Storage
+      const attachmentsPaths = [];
+      if (selectedFiles && selectedFiles.length > 0) {
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          const uploadPath = `attachments/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from("attachments")
+            .upload(uploadPath, file);
+          if (uploadError) {
+            toast.error(t("signupForm.registerError"));
+            // eslint-disable-next-line no-console
+            console.error("Supabase attachment upload error:", uploadError);
+            return;
+          }
+          attachmentsPaths.push(uploadPath);
+        }
+      }
+
+      // إنشاء مستخدم في Supabase Auth مع تخزين البيانات في user_metadata
       const { error: supabaseError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
@@ -188,26 +167,29 @@ const SignupForm = () => {
             regionId: values.region,
             commercialRecord: values.commercialRecord,
             commercialRegistrationDate: values.commercialRegistrationDate,
+            profilePicturePath,
+            attachmentsPaths,
           },
         },
       });
 
       if (supabaseError) {
-        // نحذر فقط لأن حساب الـ API الأساسي تم إنشاؤه بالفعل
+        toast.error(
+          supabaseError.message || t("signupForm.registerError")
+        );
         // eslint-disable-next-line no-console
-        console.warn("Supabase signUp error:", supabaseError.message);
+        console.error("Supabase signUp error:", supabaseError);
+        return;
       }
 
       toast.success(t("signupForm.registerSuccess"));
       navigate("/login");
     } catch (error) {
-      console.error("خطأ في التسجيل أو رفع الملفات:", error);
-      if (error?.data?.errors) {
-        setApiErrors(error.data.errors);
-      } else if (error?.data) {
-        setApiErrors(error.data);
-      }
+      // eslint-disable-next-line no-console
+      console.error("Signup error:", error);
       toast.error(t("signupForm.registerError"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
