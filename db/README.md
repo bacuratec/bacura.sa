@@ -21,6 +21,7 @@
    - **`013_functions_and_triggers.sql`** ⭐ (جديد - دوال وtriggers تلقائية)
    - **`014_constraints_and_validations.sql`** ⭐ (جديد - قيود وتحسينات)
    - **`015_rls_policies.sql`** ⭐ (جديد - سياسات الأمان RLS)
+   - **`016_simplify_admin_rls.sql`** ⭐ (جديد - تبسيط سياسات RLS للأدمن)
 
 3. حدّث متغير البيئة في مشروع React:
 
@@ -64,6 +65,15 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 - Policies للمرفقات: حسب المالك
 
 > **ملاحظة مهمة**: ملف `015_rls_policies.sql` مخصص لـ Supabase. إذا كنت تستخدم PostgreSQL عادي، قد تحتاج لتعديله أو استخدام نظام أمان آخر.
+
+#### 016_simplify_admin_rls.sql ⚠️ **مهم - إصلاح أخطاء 500**
+- **يحل مشكلة 500 Internal Server Error** في استعلامات الأدمن
+- تبسيط سياسات RLS للأدمن: التحقق من `users.role = 'Admin'` مباشرة بدلاً من استعلامات معقدة
+- إضافة سياسات UPDATE وDELETE وINSERT للأدمن على جميع الجداول
+- إصلاح دالة `get_user_role()` وجعلها متاحة كـ RPC function
+- تحسين الأداء بشكل كبير للاستعلامات الإدارية
+
+> **يجب تطبيق هذا الملف بعد `015_rls_policies.sql` لحل مشاكل الوصول للأدمن**
 
 ### الميزات الجديدة
 
