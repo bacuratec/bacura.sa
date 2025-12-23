@@ -58,7 +58,26 @@ const LoginForm = () => {
         return;
       }
 
-      const userRole = user.user_metadata?.role || null;
+      // أولوية 1: الدور من user_metadata (Supabase Auth)
+      let userRole = user.user_metadata?.role || null;
+
+      // أولوية 2: لو لم يوجد role في الميتاداتا، نحاول قراءته من جدول users في قاعدة البيانات
+      if (!userRole) {
+        try {
+          const { data: dbUser, error: dbError } = await supabase
+            .from("users")
+            .select("role")
+            .eq("email", values.email)
+            .single();
+
+          if (!dbError && dbUser?.role) {
+            userRole = dbUser.role;
+          }
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error("Error fetching role from users table:", e);
+        }
+      }
 
       dispatch(
         setCredentials({
