@@ -5,11 +5,6 @@ import "react-phone-input-2/lib/style.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import fileUpload from "../../../assets/icons/fileUpload.svg";
-import {
-  useGetProviderEntityTypesQuery,
-  useGetRequesterEntityTypesQuery,
-} from "../../../redux/api/typeApi";
-import { useGetCitiesQuery } from "../../../redux/api/citiesApi";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -25,6 +20,7 @@ const SignupForm = () => {
   const [role, setRole] = useState("");
   const location = useLocation();
   const [types, setTypes] = useState([]);
+  const [addresses, setAddresses] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,25 +31,56 @@ const SignupForm = () => {
   const buttonText = isProvider
     ? t("signupForm.submitProvider")
     : t("signupForm.submitRequester");
-
-  const { data: addresses } = useGetCitiesQuery();
-  const { data: providerData } = useGetProviderEntityTypesQuery(undefined, {
-    skip: !isProvider,
-  });
-
-  const { data: requesterData } = useGetRequesterEntityTypesQuery(undefined, {
-    skip: isProvider,
-  });
-
   useEffect(() => {
-    if (isProvider) {
-      setRole("Provider");
-      setTypes(providerData);
-    } else {
-      setRole("Requester");
-      setTypes(requesterData);
-    }
-  }, [location, providerData, requesterData]);
+    const fetchLookups = async () => {
+      try {
+        // جلب المدن من جدول cities
+        const { data: citiesData, error: citiesError } = await supabase
+          .from("cities")
+          .select("id, name_ar, name_en")
+          .order("id", { ascending: true });
+
+        if (citiesError) throw citiesError;
+        setAddresses(
+          (citiesData || []).map((c) => ({
+            id: c.id,
+            nameAr: c.name_ar,
+            nameEn: c.name_en,
+          }))
+        );
+
+        // جلب أنواع الكيان من lookup_values حسب نوع المستخدم
+        const lookupCode = isProvider
+          ? "provider-entity-types"
+          : "requester-entity-types";
+
+        const { data: typesData, error: typesError } = await supabase
+          .from("lookup_values")
+          .select(
+            "id, name_ar, name_en, lookup_types!inner(code)"
+          )
+          .eq("lookup_types.code", lookupCode);
+
+        if (typesError) throw typesError;
+
+        setTypes(
+          (typesData || []).map((item) => ({
+            id: item.id,
+            nameAr: item.name_ar,
+            nameEn: item.name_en,
+          }))
+        );
+
+        setRole(isProvider ? "Provider" : "Requester");
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Lookup fetch error:", error);
+        toast.error(t("signupForm.lookupError"));
+      }
+    };
+
+    fetchLookups();
+  }, [isProvider, t]);
 
   const initialValues = {
     fullName: "",
