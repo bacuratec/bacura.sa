@@ -3,8 +3,8 @@
 import { Suspense } from "react";
 import DashboardLayout from "@/components/Layouts/dashboard-layout/DashboardLayout";
 import AuthGuard from "@/components/authGuard";
-import LoadingPage from "@/src/pages/LoadingPage";
-import OurProjects from "@/src/pages/provider/our-projects/OurProjects";
+import LoadingPage from "@/pages/LoadingPage";
+import OurProjects from "@/pages/provider/our-projects/OurProjects";
 
 export default function OurProjectsPage() {
   return (

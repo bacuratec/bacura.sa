@@ -3,8 +3,8 @@
 import { Suspense } from "react";
 import MainLayout from "@/components/Layouts/main-layout/MainLayout";
 import AuthGuard from "@/components/authGuard";
-import LoadingPage from "@/src/pages/LoadingPage";
-import UserRequestDetails from "@/src/pages/landing/request-details/RequestDetails";
+import LoadingPage from "@/pages/LoadingPage";
+import UserRequestDetails from "@/pages/landing/request-details/RequestDetails";
 
 export default function RequestDetailsPage({ params }) {
   return (

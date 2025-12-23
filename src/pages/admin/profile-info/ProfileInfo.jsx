@@ -9,7 +9,7 @@ import pdfIcon from "@/assets/images/pdf.png";
 import fileUploadImg from "@/assets/icons/fileUpload.svg";
 import toast from "react-hot-toast";
 
-const base = import.meta.env.VITE_APP_BASE_URL || "";
+const base = process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "";
 
 // Card for already-uploaded attachments (your original style)
 export const AttachmentCard = ({ item }) => {

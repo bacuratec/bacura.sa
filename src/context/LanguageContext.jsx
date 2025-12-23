@@ -1,26 +1,32 @@
-import { useState } from "react";
-import { createContext } from "react";
+"use client";
 
-import { useEffect } from "react";
+import { useState, createContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
   const [lang, setLang] = useState(() => {
-    return localStorage.getItem("lang") || "ar";
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem("lang") || "ar";
+    }
+    return "ar";
   });
   const { i18n } = useTranslation();
   useEffect(() => {
-    const langLocal = localStorage.getItem("lang");
-    if (langLocal) {
-      setLang(langLocal);
-    } else {
-      localStorage.setItem("lang", lang);
+    if (typeof window !== 'undefined') {
+      const langLocal = localStorage.getItem("lang");
+      if (langLocal) {
+        setLang(langLocal);
+      } else {
+        localStorage.setItem("lang", lang);
+      }
     }
   }, []);
   useEffect(() => {
-    localStorage.setItem("lang", lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("lang", lang);
+    }
   }, [lang]);
 
   const changeLanguage = (newLang) => {

@@ -1,10 +1,10 @@
 'use client';
 
-import MobileNavigation from "./sidebar/MobileNavigation";
-import Header from "./header/Header";
-import SideBar from "./sidebar/SideBar";
+import MobileNavigation from "@/components/Layouts/admin-layout/sidebar/MobileNavigation";
+import Header from "@/components/Layouts/admin-layout/header/Header";
+import SideBar from "@/components/Layouts/admin-layout/sidebar/SideBar";
 import { useSelector } from "react-redux";
-import { useGetAdminDetailsQuery } from "@/src/redux/api/usersDetails";
+import { useGetAdminDetailsQuery } from "@/redux/api/usersDetails";
 
 const AdminLayout = ({ children }) => {
   const userId = useSelector((state) => state.auth.userId);

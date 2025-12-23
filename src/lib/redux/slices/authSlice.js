@@ -28,6 +28,7 @@ const getInitialState = () => {
 
   return initialState;
 };
+
 const authSlice = createSlice({
   name: "auth",
   initialState: getInitialState(),
@@ -67,3 +68,4 @@ const authSlice = createSlice({
 
 export const { setCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;
+

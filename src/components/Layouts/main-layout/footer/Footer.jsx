@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useGetProfileInfoQuery } from "../../../../redux/api/profileInfoApi";
 const Footer = () => {
   const { t } = useTranslation();
-  const base = import.meta.env.VITE_APP_BASE_URL || "";
+  const base = process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "";
 
   const role = useSelector((state) => state.auth.role);
 

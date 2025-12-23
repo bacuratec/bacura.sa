@@ -10,10 +10,6 @@ const nextConfig = {
       },
     ],
   },
-  // إيقاف App Router مؤقتاً لاستخدام Pages Router فقط
-  experimental: {
-    ppr: false,
-  },
   // إعدادات للـ API proxy (إذا لزم الأمر)
   async rewrites() {
     return [
