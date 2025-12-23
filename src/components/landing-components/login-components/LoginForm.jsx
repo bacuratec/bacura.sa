@@ -90,150 +90,100 @@ const LoginForm = () => {
       // أولوية 1: الدور من user_metadata (Supabase Auth)
       let userRole = user.user_metadata?.role || null;
 
-      // أولوية 2: التحقق من الأدمن أولاً (لأنه الأهم)
-      // نحاول جلب الـ role من جدول admins أولاً بدون أي قيود
+      // أولوية 2: التحقق من جدول users أولاً (لأن الأدمن موجود في users table)
       if (!userRole) {
         try {
-          // محاولة جلب من جدول admins بطرق متعددة
-          // الطريقة 1: البحث باستخدام id
-          let adminData = null;
-          let adminError = null;
-
-          // محاولة أولى: البحث بـ id مباشرة
-          const adminCheck1 = await supabase
-            .from("admins")
-            .select("id, user_id")
+          // أولاً: نحاول جلب role من جدول users مباشرة
+          const { data: dbUser, error: dbError } = await supabase
+            .from("users")
+            .select("role, id")
             .eq("id", user.id)
             .maybeSingle();
 
-          if (!adminCheck1.error && adminCheck1.data) {
-            adminData = adminCheck1.data;
-          } else {
-            // محاولة ثانية: البحث بـ user_id
-            const adminCheck2 = await supabase
-              .from("admins")
-              .select("id, user_id")
-              .eq("user_id", user.id)
-              .maybeSingle();
-
-            if (!adminCheck2.error && adminCheck2.data) {
-              adminData = adminCheck2.data;
-            } else {
-              adminError = adminCheck2.error;
+          if (!dbError && dbUser) {
+            // إذا كان role موجود في users، نستخدمه مباشرة
+            if (dbUser.role) {
+              userRole = dbUser.role;
+              // eslint-disable-next-line no-console
+              console.log("Role detected from users table:", userRole);
             }
+          } else if (dbError) {
+            // eslint-disable-next-line no-console
+            console.warn("Error fetching from users table:", dbError.message);
           }
 
-          if (adminData) {
-            userRole = "Admin";
-            // eslint-disable-next-line no-console
-            console.log("Admin role detected from admins table");
-          } else {
-            // إذا لم يكن أدمن، نحاول من جدول users
-            // نتحقق من role في جدول users أولاً
-            const { data: dbUser, error: dbError } = await supabase
-              .from("users")
-              .select("role, id")
-              .eq("id", user.id)
-              .maybeSingle();
+          // إذا لم نجد role من users table، نحاول من الجداول الأخرى
+          if (!userRole) {
+            // نحاول التحقق من وجود المستخدم في جداول admins, requesters, providers
+            const [adminResult, requesterResult, providerResult] = await Promise.allSettled([
+              // التحقق من admins table
+              supabase
+                .from("admins")
+                .select("id, user_id")
+                .or(`id.eq.${user.id},user_id.eq.${user.id}`)
+                .maybeSingle(),
+              // التحقق من requesters table
+              supabase
+                .from("requesters")
+                .select("id, user_id")
+                .or(`id.eq.${user.id},user_id.eq.${user.id}`)
+                .maybeSingle(),
+              // التحقق من providers table
+              supabase
+                .from("providers")
+                .select("id, user_id")
+                .or(`id.eq.${user.id},user_id.eq.${user.id}`)
+                .maybeSingle(),
+            ]);
 
-            if (!dbError && dbUser) {
-              // إذا كان role موجود في users، نستخدمه
-              if (dbUser.role) {
-                userRole = dbUser.role;
-                // eslint-disable-next-line no-console
-                console.log("Role detected from users table:", userRole);
-              } else {
-                // إذا لم يكن role موجود، نحاول التحقق من الأدمن مرة أخرى
-                // لأن الأدمن قد لا يكون له role في users table
-                const adminFinalCheck = await supabase
-                  .from("admins")
-                  .select("id")
-                  .eq("user_id", user.id)
-                  .maybeSingle();
-
-                if (adminFinalCheck.data) {
-                  userRole = "Admin";
-                  // eslint-disable-next-line no-console
-                  console.log("Admin role detected after users check");
-                }
-              }
-            }
-
-            // إذا لم نجد role بعد، نحاول من الجداول الأخرى
-            if (!userRole) {
-              // إذا فشل جلب الـ role من users، نحاول تحديده من خلال الجداول الأخرى
-              // نتحقق من وجود المستخدم في كل جدول بشكل متوازي
-              const [requesterResult, providerResult] = await Promise.allSettled([
-                supabase
-                  .from("requesters")
-                  .select("id, user_id")
-                  .or(`id.eq.${user.id},user_id.eq.${user.id}`)
-                  .maybeSingle(),
-                supabase
-                  .from("providers")
-                  .select("id, user_id")
-                  .or(`id.eq.${user.id},user_id.eq.${user.id}`)
-                  .maybeSingle(),
-              ]);
-
-              if (requesterResult.status === "fulfilled" && requesterResult.value.data) {
-                userRole = "Requester";
-                // eslint-disable-next-line no-console
-                console.log("Requester role detected");
-              } else if (providerResult.status === "fulfilled" && providerResult.value.data) {
-                userRole = "Provider";
-                // eslint-disable-next-line no-console
-                console.log("Provider role detected");
-              }
+            // أولوية للأدمن
+            if (adminResult.status === "fulfilled" && adminResult.value.data) {
+              userRole = "Admin";
+              // eslint-disable-next-line no-console
+              console.log("Admin role detected from admins table");
+            } else if (requesterResult.status === "fulfilled" && requesterResult.value.data) {
+              userRole = "Requester";
+              // eslint-disable-next-line no-console
+              console.log("Requester role detected");
+            } else if (providerResult.status === "fulfilled" && providerResult.value.data) {
+              userRole = "Provider";
+              // eslint-disable-next-line no-console
+              console.log("Provider role detected");
             }
           }
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error("Error fetching role:", e);
-          // محاولة أخيرة: التحقق من الأدمن بطرق متعددة
+          // محاولة أخيرة: التحقق من role في users table مباشرة
           try {
-            // محاولة 1: البحث بـ user_id
-            const finalAdminCheck1 = await supabase
-              .from("admins")
-              .select("id")
-              .eq("user_id", user.id)
+            // محاولة 1: البحث في users table للتحقق من role = 'Admin'
+            const userRoleCheck = await supabase
+              .from("users")
+              .select("role")
+              .eq("id", user.id)
               .maybeSingle();
             
-            if (finalAdminCheck1.data) {
-              userRole = "Admin";
+            if (userRoleCheck.data && userRoleCheck.data.role) {
+              userRole = userRoleCheck.data.role;
               // eslint-disable-next-line no-console
-              console.log("Admin role detected in final check (user_id)");
+              console.log("Role detected in final check from users table:", userRole);
             } else {
-              // محاولة 2: البحث بـ id مباشرة
-              const finalAdminCheck2 = await supabase
+              // محاولة 2: البحث في admins table
+              const finalAdminCheck = await supabase
                 .from("admins")
                 .select("id")
-                .eq("id", user.id)
+                .or(`id.eq.${user.id},user_id.eq.${user.id}`)
                 .maybeSingle();
               
-              if (finalAdminCheck2.data) {
+              if (finalAdminCheck.data) {
                 userRole = "Admin";
                 // eslint-disable-next-line no-console
-                console.log("Admin role detected in final check (id)");
-              } else {
-                // محاولة 3: البحث في users table للتحقق من role = 'Admin'
-                const userRoleCheck = await supabase
-                  .from("users")
-                  .select("role")
-                  .eq("id", user.id)
-                  .eq("role", "Admin")
-                  .maybeSingle();
-                
-                if (userRoleCheck.data) {
-                  userRole = "Admin";
-                  // eslint-disable-next-line no-console
-                  console.log("Admin role detected from users table (role filter)");
-                }
+                console.log("Admin role detected in final check from admins table");
               }
             }
           } catch (finalError) {
             // eslint-disable-next-line no-console
-            console.error("Final admin check failed:", finalError);
+            console.error("Final role check failed:", finalError);
           }
         }
       } else {
