@@ -55,12 +55,32 @@ const LoginForm = () => {
 
       if (!session || !user) {
         toast.error(t("loginForm.errors.unknownError"));
+        setLoading(false);
         return;
       }
 
-      // Supabase يقوم بتعيين الجلسة تلقائياً بعد signInWithPassword
-      // لكن ننتظر قليلاً للتأكد من أن الجلسة جاهزة قبل تنفيذ الاستعلامات
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      // التأكد من أن الجلسة معينة في Supabase client
+      // Supabase يقوم بذلك تلقائياً، لكن نتأكد بشكل صريح
+      const {
+        data: { session: currentSession },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !currentSession) {
+        // إذا لم تكن الجلسة معينة، نعيد تعيينها
+        const { error: setSessionError } = await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        });
+
+        if (setSessionError) {
+          // eslint-disable-next-line no-console
+          console.error("Error setting session:", setSessionError);
+          toast.error(t("loginForm.errors.unknownError"));
+          setLoading(false);
+          return;
+        }
+      }
 
       // أولوية 1: الدور من user_metadata (Supabase Auth)
       let userRole = user.user_metadata?.role || null;
@@ -69,19 +89,57 @@ const LoginForm = () => {
       // باستخدام id مع سياسة RLS تسمح للمستخدم بقراءة صفه فقط
       if (!userRole) {
         try {
+          // استخدام maybeSingle بدلاً من single لتجنب خطأ عندما لا يوجد صف
           const { data: dbUser, error: dbError } = await supabase
             .from("users")
             .select("role")
             .eq("id", user.id)
-            .single();
+            .maybeSingle();
 
           if (!dbError && dbUser?.role) {
             userRole = dbUser.role;
           } else if (dbError) {
             // eslint-disable-next-line no-console
             console.warn("Could not fetch role from users table:", dbError.message);
-            // لا نوقف العملية إذا فشل جلب الـ role من قاعدة البيانات
-            // يمكن للمستخدم المتابعة بدون role وسيتم توجيهه للصفحة الرئيسية
+            // إذا فشل جلب الـ role، نحاول جلبها من جدول requesters أو providers أو admins
+            // بناءً على معرف المستخدم
+            try {
+              // محاولة جلب من requesters
+              const { data: requesterData } = await supabase
+                .from("requesters")
+                .select("id")
+                .eq("id", user.id)
+                .maybeSingle();
+              
+              if (requesterData) {
+                userRole = "Requester";
+              } else {
+                // محاولة جلب من providers
+                const { data: providerData } = await supabase
+                  .from("providers")
+                  .select("id")
+                  .eq("id", user.id)
+                  .maybeSingle();
+                
+                if (providerData) {
+                  userRole = "Provider";
+                } else {
+                  // محاولة جلب من admins
+                  const { data: adminData } = await supabase
+                    .from("admins")
+                    .select("id")
+                    .eq("id", user.id)
+                    .maybeSingle();
+                  
+                  if (adminData) {
+                    userRole = "Admin";
+                  }
+                }
+              }
+            } catch (fallbackError) {
+              // eslint-disable-next-line no-console
+              console.warn("Error in fallback role detection:", fallbackError);
+            }
           }
         } catch (e) {
           // eslint-disable-next-line no-console

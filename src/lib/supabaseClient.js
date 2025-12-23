@@ -12,17 +12,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // إنشاء Supabase client مع إعدادات محسّنة
+// لا نضيف headers مخصصة لأن Supabase يتعامل معها تلقائياً
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-  },
-  global: {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
   },
 });
 
