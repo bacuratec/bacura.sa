@@ -282,6 +282,9 @@ const LoginForm = () => {
         })
       );
 
+      // انتظار قصير لضمان تحديث Redux state
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       // توجيه حسب الدور
       if (userRole === "Admin") {
         navigate("/admin", { replace: true });
