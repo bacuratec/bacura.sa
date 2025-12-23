@@ -15,7 +15,7 @@ const AddService = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { refetch } = useGetServicesQuery();
+  const { refetch } = useGetServicesQuery(undefined, { skip: true });
   const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
 
   const initialValues = {
