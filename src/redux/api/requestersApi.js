@@ -39,7 +39,26 @@ export const requestersApi = createApi({
         params: { PageNumber, PageSize, AccountStatus },
       }),
     }),
+    // Delete Requester
+    deleteRequester: builder.mutation({
+      query: (id) => ({
+        url: `api/admins/requesters-accounts/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    // Update Requester Status
+    updateRequesterStatus: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `api/admins/requesters-accounts/${id}/status`,
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetRequestersAccountsQuery } = requestersApi;
+export const {
+  useGetRequestersAccountsQuery,
+  useDeleteRequesterMutation,
+  useUpdateRequesterStatusMutation,
+} = requestersApi;

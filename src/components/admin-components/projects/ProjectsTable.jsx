@@ -1,13 +1,18 @@
 import { Link, useSearchParams } from "react-router-dom";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { useGetProjectsQuery } from "../../../redux/api/projectsApi";
+import {
+  useGetProjectsQuery,
+  useDeleteProjectMutation,
+} from "../../../redux/api/projectsApi";
 import { useSelector } from "react-redux";
 import AddReviewModal from "../../landing-components/add-rate/AddRateModal";
 import { useTranslation } from "react-i18next";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, Edit, Trash } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
+import toast from "react-hot-toast";
+import ModalDelete from "./ModalDelete";
 
 const ProjectsTable = ({ stats }) => {
   const { lang } = useContext(LanguageContext);
@@ -40,9 +45,36 @@ const ProjectsTable = ({ stats }) => {
     OrderStatusLookupId,
   });
 
+  const [deleteProject, { isLoading: isDeleting }] =
+    useDeleteProjectMutation();
+
+  const [openDelete, setOpenDelete] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
   useEffect(() => {
     refetch();
   }, [PageNumber, PageSize, OrderStatusLookupId]);
+
+  const askToDelete = (id) => {
+    setSelectedId(id);
+    setOpenDelete(true);
+  };
+
+  const onDelete = async () => {
+    if (!selectedId) return;
+
+    try {
+      await deleteProject(selectedId).unwrap();
+      toast.success(t("projects.deleteSuccess") || "تم حذف المشروع بنجاح");
+      setOpenDelete(false);
+      setSelectedId(null);
+      refetch();
+    } catch (err) {
+      toast.error(
+        err?.data?.message || t("projects.deleteError") || "فشل حذف المشروع"
+      );
+    }
+  };
 
   const tabs = [
     {
@@ -156,9 +188,9 @@ const ProjectsTable = ({ stats }) => {
       wrap: true,
     },
     {
-      name: t("projects.action"),
+      name: t("projects.action") || "الإجراءات",
       cell: (row) => (
-        <div className="flex flex-col py-3 gap-2">
+        <div className="flex items-center gap-2">
           <Link
             to={
               role === "Admin"
@@ -168,9 +200,28 @@ const ProjectsTable = ({ stats }) => {
                 : `/provider/projects/${row.id}`
             }
             className="bg-[#1A71F6] text-white px-1 py-1 rounded-lg hover:bg-blue-700 transition text-xs font-medium"
+            title={t("projects.view") || "عرض"}
           >
             <EyeIcon />
           </Link>
+          {role === "Admin" && (
+            <>
+              <Link
+                to={`/admin/projects/${row.id}`}
+                className="bg-primary text-white px-1 py-1 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
+                title={t("projects.edit") || "تعديل"}
+              >
+                <Edit width={15} />
+              </Link>
+              <button
+                onClick={() => askToDelete(row.id)}
+                className="bg-red-500 text-white px-1 py-1 rounded-lg hover:bg-red-600 transition text-xs font-medium"
+                title={t("projects.delete") || "حذف"}
+              >
+                <Trash width={15} />
+              </button>
+            </>
+          )}
         </div>
       ),
       ignoreRowClick: true,
@@ -186,22 +237,36 @@ const ProjectsTable = ({ stats }) => {
     : [];
 
   return (
-    <div className="py-5">
-      <div className="mx-2">
-        <div className="rounded-3xl bg-white p-5">
-          <CustomDataTable
-            tabs={tabs}
-            columns={columns}
-            data={sortedData}
-            searchableFields={["orderNumber", "startDate", "endDate"]}
-            searchPlaceholder={t("searchPlaceholder")}
-            isLoading={isLoading}
-            totalRows={totalRows} // 👈 الباجينيشن هيشتغل بناءً عليه
-          />
-          {/* <AddReviewModal open={open} setOpen={setOpen} orderId={orderId} /> */}
+    <>
+      <div className="py-5">
+        <div className="mx-2">
+          <div className="rounded-3xl bg-white p-5">
+            <CustomDataTable
+              tabs={tabs}
+              columns={columns}
+              data={sortedData}
+              searchableFields={["orderNumber", "startDate", "endDate"]}
+              searchPlaceholder={t("searchPlaceholder")}
+              isLoading={isLoading}
+              totalRows={totalRows} // 👈 الباجينيشن هيشتغل بناءً عليه
+            />
+            {/* <AddReviewModal open={open} setOpen={setOpen} orderId={orderId} /> */}
+          </div>
         </div>
       </div>
-    </div>
+
+      {role === "Admin" && (
+        <ModalDelete
+          open={openDelete}
+          onClose={() => {
+            setOpenDelete(false);
+            setSelectedId(null);
+          }}
+          onConfirm={onDelete}
+          loading={isDeleting}
+        />
+      )}
+    </>
   );
 };
 

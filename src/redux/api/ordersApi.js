@@ -81,6 +81,13 @@ export const ordersApi = createApi({
         body,
       }),
     }),
+    // Delete Request
+    deleteRequest: builder.mutation({
+      query: (id) => ({
+        url: `api/requests/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -94,4 +101,5 @@ export const {
   useRequesterActionMutation,
   useAdminCompleteRequestMutation,
   useReassignRequestFnMutation,
+  useDeleteRequestMutation,
 } = ordersApi;

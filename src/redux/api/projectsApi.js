@@ -91,6 +91,13 @@ export const projectsApi = createApi({
         body,
       }),
     }),
+    // Delete Project/Order
+    deleteProject: builder.mutation({
+      query: (id) => ({
+        url: `api/orders/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -102,4 +109,5 @@ export const {
   useAddOrderAttachmentsMutation,
   useCompleteOrderMutation,
   useGetProjectsProvidersQuery,
+  useDeleteProjectMutation,
 } = projectsApi;

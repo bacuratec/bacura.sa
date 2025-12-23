@@ -44,10 +44,27 @@ export const providersApi = createApi({
         params: { PageNumber, PageSize, AccountStatus, name },
       }),
     }),
+    // Delete Provider
+    deleteProvider: builder.mutation({
+      query: (id) => ({
+        url: `api/admins/service-providers-accounts/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    // Update Provider Status
+    updateProviderStatus: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `api/admins/service-providers-accounts/${id}/status`,
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
 export const {
   useGetProvidersAccountsQuery,
   useLazyGetProvidersAccountsQuery,
+  useDeleteProviderMutation,
+  useUpdateProviderStatusMutation,
 } = providersApi;

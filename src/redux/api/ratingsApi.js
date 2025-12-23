@@ -47,7 +47,18 @@ export const ratingsApi = createApi({
         body,
       }),
     }),
+    // Delete Rating
+    deleteRating: builder.mutation({
+      query: (id) => ({
+        url: `api/orders/orders-rating/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useGetRatingsQuery, useCreateRatingMutation } = ratingsApi;
+export const {
+  useGetRatingsQuery,
+  useCreateRatingMutation,
+  useDeleteRatingMutation,
+} = ratingsApi;

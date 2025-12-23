@@ -68,6 +68,7 @@ import UpsertCustomer from "./components/admin-components/customers/UpsertCustom
 import { LanguageContext } from "./context/LanguageContext";
 import i18n from "./i18n";
 import ProfileInfo from "./pages/admin/profile-info/ProfileInfo";
+import RatingsAdmin from "./pages/admin/ratings/Ratings";
 // import UpdateQuestion from "./components/admin-components/faqs/UpdateQuestion";
 
 // Reusable Suspense wrapper
@@ -199,11 +200,13 @@ const router = createBrowserRouter([
 
       // Services
       { path: "services", element: withSuspense(<ServicesPage />) },
-      { path: "tickets/:id", element: withSuspense(<TicketsDetails />) },
 
       // Projects
       { path: "projects", element: withSuspense(<ProjectsAdmin />) },
       { path: "projects/:id", element: withSuspense(<ProjectsAdminDetails />) },
+
+      // Ratings
+      { path: "ratings", element: withSuspense(<RatingsAdmin />) },
 
       { path: "our-rates", element: withSuspense(<OurRates />) },
 
