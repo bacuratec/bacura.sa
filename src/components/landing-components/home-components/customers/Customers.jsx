@@ -15,6 +15,8 @@ const Customers = () => {
   if (!customers || customers?.length === 0) {
     return;
   }
+  // لو عدد العملاء أقل من عدد الشرائح المعروضة، نلغي الـ loop لتفادي تحذير Swiper
+  const canLoop = (customers?.length || 0) >= 6;
   return (
     <section id="customers" className="bg-white">
       <div className="container">
@@ -37,7 +39,7 @@ const Customers = () => {
               pauseOnMouseEnter: false, // يستمر في الحركة حتى لو الماوس دخل على اللوجوهات
             }}
             speed={2000} // سرعة الحركة - أسرع يعني يتحرك بسرعة أكبر
-            loop={true} // يعيد اللوجوهات من الأول بعد ما يخلص
+            loop={canLoop} // يعيد اللوجوهات من الأول بعد ما يخلص فقط لو العدد كافي
             freeMode={true} // يخلي الحركة حرة ومستمرة
             modules={[Autoplay, FreeMode]}
             breakpoints={{

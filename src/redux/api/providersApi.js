@@ -51,7 +51,7 @@ export const providersApi = createApi({
         // Update users table
         return {
           table: "users",
-          method: "PUT",
+        method: "PUT",
           id: body.userId, // Should be passed from component
           body: {
             is_blocked: body.isBlocked,

@@ -11,7 +11,7 @@ export const updateApi = createApi({
         // Update provider table
         const providerUpdate = {
           table: "providers",
-          method: "PUT",
+        method: "PUT",
           id: body.providerId,
           body: {
             name: body.name,

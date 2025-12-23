@@ -22,7 +22,7 @@ export const notificationsApi = createApi({
         // For now, return the first one - components should handle multiple updates
         return {
           table: "notifications",
-          method: "PUT",
+        method: "PUT",
           id: notificationIds[0],
           body: {
             is_seen: true,

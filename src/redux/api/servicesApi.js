@@ -84,7 +84,7 @@ export const servicesApi = createApi({
           base_price: body.price,
           updated_at: new Date().toISOString(),
         },
-      }),
+    }),
       invalidatesTags: ["Services"],
     }),
     deleteService: builder.mutation({

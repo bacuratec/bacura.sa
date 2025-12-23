@@ -62,12 +62,13 @@ const LoginForm = () => {
       let userRole = user.user_metadata?.role || null;
 
       // أولوية 2: لو لم يوجد role في الميتاداتا، نحاول قراءته من جدول users في قاعدة البيانات
+      // باستخدام id مع سياسة RLS تسمح للمستخدم بقراءة صفه فقط
       if (!userRole) {
         try {
           const { data: dbUser, error: dbError } = await supabase
             .from("users")
             .select("role")
-            .eq("email", values.email)
+            .eq("id", user.id)
             .single();
 
           if (!dbError && dbUser?.role) {

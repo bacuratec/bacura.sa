@@ -45,7 +45,7 @@ export const requestersApi = createApi({
         // Then update users table
         return {
           table: "users",
-          method: "PUT",
+        method: "PUT",
           id: body.userId, // Should be passed from component
           body: {
             is_blocked: body.isBlocked,

@@ -16,7 +16,7 @@ export const profileInfoApi = createApi({
           website_url: body.websiteUrl || null,
           attachments_group_key: body.attachmentsGroupKey || null,
         },
-      }),
+    }),
       invalidatesTags: ["ProfileInfo"],
     }),
     getProfileInfo: builder.query({
@@ -24,7 +24,7 @@ export const profileInfoApi = createApi({
         table: "profile_infos",
         method: "GET",
         filters: { user_id: userId },
-      }),
+    }),
       providesTags: ["ProfileInfo"],
     }),
     updateProfileInfo: builder.mutation({

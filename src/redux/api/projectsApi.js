@@ -23,7 +23,7 @@ export const projectsApi = createApi({
         }
         return {
           table: "orders",
-          method: "GET",
+        method: "GET",
           filters,
           pagination: {
             page: Number(PageNumber),
@@ -59,7 +59,7 @@ export const projectsApi = createApi({
         }
         return {
           table: "orders",
-          method: "GET",
+        method: "GET",
           filters,
           pagination: {
             page: Number(PageNumber),

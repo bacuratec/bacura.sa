@@ -56,20 +56,38 @@ const statisticsBaseQuery = async (args, api, extraOptions) => {
 
       case "admin": {
         // Platform-wide statistics
-        const [usersCount, requestersCount, providersCount, requestsCount, ordersCount] =
-          await Promise.all([
-            supabase.from("users").select("id", { count: "exact", head: true }),
-            supabase.from("requesters").select("id", { count: "exact", head: true }),
-            supabase.from("providers").select("id", { count: "exact", head: true }),
-            supabase.from("requests").select("id", { count: "exact", head: true }),
-            supabase.from("orders").select("id", { count: "exact", head: true }),
-          ]);
+        const [
+          usersCount,
+          requestersCount,
+          providersCount,
+          requestsCount,
+          ordersCount,
+          paymentsCount,
+        ] = await Promise.all([
+          supabase.from("users").select("id", { count: "exact", head: true }),
+          supabase.from("requesters").select("id", { count: "exact", head: true }),
+          supabase.from("providers").select("id", { count: "exact", head: true }),
+          supabase.from("requests").select("id", { count: "exact", head: true }),
+          supabase.from("orders").select("id", { count: "exact", head: true }),
+          supabase
+            .from("payments")
+            .select("amount", { count: "exact", head: false }),
+        ]);
+
+        const totalAmount =
+          paymentsCount.data?.reduce(
+            (sum, row) => sum + Number(row.amount || 0),
+            0
+          ) || 0;
+
         result = {
           totalUsers: usersCount.count || 0,
           totalRequesters: requestersCount.count || 0,
           totalProviders: providersCount.count || 0,
           totalRequests: requestsCount.count || 0,
           totalOrders: ordersCount.count || 0,
+          totalFinancialAmounts: totalAmount,
+          consultationsFinancialAmounts: 0, // يمكن تخصيصها لاحقًا حسب نوع الخدمة
         };
         break;
       }

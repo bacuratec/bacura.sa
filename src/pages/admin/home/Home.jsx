@@ -18,72 +18,45 @@ import {
   // Truck,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/lib/supabaseClient";
+import { useGetAdminStatisticsQuery } from "@/redux/api/adminStatisticsApi";
 
 const Home = () => {
   const { t } = useTranslation();
   const [adminStats, setAdminStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: stats, isLoading } = useGetAdminStatisticsQuery();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
+    if (!stats) return;
 
-        const [usersRes, requestersRes, providersRes, requestsRes] =
-          await Promise.all([
-            supabase
-              .from("users")
-              .select("id", { count: "exact", head: true }),
-            supabase
-              .from("requesters")
-              .select("id", { count: "exact", head: true }),
-            supabase
-              .from("providers")
-              .select("id", { count: "exact", head: true }),
-            supabase
-              .from("requests")
-              .select("id", { count: "exact", head: true }),
-          ]);
-
-        setAdminStats({
-          users: {
-            totalUsersCount: usersRes.count || 0,
-            totalRequestersCount: requestersRes.count || 0,
-            totalProvidersCount: providersRes.count || 0,
-          },
-          requests: {
-            totalRequests: requestsRes.count || 0,
-            // الحقول المتبقية يمكن حسابها لاحقًا عند نقل منطق أنواع الطلبات
-            totalRequestsRequesters: 0,
-            projectsDiagnosisRequests: 0,
-            consultationsRequests: 0,
-            maintenanceContractsRequests: 0,
-            trainingRequests: 0,
-            projectsSupervisionRequests: 0,
-            executionContractsRequests: 0,
-            projectsManagementRequests: 0,
-            wholesaleSupplyRequests: 0,
-          },
-          financialAmounts: {
-            totalFinancialAmounts: 0,
-            consultationsFinancialAmounts: 0,
-          },
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Error fetching admin statistics from Supabase:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
+    setAdminStats({
+      users: {
+        totalUsersCount: stats.totalUsers || 0,
+        totalRequestersCount: stats.totalRequesters || 0,
+        totalProvidersCount: stats.totalProviders || 0,
+      },
+      requests: {
+        totalRequests: stats.totalRequests || 0,
+        // الحقول المتبقية يمكن حسابها لاحقًا عند نقل منطق أنواع الطلبات
+        totalRequestsRequesters: 0,
+        projectsDiagnosisRequests: 0,
+        consultationsRequests: 0,
+        maintenanceContractsRequests: 0,
+        trainingRequests: 0,
+        projectsSupervisionRequests: 0,
+        executionContractsRequests: 0,
+        projectsManagementRequests: 0,
+        wholesaleSupplyRequests: 0,
+      },
+      financialAmounts: {
+        totalFinancialAmounts: stats.totalFinancialAmounts || 0,
+        consultationsFinancialAmounts: stats.consultationsFinancialAmounts || 0,
+      },
+    });
+  }, [stats]);
 
   const usersStats = [
     {

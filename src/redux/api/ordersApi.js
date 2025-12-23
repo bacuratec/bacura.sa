@@ -23,7 +23,7 @@ export const ordersApi = createApi({
         },
       }),
       invalidatesTags: ["Requests"],
-    }),
+      }),
     // Create Priced Request (Consultation)
     createOrderPriced: builder.mutation({
       query: (body) => ({
@@ -50,7 +50,7 @@ export const ordersApi = createApi({
         }
         return {
           table: "requests",
-          method: "GET",
+        method: "GET",
           filters,
           pagination: {
             page: Number(PageNumber),
@@ -76,7 +76,7 @@ export const ordersApi = createApi({
         // Get requester_id from user_id
         return {
           table: "requests",
-          method: "GET",
+        method: "GET",
           filters,
           pagination: {
             page: Number(PageNumber),
@@ -140,7 +140,7 @@ export const ordersApi = createApi({
         if (orderId) {
           return {
             table: "orders",
-            method: "PUT",
+        method: "PUT",
             id: orderId,
             body: {
               provider_id: providerId,

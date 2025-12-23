@@ -14,7 +14,7 @@ export const ratingsApi = createApi({
         }
         return {
           table: "order_ratings",
-          method: "GET",
+        method: "GET",
           filters,
           pagination: {
             page: Number(PageNumber),
@@ -39,7 +39,7 @@ export const ratingsApi = createApi({
           rating_value: body.ratingValue,
           comment: body.comment || null,
         },
-      }),
+    }),
       invalidatesTags: ["Ratings"],
     }),
     deleteRating: builder.mutation({

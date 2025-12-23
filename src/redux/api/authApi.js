@@ -11,7 +11,7 @@ export const authApi = createApi({
         // Get user profile - need to determine role and get appropriate details
         return {
           table: "users",
-          method: "GET",
+        method: "GET",
           id: userId,
           joins: [
             // This would need to be handled based on role
