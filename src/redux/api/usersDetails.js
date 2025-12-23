@@ -1,46 +1,47 @@
-// src/services/detailsApi.js
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { jwtDecode } from "jwt-decode";
-function isTokenExpired(token) {
-  try {
-    const decoded = jwtDecode(token);
-    // JWT عادة exp كوحدة ثواني من 1970
-    if (decoded.exp) {
-      const now = Date.now() / 1000;
-      return decoded.exp < now;
-    }
-    return false;
-  } catch {
-    return true;
-  }
-}
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
+
 export const detailsApi = createApi({
   reducerPath: "detailsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      // أضف التوكن للـ Authorization header
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }), // استبدل {{base_url}} باللينك الحقيقي
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["ProviderDetails", "RequesterDetails", "AdminDetails"],
   endpoints: (builder) => ({
     getProviderDetails: builder.query({
-      query: (id) => `api/providers/${id}`,
+      query: (id) => ({
+        table: "providers",
+        method: "GET",
+        id,
+        joins: [
+          "user:users(id,email,phone,role,is_blocked)",
+          "entity_type:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
+          "city:cities(id,name_ar,name_en)",
+        ],
+      }),
+      providesTags: ["ProviderDetails"],
     }),
     getRequesterDetails: builder.query({
-      query: (id) => `api/requesters/${id}`,
+      query: (id) => ({
+        table: "requesters",
+        method: "GET",
+        id,
+        joins: [
+          "user:users(id,email,phone,role,is_blocked)",
+          "entity_type:lookup_values!requesters_entity_type_id_fkey(id,name_ar,name_en,code)",
+          "city:cities(id,name_ar,name_en)",
+        ],
+      }),
+      providesTags: ["RequesterDetails"],
     }),
     getAdminDetails: builder.query({
-      query: (id) => `api/admins/${id}`,
+      query: (id) => ({
+        table: "admins",
+        method: "GET",
+        id,
+        joins: [
+          "user:users(id,email,phone,role,is_blocked)",
+        ],
+      }),
+      providesTags: ["AdminDetails"],
     }),
   }),
 });

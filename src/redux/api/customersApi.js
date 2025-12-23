@@ -1,61 +1,60 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
 export const customersApi = createApi({
   reducerPath: "customersApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState, dispatch }) => {
-      const token = getState().auth.token;
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
-  // /api/customers
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Customers"],
   endpoints: (builder) => ({
     createCustomer: builder.mutation({
       query: (body) => ({
-        url: "api/customers",
+        table: "customers",
         method: "POST",
-        body,
+        body: {
+          name: body.name,
+          logo_url: body.logoUrl || null,
+          description: body.description || null,
+        },
       }),
+      invalidatesTags: ["Customers"],
     }),
-
     getCustomers: builder.query({
       query: () => ({
-        url: "api/customers",
+        table: "customers",
         method: "GET",
+        orderBy: { column: "created_at", ascending: false },
       }),
+      providesTags: ["Customers"],
     }),
-
     getCustomerDetails: builder.query({
       query: (id) => ({
-        url: `api/customers/${id}`,
+        table: "customers",
         method: "GET",
+        id,
       }),
+      providesTags: ["Customers"],
     }),
-
-    // ===== Update Customer =====
     updateCustomer: builder.mutation({
       query: ({ id, body }) => ({
-        url: `api/customers/${id}`,
-        method: "PUT", // أو PATCH حسب الـ API
-        body,
+        table: "customers",
+        method: "PUT",
+        id,
+        body: {
+          name: body.name,
+          logo_url: body.logoUrl || null,
+          description: body.description || null,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Customers"],
     }),
-
-    // ===== Delete Customer =====
     deleteCustomer: builder.mutation({
       query: (id) => ({
-        url: `api/customers/${id}`,
+        table: "customers",
         method: "DELETE",
+        id,
       }),
+      invalidatesTags: ["Customers"],
     }),
   }),
 });

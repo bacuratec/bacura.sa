@@ -1,11 +1,19 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
 export const citiesApi = createApi({
   reducerPath: "citiesApi",
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_APP_BASE_URL }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Cities"],
   endpoints: (builder) => ({
+    // Get All Cities
     getCities: builder.query({
-      query: () => "api/lookup-types/cities",
+      query: () => ({
+        table: "cities",
+        method: "GET",
+        orderBy: { column: "name_ar", ascending: true },
+      }),
+      providesTags: ["Cities"],
     }),
   }),
 });

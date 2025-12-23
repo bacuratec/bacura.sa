@@ -71,12 +71,12 @@ const ServicesTable = () => {
 
   const handleToggleStatus = async (service) => {
     const updatedServices = localData?.map((s) =>
-      s.id === service.id ? { ...s, isActive: !s.isActive } : s
+      s.id === service.id ? { ...s, is_active: !s.is_active } : s
     );
     setLocalData(updatedServices); // Update UI immediately (optimistic)
 
     try {
-      if (service.isActive) {
+      if (service.is_active) {
         await deActiveServiceStatus({ id: service.id }).unwrap();
       } else {
         await ActiveServiceStatus({ id: service.id }).unwrap();
@@ -86,7 +86,7 @@ const ServicesTable = () => {
 
       // Rollback if API fails
       const rollbackServices = localData?.map((s) =>
-        s.id === service.id ? { ...s, isActive: service.isActive } : s
+        s.id === service.id ? { ...s, is_active: service.is_active } : s
       );
       setLocalData(rollbackServices);
     }
@@ -95,12 +95,12 @@ const ServicesTable = () => {
   const columns = [
     {
       name: t("services.serviceTitle"),
-      selector: (row) => (lang === "ar" ? row?.titleAr : row?.titleEn) || "-",
+      selector: (row) => (lang === "ar" ? row?.name_ar : row?.name_en) || "-",
       wrap: true,
     },
     {
       name: t("services.price"),
-      selector: (row) => (row?.price ? `${row.price} ر.س` : "-"),
+      selector: (row) => (row?.base_price ? `${row.base_price} ر.س` : "-"),
       wrap: true,
     },
     {
@@ -109,14 +109,14 @@ const ServicesTable = () => {
         <label className="inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
-            checked={!!row?.isActive}
+            checked={!!row?.is_active}
             onChange={() => handleToggleStatus(row)}
             className="sr-only peer"
           />
           <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-green-500 relative transition-colors">
             <div
               className={`absolute top-1 ${
-                row?.isActive ? "left-1" : "right-1"
+                row?.is_active ? "left-1" : "right-1"
               } w-4 h-4 bg-white rounded-full transition-all peer-checked:left-6`}
             />
           </div>
@@ -130,7 +130,7 @@ const ServicesTable = () => {
       name: t("services.actions") || "الإجراءات",
       cell: (row) => (
         <div className="flex gap-2">
-          {row?.isPriced && (
+          {row?.base_price && (
             <button
               onClick={() => handleEdit(row)}
               className="bg-yellow-500 text-white px-1 py-1 rounded-md text-xs hover:bg-yellow-600 transition"
@@ -180,7 +180,7 @@ const ServicesTable = () => {
             <CustomDataTable
               columns={columns}
               data={localData}
-              searchableFields={["titleAr", "price", "titleEn"]}
+              searchableFields={["name_ar", "base_price", "name_en"]}
               searchPlaceholder={t("searchPlaceholder")}
               isLoading={isLoading}
             />

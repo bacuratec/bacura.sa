@@ -1,36 +1,36 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-
-      return headers;
-    },
-  }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Profile"],
   endpoints: (builder) => ({
     getProfile: builder.query({
-      query: () => ({
-        url: "api/auth/profile", // مثال، لو الAPI بترجع بيانات المستخدم
-        method: "GET",
-      }),
+      query: (userId) => {
+        // Get user profile - need to determine role and get appropriate details
+        return {
+          table: "users",
+          method: "GET",
+          id: userId,
+          joins: [
+            // This would need to be handled based on role
+          ],
+        };
+      },
+      providesTags: ["Profile"],
     }),
     toggleBlockUser: builder.mutation({
-      query: (id) => ({
-        url: `api/auth/block-user/${id}`,
-        method: "POST",
+      query: ({ userId, isBlocked }) => ({
+        table: "users",
+        method: "PUT",
+        id: userId,
+        body: {
+          is_blocked: isBlocked,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Profile"],
     }),
   }),
 });

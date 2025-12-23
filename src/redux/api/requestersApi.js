@@ -1,58 +1,59 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout } from "../slices/authSlice";
-import { jwtDecode } from "jwt-decode";
-function isTokenExpired(token) {
-  try {
-    const decoded = jwtDecode(token);
-    // JWT عادة exp كوحدة ثواني من 1970
-    if (decoded.exp) {
-      const now = Date.now() / 1000;
-      return decoded.exp < now;
-    }
-    return false;
-  } catch {
-    return true;
-  }
-}
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
+
 export const requestersApi = createApi({
   reducerPath: "requestersApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState, dispatch }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      // أضف التوكن للـ Authorization header
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Requesters"],
   endpoints: (builder) => ({
+    // Get Requesters Accounts (Admin)
     getRequestersAccounts: builder.query({
-      query: ({ PageNumber = 1, PageSize = 10, AccountStatus = "" }) => ({
-        url: "api/admins/requesters-accounts",
-        params: { PageNumber, PageSize, AccountStatus },
-      }),
+      query: ({ PageNumber = 1, PageSize = 10, AccountStatus = "" }) => {
+        const filters = {};
+        // AccountStatus would need to be mapped to user.is_blocked
+        // For now, we'll get all requesters with their user info
+        return {
+          table: "requesters",
+          method: "GET",
+          filters,
+          pagination: {
+            page: Number(PageNumber),
+            pageSize: Number(PageSize),
+          },
+          joins: [
+            "user:users(id,email,phone,role,is_blocked)",
+            "entity_type:lookup_values!requesters_entity_type_id_fkey(id,name_ar,name_en,code)",
+            "city:cities(id,name_ar,name_en)",
+          ],
+        };
+      },
+      providesTags: ["Requesters"],
     }),
     // Delete Requester
     deleteRequester: builder.mutation({
       query: (id) => ({
-        url: `api/admins/requesters-accounts/${id}`,
+        table: "requesters",
         method: "DELETE",
+        id,
       }),
+      invalidatesTags: ["Requesters"],
     }),
-    // Update Requester Status
+    // Update Requester Status (Block/Unblock User)
     updateRequesterStatus: builder.mutation({
-      query: ({ id, body }) => ({
-        url: `api/admins/requesters-accounts/${id}/status`,
-        method: "PUT",
-        body,
-      }),
+      query: ({ id, body }) => {
+        // First get the requester to find user_id
+        // Then update users table
+        return {
+          table: "users",
+          method: "PUT",
+          id: body.userId, // Should be passed from component
+          body: {
+            is_blocked: body.isBlocked,
+            updated_at: new Date().toISOString(),
+          },
+        };
+      },
+      invalidatesTags: ["Requesters"],
     }),
   }),
 });

@@ -1,102 +1,153 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout } from "../slices/authSlice";
-import { jwtDecode } from "jwt-decode";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
-function isTokenExpired(token) {
-  try {
-    const decoded = jwtDecode(token);
-    // JWT عادة exp كوحدة ثواني من 1970
-    if (decoded.exp) {
-      const now = Date.now() / 1000;
-      return decoded.exp < now;
-    }
-    return false;
-  } catch {
-    return true;
-  }
-}
 export const projectsApi = createApi({
   reducerPath: "projectsApis",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState, dispatch }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Orders", "Projects"],
   endpoints: (builder) => ({
+    // Get All Projects/Orders (Admin)
     getProjects: builder.query({
       query: ({
         PageNumber = 1,
         PageSize = 10,
         OrderTitle = "",
         OrderStatusLookupId,
-      }) => ({
-        url: "api/orders", // مثال، لو الAPI بترجع بيانات المستخدم
-        method: "GET",
-        params: { PageNumber, PageSize, OrderTitle, OrderStatusLookupId },
-      }),
+      }) => {
+        const filters = {};
+        if (OrderStatusLookupId) {
+          filters.order_status_id = OrderStatusLookupId;
+        }
+        if (OrderTitle) {
+          filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };
+        }
+        return {
+          table: "orders",
+          method: "GET",
+          filters,
+          pagination: {
+            page: Number(PageNumber),
+            pageSize: Number(PageSize),
+          },
+          joins: [
+            "request:requests(id,title,description,requester_id)",
+            "provider:providers(id,name,specialization)",
+            "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
+          ],
+        };
+      },
+      providesTags: ["Orders"],
     }),
+    // Get Provider Projects/Orders
     getProjectsProviders: builder.query({
       query: ({
         PageNumber = 1,
         PageSize = 10,
         OrderTitle = "",
         OrderStatusLookupId,
-      }) => ({
-        url: "api/orders/provider-orders", // مثال، لو الAPI بترجع بيانات المستخدم
-        method: "GET",
-        params: { PageNumber, PageSize, OrderTitle, OrderStatusLookupId },
-      }),
+        providerId,
+      }) => {
+        const filters = {};
+        if (providerId) {
+          filters.provider_id = providerId;
+        }
+        if (OrderStatusLookupId) {
+          filters.order_status_id = OrderStatusLookupId;
+        }
+        if (OrderTitle) {
+          filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };
+        }
+        return {
+          table: "orders",
+          method: "GET",
+          filters,
+          pagination: {
+            page: Number(PageNumber),
+            pageSize: Number(PageSize),
+          },
+          joins: [
+            "request:requests(id,title,description,requester_id)",
+            "provider:providers(id,name,specialization)",
+            "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
+          ],
+        };
+      },
+      providesTags: ["Orders"],
     }),
+    // Get Project Details
     getProjectDetails: builder.query({
-      query: ({ id, params }) => ({
-        url: `api/orders/${id}`,
-        params, // هنا تبعت الـ query params
+      query: ({ id }) => ({
+        table: "orders",
+        method: "GET",
+        id,
+        joins: [
+          "request:requests(id,title,description,requester_id,service_id)",
+          "provider:providers(id,name,specialization,avg_rate)",
+          "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
+        ],
       }),
+      providesTags: ["Orders"],
     }),
+    // Get Project Statistics
     getProjectStatistics: builder.query({
-      query: ({ userId }) => ({
-        url: "api/orders/orders-statistics",
-        params: { userId },
-      }),
+      query: ({ userId }) => {
+        // This would need custom logic - for now return orders count
+        return {
+          table: "orders",
+          method: "GET",
+          filters: {},
+        };
+      },
+      providesTags: ["Orders"],
     }),
-
+    // Provider Update Order Status
     ProviderProjectState: builder.mutation({
       query: (body) => ({
-        url: "api/orders/provider-order-update-status",
+        table: "orders",
         method: "PUT",
-        body,
+        id: body.orderId,
+        body: {
+          order_status_id: body.statusId,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Orders"],
     }),
+    // Add Order Attachments
     addOrderAttachments: builder.mutation({
       query: ({ body, projectId }) => ({
-        url: `api/orders/add-order-attachments/${projectId}`,
+        table: "orders",
         method: "PUT",
-        body,
+        id: projectId,
+        body: {
+          order_attachments_group_key: body.attachmentsGroupKey,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Orders"],
     }),
+    // Complete Order
     completeOrder: builder.mutation({
       query: ({ body, projectId }) => ({
-        url: `api/orders/complete-order/${projectId}`,
+        table: "orders",
         method: "PUT",
-        body,
+        id: projectId,
+        body: {
+          order_status_id: body.statusId, // completed status
+          completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Orders"],
     }),
     // Delete Project/Order
     deleteProject: builder.mutation({
       query: (id) => ({
-        url: `api/orders/${id}`,
+        table: "orders",
         method: "DELETE",
+        id,
       }),
+      invalidatesTags: ["Orders"],
     }),
   }),
 });

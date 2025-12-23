@@ -1,20 +1,49 @@
-// src/services/lookupApi.js
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
 export const lookupApi = createApi({
   reducerPath: "lookupApi",
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_APP_BASE_URL }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["LookupTypes", "LookupValues"],
   endpoints: (builder) => ({
-    getRequesterEntityTypes: builder.query({
-      query: () => "api/lookup-types/requester-entity-types",
+    // Get All Lookup Types
+    getLookupTypes: builder.query({
+      query: () => ({
+        table: "lookup_types",
+        method: "GET",
+      }),
+      providesTags: ["LookupTypes"],
     }),
-    getProviderEntityTypes: builder.query({
-      query: () => "api/lookup-types/provider-entity-types",
+    // Get Lookup Values by Type Code
+    getLookupValuesByType: builder.query({
+      query: (typeCode) => ({
+        table: "lookup_values",
+        method: "GET",
+        filters: {
+          // We need to join with lookup_types to filter by code
+        },
+        joins: [
+          "lookup_type:lookup_types!inner(id,code,name_ar,name_en)",
+        ],
+      }),
+      providesTags: ["LookupValues"],
+    }),
+    // Get Lookup Values by Type ID
+    getLookupValues: builder.query({
+      query: (typeId) => ({
+        table: "lookup_values",
+        method: "GET",
+        filters: {
+          lookup_type_id: typeId,
+        },
+      }),
+      providesTags: ["LookupValues"],
     }),
   }),
 });
 
 export const {
-  useGetRequesterEntityTypesQuery,
-  useGetProviderEntityTypesQuery,
+  useGetLookupTypesQuery,
+  useGetLookupValuesByTypeQuery,
+  useGetLookupValuesQuery,
 } = lookupApi;

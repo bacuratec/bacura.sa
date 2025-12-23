@@ -1,74 +1,64 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout } from "../slices/authSlice";
-import { jwtDecode } from "jwt-decode";
-import ReassignRequest from "../../components/admin-components/projects/ReassignRequest";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
-function isTokenExpired(token) {
-  try {
-    const decoded = jwtDecode(token);
-    // JWT عادة exp كوحدة ثواني من 1970
-    if (decoded.exp) {
-      const now = Date.now() / 1000;
-      return decoded.exp < now;
-    }
-    return false;
-  } catch {
-    return true;
-  }
-}
 export const ticketApi = createApi({
   reducerPath: "ticketApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState, dispatch }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      // أضف التوكن للـ Authorization header
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Tickets"],
   endpoints: (builder) => ({
     createTickets: builder.mutation({
       query: (body) => ({
-        url: "api/tickets",
+        table: "tickets",
         method: "POST",
-        body,
-      }),
-      // عادة لا نريد أوتو تسجيل بعد التسجيل؛ يمكن إعادة التوجيه للصفحة login
-    }),
-    // لو فيه endpoint لفحص صلاحية التوكن أو استعادة بيانات المستخدم:
-    getTickets: builder.query({
-      query: () => ({
-        url: "api/tickets", // مثال، لو الAPI بترجع بيانات المستخدم
-        method: "GET",
-        // params: { PageNumber, PageSize, RequestStatus },
-      }),
-    }),
-
-    getTicketDetails: builder.query({
-      query: (id) => ({
-        url: `/api/tickets/${id}`, // مثال، لو الAPI بترجع بيانات المستخدم
-        method: "GET",
-        // params: { PageNumber, PageSize, RequestStatus },
-      }),
-    }),
-
-    UpdateTicketStatus: builder.mutation({
-      query: ({ body, id }) => ({
-        url: `api/tickets/update-ticket-status/${id}`,
-        method: "PUT",
-        body: JSON.stringify(body), // لازم تبعت الرقم كـ JSON
-        headers: {
-          "Content-Type": "application/json",
+        body: {
+          user_id: body.userId,
+          related_order_id: body.relatedOrderId || null,
+          title: body.title,
+          description: body.description || null,
+          status_id: body.statusId, // Should be open status
         },
       }),
+      invalidatesTags: ["Tickets"],
+    }),
+    getTickets: builder.query({
+      query: (userId) => ({
+        table: "tickets",
+        method: "GET",
+        filters: userId ? { user_id: userId } : {},
+        orderBy: { column: "created_at", ascending: false },
+        joins: [
+          "user:users(id,email)",
+          "related_order:orders(id,order_title)",
+          "status:lookup_values!tickets_status_id_fkey(id,name_ar,name_en,code)",
+        ],
+      }),
+      providesTags: ["Tickets"],
+    }),
+    getTicketDetails: builder.query({
+      query: (id) => ({
+        table: "tickets",
+        method: "GET",
+        id,
+        joins: [
+          "user:users(id,email)",
+          "related_order:orders(id,order_title)",
+          "status:lookup_values!tickets_status_id_fkey(id,name_ar,name_en,code)",
+        ],
+      }),
+      providesTags: ["Tickets"],
+    }),
+    UpdateTicketStatus: builder.mutation({
+      query: ({ body, id }) => ({
+        table: "tickets",
+        method: "PUT",
+        id,
+        body: {
+          status_id: body.statusId,
+          updated_at: new Date().toISOString(),
+          closed_at: body.statusId === 3 ? new Date().toISOString() : null, // 3 = closed
+        },
+      }),
+      invalidatesTags: ["Tickets"],
     }),
   }),
 });

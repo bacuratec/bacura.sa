@@ -1,71 +1,82 @@
-// src/redux/api/updateApi.js
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout } from "../slices/authSlice";
-import { jwtDecode } from "jwt-decode";
-function isTokenExpired(token) {
-  try {
-    const decoded = jwtDecode(token);
-    // JWT عادة exp كوحدة ثواني من 1970
-    if (decoded.exp) {
-      const now = Date.now() / 1000;
-      return decoded.exp < now;
-    }
-    return false;
-  } catch {
-    return true;
-  }
-}
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
+
 export const updateApi = createApi({
   reducerPath: "updateApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL, // مثلاً: "https://your-api.com/"
-    prepareHeaders: (headers, { getState }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      // أضف التوكن للـ Authorization header
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Provider", "Requester", "Admin"],
   endpoints: (builder) => ({
     updateProvider: builder.mutation({
-      query: (body) => ({
-        url: "api/auth/update-provider",
-        method: "PUT",
-        body,
-      }),
+      query: (body) => {
+        // Update provider table
+        const providerUpdate = {
+          table: "providers",
+          method: "PUT",
+          id: body.providerId,
+          body: {
+            name: body.name,
+            specialization: body.specialization || null,
+            city_id: body.cityId || null,
+            updated_at: new Date().toISOString(),
+          },
+        };
+        // Also update user if needed
+        if (body.email || body.phone) {
+          // This would need to be handled separately or via RPC
+        }
+        return providerUpdate;
+      },
+      invalidatesTags: ["Provider"],
     }),
     updateRequester: builder.mutation({
       query: (body) => ({
-        url: "api/auth/update-requester",
+        table: "requesters",
         method: "PUT",
-        body,
+        id: body.requesterId,
+        body: {
+          name: body.name,
+          commercial_reg_no: body.commercialRegNo || null,
+          city_id: body.cityId || null,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Requester"],
     }),
     updateAdmin: builder.mutation({
       query: (body) => ({
-        url: "api/auth/update-admin",
+        table: "admins",
         method: "PUT",
-        body,
+        id: body.adminId,
+        body: {
+          display_name: body.displayName || null,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Admin"],
     }),
     suspendRequester: builder.mutation({
-      query: () => ({
-        url: "api/requesters/suspend-my-account",
+      query: (userId) => ({
+        table: "users",
         method: "PUT",
+        id: userId,
+        body: {
+          is_blocked: true,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Requester"],
     }),
     suspendProvider: builder.mutation({
-      query: () => ({
-        url: "api/providers/suspend-my-account",
+      query: (userId) => ({
+        table: "users",
         method: "PUT",
+        id: userId,
+        body: {
+          is_blocked: true,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["Provider"],
     }),
   }),
 });

@@ -1,51 +1,53 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
 export const profileInfoApi = createApi({
   reducerPath: "profileInfoApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState, dispatch }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      // أضف التوكن للـ Authorization header
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["ProfileInfo"],
   endpoints: (builder) => ({
     createProfileInfo: builder.mutation({
       query: (body) => ({
-        url: "api/profile-info",
+        table: "profile_infos",
         method: "POST",
-        body,
+        body: {
+          user_id: body.userId,
+          bio: body.bio || null,
+          website_url: body.websiteUrl || null,
+          attachments_group_key: body.attachmentsGroupKey || null,
+        },
       }),
+      invalidatesTags: ["ProfileInfo"],
     }),
-    // لو فيه endpoint لفحص صلاحية التوكن أو استعادة بيانات المستخدم:
     getProfileInfo: builder.query({
-      query: () => ({
-        url: "api/profile-info", // مثال، لو الAPI بترجع بيانات المستخدم
+      query: (userId) => ({
+        table: "profile_infos",
         method: "GET",
+        filters: { user_id: userId },
       }),
+      providesTags: ["ProfileInfo"],
     }),
-
-    downloadProfileInfo: builder.query({
-      query: (id) => ({
-        url: `/attachments/download/${id}`, // مثال، لو الAPI بترجع بيانات المستخدم
-        method: "GET",
-        // params: { PageNumber, PageSize, RequestStatus },
+    updateProfileInfo: builder.mutation({
+      query: ({ userId, body }) => ({
+        table: "profile_infos",
+        method: "PUT",
+        id: userId, // This assumes user_id is unique
+        body: {
+          bio: body.bio || null,
+          website_url: body.websiteUrl || null,
+          attachments_group_key: body.attachmentsGroupKey || null,
+          updated_at: new Date().toISOString(),
+        },
       }),
+      invalidatesTags: ["ProfileInfo"],
     }),
+    // Note: downloadProfileInfo would need to be handled separately
+    // as it's about downloading attachments, not querying profile_infos
   }),
 });
 
 export const {
   useCreateProfileInfoMutation,
   useGetProfileInfoQuery,
-  useDownloadProfileInfoQuery,
+  useUpdateProfileInfoMutation,
 } = profileInfoApi;

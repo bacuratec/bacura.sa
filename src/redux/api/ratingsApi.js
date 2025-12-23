@@ -1,58 +1,54 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout } from "../slices/authSlice";
-import { jwtDecode } from "jwt-decode";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { supabaseBaseQuery } from "./supabaseBaseQuery";
 
-function isTokenExpired(token) {
-  try {
-    const decoded = jwtDecode(token);
-    // JWT عادة exp كوحدة ثواني من 1970
-    if (decoded.exp) {
-      const now = Date.now() / 1000;
-      return decoded.exp < now;
-    }
-    return false;
-  } catch {
-    return true;
-  }
-}
 export const ratingsApi = createApi({
   reducerPath: "ratingsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_APP_BASE_URL,
-    prepareHeaders: (headers, { getState, dispatch }) => {
-      const lang = localStorage.getItem("lang");
-      if (lang) {
-        headers.set("lang", lang);
-        headers.set("accept-language", lang);
-      }
-      const token = getState().auth.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: supabaseBaseQuery,
+  tagTypes: ["Ratings"],
   endpoints: (builder) => ({
     getRatings: builder.query({
-      query: ({ PageNumber = 1, PageSize = 10 }) => ({
-        url: "api/orders/orders-rating", // مثال، لو الAPI بترجع بيانات المستخدم
-        method: "GET",
-        params: { PageNumber, PageSize },
-      }),
+      query: ({ PageNumber = 1, PageSize = 10, orderId }) => {
+        const filters = {};
+        if (orderId) {
+          filters.order_id = orderId;
+        }
+        return {
+          table: "order_ratings",
+          method: "GET",
+          filters,
+          pagination: {
+            page: Number(PageNumber),
+            pageSize: Number(PageSize),
+          },
+          joins: [
+            "order:orders(id,order_title)",
+            "rated_by:users(id,email)",
+          ],
+          orderBy: { column: "created_at", ascending: false },
+        };
+      },
+      providesTags: ["Ratings"],
     }),
     CreateRating: builder.mutation({
       query: (body) => ({
-        url: "api/orders/order-rating",
-        method: "PUT",
-        body,
+        table: "order_ratings",
+        method: "POST",
+        body: {
+          order_id: body.orderId,
+          rated_by_user_id: body.ratedByUserId,
+          rating_value: body.ratingValue,
+          comment: body.comment || null,
+        },
       }),
+      invalidatesTags: ["Ratings"],
     }),
-    // Delete Rating
     deleteRating: builder.mutation({
       query: (id) => ({
-        url: `api/orders/orders-rating/${id}`,
+        table: "order_ratings",
         method: "DELETE",
+        id,
       }),
+      invalidatesTags: ["Ratings"],
     }),
   }),
 });
