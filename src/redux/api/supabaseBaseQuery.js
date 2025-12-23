@@ -20,73 +20,9 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
   try {
     // Supabase يتعامل مع الجلسة تلقائياً
     // لا نضيف قيود إضافية هنا لأن RLS policies في Supabase تتعامل مع الأمان
-    let query = supabase.from(table);
-
-    // Apply joins if needed (for related data)
-    if (joins.length > 0) {
-      // Supabase joins syntax: "foreign_table!inner(column1,column2)"
-      // إذا كان select هو "*"، نستخدمه مباشرة مع الـ joins
-      // وإلا نضيف الـ joins للـ select المحدد
-      const selectWithJoins =
-        select === "*"
-          ? `${select},${joins.join(",")}`
-          : `${select},${joins.join(",")}`;
-      query = query.select(selectWithJoins);
-    } else {
-      query = query.select(select);
-    }
-
-    // Apply filters
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        if (Array.isArray(value)) {
-          query = query.in(key, value);
-        } else if (typeof value === "object" && value.operator) {
-          // Support for operators like gt, lt, gte, lte, like, ilike
-          switch (value.operator) {
-            case "gt":
-              query = query.gt(key, value.value);
-              break;
-            case "lt":
-              query = query.lt(key, value.value);
-              break;
-            case "gte":
-              query = query.gte(key, value.value);
-              break;
-            case "lte":
-              query = query.lte(key, value.value);
-              break;
-            case "like":
-              query = query.like(key, value.value);
-              break;
-            case "ilike":
-              query = query.ilike(key, value.value);
-              break;
-            default:
-              query = query.eq(key, value.value);
-          }
-        } else {
-          query = query.eq(key, value);
-        }
-      }
-    });
-
-    // Apply ordering
-    if (orderBy.column) {
-      query = query.order(orderBy.column, {
-        ascending: orderBy.ascending !== false,
-      });
-    }
-
-    // Apply pagination
-    if (pagination.page && pagination.pageSize) {
-      const from = (pagination.page - 1) * pagination.pageSize;
-      const to = from + pagination.pageSize - 1;
-      query = query.range(from, to);
-    }
-
     let result;
-    // تحديد select string للاستخدام في POST/PUT
+
+    // تحديد select string للاستخدام في الاستعلامات
     const selectString =
       joins.length > 0
         ? select === "*"
@@ -95,24 +31,98 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
         : select;
 
     switch (method) {
-      case "GET":
+      case "GET": {
+        // نبني استعلام القراءة بشكل منفصل حتى لا نؤثر على عمليات الكتابة (insert / update)
+        let query = supabase.from(table);
+
+        // Apply joins if needed (for related data)
+        if (joins.length > 0) {
+          // Supabase joins syntax: "foreign_table!inner(column1,column2)"
+          const selectWithJoins =
+            select === "*"
+              ? `${select},${joins.join(",")}`
+              : `${select},${joins.join(",")}`;
+          query = query.select(selectWithJoins);
+        } else {
+          query = query.select(select);
+        }
+
+        // Apply filters
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            if (Array.isArray(value)) {
+              query = query.in(key, value);
+            } else if (typeof value === "object" && value.operator) {
+              // Support for operators like gt, lt, gte, lte, like, ilike
+              switch (value.operator) {
+                case "gt":
+                  query = query.gt(key, value.value);
+                  break;
+                case "lt":
+                  query = query.lt(key, value.value);
+                  break;
+                case "gte":
+                  query = query.gte(key, value.value);
+                  break;
+                case "lte":
+                  query = query.lte(key, value.value);
+                  break;
+                case "like":
+                  query = query.like(key, value.value);
+                  break;
+                case "ilike":
+                  query = query.ilike(key, value.value);
+                  break;
+                default:
+                  query = query.eq(key, value.value);
+              }
+            } else {
+              query = query.eq(key, value);
+            }
+          }
+        });
+
+        // Apply ordering
+        if (orderBy.column) {
+          query = query.order(orderBy.column, {
+            ascending: orderBy.ascending !== false,
+          });
+        }
+
+        // Apply pagination
+        if (pagination.page && pagination.pageSize) {
+          const from = (pagination.page - 1) * pagination.pageSize;
+          const to = from + pagination.pageSize - 1;
+          query = query.range(from, to);
+        }
+
         if (id) {
           result = await query.eq("id", id).single();
         } else {
           result = await query;
         }
         break;
+      }
       case "POST":
-        result = await query.insert(body).select(selectString).single();
+        // في Supabase، نستخدم from(table).insert() مباشرة بدون select مسبق
+        result = await supabase
+          .from(table)
+          .insert(body)
+          .select(selectString)
+          .single();
         break;
       case "PUT":
-        result = await query.update(body).eq("id", id).select(selectString).single();
-        break;
       case "PATCH":
-        result = await query.update(body).eq("id", id).select(selectString).single();
+        // update لا يجب أن يكون بعد select، لذا نبدأ استعلامًا جديدًا
+        result = await supabase
+          .from(table)
+          .update(body)
+          .eq("id", id)
+          .select(selectString)
+          .single();
         break;
       case "DELETE":
-        result = await query.delete().eq("id", id);
+        result = await supabase.from(table).delete().eq("id", id);
         break;
       default:
         throw new Error(`Unsupported method: ${method}`);
