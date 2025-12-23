@@ -89,31 +89,56 @@ const LoginForm = () => {
 
       // أولوية 1: الدور من user_metadata (Supabase Auth)
       let userRole = user.user_metadata?.role || null;
+      
+      // eslint-disable-next-line no-console
+      console.log("Initial role from user_metadata:", userRole);
+      // eslint-disable-next-line no-console
+      console.log("User ID:", user.id);
+      // eslint-disable-next-line no-console
+      console.log("User email:", user.email);
 
       // أولوية 2: التحقق من جدول users أولاً (لأن الأدمن موجود في users table)
       if (!userRole) {
         try {
           // أولاً: نحاول جلب role من جدول users مباشرة
+          // eslint-disable-next-line no-console
+          console.log("Attempting to fetch role from users table...");
           const { data: dbUser, error: dbError } = await supabase
             .from("users")
-            .select("role, id")
+            .select("role, id, email")
             .eq("id", user.id)
             .maybeSingle();
 
+          // eslint-disable-next-line no-console
+          console.log("Users table query result:", { dbUser, dbError });
+
           if (!dbError && dbUser) {
             // إذا كان role موجود في users، نستخدمه مباشرة
+            // نتعامل مع حالات مختلفة (Admin, admin, ADMIN)
             if (dbUser.role) {
-              userRole = dbUser.role;
+              // تطبيع قيمة role (Admin, admin, ADMIN -> Admin)
+              const normalizedRole = dbUser.role.charAt(0).toUpperCase() + dbUser.role.slice(1).toLowerCase();
+              userRole = normalizedRole;
               // eslint-disable-next-line no-console
-              console.log("Role detected from users table:", userRole);
+              console.log("Role detected from users table:", dbUser.role, "-> normalized to:", userRole);
+            } else {
+              // eslint-disable-next-line no-console
+              console.warn("User found in users table but role is null or empty");
             }
           } else if (dbError) {
             // eslint-disable-next-line no-console
-            console.warn("Error fetching from users table:", dbError.message);
+            console.error("Error fetching from users table:", dbError);
+            // eslint-disable-next-line no-console
+            console.error("Error details:", JSON.stringify(dbError, null, 2));
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn("No user found in users table with id:", user.id);
           }
 
           // إذا لم نجد role من users table، نحاول من الجداول الأخرى
           if (!userRole) {
+            // eslint-disable-next-line no-console
+            console.log("Role not found in users table, checking other tables...");
             // نحاول التحقق من وجود المستخدم في جداول admins, requesters, providers
             const [adminResult, requesterResult, providerResult] = await Promise.allSettled([
               // التحقق من admins table
@@ -136,6 +161,13 @@ const LoginForm = () => {
                 .maybeSingle(),
             ]);
 
+            // eslint-disable-next-line no-console
+            console.log("Other tables check results:", {
+              admin: adminResult,
+              requester: requesterResult,
+              provider: providerResult,
+            });
+
             // أولوية للأدمن
             if (adminResult.status === "fulfilled" && adminResult.value.data) {
               userRole = "Admin";
@@ -154,26 +186,38 @@ const LoginForm = () => {
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error("Error fetching role:", e);
+          // eslint-disable-next-line no-console
+          console.error("Error stack:", e.stack);
           // محاولة أخيرة: التحقق من role في users table مباشرة
           try {
-            // محاولة 1: البحث في users table للتحقق من role = 'Admin'
+            // eslint-disable-next-line no-console
+            console.log("Attempting final role check...");
+            // محاولة 1: البحث في users table للتحقق من role
             const userRoleCheck = await supabase
               .from("users")
-              .select("role")
+              .select("role, id, email")
               .eq("id", user.id)
               .maybeSingle();
             
+            // eslint-disable-next-line no-console
+            console.log("Final users table check:", userRoleCheck);
+            
             if (userRoleCheck.data && userRoleCheck.data.role) {
-              userRole = userRoleCheck.data.role;
+              // تطبيع قيمة role
+              const normalizedRole = userRoleCheck.data.role.charAt(0).toUpperCase() + userRoleCheck.data.role.slice(1).toLowerCase();
+              userRole = normalizedRole;
               // eslint-disable-next-line no-console
-              console.log("Role detected in final check from users table:", userRole);
+              console.log("Role detected in final check from users table:", userRoleCheck.data.role, "-> normalized to:", userRole);
             } else {
               // محاولة 2: البحث في admins table
               const finalAdminCheck = await supabase
                 .from("admins")
-                .select("id")
+                .select("id, user_id")
                 .or(`id.eq.${user.id},user_id.eq.${user.id}`)
                 .maybeSingle();
+              
+              // eslint-disable-next-line no-console
+              console.log("Final admins table check:", finalAdminCheck);
               
               if (finalAdminCheck.data) {
                 userRole = "Admin";
@@ -184,6 +228,8 @@ const LoginForm = () => {
           } catch (finalError) {
             // eslint-disable-next-line no-console
             console.error("Final role check failed:", finalError);
+            // eslint-disable-next-line no-console
+            console.error("Final error details:", JSON.stringify(finalError, null, 2));
           }
         }
       } else {
@@ -192,15 +238,24 @@ const LoginForm = () => {
         console.log("Role from user_metadata:", userRole);
       }
 
-      // إذا لم نتمكن من تحديد role، نعرض رسالة تحذير
+      // إذا لم نتمكن من تحديد role، نعرض رسالة تحذير مع معلومات إضافية
       if (!userRole) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to detect user role. User info:", {
+          id: user.id,
+          email: user.email,
+          user_metadata: user.user_metadata,
+        });
         toast.error(
-          "لم يتم العثور على صلاحيات المستخدم. يرجى التواصل مع الدعم الفني.",
-          { duration: 5000 }
+          `لم يتم العثور على صلاحيات المستخدم. يرجى التواصل مع الدعم الفني.\nUser ID: ${user.id}\nEmail: ${user.email}`,
+          { duration: 7000 }
         );
         setLoading(false);
         return;
       }
+      
+      // eslint-disable-next-line no-console
+      console.log("Final detected role:", userRole);
 
       dispatch(
         setCredentials({
