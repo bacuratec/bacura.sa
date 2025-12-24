@@ -1,9 +1,7 @@
 [build]
   # Install dependencies and build Next.js
-  # Note: base is "frontend", so paths are relative to frontend directory
   command = "npm run build"
   publish = ".next"
-  base = "frontend"
   # Increase build timeout to maximum (20 minutes = 1200 seconds)
   timeout = 1200
   # Prevent build cancellation
@@ -73,11 +71,8 @@
 [functions]
   node_bundler = "esbuild"
   included_files = [
-    "../backend/src/**", 
-    "../backend/dist/**", 
-    "../backend/package.json",
-    "../package.json",
-    "package.json"
+    "package.json",
+    "next.config.js"
   ]
 
 [[plugins]]
