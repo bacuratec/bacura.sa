@@ -3,6 +3,7 @@
 import { useState, createContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
@@ -22,7 +23,8 @@ export const LanguageProvider = ({ children }) => {
         localStorage.setItem("lang", lang);
       }
     }
-  }, [lang]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem("lang", lang);

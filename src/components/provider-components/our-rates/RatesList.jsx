@@ -24,6 +24,7 @@ const RatesList = () => {
 
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [PageNumber, PageSize]);
 
   const columns = [

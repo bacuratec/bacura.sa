@@ -1,22 +1,35 @@
+"use client";
+
 import logo from "../../../../assets/images/logoFooter.png";
 import twitter from "../../../../assets/icons/twitter.svg";
 import linked from "../../../../assets/icons/linked.svg";
 import insta from "../../../../assets/icons/insta.svg";
 import facebook from "../../../../assets/icons/facebook.svg";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useSelector } from "react-redux";
 import { FaSnapchat, FaTiktok, FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useGetProfileInfoQuery } from "../../../../redux/api/profileInfoApi";
 import { getAppBaseUrl } from "../../../../utils/env";
+import { formatLastUpdate, getLastUpdateTime } from "../../../../utils/buildInfo";
+import { useEffect, useState } from "react";
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const base = getAppBaseUrl();
+  const [lastUpdate, setLastUpdate] = useState("");
 
   const role = useSelector((state) => state.auth.role);
 
   const { data } = useGetProfileInfoQuery();
+
+  useEffect(() => {
+    // Get last update time and format it
+    const updateTime = getLastUpdateTime();
+    const locale = i18n.language === "ar" ? "ar-SA" : "en-US";
+    const formatted = formatLastUpdate(updateTime, locale);
+    setLastUpdate(formatted);
+  }, [i18n.language]);
 
   const socials = [
     { icon: facebook, url: "https://www.facebook.com/Bacuratec?locale=ar_AR" },
@@ -79,25 +92,25 @@ const Footer = () => {
             </h5>
             <ul className="flex flex-col gap-3">
               <li className="text-xs md:text-sm">
-                <Link to="/">{t("footer.home")}</Link>
+                <Link href="/">{t("footer.home")}</Link>
               </li>
               <li className="text-xs md:text-sm">
-                <Link to="/about-us">{t("footer.about")}</Link>
+                <Link href="/about-us">{t("footer.about")}</Link>
               </li>
               <li className="text-xs md:text-sm">
-                <Link to="/our-services">{t("footer.services")}</Link>
+                <Link href="/our-services">{t("footer.services")}</Link>
               </li>
               <li className="text-xs md:text-sm">
-                <Link to="/how-it-work">{t("footer.howItWorks")}</Link>
+                <Link href="/how-it-work">{t("footer.howItWorks")}</Link>
               </li>
               <li className="text-xs md:text-sm">
-                <Link to="/faqs">{t("footer.faq")}</Link>
+                <Link href="/faqs">{t("footer.faq")}</Link>
               </li>
               {role !== "Requester" && (
                 <li className="text-xs md:text-sm">
                   <Link
+                    href="/signup-provider"
                     onClick={() => window.scrollTo(0, 0)}
-                    to="/signup-provider"
                   >
                     {t("footer.joinAsProvider")}
                   </Link>
@@ -132,9 +145,13 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        <div className="flex justify-center items-center gap-4 flex-wrap border-t border-t-[#2B2D32] py-5 mt-10">
+        <div className="flex flex-col justify-center items-center gap-2 flex-wrap border-t border-t-[#2B2D32] py-5 mt-10">
           <p className="text-center text-xs">{t("footer.rights")}</p>
-
+          {lastUpdate && (
+            <p className="text-center text-xs text-gray-500">
+              {t("footer.lastUpdate")}: {lastUpdate}
+            </p>
+          )}
           {/* <ul className="flex items-center gap-7 text-xs">
             <li className="underline">
               <Link to="/">{t("footer.cookies")}</Link>

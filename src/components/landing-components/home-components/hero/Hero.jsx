@@ -1,7 +1,9 @@
+"use client";
+
 import heroImg from "../../../../assets/images/hero.jpg";
 import seeMore from "../../../../assets/icons/seeMore.svg";
 import arrowSeeMore from "../../../../assets/icons/arrowSeeMore.svg";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
@@ -23,7 +25,7 @@ const Hero = () => {
             {t("hero.title")}
           </h1>
           <Link
-            to={role === "Requester" ? "/request-service" : "signup"}
+            href={role === "Requester" ? "/request-service" : "/signup"}
             className="mt-6 inline-block py-1 lg:py-2 px-3 md:px-4 lg:px-6 bg-primary text-white text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl font-medium rounded-lg"
           >
             {role === "Requester"

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useContext } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"; // ✅ استيراد Framer Motion
@@ -6,7 +8,7 @@ import s1 from "../../../../assets/icons/s1.svg";
 import s2 from "../../../../assets/icons/s2.svg";
 import s3 from "../../../../assets/icons/s3.svg";
 import { LanguageContext } from "@/context/LanguageContext";
-import { Link } from "react-router-dom";
+import { AppLink } from "../../../../utils/routing";
 import { useSelector } from "react-redux";
 
 const ServiceList = ({ data }) => {
@@ -27,9 +29,8 @@ const ServiceList = ({ data }) => {
                 transition={{ duration: 0.5, delay: index * 0.15 }}
                 viewport={{ once: true }}
               >
-                <Link
-                  to={userId ? "/request-service" : "/request-service"}
-                  state={item.id}
+                <AppLink
+                  href="/request-service"
                 >
                   <ServiceCard
                     index={index + 1}
@@ -39,7 +40,7 @@ const ServiceList = ({ data }) => {
                       lang === "ar" ? item.descriptionAr : item.descriptionEn
                     }
                   />
-                </Link>
+                </AppLink>
               </motion.div>
             ))}
         </div>

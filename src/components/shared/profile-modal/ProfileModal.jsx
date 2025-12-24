@@ -128,6 +128,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
         stopCamera(); // إيقاف الكاميرا بعد التقاط الصورة
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // إيقاف الكاميرا وتنظيف الستريم

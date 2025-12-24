@@ -1,5 +1,7 @@
+"use client";
+
 import React from "react";
-import { Link } from "react-router-dom";
+import { AppLink } from "../../../utils/routing";
 import { useTranslation } from "react-i18next";
 
 import newService from "../../../assets/icons/newService.svg";
@@ -38,8 +40,8 @@ const Services = () => {
       <h3 className="font-bold text-xl mb-3">{t("servicesLanding.title")}</h3>
       <div className="grid grid-cols-2 gap-3">
         {services.map((item, i) => (
-          <Link
-            to={item.href}
+          <AppLink
+            href={item.href}
             key={i}
             className="p-2 md:p-3 lg:p-4 xl:p-5 bg-primary/15 rounded-lg flex flex-col gap-2 md:gap-3 lg:gap-4 xl:gap-5"
           >
@@ -57,7 +59,7 @@ const Services = () => {
                 {t(`servicesLanding.items.${i}.description`)}
               </p> */}
             </div>
-          </Link>
+          </AppLink>
         ))}
       </div>
     </div>

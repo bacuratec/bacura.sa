@@ -618,7 +618,8 @@
     "cookies": "Cookie Settings",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "rights": "© 2025 Bacura Platform. All rights reserved."
+    "rights": "© 2025 Bacura Platform. All rights reserved.",
+    "lastUpdate": "Last Update"
   },
   "headerLanding": {
     "about": "About Us",

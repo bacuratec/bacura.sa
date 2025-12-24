@@ -1,9 +1,11 @@
+"use client";
+
 import React from "react";
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import joinNow from "../../../../assets/images/joinNow.jpg";
 import join from "../../../../assets/icons/join.svg";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { AppLink } from "../../../../utils/routing";
 import { useTranslation } from "react-i18next";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -53,8 +55,8 @@ const Join = () => {
               <p className="text-[#737373] text-sm md:text-base leading-relaxed">
                 {t("join.description")}
               </p>
-              <Link
-                to={role === "Requester" ? "/request-service" : "signup"}
+              <AppLink
+                href={role === "Requester" ? "/request-service" : "/signup"}
                 className="flex items-center gap-2 self-start sm:self-end mt-4 sm:mt-6 lg:mt-10"
               >
                 <span className="font-bold text-sm sm:text-base text-primary">
@@ -65,7 +67,7 @@ const Join = () => {
                   alt="join"
                   className="w-4 sm:w-5 ltr:rotate-180"
                 />
-              </Link>
+              </AppLink>
             </motion.div>
           </div>
         </div>

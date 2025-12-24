@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NewOrders from "../../../components/provider-components/home-components/new-orders/NewOrders";
 import HeadTitle from "../../../components/shared/head-title/HeadTitle";
 import {
@@ -28,7 +28,7 @@ const Home = () => {
   const providerId = providerData?.id;
 
   // Get provider statistics
-  const { data: providerStats, isLoading: isLoadingStats } = useGetProviderStatisticsQuery(
+  const { data: providerStats } = useGetProviderStatisticsQuery(
     providerId,
     { skip: !providerId }
   );

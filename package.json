@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/set-build-time.js",
+    "build:simple": "cross-env NEXT_PUBLIC_BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build",
     "start": "next start",
     "lint": "next lint",
     "preview": "next start"

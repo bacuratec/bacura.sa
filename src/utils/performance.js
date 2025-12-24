@@ -11,7 +11,8 @@ import { useMemo, useCallback } from "react";
  * @returns {any} Memoized result
  */
 export const useMemoizedValue = (fn, deps) => {
-  return useMemo(fn, deps);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => fn(), deps);
 };
 
 /**
@@ -21,7 +22,8 @@ export const useMemoizedValue = (fn, deps) => {
  * @returns {Function} Memoized callback
  */
 export const useMemoizedCallback = (fn, deps) => {
-  return useCallback(fn, deps);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useCallback(() => fn(), deps);
 };
 
 /**

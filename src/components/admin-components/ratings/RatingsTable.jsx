@@ -32,6 +32,7 @@ const RatingsTable = () => {
 
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [PageNumber, PageSize]);
 
   const askToDelete = (id) => {

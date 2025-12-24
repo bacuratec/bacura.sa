@@ -1,5 +1,7 @@
+"use client";
+
 import React from "react";
-import { Link } from "react-router-dom";
+import { AppLink } from "../../../../utils/routing";
 
 const HowItWorkCard = ({ item }) => {
   return (
@@ -14,7 +16,7 @@ const HowItWorkCard = ({ item }) => {
         </p>
 
         {item?.link && (
-          <Link to={item?.link?.href} className="flex items-center justify-center gap-2 self-center sm:self-end py-2 sm:py-3 px-4 sm:px-6 border border-primary w-full sm:w-fit rounded-full">
+          <AppLink href={item?.link?.href} className="flex items-center justify-center gap-2 self-center sm:self-end py-2 sm:py-3 px-4 sm:px-6 border border-primary w-full sm:w-fit rounded-full">
             <span className="font-medium text-sm md:text-base lg:text-lg text-primary">
               {item?.link?.name}
             </span>
@@ -23,7 +25,7 @@ const HowItWorkCard = ({ item }) => {
               alt={item?.link?.name}
               className="w-4 sm:w-5 ltr:rotate-180"
             />
-          </Link>
+          </AppLink>
         )}
       </div>
     </div>

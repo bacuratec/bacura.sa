@@ -48,6 +48,7 @@ const RequestersTable = ({ stats }) => {
 
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [PageNumber, PageSize, AccountStatus]);
 
   const askToDelete = (id) => {

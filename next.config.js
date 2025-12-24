@@ -29,6 +29,7 @@ const nextConfig = {
   // Environment variables
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
+    NEXT_PUBLIC_BUILD_TIME: process.env.NEXT_PUBLIC_BUILD_TIME || process.env.BUILD_TIME || new Date().toISOString(),
   },
 
   // Webpack configuration for Supabase and other libraries

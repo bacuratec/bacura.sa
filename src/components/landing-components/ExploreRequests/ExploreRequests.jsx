@@ -31,6 +31,7 @@ const ExploreRequests = ({ stats }) => {
 
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [PageNumber, PageSize, RequestStatus]);
 
   const tabs = [
