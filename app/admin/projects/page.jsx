@@ -1,0 +1,18 @@
+"use client";
+
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
+
+const ProjectsAdmin = dynamic(() => import("@/pages/admin/projects/Projects"), {
+  loading: () => <TablePageSkeleton />,
+});
+
+export default function AdminProjectsPage() {
+  return (
+    <Suspense fallback={<TablePageSkeleton />}>
+      <ProjectsAdmin />
+    </Suspense>
+  );
+}
+

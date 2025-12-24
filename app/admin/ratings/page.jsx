@@ -1,0 +1,18 @@
+"use client";
+
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
+
+const RatingsAdmin = dynamic(() => import("@/pages/admin/ratings/Ratings"), {
+  loading: () => <TablePageSkeleton />,
+});
+
+export default function AdminRatingsPage() {
+  return (
+    <Suspense fallback={<TablePageSkeleton />}>
+      <RatingsAdmin />
+    </Suspense>
+  );
+}
+

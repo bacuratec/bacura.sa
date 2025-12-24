@@ -28,7 +28,7 @@ const Header = ({ data }) => {
   const dispatch = useDispatch();
 
   const imageUrl = data?.profilePictureUrl
-    ? `${import.meta.env.VITE_APP_BASE_URL}/${data.profilePictureUrl}`
+    ? `${process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || ""}/${data.profilePictureUrl}`
     : userImg;
 
   return (

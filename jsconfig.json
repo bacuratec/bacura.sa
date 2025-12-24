@@ -18,7 +18,7 @@
     "strict": false,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*", "app/**/*", "lib/**/*", "context/**/*"],
-  "exclude": ["node_modules", "dist", ".next"]
+  "include": ["src/**/*", "app/**/*", "lib/**/*", "context/**/*", "pages/**/*"],
+  "exclude": ["node_modules", "dist", ".next", "node_modules"]
 }
 

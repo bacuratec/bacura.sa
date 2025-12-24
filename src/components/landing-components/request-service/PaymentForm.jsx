@@ -7,8 +7,10 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 const stripePublishableKey = 
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 
-  import.meta.env.VITE_ENV_SECRETS || 
+  (typeof process !== "undefined" ? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY : null) ||
+  (typeof process !== "undefined" ? process.env.VITE_STRIPE_PUBLISHABLE_KEY : null) ||
+  (typeof import.meta !== "undefined" ? import.meta.env?.VITE_STRIPE_PUBLISHABLE_KEY : null) ||
+  (typeof import.meta !== "undefined" ? import.meta.env?.VITE_ENV_SECRETS : null) ||
   null;
 
 // فقط حمّل Stripe إذا كان المفتاح موجوداً وصحيحاً

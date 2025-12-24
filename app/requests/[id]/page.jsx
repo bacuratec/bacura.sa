@@ -1,0 +1,18 @@
+"use client";
+
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { DetailPageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
+
+const UserRequestDetails = dynamic(() => import("@/pages/landing/request-details/RequestDetails"), {
+  loading: () => <DetailPageSkeleton />,
+});
+
+export default function RequestDetailsPage({ params }) {
+  return (
+    <Suspense fallback={<DetailPageSkeleton />}>
+      <UserRequestDetails />
+    </Suspense>
+  );
+}
+
