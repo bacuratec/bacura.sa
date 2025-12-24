@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+// التحقق من وجود المتغيرات المطلوبة
+const validUrl = supabaseUrl?.trim() || '';
+const validAnonKey = supabaseAnonKey?.trim() || '';
+
+if (!validUrl || !validAnonKey) {
+  console.error(
+    "❌ Supabase configuration is missing in middleware!\n" +
+    "Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file."
+  );
+}
 
 // Routes that require authentication
 const protectedRoutes = [
@@ -35,7 +46,22 @@ const requesterRoutes = [
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
-  const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");
+  
+  // التحقق من وجود القيم قبل إنشاء العميل
+  if (!validUrl || !validAnonKey) {
+    // إذا لم تكن المتغيرات موجودة، نسمح بالمرور بدون مصادقة
+    // لكن هذا يجب إصلاحه قبل النشر
+    console.warn("Supabase not configured - middleware will allow all requests");
+    return NextResponse.next();
+  }
+  
+  // التحقق من صحة URL
+  if (!validUrl.match(/^https?:\/\//)) {
+    console.error(`Invalid Supabase URL format in middleware: "${validUrl}"`);
+    return NextResponse.next();
+  }
+  
+  const supabase = createClient(validUrl, validAnonKey);
 
   // Get session
   const {

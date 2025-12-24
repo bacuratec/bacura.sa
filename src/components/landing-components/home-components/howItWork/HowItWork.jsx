@@ -3,7 +3,7 @@ import NumberBg from "../../../shared/numberBg/NumberBg";
 import Polygon from "../../../../assets/icons/Polygon.svg";
 import howImg from "../../../../assets/images/howImg.jpg";
 import HowItWorkList from "./HowItWorkList";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/utils/useLocation";
 import { useTranslation } from "react-i18next";
 
 const HowItWork = () => {

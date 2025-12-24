@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 class ErrorBoundaryClass extends React.Component {
   constructor(props) {
@@ -40,11 +42,11 @@ class ErrorBoundaryClass extends React.Component {
 
 function ErrorFallback({ error, errorInfo, resetError }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleGoHome = () => {
     resetError();
-    navigate("/");
+    router.push("/");
   };
 
   const handleReload = () => {

@@ -3,7 +3,7 @@ import React from "react";
 import { motion } from "framer-motion"; // ✅ استيراد Framer Motion
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import CustomAccordion from "./accordion";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/utils/useLocation";
 import { useGetQuestionsQuery } from "../../../../redux/api/faqsApi";
 import { useTranslation } from "react-i18next";
 

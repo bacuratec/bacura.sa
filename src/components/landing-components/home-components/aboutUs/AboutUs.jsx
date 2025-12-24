@@ -4,7 +4,8 @@ import { motion } from "framer-motion"; // ✅
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import more from "../../../../assets/icons/moreabout.svg";
 import bgabout from "../../../../assets/images/bgabout.png";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { useLocation } from "@/utils/useLocation";
 import { useTranslation } from "react-i18next";
 
 const AboutUs = () => {
@@ -63,7 +64,7 @@ const AboutUs = () => {
             className="relative z-20 w-fit"
           >
             <Link
-              to={"/about-us"}
+              href={"/about-us"}
               className="flex items-center rounded-3xl border-[1.5px] px-2 sm:px-3 md:px-4 py-1 md:py-2 lg:py-3 mt-6 sm:mt-8 md:mt-10 lg:mt-16 xl:mt-[100px]"
             >
               <img src={more} alt="" />

@@ -1,7 +1,7 @@
 import React from "react";
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import ServiceList from "./ServiceList";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/utils/useLocation";
 import { useTranslation } from "react-i18next";
 
 const Services = ({ data }) => {
