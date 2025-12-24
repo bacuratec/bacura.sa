@@ -5,6 +5,7 @@ import join from "../../../../assets/icons/join.svg";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 const Join = () => {

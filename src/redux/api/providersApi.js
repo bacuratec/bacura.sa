@@ -11,7 +11,6 @@ export const providersApi = createApi({
       query: ({
         PageNumber = 1,
         PageSize = 10,
-        AccountStatus = "",
         name = "",
       }) => {
         const filters = {};
@@ -47,7 +46,7 @@ export const providersApi = createApi({
     }),
     // Update Provider Status (Block/Unblock User)
     updateProviderStatus: builder.mutation({
-      query: ({ id, body }) => {
+      query: ({ body }) => {
         // Update users table
         return {
           table: "users",

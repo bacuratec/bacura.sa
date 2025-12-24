@@ -100,7 +100,7 @@ const AdminCompleteRequest = ({ data, refetch }) => {
         }));
 
         callback(options);
-      } catch (error) {
+      } catch {
         callback([]);
       }
     },

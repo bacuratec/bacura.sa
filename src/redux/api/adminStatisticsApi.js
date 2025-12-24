@@ -2,7 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { supabase } from "@/lib/supabaseClient";
 
 // Custom base query for statistics that need complex aggregations
-const statisticsBaseQuery = async (args, api, extraOptions) => {
+const statisticsBaseQuery = async (args) => {
   const { type, filters = {} } = args;
 
   try {

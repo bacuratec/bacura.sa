@@ -49,7 +49,7 @@ const ReassignRequest = ({ refetch }) => {
         }));
 
         callback(options);
-      } catch (error) {
+      } catch {
         callback([]);
       }
     },

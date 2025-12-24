@@ -21,7 +21,7 @@ const getInitialState = () => {
           initialState.userId = parsed.userId;
         }
       }
-    } catch (err) {
+    } catch {
       // تجاهل خطأ parsing localStorage
     }
   }

@@ -6,7 +6,12 @@ import { useCreatePaymentMutation } from "../../../redux/api/paymentApi";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-const stripePromise = loadStripe(import.meta.env.VITE_ENV_SECRETS);
+const stripePublishableKey = 
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 
+  import.meta.env.VITE_ENV_SECRETS || 
+  "";
+
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 export default function PaymentForm({ amount, consultationId, refetch }) {
   const { t } = useTranslation();
@@ -40,6 +45,11 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
     clientSecret,
     appearance,
   };
+
+  if (!stripePromise) {
+    console.warn("Stripe publishable key is not configured. Please set VITE_STRIPE_PUBLISHABLE_KEY environment variable.");
+    return <p>Stripe غير متاح حالياً. يرجى التحقق من إعدادات المفاتيح.</p>;
+  }
 
   return clientSecret ? (
     <Elements options={options} stripe={stripePromise}>

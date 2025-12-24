@@ -23,7 +23,7 @@ import { useGetAdminStatisticsQuery } from "@/redux/api/adminStatisticsApi";
 const Home = () => {
   const { t } = useTranslation();
   const [adminStats, setAdminStats] = useState(null);
-  const { data: stats, isLoading } = useGetAdminStatisticsQuery();
+  const { data: stats } = useGetAdminStatisticsQuery();
 
   useEffect(() => {
     window.scrollTo(0, 0);

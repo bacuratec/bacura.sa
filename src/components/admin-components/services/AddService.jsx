@@ -84,7 +84,7 @@ const AddService = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, setFieldValue, touched, errors }) => (
+          {({ values, touched, errors }) => (
             <Form>
               <div className="mb-4 border p-3 rounded-lg relative">
                 {/* Title Arabic */}

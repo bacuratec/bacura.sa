@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../../components/shared/head-title/HeadTitle";
 import {

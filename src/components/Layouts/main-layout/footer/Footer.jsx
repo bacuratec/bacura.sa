@@ -1,5 +1,4 @@
 import logo from "../../../../assets/images/logoFooter.png";
-import youtube from "../../../../assets/icons/youtube.svg";
 import twitter from "../../../../assets/icons/twitter.svg";
 import linked from "../../../../assets/icons/linked.svg";
 import insta from "../../../../assets/icons/insta.svg";

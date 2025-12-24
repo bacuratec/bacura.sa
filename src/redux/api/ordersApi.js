@@ -1,6 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { supabaseBaseQuery } from "./supabaseBaseQuery";
-import { useSelector } from "react-redux";
 
 export const ordersApi = createApi({
   reducerPath: "ordersApi",
@@ -68,7 +67,7 @@ export const ordersApi = createApi({
     }),
     // Get User Requests (Requester)
     getUserOrders: builder.query({
-      query: ({ PageNumber = 1, PageSize = 10, RequestStatus = "", userId }) => {
+      query: ({ PageNumber = 1, PageSize = 10, RequestStatus = "" }) => {
         const filters = {};
         if (RequestStatus) {
           filters.status_id = RequestStatus;

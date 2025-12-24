@@ -79,8 +79,8 @@ const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
             }api/attachments/new-attachments-group-key`
           );
           groupKey = groupRes.data ?? "";
-        } catch (err) {
-          throw err;
+        } catch {
+          throw new Error("Failed to get group key");
         }
       } else {
         groupKey = projectData?.attachmentGroupKey ?? "";
@@ -134,7 +134,7 @@ const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
 
       toast.success(t("uploadAdminAttachments.completeSuccess"));
       refetch();
-    } catch (error) {
+    } catch {
       toast.error(t("uploadAdminAttachments.completeError"));
     }
   };

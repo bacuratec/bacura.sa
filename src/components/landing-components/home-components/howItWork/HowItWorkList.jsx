@@ -1,4 +1,5 @@
 import React from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"; // ✅ استيراد موشن
 import subscripeArrow from "../../../../assets/icons/subscripeArrow.svg";
 import HowItWorkCard from "./HowItWorkCard";

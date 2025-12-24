@@ -1,4 +1,5 @@
 import React from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"; // ✅
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import more from "../../../../assets/icons/moreabout.svg";

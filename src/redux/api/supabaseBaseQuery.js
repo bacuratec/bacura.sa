@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
  * Custom base query for RTK Query using Supabase
  * Supports pagination, filtering, and CRUD operations
  */
-export const supabaseBaseQuery = async (args, api, extraOptions) => {
+export const supabaseBaseQuery = async (args) => {
   const {
     table,
     method = "GET",
@@ -160,14 +160,57 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
         if (joins.length > 0 && method === "GET") {
           try {
             const simpleQuery = supabase.from(table).select(select === "*" ? "*" : select);
+            
+            // تطبيق الفلاتر
+            Object.entries(filters).forEach(([key, value]) => {
+              if (value !== undefined && value !== null && value !== "") {
+                if (Array.isArray(value)) {
+                  simpleQuery.in(key, value);
+                } else if (typeof value === "object" && value.operator) {
+                  switch (value.operator) {
+                    case "gt": simpleQuery.gt(key, value.value); break;
+                    case "lt": simpleQuery.lt(key, value.value); break;
+                    case "gte": simpleQuery.gte(key, value.value); break;
+                    case "lte": simpleQuery.lte(key, value.value); break;
+                    case "like": simpleQuery.like(key, value.value); break;
+                    case "ilike": simpleQuery.ilike(key, value.value); break;
+                    default: simpleQuery.eq(key, value.value);
+                  }
+                } else {
+                  simpleQuery.eq(key, value);
+                }
+              }
+            });
+            
             if (id) {
               const simpleResult = await simpleQuery.eq("id", id).single();
               if (!simpleResult.error) {
+                console.warn(`Supabase query with joins failed (406), returned data without joins for table: ${table}`);
+                return { data: simpleResult.data };
+              }
+            } else {
+              // تطبيق pagination
+              if (pagination.page && pagination.pageSize) {
+                const from = (pagination.page - 1) * pagination.pageSize;
+                const to = from + pagination.pageSize - 1;
+                simpleQuery.range(from, to);
+              }
+              
+              // تطبيق ordering
+              if (orderBy.column) {
+                simpleQuery.order(orderBy.column, {
+                  ascending: orderBy.ascending !== false,
+                });
+              }
+              
+              const simpleResult = await simpleQuery;
+              if (!simpleResult.error) {
+                console.warn(`Supabase query with joins failed (406), returned data without joins for table: ${table}`);
                 return { data: simpleResult.data };
               }
             }
           } catch (retryError) {
-            // تجاهل خطأ إعادة المحاولة
+            console.error("Error retrying query without joins:", retryError);
           }
         }
         
@@ -175,7 +218,7 @@ export const supabaseBaseQuery = async (args, api, extraOptions) => {
           error: {
             status: "NOT_ACCEPTABLE",
             data: result.error,
-            message: "خطأ في تنسيق الطلب. قد تكون هناك مشكلة في الاستعلام أو الصلاحيات.",
+            message: "خطأ في تنسيق الطلب (406). قد تكون هناك مشكلة في الصلاحيات (RLS) أو في تنسيق الاستعلام. تحقق من RLS policies في Supabase.",
           },
         };
       }

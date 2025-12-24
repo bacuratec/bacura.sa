@@ -8,7 +8,7 @@ export const requestersApi = createApi({
   endpoints: (builder) => ({
     // Get Requesters Accounts (Admin)
     getRequestersAccounts: builder.query({
-      query: ({ PageNumber = 1, PageSize = 10, AccountStatus = "" }) => {
+      query: ({ PageNumber = 1, PageSize = 10 }) => {
         const filters = {};
         // AccountStatus would need to be mapped to user.is_blocked
         // For now, we'll get all requesters with their user info
@@ -40,7 +40,7 @@ export const requestersApi = createApi({
     }),
     // Update Requester Status (Block/Unblock User)
     updateRequesterStatus: builder.mutation({
-      query: ({ id, body }) => {
+      query: ({ body }) => {
         // First get the requester to find user_id
         // Then update users table
         return {

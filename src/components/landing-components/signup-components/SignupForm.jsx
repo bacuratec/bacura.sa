@@ -24,6 +24,8 @@ const SignupForm = () => {
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const isProvider = location.pathname === "/signup-provider";
 
   const navigate = useNavigate();
@@ -161,7 +163,7 @@ const SignupForm = () => {
       };
 
       // 1) إنشاء المستخدم أولاً في Supabase Auth
-      const { data: signUpData, error: supabaseError } =
+      const { error: supabaseError } =
         await supabase.auth.signUp({
           email: values.email,
           password: values.password,
@@ -206,7 +208,6 @@ const SignupForm = () => {
           });
 
         if (uploadError) {
-          // eslint-disable-next-line no-console
           // تجاهل خطأ رفع الصورة الشخصية
         } else {
           profilePicturePath = uploadPath;
@@ -484,26 +485,23 @@ const SignupForm = () => {
                 <span className="text-red-500">*</span>
               </label>
               <Field name="password">
-                {({ field }) => {
-                  const [showPassword, setShowPassword] = useState(false);
-                  return (
-                    <div className="relative">
-                      <input
-                        {...field}
-                        type={showPassword ? "text" : "password"}
-                        placeholder={t("signupForm.passwordPlaceholder")}
-                        className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5 pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
-                      >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </button>
-                    </div>
-                  );
-                }}
+                {({ field }) => (
+                  <div className="relative">
+                    <input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      placeholder={t("signupForm.passwordPlaceholder")}
+                      className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5 pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                )}
               </Field>
               <ErrorMessage
                 name="password"
@@ -531,27 +529,23 @@ const SignupForm = () => {
                 <span className="text-red-500">*</span>
               </label>
               <Field name="confirmPassword">
-                {({ field }) => {
-                  const [showConfirmPassword, setShowConfirmPassword] =
-                    useState(false);
-                  return (
-                    <div className="relative">
-                      <input
-                        {...field}
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder={t("signupForm.confirmPasswordPlaceholder")}
-                        className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5 pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword((prev) => !prev)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
-                      >
-                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                      </button>
-                    </div>
-                  );
-                }}
+                {({ field }) => (
+                  <div className="relative">
+                    <input
+                      {...field}
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder={t("signupForm.confirmPasswordPlaceholder")}
+                      className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5 pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                    >
+                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                )}
               </Field>
               <ErrorMessage
                 name="confirmPassword"

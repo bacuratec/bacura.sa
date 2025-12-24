@@ -20,7 +20,7 @@ export const LanguageProvider = ({ children }) => {
         localStorage.setItem("lang", lang);
       }
     }
-  }, []);
+  }, [lang]);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem("lang", lang);

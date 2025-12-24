@@ -8,7 +8,6 @@ import {
   useCreateOrderPricedMutation,
 } from "../../../redux/api/ordersApi";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import toast from "react-hot-toast";
 import PaymentForm from "./PaymentForm";
 import { useTranslation } from "react-i18next";

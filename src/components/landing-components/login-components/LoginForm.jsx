@@ -68,7 +68,7 @@ const LoginForm = () => {
             role = jwtRole;
           }
         }
-      } catch (error) {
+      } catch {
         // تجاهل خطأ فك التشفير
       }
     }
@@ -117,7 +117,7 @@ const LoginForm = () => {
       }
 
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -169,7 +169,7 @@ const LoginForm = () => {
       }
 
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -201,7 +201,7 @@ const LoginForm = () => {
       if (emailUser?.role) {
         return normalizeRole(emailUser.role);
       }
-    } catch (error) {
+    } catch {
       // تجاهل الخطأ
     }
 
@@ -299,7 +299,7 @@ const LoginForm = () => {
         );
         navigate("/", { replace: true });
       }
-    } catch (err) {
+    } catch {
       toast.error(t("loginForm.errors.unknownError"));
     } finally {
       setLoading(false);

@@ -90,7 +90,7 @@ export const projectsApi = createApi({
     }),
     // Get Project Statistics
     getProjectStatistics: builder.query({
-      query: ({ userId }) => {
+      query: () => {
         // This would need custom logic - for now return orders count
         return {
           table: "orders",

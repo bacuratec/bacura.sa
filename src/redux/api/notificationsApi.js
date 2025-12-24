@@ -16,7 +16,7 @@ export const notificationsApi = createApi({
       providesTags: ["Notifications"],
     }),
     seenNotifications: builder.mutation({
-      query: ({ notificationIds, userId }) => {
+      query: ({ notificationIds }) => {
         // Update multiple notifications
         // Supabase doesn't support bulk update easily, so we'll update individually
         // For now, return the first one - components should handle multiple updates

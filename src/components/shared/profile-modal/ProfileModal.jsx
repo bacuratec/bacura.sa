@@ -1,4 +1,3 @@
-/* eslint-disable no-constant-binary-expression */
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useCallback, useContext, useRef, useState } from "react";
@@ -97,12 +96,12 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
-    } catch (error) {
+    } catch {
       toast.error(
         t("profile.cameraAccessFailed") || "فشل الوصول إلى الكاميرا"
       );
     }
-  }, []);
+  }, [t]);
 
   // التقاط الصورة من الكاميرا
   const captureImage = useCallback((setFieldValue) => {
@@ -225,10 +224,10 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                   await updateFn(formData).unwrap();
                   toast.success(t("profile.profileUpdateSuccess"));
                   setOpen(false);
-                } catch (error) {
-                  toast.error(
-                    error?.data?.Message || t("profile.profileUpdateFailed") || "حدث خطأ أثناء تحديث الملف الشخصي"
-                  );
+                } catch {
+      toast.error(
+        t("profile.profileUpdateFailed") || "حدث خطأ أثناء تحديث الملف الشخصي"
+      );
                 } finally {
                   setSubmitting(false);
                   refetch();
