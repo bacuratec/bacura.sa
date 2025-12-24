@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import { Edit, PlusIcon, Trash } from "lucide-react";
 import toast from "react-hot-toast";
@@ -66,7 +66,7 @@ const CustomersTable = () => {
       cell: (row) => (
         <div className="flex items-center gap-3">
           <Link
-            to={`/admin/update-customer/${row.id}`}
+            href={`/admin/update-customer/${row.id}`}
             className="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
           >
             <Edit width={15} />
@@ -95,7 +95,7 @@ const CustomersTable = () => {
                 {t("customers.title")}
               </h2>
               <Link
-                to="/admin/add-customer"
+                href="/admin/add-customer"
                 className="flex items-center gap-2 bg-primary text-white py-2 px-4 rounded-lg text-sm md:text-base font-medium hover:bg-primary/90 transition"
               >
                 <PlusIcon className="w-4 h-4" /> {t("customers.addCustomer")}

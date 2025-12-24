@@ -6,6 +6,7 @@ import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Explore = dynamic(() => import("@/views/landing/exploreRequests/Explore"), {
   loading: () => <TablePageSkeleton />,
+  ssr: false,
 });
 
 export default function RequestsPage() {

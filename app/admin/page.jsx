@@ -6,6 +6,7 @@ import { DashboardSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const HomeAdmin = dynamic(() => import("@/views/admin/home/Home"), {
   loading: () => <DashboardSkeleton />,
+  ssr: false,
 });
 
 export default function AdminHomePage() {

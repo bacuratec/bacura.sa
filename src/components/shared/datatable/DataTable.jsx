@@ -2,12 +2,10 @@
 import { useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
 import searchIcon from "../../../assets/icons/searchIcon.svg";
-import {
-  NavLink,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import Link from "next/link";
+import { useLocation } from "@/utils/useLocation";
+import { useNavigate } from "@/utils/useNavigate";
+import { useSearchParams } from "@/utils/useSearchParams";
 import { useTranslation } from "react-i18next";
 const CustomDataTable = ({
   columns,
@@ -105,23 +103,14 @@ const CustomDataTable = ({
           <ul className="flex items-center xl:gap-10 lg:gap-8 md:gap-6 gap-3 text-sm font-bold">
             {tabs?.map((item, i) => (
               <li key={i} className="text-xs shrink-0">
-                <NavLink
-                  to={item?.href}
-                  className={() => {
-                    const isActive =
-                      item?.href.includes(AccountStatus) && AccountStatus;
-
-                    const isAll =
-                      item?.name === "الكل" ||
-                      item?.name.toLowerCase() === "all";
-
-                    let textColor = "text-[#898A8D]";
-
-                    if ((isActive && !isAll) || (isAll && !AccountStatus)) {
-                      textColor = "text-black";
-                    }
-                    return `flex items-center gap-2 ${textColor}`;
-                  }}
+                <Link
+                  href={item?.href}
+                  className={`flex items-center gap-2 ${
+                    (item?.href.includes(AccountStatus) && AccountStatus) ||
+                    ((item?.name === "الكل" || item?.name.toLowerCase() === "all") && !AccountStatus)
+                      ? "text-black"
+                      : "text-[#898A8D]"
+                  }`}
                 >
                   <span
                     className={`py-0.5 px-1.5 rounded-lg`}
@@ -133,7 +122,7 @@ const CustomDataTable = ({
                     {item?.numbers}
                   </span>
                   {item?.name}
-                </NavLink>
+                </Link>
               </li>
             ))}
           </ul>

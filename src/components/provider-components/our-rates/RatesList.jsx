@@ -5,7 +5,7 @@ import star from "../../../assets/icons/star.svg";
 import emptyStar from "../../../assets/icons/emptyStar.svg";
 import { useEffect } from "react";
 import { useGetRatingsQuery } from "../../../redux/api/ratingsApi";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "@/utils/useSearchParams";
 import { useTranslation } from "react-i18next";
 const RatesList = () => {
   const { t } = useTranslation(); // 🟢 استدعاء hook الترجمة

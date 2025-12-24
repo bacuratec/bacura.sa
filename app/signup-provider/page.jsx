@@ -6,6 +6,7 @@ import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Signup = dynamic(() => import("@/views/landing/signup/Signup"), {
   loading: () => <ProfileSkeleton />,
+  ssr: false,
 });
 
 export default function SignupProviderPage() {

@@ -6,6 +6,7 @@ import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Requests = dynamic(() => import("@/views/admin/requests/Requests"), {
   loading: () => <TablePageSkeleton />,
+  ssr: false,
 });
 
 export default function AdminRequestsPage() {

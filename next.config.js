@@ -45,6 +45,9 @@ const nextConfig = {
     return config;
   },
 
+  // Turbopack configuration (required for Next.js 16+)
+  turbopack: {},
+
   // Experimental features
   experimental: {
     optimizePackageImports: ['lucide-react', 'react-icons'],

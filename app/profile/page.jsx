@@ -6,6 +6,7 @@ import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Profile = dynamic(() => import("@/views/landing/profile/Profile"), {
   loading: () => <ProfileSkeleton />,
+  ssr: false,
 });
 
 export default function ProfilePage() {

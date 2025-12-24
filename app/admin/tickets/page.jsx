@@ -6,6 +6,7 @@ import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const TicketsPage = dynamic(() => import("@/views/admin/tickets/Tickets"), {
   loading: () => <TablePageSkeleton />,
+  ssr: false,
 });
 
 export default function AdminTicketsPage() {

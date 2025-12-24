@@ -6,6 +6,7 @@ import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const ProjectsAdmin = dynamic(() => import("@/views/admin/projects/Projects"), {
   loading: () => <TablePageSkeleton />,
+  ssr: false,
 });
 
 export default function AdminProjectsPage() {

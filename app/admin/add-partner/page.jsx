@@ -6,6 +6,7 @@ import { FormPageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const UpsertPartner = dynamic(() => import("@/components/admin-components/partners/UpsertPartner"), {
   loading: () => <FormPageSkeleton />,
+  ssr: false,
 });
 
 export default function AddPartnerPage() {

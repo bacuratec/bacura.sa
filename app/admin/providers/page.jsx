@@ -6,6 +6,7 @@ import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Providers = dynamic(() => import("@/views/admin/providers/Providers"), {
   loading: () => <TablePageSkeleton />,
+  ssr: false,
 });
 
 export default function ProvidersPage() {

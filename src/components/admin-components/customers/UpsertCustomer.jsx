@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "@/utils/useNavigate";
+import { useParams } from "@/utils/useParams";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
@@ -16,7 +17,8 @@ const UpsertCustomer = () => {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id;
   const isEdit = Boolean(id);
 
   const { data, isLoading: isLoadingDetails } = useGetCustomerDetailsQuery(id, {

@@ -6,6 +6,7 @@ import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const OurRates = dynamic(() => import("@/views/provider/our-rates/OurRates"), {
   loading: () => <ProfileSkeleton />,
+  ssr: false,
 });
 
 export default function AdminOurRatesPage() {

@@ -6,6 +6,7 @@ import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const ActiveOrders = dynamic(() => import("@/views/provider/active-orders/ActiveOrders"), {
   loading: () => <TablePageSkeleton />,
+  ssr: false,
 });
 
 export default function ActiveOrdersPage() {

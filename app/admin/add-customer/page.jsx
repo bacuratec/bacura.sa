@@ -6,7 +6,10 @@ import { FormPageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const UpsertCustomer = dynamic(() => import("@/components/admin-components/customers/UpsertCustomer"), {
   loading: () => <FormPageSkeleton />,
+  ssr: false,
 });
+
+export const dynamicParams = true;
 
 export default function AddCustomerPage() {
   return (

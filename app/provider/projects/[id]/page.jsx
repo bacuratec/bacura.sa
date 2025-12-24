@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { DetailPageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
-const ProviderProjectsDetails = dynamic(() => import("@/pages/provider/project-details/ProviderProjectsDetails"), {
+const ProviderProjectsDetails = dynamic(() => import("@/views/provider/project-details/ProviderProjectsDetails"), {
   loading: () => <DetailPageSkeleton />,
 });
 

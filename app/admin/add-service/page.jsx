@@ -6,6 +6,7 @@ import { FormPageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const AddService = dynamic(() => import("@/components/admin-components/services/AddService"), {
   loading: () => <FormPageSkeleton />,
+  ssr: false,
 });
 
 export default function AddServicePage() {

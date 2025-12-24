@@ -6,6 +6,7 @@ import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Login = dynamic(() => import("@/views/landing/login/Login"), {
   loading: () => <ProfileSkeleton />,
+  ssr: false,
 });
 
 export default function LoginPage() {

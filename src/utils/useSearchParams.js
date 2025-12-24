@@ -1,13 +1,13 @@
 /**
  * Unified search params hook that works with both React Router and Next.js
  */
-import { useSearchParams as useNextSearchParams } from "next/navigation";
-import { useSearchParams as useReactRouterSearchParams } from "react-router-dom";
+"use client";
 
 export function useSearchParams() {
   // Try Next.js first
   if (typeof window !== "undefined") {
     try {
+      const { useSearchParams: useNextSearchParams } = require("next/navigation");
       const searchParams = useNextSearchParams();
       return {
         get: (key) => searchParams?.get(key) || null,
@@ -22,6 +22,7 @@ export function useSearchParams() {
 
   // Fallback to React Router
   try {
+    const { useSearchParams: useReactRouterSearchParams } = require("react-router-dom");
     return useReactRouterSearchParams();
   } catch (e) {
     // Final fallback

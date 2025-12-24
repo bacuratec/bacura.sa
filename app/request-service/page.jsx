@@ -6,6 +6,7 @@ import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const RequestService = dynamic(() => import("@/views/landing/requestService/RequestService"), {
   loading: () => <ProfileSkeleton />,
+  ssr: false,
 });
 
 export default function RequestServicePage() {

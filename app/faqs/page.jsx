@@ -6,6 +6,7 @@ import { DashboardSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Faqs = dynamic(() => import("@/components/landing-components/home-components/faqs/Faqs"), {
   loading: () => <DashboardSkeleton />,
+  ssr: false,
 });
 
 export default function FaqsPage() {

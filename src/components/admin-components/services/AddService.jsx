@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/utils/useNavigate";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";

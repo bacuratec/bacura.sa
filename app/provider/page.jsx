@@ -6,6 +6,7 @@ import { DashboardSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const HomeProvider = dynamic(() => import("@/views/provider/home/Home"), {
   loading: () => <DashboardSkeleton />,
+  ssr: false,
 });
 
 export default function ProviderHomePage() {

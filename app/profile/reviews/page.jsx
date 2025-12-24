@@ -6,6 +6,7 @@ import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const Reviews = dynamic(() => import("@/views/landing/reviws/Reviews"), {
   loading: () => <ProfileSkeleton />,
+  ssr: false,
 });
 
 export default function ReviewsPage() {

@@ -1,4 +1,6 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useLocation } from "@/utils/useLocation";
+import { useNavigate } from "@/utils/useNavigate";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
@@ -16,7 +18,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || location.search?.split("redirect=")[1]?.split("&")[0] || "/";
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -153,7 +155,7 @@ const LoginForm = () => {
           <h3 className="text-[#8D8D8D] text-xs">
             {t("loginForm.noAccount")}
           </h3>
-          <Link className="text-xs text-primary" to={"/signup"}>
+          <Link className="text-xs text-primary" href={"/signup"}>
             {t("loginForm.createAccount")}
           </Link>
         </div>

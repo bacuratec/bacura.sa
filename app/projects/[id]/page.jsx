@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { DetailPageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
-const ProjectUserDetails = dynamic(() => import("@/pages/landing/project-details/ProjectUserDetails"), {
+const ProjectUserDetails = dynamic(() => import("@/views/landing/project-details/ProjectUserDetails"), {
   loading: () => <DetailPageSkeleton />,
 });
 
