@@ -1,9 +1,85 @@
 [build]
+  # Install dependencies and build Next.js
   command = "npm run build"
   publish = ".next"
+  # Increase build timeout to maximum (20 minutes = 1200 seconds)
+  timeout = 1200
+  # Prevent build cancellation
+  skip_processing = false
+  # Enable build logs to debug cancellation issues
+  processing = { css = { bundle = true }, js = { bundle = true } }
 
 [build.environment]
+  # Netlify Next.js v5 optimizations
+  NEXT_PRIVATE_STANDALONE_VERIFY_IGNORE = "true"
+  NETLIFY_NEXT_V5_ENABLED = "true"
+  # Use Node 20
   NODE_VERSION = "20"
+  # Optimize npm for faster installs
+  NPM_FLAGS = "--prefer-offline --no-audit --no-fund"
+  # Optimize Node.js memory
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  # CI mode for better caching and performance
+  CI = "true"
+  # Optimize build performance
+  NPM_CONFIG_PRODUCTION = "false"
+  NPM_CONFIG_AUDIT = "false"
+  NPM_CONFIG_FUND = "false"
+  # Next.js build optimizations
+  NEXT_TELEMETRY_DISABLED = "1"
 
+# API redirects - proxy to external API via Next.js rewrites
+# Note: Next.js rewrites in next.config.js handle this, but we keep redirects as fallback
+[[redirects]]
+  from = "/api/:path*"
+  to = "http://51.112.209.149:5141/api/:splat"
+  status = 200
+  force = true
+
+# Exclude static files from SPA redirect
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+
+[[redirects]]
+  from = "/manifest.json"
+  to = "/manifest.json"
+  status = 200
+
+[[redirects]]
+  from = "/sw.js"
+  to = "/sw.js"
+  status = 200
+
+[[redirects]]
+  from = "/offline.html"
+  to = "/offline.html"
+  status = 200
+
+# Headers for Service Worker
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+# Headers for manifest.json
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
+
+# Functions configuration (if needed for serverless functions)
+[functions]
+  node_bundler = "esbuild"
+  included_files = [
+    "package.json",
+    "next.config.js"
+  ]
+
+# Netlify Next.js plugin (required for Next.js on Netlify)
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
