@@ -27,6 +27,20 @@
   NETLIFY_NEXT_V5_ENABLED = "true"
   NEXT_PRIVATE_STANDALONE_VERIFY_IGNORE = "true"
   
+  # ============================================
+  # ⚠️ Environment Variables المطلوبة في Netlify Dashboard:
+  # ============================================
+  # يجب إضافة المتغيرات التالية في Netlify Dashboard:
+  # Site settings → Environment variables → Add variable
+  #
+  # NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+  # NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+  # NEXT_PUBLIC_DEFAULT_LANG=ar (اختياري)
+  #
+  # للحصول على Supabase credentials:
+  # https://app.supabase.com/project/_/settings/api
+  # ============================================
+  
   # استخدام Node.js 20
   NODE_VERSION = "20"
   
