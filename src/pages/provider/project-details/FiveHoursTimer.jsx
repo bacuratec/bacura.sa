@@ -1,4 +1,4 @@
-import { useCountdown } from "./UseCountDown";
+import { useCountdown } from "../../../hooks/useCountdown";
 
 function formatTime(ms) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -10,7 +10,7 @@ function formatTime(ms) {
   ).padStart(2, "0")}`;
 }
 
-export const FiveHoursTimer = ({
+const FiveHoursTimer = ({
   startISO,
   durationHours = 5,
   //   timeZone = "Africa/Cairo",
@@ -51,3 +51,6 @@ export const FiveHoursTimer = ({
     </div>
   );
 };
+
+export default FiveHoursTimer;
+export { FiveHoursTimer };

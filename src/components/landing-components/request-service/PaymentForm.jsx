@@ -23,12 +23,12 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
   const [clientSecret, setClientSecret] = useState("");
   const [createPayment, { isLoading, error }] = useCreatePaymentMutation();
 
-  // إذا لم يكن Stripe متوفراً، لا تعرض أي شيء
-  if (!stripePublishableKey || !stripePromise) {
-    return null;
-  }
-
   useEffect(() => {
+    // إذا لم يكن Stripe متوفراً، لا تفعل شيء
+    if (!stripePublishableKey || !stripePromise) {
+      return;
+    }
+
     const createPaymentIntent = async () => {
       try {
         const data = await createPayment({
@@ -48,6 +48,11 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
       createPaymentIntent();
     }
   }, [amount, consultationId, createPayment, t]);
+
+  // إذا لم يكن Stripe متوفراً، لا تعرض أي شيء
+  if (!stripePublishableKey || !stripePromise) {
+    return null;
+  }
 
   const appearance = { theme: "stripe" };
   const options = {

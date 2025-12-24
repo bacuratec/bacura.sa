@@ -50,6 +50,20 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'react-icons'],
   },
 
+  // ESLint configuration
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: false,
+  },
+
+  // TypeScript configuration
+  typescript: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has type errors.
+    ignoreBuildErrors: false,
+  },
+
   // Redirects for SPA compatibility
   async redirects() {
     return [];
