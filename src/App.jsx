@@ -1,4 +1,4 @@
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, lazy, useContext, useEffect, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "./lib/supabaseClient";
@@ -9,77 +9,82 @@ import AdminLayout from "./components/Layouts/admin-layout/AdminLayout";
 import MainLayout from "./components/Layouts/main-layout/MainLayout";
 import LoadingPage from "./pages/LoadingPage";
 import NotFound from "./pages/not-found/NotFound";
+import { DashboardSkeleton, TablePageSkeleton, ProfileSkeleton } from "./components/shared/skeletons/PageSkeleton";
 
-// Landing Pages
-import LandingHome from "./pages/landing/home/Home";
-import Login from "./pages/landing/login/Login";
-import Signup from "./pages/landing/signup/Signup";
-import RequestService from "./pages/landing/requestService/RequestService";
-import Profile from "./pages/landing/profile/Profile";
-import Explore from "./pages/landing/exploreRequests/Explore";
-import Projects from "./pages/landing/projects/Projects";
-import Reviews from "./pages/landing/reviws/Reviews";
+// Landing Pages - Lazy loaded for better performance
+const LandingHome = lazy(() => import("./pages/landing/home/Home"));
+const Login = lazy(() => import("./pages/landing/login/Login"));
+const Signup = lazy(() => import("./pages/landing/signup/Signup"));
+const RequestService = lazy(() => import("./pages/landing/requestService/RequestService"));
+const Profile = lazy(() => import("./pages/landing/profile/Profile"));
+const Explore = lazy(() => import("./pages/landing/exploreRequests/Explore"));
+const Projects = lazy(() => import("./pages/landing/projects/Projects"));
+const Reviews = lazy(() => import("./pages/landing/reviws/Reviews"));
+const UserRequestDetails = lazy(() => import("./pages/landing/request-details/RequestDetails"));
+const ProjectUserDetails = lazy(() => import("./pages/landing/project-details/ProjectUserDetails"));
+const OurServices = lazy(() => import("./pages/landing/our-services/OurServices"));
+const AboutUs = lazy(() => import("./pages/landing/about-us/AboutUs"));
+const HowItWork = lazy(() => import("./pages/landing/howItWork/HowItWork"));
+const Tickets = lazy(() => import("./pages/landing/tickets/Tickets"));
 
-// Provider Pages
-import HomeProvider from "./pages/provider/home/Home";
-import ActiveOrders from "./pages/provider/active-orders/ActiveOrders";
-import OurProjects from "./pages/provider/our-projects/OurProjects";
-import OurRates from "./pages/provider/our-rates/OurRates";
+// Provider Pages - Lazy loaded
+const HomeProvider = lazy(() => import("./pages/provider/home/Home"));
+const ActiveOrders = lazy(() => import("./pages/provider/active-orders/ActiveOrders"));
+const OurProjects = lazy(() => import("./pages/provider/our-projects/OurProjects"));
+const OurRates = lazy(() => import("./pages/provider/our-rates/OurRates"));
+const ProviderProjectsDetails = lazy(() => import("./pages/provider/project-details/ProviderProjectsDetails"));
 
-// Admin Pages
-import HomeAdmin from "./pages/admin/home/Home";
+// Admin Pages - Lazy loaded
+const HomeAdmin = lazy(() => import("./pages/admin/home/Home"));
+const Providers = lazy(() => import("./pages/admin/providers/Providers"));
+const Requesters = lazy(() => import("./pages/admin/requesters/Requesters"));
+const Requests = lazy(() => import("./pages/admin/requests/Requests"));
+const ProjectsAdmin = lazy(() => import("./pages/admin/projects/Projects"));
+const ProjectsAdminDetails = lazy(() => import("./pages/admin/project-details/ProjectsAdminDetails"));
+const UsersDetails = lazy(() => import("./pages/admin/users-details/UsersDetails"));
+const ProfileDetails = lazy(() => import("./pages/admin/profile-details/ProfileDetails"));
+const RequestDetails = lazy(() => import("./pages/admin/request-details/RequestDetails"));
+const ServicesPage = lazy(() => import("./pages/admin/services/Services"));
+const TicketsPage = lazy(() => import("./pages/admin/tickets/Tickets"));
+const TicketsDetails = lazy(() => import("./pages/admin/tickets/TicketsDetails"));
+const FaqsAdmin = lazy(() => import("./pages/admin/faqs/Faqs"));
+const PartnersAdmin = lazy(() => import("./pages/admin/partners/Partners"));
+const CustomersAdmin = lazy(() => import("./pages/admin/customers/Customers"));
+const ProfileInfo = lazy(() => import("./pages/admin/profile-info/ProfileInfo"));
+const RatingsAdmin = lazy(() => import("./pages/admin/ratings/Ratings"));
 
-// Admin > Providers
-import Providers from "./pages/admin/providers/Providers";
-
-// Admin > Requesters
-import Requesters from "./pages/admin/requesters/Requesters";
-
-// Admin > Requests
-import Requests from "./pages/admin/requests/Requests";
-
-// Admin > Projects
-import ProjectsAdmin from "./pages/admin/projects/Projects";
-import ProjectsAdminDetails from "./pages/admin/project-details/ProjectsAdminDetails";
+// Components - Lazy loaded
+const Faqs = lazy(() => import("./components/landing-components/home-components/faqs/Faqs"));
+const Partners = lazy(() => import("./components/landing-components/home-components/partners/Partners"));
+const AddQuestion = lazy(() => import("./components/admin-components/faqs/AddQuestion"));
+const UpdateQuestion = lazy(() => import("./components/admin-components/faqs/UpdateQuestion"));
+const UpsertPartner = lazy(() => import("./components/admin-components/partners/UpsertPartner"));
+const UpsertCustomer = lazy(() => import("./components/admin-components/customers/UpsertCustomer"));
+const AddService = lazy(() => import("./components/admin-components/services/AddService"));
 
 import AuthGuard from "./components/authGuard";
 import GuestGuard from "./components/GuestGuard";
-import UsersDetails from "./pages/admin/users-details/UsersDetails";
-import ProfileDetails from "./pages/admin/profile-details/ProfileDetails";
-import RequestDetails from "./pages/admin/request-details/RequestDetails";
-
-import UserRequestDetails from "./pages/landing/request-details/RequestDetails";
-import ProjectUserDetails from "./pages/landing/project-details/ProjectUserDetails";
-import ProviderProjectsDetails from "./pages/provider/project-details/ProviderProjectsDetails";
-import OurServices from "./pages/landing/our-services/OurServices";
-import AboutUs from "./pages/landing/about-us/AboutUs";
-import HowItWork from "./pages/landing/howItWork/HowItWork";
-import Faqs from "./components/landing-components/home-components/faqs/Faqs";
-import Partners from "./components/landing-components/home-components/partners/Partners";
 import BackToTopButton from "./components/BackTop";
-import Tickets from "./pages/landing/tickets/Tickets";
-import ServicesPage from "./pages/admin/services/Services";
-import TicketsPage from "./pages/admin/tickets/Tickets";
-import TicketsDetails from "./pages/admin/tickets/TicketsDetails";
-import FaqsAdmin from "./pages/admin/faqs/Faqs";
-import AddQuestion from "./components/admin-components/faqs/AddQuestion";
-import UpdateQuestion from "./components/admin-components/faqs/UpdateQuestion";
-
-import PartnersAdmin from "./pages/admin/partners/Partners";
-import CustomersAdmin from "./pages/admin/customers/Customers";
-import UpsertPartner from "./components/admin-components/partners/UpsertPartner";
-import UpsertCustomer from "./components/admin-components/customers/UpsertCustomer";
 import { LanguageContext } from "./context/LanguageContext";
 import i18n from "./i18n";
-import ProfileInfo from "./pages/admin/profile-info/ProfileInfo";
-import RatingsAdmin from "./pages/admin/ratings/Ratings";
-import AddService from "./components/admin-components/services/AddService";
-// import UpdateQuestion from "./components/admin-components/faqs/UpdateQuestion";
 
-// Reusable Suspense wrapper
-const withSuspense = (Component) => (
-  <Suspense fallback={<LoadingPage />}>{Component}</Suspense>
-);
+// Reusable Suspense wrapper with different loading states
+const withSuspense = (Component, skeletonType = "default") => {
+  const getSkeleton = () => {
+    switch (skeletonType) {
+      case "dashboard":
+        return <DashboardSkeleton />;
+      case "table":
+        return <TablePageSkeleton />;
+      case "profile":
+        return <ProfileSkeleton />;
+      default:
+        return <LoadingPage />;
+    }
+  };
+
+  return <Suspense fallback={getSkeleton()}>{Component}</Suspense>;
+};
 
 const router = createBrowserRouter([
   // صفحات عامة (بدون حماية)
@@ -87,7 +92,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <MainLayout />,
     children: [
-      { index: true, element: withSuspense(<LandingHome />) },
+      { index: true, element: withSuspense(<LandingHome />, "dashboard") },
       { path: "our-services", element: withSuspense(<OurServices />) },
       { path: "about-us", element: withSuspense(<AboutUs />) },
       { path: "how-it-work", element: withSuspense(<HowItWork />) },
@@ -169,17 +174,17 @@ const router = createBrowserRouter([
       { index: true, element: withSuspense(<HomeAdmin />) },
 
       // Providers
-      { path: "providers", element: withSuspense(<Providers />) },
+      { path: "providers", element: withSuspense(<Providers />, "table") },
       { path: "providers/:id", element: withSuspense(<UsersDetails />) },
 
       // Requesters
-      { path: "requesters", element: withSuspense(<Requesters />) },
+      { path: "requesters", element: withSuspense(<Requesters />, "table") },
       { path: "requesters/:id", element: withSuspense(<UsersDetails />) },
 
       { path: "profile", element: withSuspense(<ProfileDetails />) },
 
       // Requests
-      { path: "requests", element: withSuspense(<Requests />) },
+      { path: "requests", element: withSuspense(<Requests />, "table") },
       { path: "requests/:id", element: withSuspense(<RequestDetails />) },
 
       // Tickets
@@ -191,7 +196,7 @@ const router = createBrowserRouter([
       { path: "add-service", element: withSuspense(<AddService />) },
 
       // Projects
-      { path: "projects", element: withSuspense(<ProjectsAdmin />) },
+      { path: "projects", element: withSuspense(<ProjectsAdmin />, "table") },
       { path: "projects/:id", element: withSuspense(<ProjectsAdminDetails />) },
 
       // Ratings

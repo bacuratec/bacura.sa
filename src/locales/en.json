@@ -914,5 +914,23 @@
       "errorUpload": "An error occurred during registration. Please check the data.",
       "registrationError": "Registration or file upload error:"
     }
+  },
+  "error": {
+    "boundary": {
+      "title": "An unexpected error occurred",
+      "message": "We're sorry, an unexpected error occurred. Please try again or return to the home page.",
+      "goHome": "Go to Home Page",
+      "reload": "Reload Page",
+      "tryAgain": "Try Again"
+    }
+  },
+  "loading": {
+    "default": "Loading...",
+    "subtitle": "Please wait",
+    "data": "Loading data...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "uploading": "Uploading...",
+    "processing": "Processing..."
   }
 }
