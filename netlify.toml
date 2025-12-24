@@ -1,7 +1,9 @@
 [build]
   # Install dependencies and build Next.js
+  # Note: base is "frontend", so paths are relative to frontend directory
   command = "npm run build"
   publish = ".next"
+  base = "frontend"
   # Increase build timeout to maximum (20 minutes = 1200 seconds)
   timeout = 1200
   # Prevent build cancellation
@@ -28,11 +30,10 @@
   # Next.js build optimizations
   NEXT_TELEMETRY_DISABLED = "1"
 
-# API redirects - proxy to external API
-# Note: Next.js rewrites in next.config.js handle this, but Netlify redirects provide fallback
+# API redirects - must come before other redirects
 [[redirects]]
   from = "/api/v1/*"
-  to = "http://51.112.209.149:5141/api/v1/:splat"
+  to = "/.netlify/functions/server/:splat"
   status = 200
   force = true
 
@@ -72,8 +73,11 @@
 [functions]
   node_bundler = "esbuild"
   included_files = [
-    "package.json",
-    "next.config.js"
+    "../backend/src/**", 
+    "../backend/dist/**", 
+    "../backend/package.json",
+    "../package.json",
+    "package.json"
   ]
 
 [[plugins]]
