@@ -9,15 +9,22 @@ import { useTranslation } from "react-i18next";
 const stripePublishableKey = 
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 
   import.meta.env.VITE_ENV_SECRETS || 
-  "";
+  null;
 
-const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
+// فقط حمّل Stripe إذا كان المفتاح موجوداً وصحيحاً
+const stripePromise = stripePublishableKey && stripePublishableKey.trim() 
+  ? loadStripe(stripePublishableKey.trim()) 
+  : null;
 
 export default function PaymentForm({ amount, consultationId, refetch }) {
   const { t } = useTranslation();
   const [clientSecret, setClientSecret] = useState("");
-  // "pi_3Rqfo7CD3Txa0lrN1VOTs56E_secret_6au6fSlEiZP62p5YCwjh3mDk7"
   const [createPayment, { isLoading, error }] = useCreatePaymentMutation();
+
+  // إذا لم يكن Stripe متوفراً، لا تعرض أي شيء
+  if (!stripePublishableKey || !stripePromise) {
+    return null;
+  }
 
   useEffect(() => {
     const createPaymentIntent = async () => {
@@ -26,8 +33,8 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
           amount,
           currency: "sar",
           consultationId,
-        }).unwrap(); // unwrap بيطلعلك الـ data مباشرة من الـ response
-        setClientSecret(data.clientSecret); // تأكد إن ده نفس الاسم اللي API بيرجعه
+        }).unwrap();
+        setClientSecret(data.clientSecret);
       } catch (err) {
         toast.error(
           err?.data?.message || t("payment.stripeError") || "حدث خطأ أثناء إنشاء نية الدفع"
@@ -38,18 +45,13 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
     if (amount && consultationId) {
       createPaymentIntent();
     }
-  }, [amount, consultationId, createPayment]);
+  }, [amount, consultationId, createPayment, t]);
 
   const appearance = { theme: "stripe" };
   const options = {
     clientSecret,
     appearance,
   };
-
-  if (!stripePromise) {
-    console.warn("Stripe publishable key is not configured. Please set VITE_STRIPE_PUBLISHABLE_KEY environment variable.");
-    return <p>Stripe غير متاح حالياً. يرجى التحقق من إعدادات المفاتيح.</p>;
-  }
 
   return clientSecret ? (
     <Elements options={options} stripe={stripePromise}>

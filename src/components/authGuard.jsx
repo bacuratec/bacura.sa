@@ -23,28 +23,28 @@ const AuthGuard = ({ allowedRoles, children }) => {
   useEffect(() => {
     if (token && isTokenExpired(token)) {
       dispatch(logout());
-      setShouldRedirect(true); // يخلي الري أكت ترجع تعمل render ويفعل التنقل
+      setShouldRedirect(true);
     }
   }, [token, dispatch]);
 
+  // إذا لم يكن هناك token أو انتهت صلاحيته
   if (shouldRedirect || !token) {
-    if (
-      allowedRoles.includes("Requester") &&
-      !location.pathname.includes("profile") &&
-      !location.pathname.includes("request-service") &&
-      !location.pathname.includes("requests") &&
-      !location.pathname.includes("request") &&
-      !location.pathname.includes("projects")
-    ) {
-      return children;
-    }
-
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // إذا كان المستخدم ليس له الدور المطلوب
   if (!allowedRoles.includes(role)) {
-    dispatch(logout());
-    return <Navigate to="/login" replace />;
+    // توجيه المستخدم إلى لوحة التحكم المناسبة حسب دوره
+    let redirectPath = "/login";
+    if (role === "Admin") {
+      redirectPath = "/admin";
+    } else if (role === "Provider") {
+      redirectPath = "/provider";
+    } else if (role === "Requester") {
+      redirectPath = "/";
+    }
+    
+    return <Navigate to={redirectPath} replace />;
   }
 
   return children;

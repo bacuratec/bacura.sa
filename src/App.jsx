@@ -3,6 +3,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "./lib/supabaseClient";
 import { setCredentials, logout } from "./redux/slices/authSlice";
+import { detectUserRole } from "./utils/roleDetection";
 import DashboardLayout from "./components/Layouts/dashboard-layout/DashboardLayout";
 import AdminLayout from "./components/Layouts/admin-layout/AdminLayout";
 import MainLayout from "./components/Layouts/main-layout/MainLayout";
@@ -81,38 +82,17 @@ const withSuspense = (Component) => (
 );
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: (
-      <AuthGuard allowedRoles={["Requester"]}>
-        <MainLayout />
-      </AuthGuard>
-    ),
-    children: [
-      { index: true, element: withSuspense(<LandingHome />) },
-
-      { path: "request-service", element: withSuspense(<RequestService />) },
-      { path: "requests", element: withSuspense(<Explore />) },
-      { path: "requests/:id", element: withSuspense(<UserRequestDetails />) },
-
-      { path: "tickets", element: withSuspense(<Tickets />) },
-      { path: "projects", element: withSuspense(<Projects />) },
-      { path: "projects/:id", element: withSuspense(<ProjectUserDetails />) },
-      {
-        path: "profile",
-        children: [
-          { index: true, element: withSuspense(<Profile />) },
-          { path: "reviews", element: withSuspense(<Reviews />) },
-          { path: "*", element: <NotFound /> },
-        ],
-      },
-      { path: "*", element: <NotFound /> },
-    ],
-  },
+  // صفحات عامة (بدون حماية)
   {
     path: "/",
     element: <MainLayout />,
     children: [
+      { index: true, element: withSuspense(<LandingHome />) },
+      { path: "our-services", element: withSuspense(<OurServices />) },
+      { path: "about-us", element: withSuspense(<AboutUs />) },
+      { path: "how-it-work", element: withSuspense(<HowItWork />) },
+      { path: "faqs", element: withSuspense(<Faqs />) },
+      { path: "partners", element: withSuspense(<Partners />) },
       {
         path: "login",
         element: <GuestGuard>{withSuspense(<Login />)}</GuestGuard>,
@@ -125,27 +105,31 @@ const router = createBrowserRouter([
         path: "signup-provider",
         element: <GuestGuard>{withSuspense(<Signup />)}</GuestGuard>,
       },
-
-      { path: "*", element: <NotFound /> },
     ],
   },
+  // صفحات Requester المحمية
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <AuthGuard allowedRoles={["Requester"]}>
+        <MainLayout />
+      </AuthGuard>
+    ),
     children: [
-      { path: "/our-services", element: withSuspense(<OurServices />) },
-      { path: "/about-us", element: withSuspense(<AboutUs />) },
-      { path: "/how-it-work", element: withSuspense(<HowItWork />) },
+      { path: "request-service", element: withSuspense(<RequestService />) },
+      { path: "requests", element: withSuspense(<Explore />) },
+      { path: "requests/:id", element: withSuspense(<UserRequestDetails />) },
+      { path: "tickets", element: withSuspense(<Tickets />) },
+      { path: "projects", element: withSuspense(<Projects />) },
+      { path: "projects/:id", element: withSuspense(<ProjectUserDetails />) },
       {
-        path: "/faqs",
-        element: withSuspense(
-          <>
-            <Faqs />
-          </>
-        ),
+        path: "profile",
+        children: [
+          { index: true, element: withSuspense(<Profile />) },
+          { path: "reviews", element: withSuspense(<Reviews />) },
+          { path: "*", element: <NotFound /> },
+        ],
       },
-      { path: "/partners", element: withSuspense(<Partners />) },
-      { path: "*", element: <NotFound /> },
     ],
   },
 
@@ -264,42 +248,18 @@ function AuthInitializer({ children }) {
         if (session && session.user) {
           // إذا كان هناك session لكن لا يوجد role في Redux
           if (!role || !token) {
-            // محاولة جلب الدور من RPC function
             try {
-              const { data: userRole, error: rpcError } = await supabase.rpc(
-                "get_user_role",
-                { user_id: session.user.id }
-              );
-
-              if (!rpcError && userRole) {
-                const normalizedRole = userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
+              const userRole = await detectUserRole(session.user, session);
+              
+              if (userRole) {
                 dispatch(
                   setCredentials({
                     token: session.access_token,
                     refreshToken: session.refresh_token || null,
-                    role: normalizedRole,
+                    role: userRole,
                     userId: session.user.id,
                   })
                 );
-              } else {
-                // محاولة جلب الدور من جدول users
-                const { data: dbUser, error: dbError } = await supabase
-                  .from("users")
-                  .select("role, id")
-                  .eq("id", session.user.id)
-                  .maybeSingle();
-
-                if (!dbError && dbUser?.role) {
-                  const normalizedRole = dbUser.role.charAt(0).toUpperCase() + dbUser.role.slice(1).toLowerCase();
-                  dispatch(
-                    setCredentials({
-                      token: session.access_token,
-                      refreshToken: session.refresh_token || null,
-                      role: normalizedRole,
-                      userId: session.user.id,
-                    })
-                  );
-                }
               }
             } catch (err) {
               console.error("Error detecting role:", err);
@@ -328,18 +288,14 @@ function AuthInitializer({ children }) {
         } else if (event === "SIGNED_IN" && session) {
           // إذا تم تسجيل الدخول، جلب الدور
           try {
-            const { data: userRole, error: rpcError } = await supabase.rpc(
-              "get_user_role",
-              { user_id: session.user.id }
-            );
-
-            if (!rpcError && userRole) {
-              const normalizedRole = userRole.charAt(0).toUpperCase() + userRole.slice(1).toLowerCase();
+            const userRole = await detectUserRole(session.user, session);
+            
+            if (userRole) {
               dispatch(
                 setCredentials({
                   token: session.access_token,
                   refreshToken: session.refresh_token || null,
-                  role: normalizedRole,
+                  role: userRole,
                   userId: session.user.id,
                 })
               );
