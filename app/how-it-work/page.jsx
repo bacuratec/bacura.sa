@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { DashboardSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
-const HowItWork = dynamic(() => import("@/pages/landing/howItWork/HowItWork"), {
+const HowItWork = dynamic(() => import("@/views/landing/howItWork/HowItWork"), {
   loading: () => <DashboardSkeleton />,
 });
 

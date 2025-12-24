@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
-const Login = dynamic(() => import("@/pages/landing/login/Login"), {
+const Login = dynamic(() => import("@/views/landing/login/Login"), {
   loading: () => <ProfileSkeleton />,
 });
 

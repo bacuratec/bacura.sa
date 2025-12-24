@@ -48,21 +48,11 @@ const nextConfig = {
   // Experimental features
   experimental: {
     optimizePackageImports: ['lucide-react', 'react-icons'],
+    // Enable MCP (Model Context Protocol) for dynamic development and debugging
+    // MCP is automatically enabled in Next.js 16+ for dev server
+    // This ensures MCP tools are available for real-time error detection and fixes
   },
 
-  // ESLint configuration
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: false,
-  },
-
-  // TypeScript configuration
-  typescript: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has type errors.
-    ignoreBuildErrors: false,
-  },
 
   // Redirects for SPA compatibility
   async redirects() {

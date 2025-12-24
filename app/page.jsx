@@ -2,10 +2,10 @@
 
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
-import LoadingPage from "@/pages/LoadingPage";
+import LoadingPage from "@/views/LoadingPage";
 import { DashboardSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
-const LandingHome = dynamic(() => import("@/pages/landing/home/Home"), {
+const LandingHome = dynamic(() => import("@/views/landing/home/Home"), {
   loading: () => <DashboardSkeleton />,
 });
 

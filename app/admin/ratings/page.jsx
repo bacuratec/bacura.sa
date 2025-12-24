@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
-const RatingsAdmin = dynamic(() => import("@/pages/admin/ratings/Ratings"), {
+const RatingsAdmin = dynamic(() => import("@/views/admin/ratings/Ratings"), {
   loading: () => <TablePageSkeleton />,
 });
 

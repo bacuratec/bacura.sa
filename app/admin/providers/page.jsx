@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
-const Providers = dynamic(() => import("@/pages/admin/providers/Providers"), {
+const Providers = dynamic(() => import("@/views/admin/providers/Providers"), {
   loading: () => <TablePageSkeleton />,
 });
 
