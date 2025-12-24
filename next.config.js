@@ -43,6 +43,13 @@ const nextConfig = {
         tls: false,
       };
     }
+    
+    // Ensure path aliases work correctly
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, './src'),
+    };
+    
     return config;
   },
 
