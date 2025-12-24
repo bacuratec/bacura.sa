@@ -8,7 +8,7 @@ const UpsertPartner = dynamic(() => import("@/components/admin-components/partne
   loading: () => <FormPageSkeleton />,
 });
 
-export default function UpdatePartnerPage({ params }) {
+export default function UpdatePartnerPage({ params: _params }) {
   return (
     <Suspense fallback={<FormPageSkeleton />}>
       <UpsertPartner />

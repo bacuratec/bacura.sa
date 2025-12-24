@@ -8,7 +8,7 @@ const UpsertCustomer = dynamic(() => import("@/components/admin-components/custo
   loading: () => <FormPageSkeleton />,
 });
 
-export default function UpdateCustomerPage({ params }) {
+export default function UpdateCustomerPage({ params: _params }) {
   return (
     <Suspense fallback={<FormPageSkeleton />}>
       <UpsertCustomer />

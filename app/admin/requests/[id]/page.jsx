@@ -8,7 +8,7 @@ const RequestDetails = dynamic(() => import("@/views/admin/request-details/Reque
   loading: () => <DetailPageSkeleton />,
 });
 
-export default function AdminRequestDetailsPage({ params }) {
+export default function AdminRequestDetailsPage({ params: _params }) {
   return (
     <Suspense fallback={<DetailPageSkeleton />}>
       <RequestDetails />

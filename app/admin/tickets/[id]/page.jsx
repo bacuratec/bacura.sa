@@ -8,7 +8,7 @@ const TicketsDetails = dynamic(() => import("@/views/admin/tickets/TicketsDetail
   loading: () => <DetailPageSkeleton />,
 });
 
-export default function AdminTicketDetailsPage({ params }) {
+export default function AdminTicketDetailsPage({ params: _params }) {
   return (
     <Suspense fallback={<DetailPageSkeleton />}>
       <TicketsDetails />

@@ -8,7 +8,7 @@ const ProjectsAdminDetails = dynamic(() => import("@/views/admin/project-details
   loading: () => <DetailPageSkeleton />,
 });
 
-export default function AdminProjectDetailsPage({ params }) {
+export default function AdminProjectDetailsPage({ params: _params }) {
   return (
     <Suspense fallback={<DetailPageSkeleton />}>
       <ProjectsAdminDetails />

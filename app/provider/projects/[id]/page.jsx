@@ -8,7 +8,7 @@ const ProviderProjectsDetails = dynamic(() => import("@/views/provider/project-d
   loading: () => <DetailPageSkeleton />,
 });
 
-export default function ProviderProjectDetailsPage({ params }) {
+export default function ProviderProjectDetailsPage({ params: _params }) {
   return (
     <Suspense fallback={<DetailPageSkeleton />}>
       <ProviderProjectsDetails />

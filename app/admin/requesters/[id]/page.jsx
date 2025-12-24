@@ -8,7 +8,7 @@ const UsersDetails = dynamic(() => import("@/views/admin/users-details/UsersDeta
   loading: () => <DetailPageSkeleton />,
 });
 
-export default function RequesterDetailsPage({ params }) {
+export default function RequesterDetailsPage({ params: _params }) {
   return (
     <Suspense fallback={<DetailPageSkeleton />}>
       <UsersDetails />

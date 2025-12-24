@@ -8,7 +8,7 @@ const ProjectUserDetails = dynamic(() => import("@/views/landing/project-details
   loading: () => <DetailPageSkeleton />,
 });
 
-export default function ProjectDetailsPage({ params }) {
+export default function ProjectDetailsPage({ params: _params }) {
   return (
     <Suspense fallback={<DetailPageSkeleton />}>
       <ProjectUserDetails />

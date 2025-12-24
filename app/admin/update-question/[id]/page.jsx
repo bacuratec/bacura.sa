@@ -8,7 +8,7 @@ const UpdateQuestion = dynamic(() => import("@/components/admin-components/faqs/
   loading: () => <FormPageSkeleton />,
 });
 
-export default function UpdateQuestionPage({ params }) {
+export default function UpdateQuestionPage({ params: _params }) {
   return (
     <Suspense fallback={<FormPageSkeleton />}>
       <UpdateQuestion />
