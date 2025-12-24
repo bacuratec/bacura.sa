@@ -2,7 +2,7 @@ import { Suspense, useContext, useEffect, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "./lib/supabaseClient";
-import { setCredentials, logout } from "./redux/slices/authSlice";
+import { setCredentials, logoutUser } from "./redux/slices/authSlice";
 import { detectUserRole } from "./utils/roleDetection";
 import DashboardLayout from "./components/Layouts/dashboard-layout/DashboardLayout";
 import AdminLayout from "./components/Layouts/admin-layout/AdminLayout";
@@ -268,7 +268,7 @@ function AuthInitializer({ children }) {
         } else {
           // لا يوجد session - مسح البيانات
           if (token || role) {
-            dispatch(logout());
+            dispatch(logoutUser());
           }
         }
       } catch (err) {
@@ -284,7 +284,7 @@ function AuthInitializer({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_OUT" || !session) {
-          dispatch(logout());
+          dispatch(logoutUser());
         } else if (event === "SIGNED_IN" && session) {
           // إذا تم تسجيل الدخول، جلب الدور
           try {

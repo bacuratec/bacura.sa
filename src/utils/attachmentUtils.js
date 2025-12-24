@@ -14,6 +14,20 @@ export const createAttachmentGroupKey = async () => {
     
     if (error) {
       console.error("Error creating attachment group key:", error);
+      
+      // معالجة أخطاء محددة
+      if (error.code === '23503') {
+        // Foreign key constraint violation - user doesn't exist in users table
+        console.warn("User not found in users table, creating group without user_id");
+        // المحاولة مرة أخرى - الدالة يجب أن تتعامل مع هذا
+        const retryResult = await supabase.rpc("create_attachment_group_key");
+        if (retryResult.error) {
+          toast.error("فشل في إنشاء group key للمرفقات");
+          return null;
+        }
+        return retryResult.data;
+      }
+      
       toast.error("فشل في إنشاء group key للمرفقات");
       return null;
     }

@@ -1,14 +1,72 @@
-import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, Navigate } from "react-router-dom";
 import MobileNavigation from "./sidebar/MobileNavigation";
 import Header from "./header/Header";
 import SideBar from "./sidebar/SideBar";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useGetAdminDetailsQuery } from "../../../redux/api/usersDetails";
+import { supabase } from "../../../lib/supabaseClient";
+import { detectUserRole } from "../../../utils/roleDetection";
+import { logoutUser } from "../../../redux/slices/authSlice";
+import LoadingPage from "../../../pages/LoadingPage";
 
 const AdminLayout = () => {
   const userId = useSelector((state) => state.auth.userId);
+  const role = useSelector((state) => state.auth.role);
+  const dispatch = useDispatch();
+  const [isVerifying, setIsVerifying] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const { data: adminData } = useGetAdminDetailsQuery(userId);
+  const { data: adminData } = useGetAdminDetailsQuery(userId, {
+    skip: !userId || !isAdmin,
+  });
+
+  useEffect(() => {
+    const verifyAdminRole = async () => {
+      try {
+        // التحقق من Supabase session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session || !session.user) {
+          dispatch(logoutUser());
+          setIsAdmin(false);
+          setIsVerifying(false);
+          return;
+        }
+
+        // التحقق من الدور مباشرة من جدول users في Supabase
+        const userRole = await detectUserRole(session.user, session);
+        
+        // التأكد من أن المستخدم أدمن فقط
+        if (userRole === "Admin") {
+          setIsAdmin(true);
+        } else {
+          // إذا لم يكن أدمن، تسجيل الخروج وإعادة التوجيه
+          dispatch(logoutUser());
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error("Error verifying admin role:", error);
+        dispatch(logoutUser());
+        setIsAdmin(false);
+      } finally {
+        setIsVerifying(false);
+      }
+    };
+
+    verifyAdminRole();
+  }, [userId, dispatch]);
+
+  // عرض صفحة التحميل أثناء التحقق
+  if (isVerifying) {
+    return <LoadingPage />;
+  }
+
+  // إذا لم يكن أدمن، إعادة التوجيه
+  if (!isAdmin || role !== "Admin") {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div>
       <MobileNavigation />

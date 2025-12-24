@@ -28,12 +28,23 @@ ON users FOR SELECT
 USING (auth.uid() = id);
 
 -- الأدمن يمكنه قراءة جميع المستخدمين
+-- ملاحظة: هذا يتطلب أن يكون auth.uid() موجوداً في admins table
 CREATE POLICY "Admins can read all users"
 ON users FOR SELECT
 USING (
     EXISTS (
         SELECT 1 FROM admins 
         WHERE user_id = auth.uid() OR id = auth.uid()
+    )
+    -- السماح أيضاً بقراءة users المرتبطة بـ requesters/providers/admins للـ joins
+    OR EXISTS (
+        SELECT 1 FROM requesters WHERE user_id = users.id
+    )
+    OR EXISTS (
+        SELECT 1 FROM providers WHERE user_id = users.id
+    )
+    OR EXISTS (
+        SELECT 1 FROM admins WHERE user_id = users.id
     )
 );
 

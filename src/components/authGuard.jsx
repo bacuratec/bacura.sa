@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import { logout } from "../redux/slices/authSlice";
+import { logoutUser, setCredentials } from "../redux/slices/authSlice";
+import { supabase } from "../lib/supabaseClient";
+import { detectUserRole } from "../utils/roleDetection";
+import LoadingPage from "../pages/LoadingPage";
 
 const isTokenExpired = (token) => {
   try {
@@ -14,33 +17,91 @@ const isTokenExpired = (token) => {
 };
 
 const AuthGuard = ({ allowedRoles, children }) => {
-  const { token, role } = useSelector((state) => state.auth);
+  const { token, role, userId } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const location = useLocation();
 
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
+  const [verifiedRole, setVerifiedRole] = useState(null);
 
   useEffect(() => {
-    if (token && isTokenExpired(token)) {
-      dispatch(logout());
-      setShouldRedirect(true);
-    }
-  }, [token, dispatch]);
+    const verifyRole = async () => {
+      if (!token || isTokenExpired(token)) {
+        dispatch(logoutUser());
+        setShouldRedirect(true);
+        setIsVerifying(false);
+        return;
+      }
+
+      try {
+        // التحقق من Supabase session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session || !session.user) {
+          dispatch(logoutUser());
+          setShouldRedirect(true);
+          setIsVerifying(false);
+          return;
+        }
+
+        // التحقق من الدور مباشرة من جدول users في Supabase
+        const userRole = await detectUserRole(session.user, session);
+        
+        if (!userRole) {
+          dispatch(logoutUser());
+          setShouldRedirect(true);
+          setIsVerifying(false);
+          return;
+        }
+
+        // تحديث Redux إذا تغير الدور
+        if (userRole !== role) {
+          dispatch(
+            setCredentials({
+              token: session.access_token,
+              refreshToken: session.refresh_token || null,
+              role: userRole,
+              userId: session.user.id,
+            })
+          );
+        }
+
+        setVerifiedRole(userRole);
+      } catch (error) {
+        console.error("Error verifying role:", error);
+        dispatch(logoutUser());
+        setShouldRedirect(true);
+      } finally {
+        setIsVerifying(false);
+      }
+    };
+
+    verifyRole();
+  }, [token, dispatch, role, userId]);
+
+  // عرض صفحة التحميل أثناء التحقق
+  if (isVerifying) {
+    return <LoadingPage />;
+  }
 
   // إذا لم يكن هناك token أو انتهت صلاحيته
   if (shouldRedirect || !token) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // استخدام الدور المُتحقق منه من Supabase
+  const currentRole = verifiedRole || role;
+
   // إذا كان المستخدم ليس له الدور المطلوب
-  if (!allowedRoles.includes(role)) {
+  if (!allowedRoles.includes(currentRole)) {
     // توجيه المستخدم إلى لوحة التحكم المناسبة حسب دوره
     let redirectPath = "/login";
-    if (role === "Admin") {
+    if (currentRole === "Admin") {
       redirectPath = "/admin";
-    } else if (role === "Provider") {
+    } else if (currentRole === "Provider") {
       redirectPath = "/provider";
-    } else if (role === "Requester") {
+    } else if (currentRole === "Requester") {
       redirectPath = "/";
     }
     

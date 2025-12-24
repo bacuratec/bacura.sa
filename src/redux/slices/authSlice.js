@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { supabase } from "../../lib/supabaseClient";
 
 const getInitialState = () => {
   const initialState = {
@@ -28,6 +29,26 @@ const getInitialState = () => {
 
   return initialState;
 };
+
+// Async thunk لتسجيل الخروج من Supabase ثم مسح Redux state
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { dispatch }) => {
+    try {
+      // تسجيل الخروج من Supabase
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Error signing out from Supabase:", error);
+      // نستمر في مسح Redux state حتى لو فشل signOut
+    }
+    
+    // مسح Redux state
+    dispatch(logout());
+    
+    return null;
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState: getInitialState(),

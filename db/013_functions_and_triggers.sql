@@ -250,3 +250,57 @@ CREATE TRIGGER trigger_validate_order_dates
     FOR EACH ROW
     EXECUTE FUNCTION validate_order_dates();
 
+-- ============================================
+-- دالة لإنشاء group key جديد للمرفقات
+-- ============================================
+CREATE OR REPLACE FUNCTION create_attachment_group_key()
+RETURNS VARCHAR(100) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    new_group_key VARCHAR(100);
+    current_user_id UUID;
+    user_exists BOOLEAN;
+BEGIN
+    -- توليد group_key فريد
+    new_group_key := 'group_' || gen_random_uuid()::TEXT;
+    
+    -- جلب user ID من auth.uid()
+    current_user_id := auth.uid();
+    
+    -- التحقق من وجود المستخدم في جدول users
+    IF current_user_id IS NOT NULL THEN
+        SELECT EXISTS(SELECT 1 FROM users WHERE id = current_user_id) INTO user_exists;
+        
+        -- إدراج السجل مع user_id فقط إذا كان موجوداً في users
+        IF user_exists THEN
+            INSERT INTO attachment_groups (group_key, created_by_user_id)
+            VALUES (new_group_key, current_user_id);
+        ELSE
+            -- إذا لم يكن موجوداً، ندرجه بدون user_id
+            INSERT INTO attachment_groups (group_key, created_by_user_id)
+            VALUES (new_group_key, NULL);
+        END IF;
+    ELSE
+        -- إذا لم يكن هناك مستخدم مصادق عليه
+        INSERT INTO attachment_groups (group_key, created_by_user_id)
+        VALUES (new_group_key, NULL);
+    END IF;
+    
+    RETURN new_group_key;
+EXCEPTION
+    WHEN unique_violation THEN
+        -- إذا كان group_key موجود بالفعل (نادر جداً)، نحاول مرة أخرى
+        RETURN create_attachment_group_key();
+    WHEN OTHERS THEN
+        -- في حالة أي خطأ آخر، نعيد NULL
+        RAISE EXCEPTION 'فشل في إنشاء group key: %', SQLERRM;
+END;
+$$;
+
+-- منح الصلاحيات للدالة
+GRANT EXECUTE ON FUNCTION create_attachment_group_key() TO authenticated;
+GRANT EXECUTE ON FUNCTION create_attachment_group_key() TO anon;
+

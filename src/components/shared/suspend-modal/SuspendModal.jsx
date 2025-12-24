@@ -6,18 +6,20 @@ import {
   DialogDescription,
 } from "@headlessui/react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import suspend from "@/assets/icons/suspend.svg";
 import {
   useSuspendProviderMutation,
   useSuspendRequesterMutation,
 } from "../../../redux/api/updateApi";
-import { logout } from "../../../redux/slices/authSlice";
+import { logoutUser } from "../../../redux/slices/authSlice";
 import { useTranslation } from "react-i18next";
 
 export default function SuspendModal({ open, setOpen }) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const role = useSelector((state) => state.auth.role);
   const [suspendProvider, { isLoading: loadingProvider }] =
     useSuspendProviderMutation();
@@ -32,7 +34,8 @@ export default function SuspendModal({ open, setOpen }) {
         await suspendRequester().unwrap();
       }
       toast.success(t("suspend.success"));
-      dispatch(logout());
+      await dispatch(logoutUser());
+      navigate("/login", { replace: true });
     } catch (error) {
       toast.error(
         error?.data?.message || t("suspend.error") || "حدث خطأ أثناء تعليق الحساب"

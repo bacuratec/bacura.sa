@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import logo from "../../../../assets/images/logo-landing.png";
 import userImg from "../../../../assets/images/user.jpg";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../../../redux/slices/authSlice";
+import { logoutUser } from "../../../../redux/slices/authSlice";
 import logoutIcon from "@/assets/icons/logout.svg";
 import { useGetNotificationsQuery } from "../../../../redux/api/notificationsApi";
 import NotificationsModal from "../../NotificationsModal";
@@ -18,6 +18,7 @@ const Header = ({ data }) => {
   const { t } = useTranslation(); // 👈 استخدام hook الترجمة
 
   const location = useLocation(); // 👈 نجيب اللينك الحالي
+  const navigate = useNavigate();
   const { token, role } = useSelector((state) => state.auth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
@@ -124,7 +125,10 @@ const Header = ({ data }) => {
                 {t("headerLanding.requestService")}
               </Link>
               <button
-                onClick={() => dispatch(logout())}
+                onClick={async () => {
+                  await dispatch(logoutUser());
+                  navigate("/login", { replace: true });
+                }}
                 className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
               >
                 <span className="hidden sm:inline">
@@ -160,7 +164,10 @@ const Header = ({ data }) => {
           role={role}
           unseenCount={unseenNotifications.length}
           imageUrl={imageUrl}
-          onLogout={() => dispatch(logout())}
+          onLogout={async () => {
+            await dispatch(logoutUser());
+            navigate("/login", { replace: true });
+          }}
           onClose={() => setIsMenuOpen(false)}
         />
       </div>

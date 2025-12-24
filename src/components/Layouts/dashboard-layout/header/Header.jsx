@@ -2,8 +2,8 @@ import userImg from "../../../../assets/images/logo.png";
 import logoutIcon from "../../../../assets/icons/logout.svg";
 import notifications from "../../../../assets/icons/notifications.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../../../redux/slices/authSlice";
-import { Link } from "react-router-dom";
+import { logoutUser } from "../../../../redux/slices/authSlice";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useGetNotificationsQuery } from "../../../../redux/api/notificationsApi";
 import NotificationsModal from "../../NotificationsModal";
@@ -12,6 +12,7 @@ import LanguageDropdown from "../../LanguageDropdown";
 
 const Header = ({ data }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,7 +72,10 @@ const Header = ({ data }) => {
               </span>
             </button>
             <button
-              onClick={() => dispatch(logout())}
+              onClick={async () => {
+                await dispatch(logoutUser());
+                navigate("/login", { replace: true });
+              }}
               className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >
               <span className="hidden sm:inline">{t("header.logout")}</span>

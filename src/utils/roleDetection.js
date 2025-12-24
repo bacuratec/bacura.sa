@@ -142,18 +142,19 @@ export const getRoleFromRoleTables = async (userId) => {
 
 /**
  * تحديد role المستخدم (دالة رئيسية)
+ * أولوية لجدول users في Supabase للتحقق الداخلي
  */
 export const detectUserRole = async (user, session) => {
-  // أولوية 1: من user_metadata أو JWT
-  let role = getRoleFromMetadata(user, session);
+  // أولوية 1: من جدول users في Supabase (التحقق الداخلي)
+  let role = await getRoleFromUsersTable(user.id, user.email);
   if (role) return role;
 
-  // أولوية 2: من جدول users
-  role = await getRoleFromUsersTable(user.id, user.email);
-  if (role) return role;
-
-  // أولوية 3: من جداول admins, requesters, providers
+  // أولوية 2: من جداول admins, requesters, providers
   role = await getRoleFromRoleTables(user.id);
+  if (role) return role;
+
+  // أولوية 3: من user_metadata أو JWT (كحل احتياطي فقط)
+  role = getRoleFromMetadata(user, session);
   if (role) return role;
 
   // محاولة أخيرة: البحث في users table بـ email
