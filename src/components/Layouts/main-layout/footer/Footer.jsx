@@ -8,9 +8,11 @@ import { useSelector } from "react-redux";
 import { FaSnapchat, FaTiktok, FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useGetProfileInfoQuery } from "../../../../redux/api/profileInfoApi";
+import { getAppBaseUrl } from "../../../../utils/env";
+
 const Footer = () => {
   const { t } = useTranslation();
-  const base = import.meta.env.VITE_APP_BASE_URL || "";
+  const base = getAppBaseUrl();
 
   const role = useSelector((state) => state.auth.role);
 

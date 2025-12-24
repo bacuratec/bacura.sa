@@ -11,6 +11,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useAddOrderAttachmentsMutation } from "../../redux/api/projectsApi";
 import { useTranslation } from "react-i18next";
+import { getAppBaseUrl } from "../../utils/env";
 
 const AdminCompleteRequest = ({ data, refetch }) => {
   const { t } = useTranslation();
@@ -37,9 +38,7 @@ const AdminCompleteRequest = ({ data, refetch }) => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const groupRes = await axios.get(
-        `${
-          import.meta.env.VITE_APP_BASE_URL
-        }api/attachments/new-attachments-group-key`
+        `${getAppBaseUrl()}api/attachments/new-attachments-group-key`
       );
       const groupKey = groupRes.data;
 
@@ -60,9 +59,7 @@ const AdminCompleteRequest = ({ data, refetch }) => {
           uploadFormData.append("files", selectedFiles[i]);
         }
         await axios.post(
-          `${
-            import.meta.env.VITE_APP_BASE_URL
-          }api/attachments?groupKey=${groupKey}`,
+          `${getAppBaseUrl()}api/attachments?groupKey=${groupKey}`,
           uploadFormData
         );
       }

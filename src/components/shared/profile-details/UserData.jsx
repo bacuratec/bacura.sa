@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
+import { getAppBaseUrl } from "../../../utils/env";
 
 const UserData = ({ data }) => {
   const { t } = useTranslation();
@@ -34,7 +35,7 @@ const UserData = ({ data }) => {
     month: "long",
     day: "numeric",
   });
-  const base = import.meta.env.VITE_APP_BASE_URL || "";
+  const base = getAppBaseUrl();
   // href={`${base}${row?.filePathUrl}`}
   return (
     <section className="sm:py-2 md:py-3 lg:py-5">

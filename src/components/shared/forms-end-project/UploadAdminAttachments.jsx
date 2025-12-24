@@ -8,6 +8,7 @@ import {
 } from "../../../redux/api/projectsApi";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { getAppBaseUrl } from "../../../utils/env";
 
 const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
   const { t } = useTranslation();
@@ -74,9 +75,7 @@ const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
       if (orderAttachments.length === 0) {
         try {
           const groupRes = await axios.get(
-            `${
-              import.meta.env.VITE_APP_BASE_URL
-            }api/attachments/new-attachments-group-key`
+            `${getAppBaseUrl()}api/attachments/new-attachments-group-key`
           );
           groupKey = groupRes.data ?? "";
         } catch {
@@ -99,9 +98,7 @@ const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
         );
 
         await axios.post(
-          `${
-            import.meta.env.VITE_APP_BASE_URL
-          }api/attachments?groupKey=${groupKey}`,
+          `${getAppBaseUrl()}api/attachments?groupKey=${groupKey}`,
           formData
         );
       }

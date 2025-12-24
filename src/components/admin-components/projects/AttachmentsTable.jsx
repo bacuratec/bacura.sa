@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import CustomDataTable from "../../shared/datatable/DataTable";
+import { getAppBaseUrl } from "../../../utils/env";
 
 const AttachmentsTable = ({ title, attachments }) => {
   const { t } = useTranslation();
-  const base = import.meta.env.VITE_APP_BASE_URL || "";
+  const base = getAppBaseUrl();
 
   const columns = [
     {

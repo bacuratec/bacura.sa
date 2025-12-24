@@ -5,6 +5,7 @@ import { useToggleBlockUserMutation } from "../../../redux/api/authApi";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
+import { getAppBaseUrl } from "../../../utils/env";
 
 const UserData = ({ data, refetch }) => {
   const { t } = useTranslation();
@@ -56,7 +57,7 @@ const UserData = ({ data, refetch }) => {
       );
     }
   };
-  const base = import.meta.env.VITE_APP_BASE_URL || "";
+  const base = getAppBaseUrl();
 
   return (
     <section className="py-5">

@@ -3,12 +3,14 @@ import { HomeIcon, PlusCircle, UserCircle2Icon } from "lucide-react";
 import { useSelector } from "react-redux";
 import requestOrders from "../../../../assets/icons/requestOrders.svg";
 import requestOrdersActive from "../../../../assets/icons/requestOrdersActive.svg";
+import { getAppBaseUrl } from "../../../../utils/env";
+
 const MobileNavigation = ({ data }) => {
   const { token, role } = useSelector((state) => state.auth);
 
   const navLinks = [
     {
-      name: "الصفحه الرئيسية",
+      name: " الصفحه الرئيسية",
       href: "/",
       icon: <HomeIcon />,
     },
@@ -27,7 +29,7 @@ const MobileNavigation = ({ data }) => {
   ];
   const path = useLocation();
   const imageUrl = data?.profilePictureUrl
-    ? `${import.meta.env.VITE_APP_BASE_URL}/${data.profilePictureUrl}`
+    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : null;
   // <UserCircle2Icon />
   return (

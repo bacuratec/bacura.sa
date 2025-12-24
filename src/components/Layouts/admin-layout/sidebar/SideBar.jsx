@@ -24,6 +24,7 @@ import reportsActive from "../../../../assets/icons/reportsActive.svg";
 import { File, FileQuestionMark } from "lucide-react";
 import { FaPeopleArrows } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { getAppBaseUrl } from "../../../../utils/env";
 
 const SideBar = ({ data }) => {
   const { t } = useTranslation();
@@ -99,7 +100,7 @@ const SideBar = ({ data }) => {
   ];
   const path = useLocation();
   const imageUrl = data?.profilePictureUrl
-    ? `${import.meta.env.VITE_APP_BASE_URL}/${data.profilePictureUrl}`
+    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : logo;
   return (
     <aside className="min-h-screen fixed w-[250px] bg-primary top-0 right-0 hidden lg:flex flex-col justify-between">

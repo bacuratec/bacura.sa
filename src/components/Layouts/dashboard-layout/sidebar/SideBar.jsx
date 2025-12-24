@@ -16,11 +16,12 @@ import ratesActive from "../../../../assets/icons/ratesActive.svg";
 
 import reports from "../../../../assets/icons/reports.svg";
 import reportsActive from "../../../../assets/icons/reportsActive.svg";
+import { getAppBaseUrl } from "../../../../utils/env";
 
 const SideBar = ({ data }) => {
   const { t } = useTranslation();
   const imageUrl = data?.profilePictureUrl
-    ? `${import.meta.env.VITE_APP_BASE_URL}/${data.profilePictureUrl}`
+    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : logo;
 
   const Links = [

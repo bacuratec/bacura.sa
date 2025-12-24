@@ -24,6 +24,7 @@ import {
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
+import { getAppBaseUrl } from "../../../utils/env";
 
 export default function ProfileModal({ open, setOpen, data, refetch }) {
   const { t } = useTranslation();
@@ -67,7 +68,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
 
   const [preview, setPreview] = useState(() => {
     const url = data?.profilePictureUrl;
-    return url ? `${import.meta.env.VITE_APP_BASE_URL}/${url}` : null;
+    return url ? `${getAppBaseUrl()}/${url}` : null;
   });
 
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -200,7 +201,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                     }
 
                     const uploadRes = await axios.post(
-                      `${import.meta.env.VITE_APP_BASE_URL}api/attachments${
+                      `${getAppBaseUrl()}api/attachments${
                         groupKey ? `?groupKey=${groupKey}` : ""
                       }`,
                       uploadFormData

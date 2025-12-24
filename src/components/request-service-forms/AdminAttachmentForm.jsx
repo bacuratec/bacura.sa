@@ -6,6 +6,7 @@ import fileUpload from "@/assets/icons/fileUpload.svg";
 import axios from "axios";
 import { useAdminRequestPriceMutation } from "@/redux/api/ordersApi";
 import { useTranslation } from "react-i18next";
+import { getAppBaseUrl } from "../../utils/env";
 
 const AdminAttachmentForm = ({ data, refetch }) => {
   const { t } = useTranslation();
@@ -48,7 +49,7 @@ const AdminAttachmentForm = ({ data, refetch }) => {
         });
 
         await axios.post(
-          `${import.meta.env.VITE_APP_BASE_URL}api/attachments?groupKey=${
+          `${getAppBaseUrl()}api/attachments?groupKey=${
             data?.attachmenstGroupKey
           }`,
           uploadFormData

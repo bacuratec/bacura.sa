@@ -6,6 +6,7 @@ import fileUpload from "@/assets/icons/fileUpload.svg";
 import axios from "axios";
 import { useRequesterActionMutation } from "@/redux/api/ordersApi";
 import { useTranslation } from "react-i18next";
+import { getAppBaseUrl } from "../../utils/env";
 
 const RequesterAttachmentForm = ({ data, refetch }) => {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ const RequesterAttachmentForm = ({ data, refetch }) => {
           uploadFormData.append("files", file);
         });
         await axios.post(
-          `${import.meta.env.VITE_APP_BASE_URL}api/attachments?groupKey=${
+          `${getAppBaseUrl()}api/attachments?groupKey=${
             data?.attachmenstGroupKey
           }`,
           uploadFormData
