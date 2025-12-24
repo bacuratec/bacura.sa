@@ -64,6 +64,15 @@ const nextConfig = {
     // This ensures MCP tools are available for real-time error detection and fixes
   },
 
+  // Optimize preloading to reduce warnings
+  // This helps reduce "preloaded but not used" warnings
+  onDemandEntries: {
+    // Period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // Number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
+  },
+
 
   // Redirects for SPA compatibility
   async redirects() {
