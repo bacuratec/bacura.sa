@@ -4,7 +4,7 @@ import CustomDataTable from "../../shared/datatable/DataTable";
 
 const AttachmentsTable = ({ title, attachments }) => {
   const { t } = useTranslation();
-  const base = process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "";
+  const base = import.meta.env.VITE_APP_BASE_URL || "";
 
   const columns = [
     {

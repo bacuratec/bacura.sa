@@ -56,7 +56,7 @@ const UserData = ({ data, refetch }) => {
       );
     }
   };
-  const base = process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "";
+  const base = import.meta.env.VITE_APP_BASE_URL || "";
 
   return (
     <section className="py-5">

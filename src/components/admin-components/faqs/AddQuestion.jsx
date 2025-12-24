@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import { Formik, Form, Field, FieldArray } from "formik";
 import * as Yup from "yup";

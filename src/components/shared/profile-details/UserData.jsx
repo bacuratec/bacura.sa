@@ -34,7 +34,7 @@ const UserData = ({ data }) => {
     month: "long",
     day: "numeric",
   });
-  const base = process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "";
+  const base = import.meta.env.VITE_APP_BASE_URL || "";
   // href={`${base}${row?.filePathUrl}`}
   return (
     <section className="sm:py-2 md:py-3 lg:py-5">
