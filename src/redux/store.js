@@ -20,6 +20,7 @@ import { partnersApi } from "./api/partnersApi";
 import { paymentApi } from "./api/paymentApi";
 import { customersApi } from "./api/customersApi";
 import { profileInfoApi } from "./api/profileInfoApi";
+import { providerStatisticsApi } from "./api/providerStatisticsApi";
 
 export const store = configureStore({
   reducer: {
@@ -43,6 +44,7 @@ export const store = configureStore({
     [customersApi.reducerPath]: customersApi.reducer,
     [paymentApi.reducerPath]: paymentApi.reducer,
     [profileInfoApi.reducerPath]: profileInfoApi.reducer,
+    [providerStatisticsApi.reducerPath]: providerStatisticsApi.reducer,
 
     // إضافة slice أو api أخرى هنا
   },
@@ -66,7 +68,8 @@ export const store = configureStore({
       .concat(partnersApi.middleware)
       .concat(customersApi.middleware)
       .concat(profileInfoApi.middleware)
-      .concat(paymentApi.middleware),
+      .concat(paymentApi.middleware)
+      .concat(providerStatisticsApi.middleware),
 });
 
 export const useAppDispatch = useDispatch;

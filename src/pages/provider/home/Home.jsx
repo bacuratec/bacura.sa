@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import NewOrders from "../../../components/provider-components/home-components/new-orders/NewOrders";
 import HeadTitle from "../../../components/shared/head-title/HeadTitle";
 import {
@@ -15,17 +15,31 @@ import {
 import Statistics from "../../../components/admin-components/home/statistics/Statistics";
 import BarchartStats from "../../../components/shared/barChart/BarChart";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { useGetProviderStatisticsQuery } from "../../../redux/api/providerStatisticsApi";
+import { useGetProviderDetailsQuery } from "../../../redux/api/usersDetails";
+
 const Home = () => {
   const { t } = useTranslation();
+  const userId = useSelector((state) => state.auth.userId);
+  
+  // Get provider ID from user details
+  const { data: providerData } = useGetProviderDetailsQuery(userId);
+  const providerId = providerData?.id;
+
+  // Get provider statistics
+  const { data: providerStats, isLoading: isLoadingStats } = useGetProviderStatisticsQuery(
+    providerId,
+    { skip: !providerId }
+  );
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const ProviderStats = null;
 
   const ordersStatistics = [
     {
-      number: ProviderStats?.totalOrdersCount ?? 0,
+      number: providerStats?.totalOrdersCount ?? 0,
       title: t("providerHome.totalOrders"),
       icon: <ListChecks />,
       color: "#F0F4FF",
@@ -35,56 +49,56 @@ const Home = () => {
 
   const ordersStats = [
     {
-      number: ProviderStats?.waitingForApprovalOrdersCount ?? 0,
+      number: providerStats?.waitingForApprovalOrdersCount ?? 0,
       title: t("providerHome.waitingApproval"),
       icon: <Hourglass />,
       color: "#FFF8E1",
       ic: true,
     },
     {
-      number: ProviderStats?.waitingToStartOrdersCount ?? 0,
+      number: providerStats?.waitingToStartOrdersCount ?? 0,
       title: t("providerHome.waitingStart"),
       icon: <Clock />,
       color: "#E1F5FE",
       ic: true,
     },
     {
-      number: ProviderStats?.ongoingOrdersCount ?? 0,
+      number: providerStats?.ongoingOrdersCount ?? 0,
       title: t("providerHome.ongoing"),
       icon: <Loader />,
       color: "#E8F5E9",
       ic: true,
     },
     {
-      number: ProviderStats?.completedOrdersCount ?? 0,
+      number: providerStats?.completedOrdersCount ?? 0,
       title: t("providerHome.completed"),
       icon: <CheckCircle2 />,
       color: "#F1F8E9",
       ic: true,
     },
     {
-      number: ProviderStats?.rejectedOrdersCount ?? 0,
+      number: providerStats?.rejectedOrdersCount ?? 0,
       title: t("providerHome.rejected"),
       icon: <XCircle />,
       color: "#FFEBEE",
       ic: true,
     },
     {
-      number: ProviderStats?.serviceCompletedOrdersCount ?? 0,
+      number: providerStats?.serviceCompletedOrdersCount ?? 0,
       title: t("providerHome.serviceCompleted"),
       icon: <ShieldCheck />,
       color: "#E8EAF6",
       ic: true,
     },
     {
-      number: ProviderStats?.expiredOrdersCount ?? 0,
+      number: providerStats?.expiredOrdersCount ?? 0,
       title: t("providerHome.expired"),
       icon: <CalendarX />,
       color: "#FFF3E0",
       ic: true,
     },
     {
-      number: ProviderStats?.averageRating ?? 0,
+      number: providerStats?.averageRating ?? 0,
       title: t("providerHome.averageRating"),
       icon: <Star />,
       color: "#FFFDE7",
