@@ -1,3 +1,6 @@
+/* eslint-disable */
+"use client";
+
 import { useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";

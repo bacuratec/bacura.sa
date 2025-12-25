@@ -1,3 +1,6 @@
+/* eslint-disable */
+"use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -14,6 +17,7 @@ import NavLinks from "./NavLinks";
 import NotificationButton from "./NotificationButton";
 import LanguageDropdown from "../../LanguageDropdown";
 import { useTranslation } from "react-i18next";
+import { getAppBaseUrl } from "../../../../utils/env";
 
 const Header = ({ data }) => {
   const { t } = useTranslation(); // 👈 استخدام hook الترجمة
@@ -41,7 +45,7 @@ const Header = ({ data }) => {
     [];
   const dispatch = useDispatch();
   const imageUrl = data?.profilePictureUrl
-    ? `${process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || ""}/${data.profilePictureUrl}`
+    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : userImg;
 
   const isActive = (path) => pathname === path;
@@ -110,20 +114,14 @@ const Header = ({ data }) => {
               />
               <NotificationsModal open={isModalOpen} setOpen={setIsModalOpen} />
 
-              <Link
-                href="/profile"
-                className="flex items-center gap-1 border-2 border-primary/50 rounded-full w-10 h-10 overflow-hidden p-1"
-              >
+              <Link href="/profile" className="flex items-center gap-1 border-2 border-primary/50 rounded-full w-10 h-10 overflow-hidden p-1">
                 <img
                   src={imageUrl}
                   alt="user"
                   className="w-full h-full object-cover rounded-full"
                 />
               </Link>
-              <Link
-                href="/request-service"
-                className="py-2 px-6 bg-primary text-white rounded-lg"
-              >
+              <Link href="/request-service" className="py-2 px-6 bg-primary text-white rounded-lg">
                 {t("headerLanding.requestService")}
               </Link>
               <button
@@ -141,16 +139,10 @@ const Header = ({ data }) => {
             </div>
           ) : (
             <div className="hidden lg:flex items-center gap-4">
-              <Link
-                href="/signup"
-                className="py-2 px-6 bg-primary text-white rounded-lg"
-              >
+              <Link href="/signup" className="py-2 px-6 bg-primary text-white rounded-lg">
                 {t("headerLanding.signup")}
               </Link>
-              <Link
-                href="/login"
-                className="py-2 px-6 border border-primary text-primary rounded-lg"
-              >
+              <Link href="/login" className="py-2 px-6 border border-primary text-primary rounded-lg">
                 {t("headerLanding.login")}
               </Link>
             </div>

@@ -1,6 +1,6 @@
 import logo from "../../../../assets/images/logo.png";
- 2→import Link from "next/link";
- 3→import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
 import homeIcon from "../../../../assets/icons/homeIcon.svg";
@@ -51,7 +51,8 @@ const SideBar = ({ data }) => {
       iconActive: reportsActive,
     },
   ];
- 55→  const pathname = usePathname();
+
+  const pathname = usePathname();
 
   return (
     <aside className="min-h-screen fixed w-[250px] bg-primary top-0 right-0 hidden lg:flex flex-col justify-between">
@@ -107,7 +108,7 @@ const SideBar = ({ data }) => {
         <div className="rounded-full w-8 h-8 overflow-hidden border-2 border-[#D8D8FE]">
           <img src={imageUrl} alt="" className="w-full h-full object-cover" />
         </div>
- 111→        <Link href={"/provider/profile"} className="content text-white">
+        <Link to={"/provider/profile"} className="content text-white">
           <h3 className="font-medium leading-4">{data?.name}</h3>
           <span className="text-xs font-normal leading-4">
             {t("navProvider.serviceProvider")}

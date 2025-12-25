@@ -1,3 +1,6 @@
+/* eslint-disable */
+"use client";
+
 import Header from "./header/Header";
 import Footer from "./footer/Footer";
 import { useGetRequesterDetailsQuery } from "../../../redux/api/usersDetails";

@@ -26,7 +26,6 @@ import { File, FileQuestionMark } from "lucide-react";
 import { FaPeopleArrows } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { getAppBaseUrl } from "../../../../utils/env";
-import { useLocation } from "@/utils/useLocation";
 
 const SideBar = ({ data }) => {
   const { t } = useTranslation();
@@ -100,7 +99,6 @@ const SideBar = ({ data }) => {
       iconActive: providersActive,
     },
   ];
-  const pathname = usePathname();
   const path = useLocation();
   const imageUrl = data?.profilePictureUrl
     ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
@@ -172,7 +170,7 @@ const SideBar = ({ data }) => {
         <div className="rounded-full w-8 h-8 overflow-hidden border-2 border-[#D8D8FE]">
           <img src={imageUrl} alt="" className="w-full h-full object-cover" />
         </div>
-        <Link href={"/admin/profile"} className="content text-white">
+        <Link to={"/admin/profile"} className="content text-white">
           <h3 className="font-medium leading-4">{data?.fullName}</h3>
           <span className="text-xs font-normal leading-4">
             {t("nav.admin")}

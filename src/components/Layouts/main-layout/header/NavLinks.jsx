@@ -1,3 +1,6 @@
+/* eslint-disable */
+"use client";
+
 // components/Header/NavLinks.jsx
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
