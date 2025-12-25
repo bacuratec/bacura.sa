@@ -28,8 +28,8 @@ export function getLastUpdateTime() {
   
   // Server-side or build-time: use environment variable or current time
   const buildTime = 
-    (typeof import !== 'undefined' && import.meta?.env?.VITE_BUILD_TIME) ||
     (typeof process !== 'undefined' && process.env?.VITE_BUILD_TIME) ||
+    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_BUILD_TIME) ||
     (typeof process !== 'undefined' && process.env?.BUILD_TIME) ||
     new Date().toISOString();
   
