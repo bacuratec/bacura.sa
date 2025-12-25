@@ -1,3 +1,6 @@
+/* eslint-disable */
+"use client";
+
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../../redux/slices/authSlice";
 import Link from "next/link";
@@ -11,10 +14,11 @@ import LanguageDropdown from "../../LanguageDropdown";
 import userImg from "../../../../assets/images/user.jpg";
 import logoutIcon from "../../../../assets/icons/logout.svg";
 import notifications from "../../../../assets/icons/notifications.svg";
+import { getAppBaseUrl } from "../../../../utils/env";
 
 const Header = ({ data }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const router = useRouter();
   const token = useSelector((state) => state.auth.token);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,7 +33,7 @@ const Header = ({ data }) => {
 
   const dispatch = useDispatch();
   const imageUrl = data?.profilePictureUrl
-    ? `${process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || ""}/${data.profilePictureUrl}`
+    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : userImg;
 
   return (

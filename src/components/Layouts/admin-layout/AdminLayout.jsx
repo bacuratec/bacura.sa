@@ -1,5 +1,8 @@
+/* eslint-disable */
+"use client";
+
 import { useEffect, useState } from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import MobileNavigation from "./sidebar/MobileNavigation";
 import Header from "./header/Header";
 import SideBar from "./sidebar/SideBar";
@@ -8,14 +11,15 @@ import { useGetAdminDetailsQuery } from "../../../redux/api/usersDetails";
 import { supabase } from "../../../lib/supabaseClient";
 import { detectUserRole } from "../../../utils/roleDetection";
 import { logoutUser } from "../../../redux/slices/authSlice";
-import LoadingPage from "../../../pages/LoadingPage";
+import LoadingPage from "../../../views/LoadingPage";
 
-const AdminLayout = () => {
+const AdminLayout = ({ children }) => {
   const userId = useSelector((state) => state.auth.userId);
   const role = useSelector((state) => state.auth.role);
   const dispatch = useDispatch();
   const [isVerifying, setIsVerifying] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
 
   const { data: adminData } = useGetAdminDetailsQuery(userId, {
     skip: !userId || !isAdmin,

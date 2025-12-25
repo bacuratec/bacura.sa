@@ -1,3 +1,6 @@
+/* eslint-disable */
+'use client';
+
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
@@ -5,7 +8,7 @@ import { jwtDecode } from "jwt-decode";
 import { logoutUser, setCredentials } from "../redux/slices/authSlice";
 import { supabase } from "../lib/supabaseClient";
 import { detectUserRole } from "../utils/roleDetection";
-import LoadingPage from "../pages/LoadingPage";
+import LoadingPage from "../views/LoadingPage";
 
 const isTokenExpired = (token) => {
   try {

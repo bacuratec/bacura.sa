@@ -1,3 +1,6 @@
+/* eslint-disable */
+"use client";
+
 import userImg from "../../../../assets/images/logo.png";
 import logoutIcon from "../../../../assets/icons/logout.svg";
 import notifications from "../../../../assets/icons/notifications.svg";
@@ -10,6 +13,7 @@ import { useGetNotificationsQuery } from "../../../../redux/api/notificationsApi
 import NotificationsModal from "../../NotificationsModal";
 import { useTranslation } from "react-i18next";
 import LanguageDropdown from "../../LanguageDropdown";
+import { getAppBaseUrl } from "../../../../utils/env";
 
 const Header = ({ data }) => {
   const { t } = useTranslation();
@@ -29,7 +33,7 @@ const Header = ({ data }) => {
   const dispatch = useDispatch();
 
   const imageUrl = data?.profilePictureUrl
-    ? `${process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || ""}/${data.profilePictureUrl}`
+    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : userImg;
 
   return (

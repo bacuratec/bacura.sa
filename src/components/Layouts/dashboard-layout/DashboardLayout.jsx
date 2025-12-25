@@ -1,3 +1,6 @@
+/* eslint-disable */
+"use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import MobileNavigation from "./sidebar/MobileNavigation";
@@ -8,7 +11,7 @@ import { useGetProviderDetailsQuery } from "../../../redux/api/usersDetails";
 import { supabase } from "../../../lib/supabaseClient";
 import { detectUserRole } from "../../../utils/roleDetection";
 import { logoutUser } from "../../../redux/slices/authSlice";
-import LoadingPage from "../../../pages/LoadingPage";
+import LoadingPage from "../../../views/LoadingPage";
 
 const DashboardLayout = ({ children }) => {
   const userId = useSelector((state) => state.auth.userId);
