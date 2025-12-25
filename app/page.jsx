@@ -7,6 +7,7 @@ import { DashboardSkeleton } from "@/components/shared/skeletons/PageSkeleton";
 
 const LandingHome = dynamic(() => import("@/views/landing/home/Home"), {
   loading: () => <DashboardSkeleton />,
+  ssr: false,
 });
 
 export default function HomePage() {
