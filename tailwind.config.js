@@ -1,6 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const dir = require("tailwindcss-dir");
-
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -47,5 +45,5 @@ module.exports = {
       },
     },
   },
-  plugins: [dir()],
+  plugins: [require("tailwindcss-dir")()],
 };
