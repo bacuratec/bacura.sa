@@ -111,7 +111,7 @@ const Header = ({ data }) => {
               <NotificationsModal open={isModalOpen} setOpen={setIsModalOpen} />
 
               <Link
-                to="/profile"
+                href="/profile"
                 className="flex items-center gap-1 border-2 border-primary/50 rounded-full w-10 h-10 overflow-hidden p-1"
               >
                 <img
@@ -121,7 +121,7 @@ const Header = ({ data }) => {
                 />
               </Link>
               <Link
-                to="/request-service"
+                href="/request-service"
                 className="py-2 px-6 bg-primary text-white rounded-lg"
               >
                 {t("headerLanding.requestService")}
@@ -129,7 +129,7 @@ const Header = ({ data }) => {
               <button
                 onClick={async () => {
                   await dispatch(logoutUser());
-                  navigate("/login", { replace: true });
+                  router.replace("/login");
                 }}
                 className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
               >
@@ -142,13 +142,13 @@ const Header = ({ data }) => {
           ) : (
             <div className="hidden lg:flex items-center gap-4">
               <Link
-                to="/signup"
+                href="/signup"
                 className="py-2 px-6 bg-primary text-white rounded-lg"
               >
                 {t("headerLanding.signup")}
               </Link>
               <Link
-                to="/login"
+                href="/login"
                 className="py-2 px-6 border border-primary text-primary rounded-lg"
               >
                 {t("headerLanding.login")}
@@ -168,7 +168,7 @@ const Header = ({ data }) => {
           imageUrl={imageUrl}
           onLogout={async () => {
             await dispatch(logoutUser());
-            navigate("/login", { replace: true });
+            router.replace("/login");
           }}
           onClose={() => setIsMenuOpen(false)}
         />
