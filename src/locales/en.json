@@ -264,7 +264,7 @@
       "Raise community awareness of the importance of smart technological solutions.",
       "Develop local products that can compete in global markets."
     ],
-    "whyTitle": "Why We Launched Bacura Aamal Platform:",
+    "whyTitle": "Why We Launched Bacura Amal Platform:",
     "whyIntro": "Driven by our belief in partnership with government and commercial entities, and recognizing the market need, we launched the platform for the following reasons:",
     "whyPoints": [
       "The workload in this sector is increasing with Vision 2030.",
@@ -343,7 +343,7 @@
   "faq": "FAQ",
 
   "hero": {
-    "title": "Bacura Business - Our Launch",
+    "title": "Bacura Amal - Our Launch",
     "registerNow": "Register Now",
     "requestService": "Request a Service",
     "seeMore": "See More"
@@ -366,13 +366,13 @@
     "signup": "Sign Up"
   },
   "loginContent": {
-    "welcome": "Welcome back to Bacura Aamal",
+    "welcome": "Welcome back to Bacura Amal",
     "subtitle": "Log in to access your account, track your requests, and execute projects.",
     "description": "We provide you with a secure and smooth experience to manage your services and execute your projects with confidence."
   },
   "loginForm": {
     "welcome": "Welcome to",
-    "brand": "Bacura Al Aamal",
+    "brand": "Bacura Amal",
     "noAccount": "Don't have an account?",
     "createAccount": "Create Account",
     "loginTitle": "Login",
@@ -528,7 +528,7 @@
   },
   "signupForm": {
     "welcome": "Welcome to",
-    "appName": "Bacurah Al-Aaamal",
+    "appName": "Bacura Amal",
     "haveAccount": "Already have an account",
     "login": "Login",
     "title": "Create Account",
