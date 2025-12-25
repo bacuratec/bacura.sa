@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { FiMenu, FiX } from "react-icons/fi";
 import logo from "../../../../assets/images/logo-landing.png";
 import userImg from "../../../../assets/images/user.jpg";
@@ -17,8 +18,9 @@ import { useTranslation } from "react-i18next";
 const Header = ({ data }) => {
   const { t } = useTranslation(); // 👈 استخدام hook الترجمة
 
-  const location = useLocation(); // 👈 نجيب اللينك الحالي
-  const navigate = useNavigate();
+  const pathname = usePathname(); // 👈 نجيب اللينك الحالي
+  const location = { pathname }; // Compatibility wrapper if needed, or just use pathname
+  const router = useRouter();
   const { token, role } = useSelector((state) => state.auth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });

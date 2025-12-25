@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import fileUpload from "../../../assets/icons/fileUpload.svg";
-import { useLocation, useNavigate } from "react-router-dom";
+import { usePathname, useRouter } from "next/navigation";
 import {
   useCreateOrderMutation,
   useCreateOrderPricedMutation,
@@ -15,8 +15,9 @@ import { LanguageContext } from "@/context/LanguageContext";
 import { createAttachmentGroupKey, uploadAttachmentsToStorage } from "@/utils/attachmentUtils";
 
 const RequestForm = ({ services }) => {
-  const location = useLocation();
-  const itemId = location.state;
+  const pathname = usePathname();
+  const router = useRouter();
+  const itemId = null;
 
   const { lang } = useContext(LanguageContext);
   const { t } = useTranslation();
@@ -136,7 +137,7 @@ const RequestForm = ({ services }) => {
         await createOrder(payload).unwrap();
         toast.success(t("formRequest.messages.successUpload"));
       }
-      navigate("/");
+      router.push("/");
     } catch (error) {
       toast.error(
         error?.data?.message || t("formRequest.messages.registrationError") || "حدث خطأ أثناء إنشاء الطلب"

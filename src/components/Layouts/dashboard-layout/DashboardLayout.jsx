@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import MobileNavigation from "./sidebar/MobileNavigation";
 import Header from "./header/Header";
 import SideBar from "./sidebar/SideBar";
@@ -10,10 +10,11 @@ import { detectUserRole } from "../../../utils/roleDetection";
 import { logoutUser } from "../../../redux/slices/authSlice";
 import LoadingPage from "../../../pages/LoadingPage";
 
-const DashboardLayout = () => {
+const DashboardLayout = ({ children }) => {
   const userId = useSelector((state) => state.auth.userId);
   const role = useSelector((state) => state.auth.role);
   const dispatch = useDispatch();
+  const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(true);
   const [isProvider, setIsProvider] = useState(false);
 
@@ -57,18 +58,15 @@ const DashboardLayout = () => {
     verifyProviderRole();
   }, [userId, dispatch]);
 
-  // إذا لم يكن Provider، إعادة التوجيه
-  useEffect(() => {
-    if (!isVerifying && (!isProvider || role !== "Provider")) {
-      router.replace("/login");
-    }
-  }, [isVerifying, isProvider, role, router]);
-
   if (isVerifying) {
     return <LoadingPage />;
   }
 
   if (!isProvider || role !== "Provider") {
+    // Perform client-side redirect
+    if (typeof window !== 'undefined') {
+      router.replace("/login");
+    }
     return null;
   }
 

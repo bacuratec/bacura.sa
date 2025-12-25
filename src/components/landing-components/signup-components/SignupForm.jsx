@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -18,7 +19,7 @@ const SignupForm = () => {
   // const [show, setShow] = useState(false);
   const [apiErrors] = useState({});
   const [role, setRole] = useState("");
-  const location = useLocation();
+  const pathname = usePathname();
   const [types, setTypes] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState(null);
@@ -26,9 +27,9 @@ const SignupForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const isProvider = location.pathname === "/signup-provider";
+  const isProvider = pathname === "/signup-provider";
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const buttonText = isProvider
     ? t("signupForm.submitProvider")
@@ -189,7 +190,7 @@ const SignupForm = () => {
         // في حال لم يكن هناك جلسة بعد التسجيل (مثلاً لو التفعيل عبر رابط بريد)
         // نكمل بدون رفع الملفات حتى لا نفشل التسجيل بالكامل
         toast.success(t("signupForm.registerSuccess") || "تم التسجيل بنجاح");
-        navigate("/login");
+        router.push("/login");
         return;
       }
 
@@ -250,7 +251,7 @@ const SignupForm = () => {
       }
 
       toast.success(t("signupForm.registerSuccess"));
-      navigate("/login");
+      router.push("/login");
     } catch (error) {
       toast.error(
         error?.message || t("signupForm.registerError") || "حدث خطأ أثناء التسجيل"
@@ -277,7 +278,7 @@ const SignupForm = () => {
           <h3 className="text-[#8D8D8D] text-xs">
             {t("signupForm.haveAccount")}
           </h3>
-          <Link className="text-xs text-primary" to={"/login"}>
+          <Link className="text-xs text-primary" href={"/login"}>
             {t("signupForm.login")}
           </Link>
         </div>
@@ -624,7 +625,7 @@ const SignupForm = () => {
               <label htmlFor="agreeToTerms" className="text-sm">
                 <span className="text-red-500">*</span>{" "}
                 {t("signupForm.agreeToTerms")}{" "}
-                <Link to="#" className="text-primary underline">
+                <Link href="#" className="text-primary underline">
                   {t("signupForm.terms")}
                 </Link>
               </label>

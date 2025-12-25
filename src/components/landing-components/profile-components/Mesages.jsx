@@ -1,6 +1,6 @@
 import React from "react";
 import userTest from "../../../assets/images/userTest.png";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 const Mesages = ({ tickets }) => {
@@ -38,7 +38,7 @@ const Mesages = ({ tickets }) => {
         )}
 
         <Link
-          to="/tickets"
+          href="/tickets"
           className="bg-primary/10 rounded-xl text-sm font-bold py-2 px-4 w-fit self-end"
         >
           {t("messages.goToMessages")}

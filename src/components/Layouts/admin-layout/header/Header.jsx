@@ -37,7 +37,7 @@ const Header = ({ data }) => {
       <div className="container">
         <div className="flex items-center justify-between gap-7">
           <Link
-            to={"/admin/profile"}
+            href={"/admin/profile"}
             className="profile flex items-center gap-1"
           >
             <div className="w-10 h-10 overflow-hidden rounded-md">

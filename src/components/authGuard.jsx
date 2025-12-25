@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, Navigate } from "react-router-dom";
+import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { logoutUser, setCredentials } from "../redux/slices/authSlice";
@@ -19,7 +19,9 @@ const isTokenExpired = (token) => {
 const AuthGuard = ({ allowedRoles, children }) => {
   const { token, role, userId } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const location = useLocation();
+  const pathname = usePathname();
+  const router = useRouter();
+  const location = { pathname };
 
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);

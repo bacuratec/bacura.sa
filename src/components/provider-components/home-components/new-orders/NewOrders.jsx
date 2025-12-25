@@ -1,4 +1,5 @@
-import { Link, useSearchParams } from "react-router-dom";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../../shared/datatable/DataTable";
 import { useContext, useEffect } from "react";
 import dayjs from "dayjs";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import {
   useGetQuestionsQuery,

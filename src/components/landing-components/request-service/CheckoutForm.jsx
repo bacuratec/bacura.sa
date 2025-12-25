@@ -65,23 +65,28 @@
 // }
 
 import {
-  useStripe,
-  useElements,
   PaymentElement,
+  useElements,
+  useStripe,
 } from "@stripe/react-stripe-js";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { updateProjectPayment } from "../../../redux/slices/projectsSlice";
+import Button from "../../ui/Button";
 
 export default function CheckoutForm({ refetch }) {
   const { t } = useTranslation();
-  const location = useLocation();
+  const pathname = usePathname();
+  const location = { pathname };
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

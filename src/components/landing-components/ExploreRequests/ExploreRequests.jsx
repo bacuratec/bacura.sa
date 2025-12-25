@@ -1,19 +1,20 @@
 // example: pages/OrdersTable.jsx
 
-import { Link, useSearchParams } from "react-router-dom";
-import CustomDataTable from "../../shared/datatable/DataTable";
-import { useGetUserOrdersQuery } from "../../../redux/api/ordersApi";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useContext, useEffect } from "react";
-import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { Eye } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
+import CustomDataTable from "../../shared/datatable/DataTable";
+import { useGetUserOrdersQuery } from "../../../redux/api/ordersApi";
+import dayjs from "dayjs";
 
 const ExploreRequests = ({ stats }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   // استخراج القيم من الـ URL
   const PageNumber = searchParams.get("PageNumber") || 1;
   const PageSize = searchParams.get("PageSize") || 30;
@@ -131,12 +132,14 @@ const ExploreRequests = ({ stats }) => {
     {
       name: t("requestsUser.action"),
       cell: (row) => (
-        <Link
-          href={`/requests/${row.id}`}
-          className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium ml-5 text-nowrap"
-        >
-          <Eye />
-        </Link>
+        <div className="flex items-center gap-2 mt-4 justify-end">
+          <Link
+            href={`/requests/${row.id}`}
+            className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium ml-5 text-nowrap"
+          >
+            <Eye />
+          </Link>
+        </div>
       ),
       ignoreRowClick: true,
       allowOverflow: true,

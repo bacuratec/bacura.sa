@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@headlessui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import suspend from "@/assets/icons/suspend.svg";
 import {
