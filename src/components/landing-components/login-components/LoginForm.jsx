@@ -17,8 +17,10 @@ const LoginForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const from = location.state?.from?.pathname || location.search?.split("redirect=")[1]?.split("&")[0] || "/";
+ 
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(location.search) : null;
+  const fromParam = searchParams?.get("from") || searchParams?.get("redirect") || null;
+  const from = location.state?.from?.pathname || (fromParam ? decodeURIComponent(fromParam) : null) || "/";
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);

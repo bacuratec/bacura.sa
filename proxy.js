@@ -23,7 +23,25 @@ const providerRoutes = ["/provider"];
 const requesterRoutes = ["/request-service", "/requests", "/projects", "/profile", "/tickets"];
 
 export async function proxy(request) {
-  const { pathname } = request.nextUrl;
+  const url = request.nextUrl.clone();
+  const pathname = url.pathname || "/";
+
+  if (pathname.includes("%2F")) {
+    const decoded = decodeURIComponent(pathname);
+    if (decoded !== pathname) {
+      url.pathname = decoded;
+      return NextResponse.redirect(url);
+    }
+  }
+
+  const fromParam = url.searchParams.get("from") || url.searchParams.get("redirect");
+  if (fromParam && fromParam.includes("%2F")) {
+    const decodedFrom = decodeURIComponent(fromParam);
+    if (decodedFrom !== fromParam) {
+      url.searchParams.set(url.searchParams.get("from") ? "from" : "redirect", decodedFrom);
+      return NextResponse.redirect(url);
+    }
+  }
 
   if (!validUrl || !validAnonKey) {
     return NextResponse.next();
