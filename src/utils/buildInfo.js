@@ -79,7 +79,6 @@ export function formatLastUpdate(date, locale = 'ar-SA') {
 export function getBuildInfo() {
   const lastUpdate = getLastUpdateTime();
   const version = 
-    (typeof import !== 'undefined' && import.meta?.env?.VITE_APP_VERSION) ||
     (typeof process !== 'undefined' && process.env?.VITE_APP_VERSION) ||
     (typeof process !== 'undefined' && process.env?.npm_package_version) ||
     '1.0.0';
