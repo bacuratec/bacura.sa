@@ -121,9 +121,8 @@ const LoginForm = () => {
       } else if (userRole === "Provider") {
         navigate("/provider", { replace: true });
       } else if (userRole === "Requester") {
-        // إذا كان المستخدم حاول الوصول لصفحة محمية، ارجع إليها
-        // وإلا اذهب للصفحة الرئيسية (يمكنه الوصول لصفحاته من هناك)
-        const targetPath = from && from !== "/login" ? from : "/";
+        // توجيه طالب الخدمة إلى لوحة التحكم الخاصة به (Profile) أو الصفحة التي جاء منها
+        const targetPath = from && from !== "/login" && from !== "/" ? from : "/profile";
         navigate(targetPath, { replace: true });
       } else {
         toast.warning(
