@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import userImg from "../../../../assets/images/logo.png";
