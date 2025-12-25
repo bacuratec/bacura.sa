@@ -172,6 +172,12 @@ export const detectUserRole = async (user, session) => {
     // تجاهل الخطأ
   }
 
+  // إذا كان المستخدم مسجلاً للدخول ولكن لم يتم العثور على دور (مثلاً تم إنشاؤه عبر CLI بدون metadata)
+  // نفترض أنه "Requester" كدور افتراضي لتمكينه من استخدام المنصة
+  if (user && user.aud === "authenticated") {
+    return "Requester";
+  }
+
   return null;
 };
 

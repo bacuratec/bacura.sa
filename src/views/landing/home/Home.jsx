@@ -10,6 +10,8 @@ import LoadingPage from "../../LoadingPage";
 import Partners from "../../../components/landing-components/home-components/partners/Partners";
 import { useTranslation } from "react-i18next";
 import Customers from "../../../components/landing-components/home-components/customers/Customers";
+import MainLayout from "../../../components/Layouts/main-layout/MainLayout";
+
 const Home = () => {
   const { t } = useTranslation();
   useEffect(() => {
@@ -21,18 +23,20 @@ const Home = () => {
     return <LoadingPage />;
   }
   return (
-    <div className="bg-white">
-      <title>{t("home.metaTitle")}</title>
-      <meta name="description" content={t("about.metaDescription")} />
-      <Hero />
-      <Services data={services} />
-      <AboutUs />
-      <HowItWork />
-      <Join />
-      <Faqs />
-      <Partners />
-      <Customers />
-    </div>
+    <MainLayout>
+      <div className="bg-white">
+        <title>{t("home.metaTitle")}</title>
+        <meta name="description" content={t("about.metaDescription")} />
+        <Hero />
+        <Services data={services} />
+        <AboutUs />
+        <HowItWork />
+        <Join />
+        <Faqs />
+        <Partners />
+        <Customers />
+      </div>
+    </MainLayout>
   );
 };
 
