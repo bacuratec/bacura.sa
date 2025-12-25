@@ -1,0 +1,154 @@
+import { useEffect, useState } from 'react'
+import { useAuthStore } from '@/store'
+import { authService } from '@/services/auth'
+import type { LoginCredentials, SignupCredentials } from '@/services/auth'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+
+export const useAuth = () => {
+  const router = useRouter()
+  const { user, profile, isAuthenticated, isLoading, setUser, setProfile, setIsLoading, logout: storeLogout } = useAuthStore()
+
+  const login = async (credentials: LoginCredentials) => {
+    setIsLoading(true)
+    try {
+      const { user: authUser, profile: userProfile, error } = await authService.login(credentials)
+      
+      if (error) {
+        toast.error(error.message || 'فشل تسجيل الدخول')
+        return { success: false, error }
+      }
+
+      if (authUser && userProfile) {
+        setUser(authUser)
+        setProfile(userProfile)
+        toast.success('تم تسجيل الدخول بنجاح')
+        
+        // Redirect based on role
+        if (userProfile.role === 'Admin') {
+          router.push('/admin')
+        } else if (userProfile.role === 'Provider') {
+          router.push('/provider')
+        } else {
+          router.push('/profile')
+        }
+        
+        return { success: true }
+      }
+    } catch (error) {
+      toast.error('حدث خطأ غير متوقع')
+      return { success: false, error }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const signup = async (credentials: SignupCredentials) => {
+    setIsLoading(true)
+    try {
+      const { user: authUser, profile: userProfile, error } = await authService.signup(credentials)
+      
+      if (error) {
+        toast.error(error.message || 'فشل إنشاء الحساب')
+        return { success: false, error }
+      }
+
+      if (authUser && userProfile) {
+        setUser(authUser)
+        setProfile(userProfile)
+        toast.success('تم إنشاء الحساب بنجاح')
+        router.push('/profile')
+        return { success: true }
+      }
+    } catch (error) {
+      toast.error('حدث خطأ غير متوقع')
+      return { success: false, error }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const logout = async () => {
+    setIsLoading(true)
+    try {
+      const { error } = await authService.logout()
+      if (error) {
+        toast.error(error.message || 'فشل تسجيل الخروج')
+        return { success: false, error }
+      }
+      
+      storeLogout()
+      router.push('/login')
+      toast.success('تم تسجيل الخروج بنجاح')
+      return { success: true }
+    } catch (error) {
+      toast.error('حدث خطأ غير متوقع')
+      return { success: false, error }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const checkAuth = async () => {
+    setIsLoading(true)
+    try {
+      const { user: authUser, profile: userProfile, error } = await authService.getCurrentUser()
+      
+      if (error || !authUser) {
+        storeLogout()
+        return { success: false, error }
+      }
+
+      setUser(authUser)
+      setProfile(userProfile)
+      return { success: true }
+    } catch (error) {
+      storeLogout()
+      return { success: false, error }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    checkAuth()
+  }, [])
+
+  return {
+    user,
+    profile,
+    isAuthenticated,
+    isLoading,
+    login,
+    signup,
+    logout,
+    checkAuth,
+  }
+}
+
+export const useRequireAuth = (allowedRoles?: string[]) => {
+  const { isAuthenticated, profile, isLoading } = useAuthStore()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login')
+      return
+    }
+
+    if (!isLoading && isAuthenticated && allowedRoles && profile) {
+      if (!allowedRoles.includes(profile.role)) {
+        // Redirect to appropriate dashboard based on role
+        if (profile.role === 'Admin') {
+          router.push('/admin')
+        } else if (profile.role === 'Provider') {
+          router.push('/provider')
+        } else {
+          router.push('/profile')
+        }
+      }
+    }
+  }, [isAuthenticated, profile, isLoading, router, allowedRoles])
+
+  return { isAuthenticated, profile, isLoading }
+}
