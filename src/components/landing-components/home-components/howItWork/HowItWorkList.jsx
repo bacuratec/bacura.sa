@@ -1,14 +1,35 @@
-import React from "react";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion"; // ✅ استيراد موشن
+import React, { useRef, useEffect } from "react";
 import subscripeArrow from "../../../../assets/icons/subscripeArrow.svg";
 import HowItWorkCard from "./HowItWorkCard";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const HowItWorkList = () => {
   const { t } = useTranslation();
   const role = useSelector((state) => state.auth.role);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.from(".how-it-work-item", {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 85%",
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.2,
+        ease: "power3.out",
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const howItWork = [
     {
@@ -34,17 +55,14 @@ const HowItWorkList = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-2">
+    <div ref={containerRef} className="flex flex-col gap-2">
       {howItWork?.map((item, i) => (
-        <motion.div
+        <div
           key={item?.id}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: i * 0.2 }}
-          viewport={{ once: true }}
+          className="how-it-work-item"
         >
           <HowItWorkCard item={item} />
-        </motion.div>
+        </div>
       ))}
     </div>
   );

@@ -31,7 +31,7 @@ export const profileInfoApi = createApi({
       query: ({ userId, body }) => ({
         table: "profile_infos",
         method: "PUT",
-        id: userId, // This assumes user_id is unique
+        filters: { user_id: userId },
         body: {
           bio: body.bio || null,
           website_url: body.websiteUrl || null,

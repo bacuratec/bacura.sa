@@ -126,18 +126,57 @@ export const supabaseBaseQuery = async (args) => {
           .single();
         break;
       case "PUT":
-      case "PATCH":
-        // update لا يجب أن يكون بعد select، لذا نبدأ استعلامًا جديدًا
-        result = await supabase
-          .from(table)
-          .update(body)
-          .eq("id", id)
-          .select(selectString)
-          .single();
+      case "PATCH": {
+        let updateQuery = supabase.from(table).update(body);
+        
+        // Apply custom filters for update if provided
+        if (filters && Object.keys(filters).length > 0) {
+          Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              if (Array.isArray(value)) {
+                updateQuery = updateQuery.in(key, value);
+              } else {
+                updateQuery = updateQuery.eq(key, value);
+              }
+            }
+          });
+        } else if (id) {
+          // Default to ID if no filters
+          updateQuery = updateQuery.eq("id", id);
+        } else {
+          throw new Error("Missing id or filters for update operation");
+        }
+
+        // Only select single if we expect a single result (e.g. by ID)
+        if (id || (filters && !Object.values(filters).some(Array.isArray))) {
+          result = await updateQuery.select(selectString).single();
+        } else {
+          result = await updateQuery.select(selectString);
+        }
         break;
-      case "DELETE":
-        result = await supabase.from(table).delete().eq("id", id);
+      }
+      case "DELETE": {
+        let deleteQuery = supabase.from(table).delete();
+        
+        if (filters && Object.keys(filters).length > 0) {
+           Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              if (Array.isArray(value)) {
+                deleteQuery = deleteQuery.in(key, value);
+              } else {
+                deleteQuery = deleteQuery.eq(key, value);
+              }
+            }
+          });
+        } else if (id) {
+          deleteQuery = deleteQuery.eq("id", id);
+        } else {
+           throw new Error("Missing id or filters for delete operation");
+        }
+        
+        result = await deleteQuery;
         break;
+      }
       default:
         throw new Error(`Unsupported method: ${method}`);
     }

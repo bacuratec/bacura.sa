@@ -17,13 +17,11 @@ export const notificationsApi = createApi({
     }),
     seenNotifications: builder.mutation({
       query: ({ notificationIds }) => {
-        // Update multiple notifications
-        // Supabase doesn't support bulk update easily, so we'll update individually
-        // For now, return the first one - components should handle multiple updates
+        // Update multiple notifications using 'in' filter logic supported by modified supabaseBaseQuery
         return {
           table: "notifications",
-        method: "PUT",
-          id: notificationIds[0],
+          method: "PUT",
+          filters: { id: notificationIds },
           body: {
             is_seen: true,
           },

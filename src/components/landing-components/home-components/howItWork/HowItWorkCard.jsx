@@ -2,6 +2,7 @@
 
 import React from "react";
 import { AppLink } from "../../../../utils/routing";
+import Image from "next/image";
 
 const HowItWorkCard = ({ item }) => {
   return (
@@ -20,7 +21,7 @@ const HowItWorkCard = ({ item }) => {
             <span className="font-medium text-sm md:text-base lg:text-lg text-primary">
               {item?.link?.name}
             </span>
-            <img
+            <Image
               src={item?.link?.icon}
               alt={item?.link?.name}
               className="w-4 sm:w-5 ltr:rotate-180"

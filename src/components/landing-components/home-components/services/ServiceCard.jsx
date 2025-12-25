@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const ServiceCard = ({ icon, title, description, index }) => {
   return (
@@ -14,8 +15,8 @@ const ServiceCard = ({ icon, title, description, index }) => {
       {/* محتوى البطاقة */}
       <div className="flex flex-col justify-around h-full gap-4">
         {/* الأيقونة */}
-        <div className="icon rounded-xl sm:rounded-2xl bg-[#F1F1F1] group-hover:bg-[#2374BD] p-2 sm:p-3 w-fit flex items-center justify-center text-primary">
-          <img src={icon} alt="" className="w-6 sm:w-8" />
+        <div className="icon rounded-xl sm:rounded-2xl bg-[#F1F1F1] group-hover:bg-[#2374BD] p-2 sm:p-3 w-fit flex items-center justify-center text-primary relative h-10 w-10 sm:h-12 sm:w-12">
+          <Image src={icon} alt="" className="w-6 sm:w-8" />
         </div>
 
         {/* النصوص */}
