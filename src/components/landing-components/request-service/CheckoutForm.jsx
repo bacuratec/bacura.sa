@@ -72,10 +72,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { updateProjectPayment } from "../../../redux/slices/projectsSlice";
-import Button from "../../ui/Button";
+import toast from "react-hot-toast";
 
 export default function CheckoutForm({ refetch }) {
   const { t } = useTranslation();
