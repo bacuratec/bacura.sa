@@ -42,7 +42,7 @@ const Header = ({ data }) => {
     ? `${process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.VITE_APP_BASE_URL || ""}/${data.profilePictureUrl}`
     : userImg;
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => pathname === path;
 
   return (
     <header className="py-3 border-b border-b-[#DBDBDB] sticky top-0 left-0 bg-white z-[500] shadow-sm">
@@ -50,7 +50,7 @@ const Header = ({ data }) => {
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link
-            to="/"
+            href="/"
             onClick={() => scrollToTop()}
             className="logo w-[76px] h-[51px]"
           >

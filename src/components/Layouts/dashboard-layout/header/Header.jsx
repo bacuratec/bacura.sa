@@ -12,7 +12,7 @@ import LanguageDropdown from "../../LanguageDropdown";
 
 const Header = ({ data }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const router = useRouter();
   const token = useSelector((state) => state.auth.token);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,7 +36,7 @@ const Header = ({ data }) => {
       <div className="container">
         <div className="flex items-center justify-between gap-7">
           <Link
-            to={"/provider/profile"}
+            href={"/provider/profile"}
             className="profile flex items-center gap-1"
           >
             <div className="w-10 h-10 overflow-hidden rounded-md">
@@ -74,7 +74,7 @@ const Header = ({ data }) => {
             <button
               onClick={async () => {
                 await dispatch(logoutUser());
-                navigate("/login", { replace: true });
+                router.replace("/login");
               }}
               className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >

@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom"; // لو انت شغال React Router
+import { useRouter, useParams } from "next/navigation";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import {
@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 const UpdateQuestion = () => {
   const { t } = useTranslation();
 
-  const navigate = useNavigate();
+  const router = useRouter();
   const { id } = useParams(); // جيب الـ id من البارامز
   const { data, isLoading: isLoadingDetails } = useGetQuestionDetailsQuery(id);
   const [updateQuestion, { isLoading }] = useUpdateQuestionMutation();
@@ -30,7 +30,7 @@ const UpdateQuestion = () => {
       await updateQuestion({ id, body: values }).unwrap();
       toast.success(t("question.updateSuccess"));
       refetch();
-      navigate("/admin/faqs");
+      router.push("/admin/faqs");
     } catch (err) {
       toast.error(
         err?.data?.message || t("question.updateError") || "حدث خطأ أثناء تحديث السؤال"

@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 export default function SuspendModal({ open, setOpen }) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const router = useRouter();
   const role = useSelector((state) => state.auth.role);
   const [suspendProvider, { isLoading: loadingProvider }] =
     useSuspendProviderMutation();
@@ -35,7 +35,7 @@ export default function SuspendModal({ open, setOpen }) {
       }
       toast.success(t("suspend.success"));
       await dispatch(logoutUser());
-      navigate("/login", { replace: true });
+      router.replace("/login");
     } catch (error) {
       toast.error(
         error?.data?.message || t("suspend.error") || "حدث خطأ أثناء تعليق الحساب"

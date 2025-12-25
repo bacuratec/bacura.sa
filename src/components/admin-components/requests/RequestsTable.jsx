@@ -1,6 +1,7 @@
 // example: pages/OrdersTable.jsx
 
-import { Link, useSearchParams } from "react-router-dom";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import { useGetOrdersQuery, useDeleteRequestMutation } from "../../../redux/api/ordersApi";
 import { useContext, useEffect, useState } from "react";
@@ -15,7 +16,7 @@ const RequestsTable = ({ stats }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
 
   // استخراج القيم من الـ URL
   const PageNumber = searchParams.get("PageNumber") || 1;

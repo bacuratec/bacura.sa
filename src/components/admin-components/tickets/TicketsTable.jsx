@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import { useGetTicketsQuery } from "../../../redux/api/ticketApi";
 import { useSelector } from "react-redux";
@@ -44,7 +44,7 @@ const TicketsTable = () => {
       name: t("tickets.actions"),
       cell: (row) => (
         <Link
-          to={
+          href={
             role === "Admin"
               ? `/admin/tickets/${row.id}`
               : `/provider/tickets/${row.id}`

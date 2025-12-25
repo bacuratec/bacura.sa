@@ -1,12 +1,12 @@
 import { useSelector } from "react-redux";
-import { Navigate, useLocation } from "react-router-dom";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const GuestGuard = ({ children }) => {
   const { token, role } = useSelector((state) => state.auth);
-  const location = useLocation();
+  const pathname = usePathname();
+  const router = useRouter();
   const [shouldRedirect, setShouldRedirect] = useState(false);
-  const [redirectPath, setRedirectPath] = useState(null);
 
   useEffect(() => {
     if (token && role) {
@@ -20,15 +20,15 @@ const GuestGuard = ({ children }) => {
         path = "/";
       }
 
-      if (path && location.pathname !== path) {
-        setRedirectPath(path);
+      if (path && pathname !== path) {
+        router.replace(path);
         setShouldRedirect(true);
       }
     }
-  }, [token, role, location.pathname]);
+  }, [token, role, pathname, router]);
 
-  if (shouldRedirect && redirectPath) {
-    return <Navigate to={redirectPath} replace />;
+  if (shouldRedirect) {
+    return null; // or loading spinner
   }
 
   // ✅ لو مفيش توكن نسمح له يشوف الصفحة

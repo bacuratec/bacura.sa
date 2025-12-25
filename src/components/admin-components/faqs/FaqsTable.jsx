@@ -56,7 +56,7 @@ const FaqsTable = () => {
       cell: (row) => (
         <div className="flex items-center gap-3">
           <Link
-            to={`/admin/update-question/${row.id}`}
+            href={`/admin/update-question/${row.id}`}
             className="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
           >
             <Edit width={15} />
@@ -85,7 +85,7 @@ const FaqsTable = () => {
                 {t("question.faqManagement")}
               </h2>
               <Link
-                to="/admin/add-questions"
+                href="/admin/add-questions"
                 className="flex items-center gap-2 bg-primary text-white py-2 px-4 rounded-lg text-sm md:text-base font-medium hover:bg-primary/90 transition"
               >
                 <PlusIcon className="w-4 h-4" /> {t("question.addQuestion")}

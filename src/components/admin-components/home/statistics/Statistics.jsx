@@ -1,10 +1,9 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 const Statistics = ({ title, stats }) => {
-  const location = useLocation();
-  const pathname = location.pathname;
+  const pathname = usePathname();
   return (
     <div className="my-5 w-full basis-full lg:basis-1/3">
       <div className="container">

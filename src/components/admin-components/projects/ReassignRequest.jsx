@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import AsyncSelect from "react-select/async";
 import { useLazyGetProvidersAccountsQuery } from "@/redux/api/providersApi";
 import debounce from "lodash.debounce";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 import { useReassignRequestFnMutation } from "../../../redux/api/ordersApi";
 import { useTranslation } from "react-i18next";
 

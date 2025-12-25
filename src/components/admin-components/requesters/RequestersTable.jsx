@@ -1,6 +1,7 @@
 // example: pages/OrdersTable.jsx
 
-import { Link, useSearchParams } from "react-router-dom";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import {
   useGetRequestersAccountsQuery,
@@ -17,7 +18,7 @@ const RequestersTable = ({ stats }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
 
   // استخراج القيم من الـ URL
   const PageNumber = searchParams.get("PageNumber") || 1;

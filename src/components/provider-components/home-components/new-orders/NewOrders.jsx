@@ -94,7 +94,7 @@ const OrdersTable = () => {
       name: t("orders.columns.action"),
       cell: (row) => (
         <Link
-          to={
+          href={
             role === "Admin"
               ? `/admin/projects/${row.id}`
               : role === "Requester"

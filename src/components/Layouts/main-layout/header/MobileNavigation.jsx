@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { HomeIcon, PlusCircle, UserCircle2Icon } from "lucide-react";
 import { useSelector } from "react-redux";
 import requestOrders from "../../../../assets/icons/requestOrders.svg";
@@ -27,7 +28,7 @@ const MobileNavigation = ({ data }) => {
       icon: <PlusCircle />,
     },
   ];
-  const path = useLocation();
+  const pathname = usePathname();
   const imageUrl = data?.profilePictureUrl
     ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : null;
@@ -38,11 +39,11 @@ const MobileNavigation = ({ data }) => {
         {/* Navigation Links */}
         <nav className="flex-1 flex justify-around items-center gap-1">
           {navLinks?.map((link) => (
-            <NavLink
+            <Link
               key={link.href}
-              to={link.href}
+              href={link.href}
               className={`flex flex-col items-center justify-center space-y-1 text-sm text-gray-500 hover:text-primary transition-all ${
-                path?.pathname === link?.href
+                pathname === link?.href
                   ? "text-primary font-semibold"
                   : ""
               }`}
@@ -56,12 +57,12 @@ const MobileNavigation = ({ data }) => {
               ) : (
                 link?.icon
               )}
-            </NavLink>
+            </Link>
           ))}
 
           {token && imageUrl ? (
-            <NavLink
-              to="/profile"
+            <Link
+              href="/profile"
               className="flex items-center gap-1 border-2 border-primary/50 rounded-full w-10 h-10 overflow-hidden p-1"
             >
               <img
@@ -69,16 +70,16 @@ const MobileNavigation = ({ data }) => {
                 alt="user"
                 className="w-full h-full object-cover rounded-full"
               />
-            </NavLink>
+            </Link>
           ) : (
-            <NavLink
-              to={"/login"}
+            <Link
+              href={"/login"}
               className={`flex flex-col items-center justify-center space-y-1 text-sm text-gray-500 hover:text-primary transition-all ${
-                path?.pathname === "/login" ? "text-primary font-semibold" : ""
+                pathname === "/login" ? "text-primary font-semibold" : ""
               }`}
             >
               <UserCircle2Icon />
-            </NavLink>
+            </Link>
           )}
         </nav>
 

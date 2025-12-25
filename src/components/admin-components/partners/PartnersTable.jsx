@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import { Edit, PlusIcon, Trash } from "lucide-react";
 import toast from "react-hot-toast";
@@ -90,7 +90,7 @@ const PartnersTable = () => {
                 {t("partners.title")}
               </h2>
               <Link
-                to="/admin/add-partner"
+                href="/admin/add-partner"
                 className="flex items-center gap-2 bg-primary text-white py-2 px-4 rounded-lg text-sm md:text-base font-medium hover:bg-primary/90 transition"
               >
                 <PlusIcon className="w-4 h-4" /> {t("partners.addPartner")}

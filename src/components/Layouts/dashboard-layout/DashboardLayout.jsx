@@ -57,14 +57,19 @@ const DashboardLayout = () => {
     verifyProviderRole();
   }, [userId, dispatch]);
 
-  // عرض صفحة التحميل أثناء التحقق
+  // إذا لم يكن Provider، إعادة التوجيه
+  useEffect(() => {
+    if (!isVerifying && (!isProvider || role !== "Provider")) {
+      router.replace("/login");
+    }
+  }, [isVerifying, isProvider, role, router]);
+
   if (isVerifying) {
     return <LoadingPage />;
   }
 
-  // إذا لم يكن Provider، إعادة التوجيه
   if (!isProvider || role !== "Provider") {
-    return <Navigate to="/login" replace />;
+    return null;
   }
 
   return (
@@ -73,7 +78,7 @@ const DashboardLayout = () => {
       <Header data={providerData} />
       <SideBar data={providerData} />
       <main className="lg:mr-[250px] min-h-screen mb-10 lg:mb-0">
-        <Outlet />
+        {children}
       </main>
     </div>
   );

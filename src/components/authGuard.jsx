@@ -85,17 +85,15 @@ const AuthGuard = ({ allowedRoles, children }) => {
     return <LoadingPage />;
   }
 
-  // إذا لم يكن هناك token أو انتهت صلاحيته
-  if (shouldRedirect || !token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  // استخدام الدور المُتحقق منه من Supabase
+  // Handle redirects in useEffect or checking state
   const currentRole = verifiedRole || role;
 
-  // إذا كان المستخدم ليس له الدور المطلوب
+  if (shouldRedirect || !token) {
+    if (typeof window !== 'undefined') router.replace(`/login?from=${pathname}`);
+    return null;
+  }
+
   if (!allowedRoles.includes(currentRole)) {
-    // توجيه المستخدم إلى لوحة التحكم المناسبة حسب دوره
     let redirectPath = "/login";
     if (currentRole === "Admin") {
       redirectPath = "/admin";
@@ -104,8 +102,8 @@ const AuthGuard = ({ allowedRoles, children }) => {
     } else if (currentRole === "Requester") {
       redirectPath = "/";
     }
-    
-    return <Navigate to={redirectPath} replace />;
+    if (typeof window !== 'undefined') router.replace(redirectPath);
+    return null;
   }
 
   return children;

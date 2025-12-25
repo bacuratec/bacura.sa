@@ -1,5 +1,6 @@
 import logo from "../../../../assets/images/logo.png";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
 import homeIcon from "../../../../assets/icons/homeIcon.svg";
@@ -51,7 +52,7 @@ const SideBar = ({ data }) => {
     },
   ];
 
-  const path = useLocation();
+  const pathname = usePathname();
 
   return (
     <aside className="min-h-screen fixed w-[250px] bg-primary top-0 right-0 hidden lg:flex flex-col justify-between">
@@ -61,41 +62,41 @@ const SideBar = ({ data }) => {
       <nav className="flex-1">
         <ul>
           <li>
-            <NavLink
-              to={"/provider"}
+            <Link
+              href={"/provider"}
               className={`flex items-center gap-6 py-3 px-6 text-white ${
-                path?.pathname === "/provider"
+                pathname === "/provider"
                   ? "!text-black font-medium bg-white border-r-4 border-r-black"
                   : ""
               }`}
             >
               <img
-                src={path?.pathname === "/provider" ? homeIconActive : homeIcon}
+                src={pathname === "/provider" ? homeIconActive : homeIcon}
                 alt="home"
               />
               <span>{t("navProvider.home")}</span>
-            </NavLink>
+            </Link>
           </li>
           {Links.map((item, i) => (
             <li key={i}>
-              <NavLink
-                to={item.href}
+              <Link
+                href={item.href}
                 className={`flex items-center gap-6 py-3 px-6 text-white ${
-                  path?.pathname.includes(item.href)
+                  pathname.includes(item.href)
                     ? "!text-black font-medium bg-white border-r-4 border-r-black"
                     : ""
                 }`}
               >
                 <img
                   src={
-                    path?.pathname.includes(item.href)
+                    pathname.includes(item.href)
                       ? item.iconActive
                       : item.icon
                   }
                   alt={item.name}
                 />
                 <span>{item.name}</span>
-              </NavLink>
+              </Link>
             </li>
           ))}
         </ul>

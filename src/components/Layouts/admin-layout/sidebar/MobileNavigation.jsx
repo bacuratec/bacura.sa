@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import homeIcon from "../../../../assets/icons/homeIcon.svg";
 import homeIconActive from "../../../../assets/icons/homeIconActive.svg";
 
@@ -97,32 +98,32 @@ const navLinks = [
   },
 ];
 const MobileNavigation = () => {
-  const path = useLocation();
+  const pathname = usePathname();
   return (
     <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-lg z-50">
       <div className="flex justify-between items-center h-16 px-4">
         {/* Navigation Links */}
         <nav className="flex-1 flex justify-around items-center gap-1">
-          {navLinks.map((link) => (
-            <NavLink
+          {navLinks?.map((link) => (
+            <Link
               key={link.href}
-              to={link.href}
+              href={link.href}
               className={`flex flex-col items-center justify-center space-y-1 text-sm text-gray-500 hover:text-primary transition-all ${
-                path?.pathname === link?.href
+                pathname === link?.href
                   ? "text-primary font-semibold"
                   : ""
               }`}
             >
-              {link?.ic ? (
+              {link?.ic === true ? (
                 link?.icon
               ) : (
                 <img
                   src={link.iconActive}
                   alt={link.name}
-                  className="w-4 h-4"
+                  className="w-6 h-6"
                 />
               )}
-            </NavLink>
+            </Link>
           ))}
         </nav>
       </div>

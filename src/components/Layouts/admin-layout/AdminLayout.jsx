@@ -57,14 +57,19 @@ const AdminLayout = () => {
     verifyAdminRole();
   }, [userId, dispatch]);
 
-  // عرض صفحة التحميل أثناء التحقق
+  // إذا لم يكن أدمن، إعادة التوجيه
+  useEffect(() => {
+    if (!isVerifying && (!isAdmin || role !== "Admin")) {
+      router.replace("/login");
+    }
+  }, [isVerifying, isAdmin, role, router]);
+
   if (isVerifying) {
     return <LoadingPage />;
   }
 
-  // إذا لم يكن أدمن، إعادة التوجيه
   if (!isAdmin || role !== "Admin") {
-    return <Navigate to="/login" replace />;
+    return null;
   }
 
   return (
@@ -73,7 +78,7 @@ const AdminLayout = () => {
       <Header data={adminData} />
       <SideBar data={adminData} />
       <main className="lg:mr-[250px] min-h-screen mb-10 lg:mb-0">
-        <Outlet />
+        {children}
       </main>
     </div>
   );

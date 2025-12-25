@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../../redux/slices/authSlice";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import NotificationsModal from "../../NotificationsModal";
@@ -74,7 +75,7 @@ const Header = ({ data }) => {
             <button
               onClick={async () => {
                 await dispatch(logoutUser());
-                navigate("/login", { replace: true });
+                router.replace("/login");
               }}
               className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >

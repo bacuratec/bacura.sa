@@ -132,7 +132,7 @@ const ExploreRequests = ({ stats }) => {
       name: t("requestsUser.action"),
       cell: (row) => (
         <Link
-          to={`/requests/${row.id}`}
+          href={`/requests/${row.id}`}
           className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium ml-5 text-nowrap"
         >
           <Eye />

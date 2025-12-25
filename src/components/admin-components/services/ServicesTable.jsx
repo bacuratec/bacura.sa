@@ -11,7 +11,7 @@ import UpdatePriceModal from "./UpdatePriceModal";
 import { useTranslation } from "react-i18next";
 import { Edit, PlusIcon, Trash } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
 
@@ -166,7 +166,7 @@ const ServicesTable = () => {
                 {t("services.title") || "الخدمات"}
               </h2>
               <Link
-                to="/admin/add-service"
+                href="/admin/add-service"
                 className="flex items-center gap-2 bg-primary text-white py-2 px-4 rounded-lg text-sm md:text-base font-medium hover:bg-primary/90 transition"
               >
                 <PlusIcon className="w-4 h-4" />{" "}

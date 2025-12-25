@@ -1,6 +1,7 @@
 // example: pages/OrdersTable.jsx
 
-import { Link, useSearchParams } from "react-router-dom";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   useGetProvidersAccountsQuery,
   useDeleteProviderMutation,

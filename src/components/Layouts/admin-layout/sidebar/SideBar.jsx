@@ -1,5 +1,6 @@
 import logo from "../../../../assets/images/logo.png";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import homeIcon from "../../../../assets/icons/homeIcon.svg";
 import homeIconActive from "../../../../assets/icons/homeIconActive.svg";
@@ -110,45 +111,54 @@ const SideBar = ({ data }) => {
       <nav className="flex-1">
         <ul>
           <li>
-            <NavLink
-              to={"/admin"}
+            <Link
+              href={"/admin"}
               className={`flex items-center gap-6 py-3 px-6 text-white ${
-                path?.pathname === "/admin"
+                pathname === "/admin"
                   ? "!text-black font-medium bg-white border-r-4 border-r-black"
                   : ""
               }`}
             >
               <img
-                src={path?.pathname === "/admin" ? homeIconActive : homeIcon}
+                src={pathname === "/admin" ? homeIconActive : homeIcon}
                 alt="home"
               />
-              <span className="text-sm">{t("nav.home")}</span>
-            </NavLink>
+              <span>{t("navProvider.home")}</span>
+            </Link>
           </li>
-          {Links?.map((item, i) => (
+          {Links.map((item, i) => (
             <li key={i}>
-              <NavLink
-                to={item?.href}
-                className={`flex items-center gap-6 py-2 px-6 text-white ${
-                  path?.pathname.includes(item?.href)
+              <Link
+                href={item.href}
+                className={`flex items-center gap-6 py-3 px-6 text-white ${
+                  pathname.includes(item.href)
                     ? "!text-black font-medium bg-white border-r-4 border-r-black"
                     : ""
                 }`}
               >
-                {item?.ic ? (
-                  item?.icon
+                {item.ic ? (
+                  <span
+                    className={
+                      pathname.includes(item.href)
+                        ? "text-[#1A71F6]"
+                        : "text-white"
+                    }
+                  >
+                    {item.icon}
+                  </span>
                 ) : (
                   <img
                     src={
-                      path?.pathname.includes(item?.href)
-                        ? item?.iconActive
-                        : item?.icon
+                      pathname.includes(item.href)
+                        ? item.iconActive
+                        : item.icon
                     }
-                    alt={item?.name}
+                    alt={item.name}
                   />
                 )}
-                <span className="text-sm">{item?.name}</span>
-              </NavLink>
+
+                <span>{item.name}</span>
+              </Link>
             </li>
           ))}
         </ul>

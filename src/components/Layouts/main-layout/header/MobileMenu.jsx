@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import logoutIcon from "@/assets/icons/logout.svg";
 import NavLinks from "./NavLinks";
 import { useTranslation } from "react-i18next";
@@ -59,14 +59,14 @@ const MobileMenu = ({
       ) : (
         <div className="flex flex-col gap-3">
           <Link
-            to="/signup"
+            href="/signup"
             className="py-2 px-4 bg-primary text-white rounded-lg text-center"
             onClick={onClose}
           >
             {t("mobileMenu.signup")}
           </Link>
           <Link
-            to="/login"
+            href="/login"
             className="py-2 px-4 border border-primary text-primary rounded-lg text-center"
             onClick={onClose}
           >

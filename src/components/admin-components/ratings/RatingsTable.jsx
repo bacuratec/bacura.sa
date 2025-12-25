@@ -4,7 +4,7 @@ import star from "../../../assets/icons/star.svg";
 import emptyStar from "../../../assets/icons/emptyStar.svg";
 import { useEffect } from "react";
 import { useGetRatingsQuery, useDeleteRatingMutation } from "../../../redux/api/ratingsApi";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { Trash } from "lucide-react";
 import toast from "react-hot-toast";
