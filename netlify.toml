@@ -7,14 +7,5 @@
     NODE_VERSION = "20"
     NEXT_TELEMETRY_DISABLED = "1"
 
-[[plugins]]{
-  "mcpServers": {
-    "supabase": {
-      "url": "https://mcp.supabase.com/mcp?project_ref=tqskjoufozgyactjnrix",
-      "headers": {
-        "Authorization": "Bearer <SUPABASE_SERVICE_ROLE_KEY>"
-      }
-    }
-  }
-}
+[[plugins]]
   package = "@netlify/plugin-nextjs"
