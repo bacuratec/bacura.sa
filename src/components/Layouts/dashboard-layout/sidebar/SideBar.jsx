@@ -108,7 +108,7 @@ const SideBar = ({ data }) => {
         <div className="rounded-full w-8 h-8 overflow-hidden border-2 border-[#D8D8FE]">
           <img src={imageUrl} alt="" className="w-full h-full object-cover" />
         </div>
-        <Link to={"/provider/profile"} className="content text-white">
+        <Link href={"/provider/profile"} className="content text-white">
           <h3 className="font-medium leading-4">{data?.name}</h3>
           <span className="text-xs font-normal leading-4">
             {t("navProvider.serviceProvider")}

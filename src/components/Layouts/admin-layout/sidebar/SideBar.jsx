@@ -99,7 +99,7 @@ const SideBar = ({ data }) => {
       iconActive: providersActive,
     },
   ];
-  const path = useLocation();
+  const pathname = usePathname();
   const imageUrl = data?.profilePictureUrl
     ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : logo;
@@ -170,7 +170,7 @@ const SideBar = ({ data }) => {
         <div className="rounded-full w-8 h-8 overflow-hidden border-2 border-[#D8D8FE]">
           <img src={imageUrl} alt="" className="w-full h-full object-cover" />
         </div>
-        <Link to={"/admin/profile"} className="content text-white">
+        <Link href={"/admin/profile"} className="content text-white">
           <h3 className="font-medium leading-4">{data?.fullName}</h3>
           <span className="text-xs font-normal leading-4">
             {t("nav.admin")}
