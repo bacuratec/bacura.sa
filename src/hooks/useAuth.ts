@@ -34,6 +34,10 @@ export const useAuth = () => {
         }
         
         return { success: true }
+      } else {
+        // Handle case where authUser or userProfile is missing
+        toast.error('بيانات تسجيل الدخول غير مكتملة')
+        return { success: false, error: new Error('Missing user data') }
       }
     } catch (error) {
       toast.error('حدث خطأ غير متوقع')
@@ -59,6 +63,10 @@ export const useAuth = () => {
         toast.success('تم إنشاء الحساب بنجاح')
         router.push('/profile')
         return { success: true }
+      } else {
+        // Handle case where authUser or userProfile is missing
+        toast.error('بيانات إنشاء الحساب غير مكتملة')
+        return { success: false, error: new Error('Missing user data') }
       }
     } catch (error) {
       toast.error('حدث خطأ غير متوقع')

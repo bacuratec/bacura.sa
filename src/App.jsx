@@ -62,7 +62,7 @@ const UpsertPartner = lazy(() => import("./components/admin-components/partners/
 const UpsertCustomer = lazy(() => import("./components/admin-components/customers/UpsertCustomer"));
 const AddService = lazy(() => import("./components/admin-components/services/AddService"));
 
-import AuthGuard from "./components/authGuard";
+import AuthGuard from "./components/AuthGuard";
 import GuestGuard from "./components/GuestGuard";
 import BackToTopButton from "./components/BackTop";
 import { LanguageContext } from "./context/LanguageContext";
