@@ -73,8 +73,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
+import { useUpdatePaymentStatusMutation } from "../../../redux/api/paymentApi";
 
-export default function CheckoutForm({ refetch }) {
+export default function CheckoutForm({ refetch, paymentId }) {
   const { t } = useTranslation();
   const pathname = usePathname();
   const location = { pathname };
@@ -84,6 +85,7 @@ export default function CheckoutForm({ refetch }) {
   const [message, setMessage] = useState("");
   const router = useRouter();
   const navigate = (path) => router.push(path);
+  const [updatePaymentStatus] = useUpdatePaymentStatusMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,8 +94,7 @@ export default function CheckoutForm({ refetch }) {
     setLoading(true);
 
     try {
-      // ✅ أولاً: إنشاء الأوردر
-      // ✅ ثانياً: بدء الدفع
+      // ✅ أولاً: بدء الدفع
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: { return_url: window.location.href },
@@ -108,6 +109,23 @@ export default function CheckoutForm({ refetch }) {
 
       if (paymentIntent?.status === "succeeded") {
         setMessage(t("payment.succeeded"));
+        
+        // تحديث حالة الدفع في قاعدة البيانات
+        if (paymentId) {
+            try {
+                await updatePaymentStatus({
+                    id: paymentId,
+                    body: {
+                        status: "succeeded",
+                        stripePaymentIntentId: paymentIntent.id
+                    }
+                }).unwrap();
+            } catch (updateErr) {
+                console.error("Failed to update payment status in DB:", updateErr);
+                // لا نوقف العملية لأن الدفع تم بالفعل في Stripe
+            }
+        }
+
         toast.success(t("payment.success"));
         if (location?.pathname?.includes("requests/")) {
           refetch();

@@ -84,6 +84,7 @@ CREATE TABLE services (
   description_ar TEXT,
   description_en TEXT,
   price DECIMAL(10, 2),
+  image_url TEXT,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

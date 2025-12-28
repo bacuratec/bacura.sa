@@ -21,6 +21,7 @@ const stripePromise = stripePublishableKey && stripePublishableKey.trim()
 export default function PaymentForm({ amount, consultationId, refetch }) {
   const { t } = useTranslation();
   const [clientSecret, setClientSecret] = useState("");
+  const [paymentId, setPaymentId] = useState(null); // Store DB Payment ID
   const [createPayment, { isLoading, error }] = useCreatePaymentMutation();
 
   useEffect(() => {
@@ -31,15 +32,44 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
 
     const createPaymentIntent = async () => {
       try {
-        const data = await createPayment({
+        // 1. Create Payment Intent via Next.js API
+        const response = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount, currency: "sar" }),
+        });
+        
+        const paymentData = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(paymentData.error || "Failed to create payment intent");
+        }
+
+        const { clientSecret: secret } = paymentData;
+        const intentId = secret?.split('_secret_')[0] || null;
+
+        // 2. Create pending payment record in Supabase
+        const dbPayment = await createPayment({
           amount,
           currency: "sar",
           consultationId,
+          stripePaymentIntentId: intentId,
+          status: "pending",
         }).unwrap();
-        setClientSecret(data.clientSecret);
+        
+        if (dbPayment?.data?.id) {
+            setPaymentId(dbPayment.data.id);
+        } else if (dbPayment?.id) {
+             setPaymentId(dbPayment.id);
+        }
+
+        // 3. Show Form
+        setClientSecret(secret);
+
       } catch (err) {
+        console.error("Payment setup error:", err);
         toast.error(
-          err?.data?.message || t("payment.stripeError") || "حدث خطأ أثناء إنشاء نية الدفع"
+          err?.message || t("payment.stripeError") || "حدث خطأ أثناء إنشاء نية الدفع"
         );
       }
     };
@@ -62,7 +92,7 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
 
   return clientSecret ? (
     <Elements options={options} stripe={stripePromise}>
-      <CheckoutForm refetch={refetch} />
+      <CheckoutForm refetch={refetch} paymentId={paymentId} />
     </Elements>
   ) : isLoading ? (
     <p>جاري تحميل الدفع...</p>

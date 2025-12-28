@@ -34,6 +34,7 @@ const UpsertService = () => {
     isPriced: !!data?.base_price,
     isActive: data?.is_active !== undefined ? !!data.is_active : true,
     image: null,
+    removeImage: false,
   };
 
   const validationSchema = Yup.object({
@@ -61,7 +62,11 @@ const UpsertService = () => {
     try {
       let imageUrl = data?.image_url || null;
 
-      if (values.image) {
+      if (values.removeImage && data?.image_url) {
+        const { deleteImageFromStorage } = await import("../../../utils/imageUpload");
+        await deleteImageFromStorage(data.image_url, "images");
+        imageUrl = null;
+      } else if (values.image) {
         const { uploadImageToStorage } = await import("../../../utils/imageUpload");
         const uploadedUrl = await uploadImageToStorage(values.image, "images", "services");
         if (!uploadedUrl) {
@@ -172,6 +177,7 @@ const UpsertService = () => {
                       if (file) {
                         const url = URL.createObjectURL(file);
                         setPreview(url);
+                        setFieldValue("removeImage", false);
                       }
                     }}
                     className="w-full border rounded p-2 bg-primary/10 focus:outline-primary mb-2"
@@ -184,6 +190,7 @@ const UpsertService = () => {
                       onClick={() => {
                         setPreview(null);
                         setFieldValue("image", null);
+                        setFieldValue("removeImage", true);
                       }}
                       className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                     >
@@ -193,6 +200,14 @@ const UpsertService = () => {
                 )}
                 {!preview && touched.image && errors.image && (
                   <div className="text-red-500 text-sm mt-2">{errors.image}</div>
+                )}
+                {data?.image_url && (
+                  <label className="flex items-center gap-2 mt-2">
+                    <Field type="checkbox" name="removeImage" className="w-5 h-5 accent-primary" />
+                    <span className="text-gray-700">
+                      {t("services.removeImage") || "إزالة الصورة الحالية"}
+                    </span>
+                  </label>
                 )}
 
                 <label className="flex items-center gap-2 mb-2 mt-4">
@@ -228,4 +243,3 @@ const UpsertService = () => {
 };
 
 export default UpsertService;
-
