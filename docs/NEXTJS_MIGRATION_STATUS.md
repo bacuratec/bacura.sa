@@ -39,13 +39,13 @@
 
 ## 📋 المهام المتبقية
 
-### صفحات Landing (Requester) - 0/9
-- [ ] `/request-service`
-- [ ] `/requests`
-- [ ] `/requests/[id]`
-- [ ] `/projects`
-- [ ] `/projects/[id]`
-- [ ] `/profile`
+### صفحات Landing (Requester) - 5/9
+- [x] `/request-service`
+- [x] `/requests`
+- [x] `/requests/[id]`
+- [x] `/projects`
+- [x] `/projects/[id]`
+- [x] `/profile`
 - [ ] `/profile/reviews`
 - [ ] `/tickets`
 - [ ] صفحات عامة أخرى

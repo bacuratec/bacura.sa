@@ -35,58 +35,58 @@ const ProjectUserDetails = () => {
     return <LoadingPage />;
   }
 
-  if (!projectData) {
+  if (!data) {
     return <NotFound />;
   }
   return (
     <div className="py-6">
       <title>{`${t("projectDetails.title")} #${
-        projectData?.orderNumber
+        data?.orderNumber
       }`}</title>
-      <meta name="description" content={projectData?.description} />
+      <meta name="description" content={data?.description} />
       <div className="container">
         <HeadTitle
-          title={`${t("projectDetails.title")} #${projectData?.orderNumber}`}
+          title={`${t("projectDetails.title")} #${data?.orderNumber}`}
           nav1={t("projectDetails.nav1")}
           nav2={t("projectDetails.nav2")}
           typeProject={
             lang === "ar"
-              ? projectData?.orderStatus?.nameAr
-              : projectData?.orderStatus?.nameEn
+              ? data?.orderStatus?.nameAr
+              : data?.orderStatus?.nameEn
           }
-          statusProject={projectData?.orderStatus?.id}
+          statusProject={data?.orderStatus?.id}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 lg:gap-6 xl:gap-8 mt-5">
           <div className="lg:basis-1/2 w-full bg-white shadow-lg overflow-hidden rounded-xl">
-            <ProjectListInfo data={projectData} />
+            <ProjectListInfo data={data} />
           </div>
           <div className="lg:basis-1/2 w-full bg-white shadow-lg overflow-hidden rounded-xl p-5">
-            <ProjectDescription des={projectData?.description} />
+            <ProjectDescription des={data?.description} />
           </div>
         </div>
         {/* <AttachmentsTable
           title={"المرفقات الخاصة بالمشروع"}
-          attachments={projectData?.orderAttachments}
+          attachments={data?.orderAttachments}
         /> */}
         <AttachmentsTable
           title={t("projectDetails.projectAttachments")}
-          attachments={projectData?.orderAttachments?.filter(
+          attachments={data?.orderAttachments?.filter(
             (att) => att.attachmentUploaderLookupId !== 700
           )}
         />
         <AttachmentsTable
           title={t("projectDetails.requesterAttachments")}
-          attachments={projectData?.requestAttachments}
+          attachments={data?.requestAttachments}
         />
-        <UploadAdminAttachments projectData={projectData} refetch={refetch} />
+        <UploadAdminAttachments projectData={data} refetch={refetch} />
 
         {role === "Requester" &&
-          !projectData?.isRated &&
-          projectData?.orderStatus?.id === 603 && (
+          !data?.isRated &&
+          data?.orderStatus?.id === 603 && (
             <button
               onClick={() => {
-                setOrderId(projectData.id);
+                setOrderId(data.id);
                 setOpen(true);
               }}
               className="bg-green-600 text-white px-10 py-4 rounded-lg hover:bg-green-700 transition text-base font-bold mx-auto block"
