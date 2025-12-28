@@ -26,7 +26,11 @@ export interface SignupCredentials {
 class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const client = supabase as any
+      if (!client) {
+        return { user: null, profile: null, error: { message: 'Supabase client not initialized' } as AuthError }
+      }
+      const { data, error } = await client.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
       })
@@ -36,7 +40,7 @@ class AuthService {
       }
 
       if (data.user) {
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await client
           .from('profiles')
           .select('*')
           .eq('id', data.user.id)
@@ -57,7 +61,11 @@ class AuthService {
 
   async signup(credentials: SignupCredentials): Promise<AuthResponse> {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const client = supabase as any
+      if (!client) {
+        return { user: null, profile: null, error: { message: 'Supabase client not initialized' } as AuthError }
+      }
+      const { data, error } = await client.auth.signUp({
         email: credentials.email,
         password: credentials.password,
       })
@@ -67,7 +75,7 @@ class AuthService {
       }
 
       if (data.user) {
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await client
           .from('profiles')
           .insert({
             id: data.user.id,
@@ -97,7 +105,11 @@ class AuthService {
 
   async logout(): Promise<{ error: AuthError | null }> {
     try {
-      const { error } = await supabase.auth.signOut()
+      const client = supabase as any
+      if (!client) {
+        return { error: { message: 'Supabase client not initialized' } as AuthError }
+      }
+      const { error } = await client.auth.signOut()
       return { error }
     } catch (error) {
       return { error: error as AuthError }
@@ -106,13 +118,17 @@ class AuthService {
 
   async getCurrentUser(): Promise<AuthResponse> {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser()
+      const client = supabase as any
+      if (!client) {
+        return { user: null, profile: null, error: { message: 'Supabase client not initialized' } as AuthError }
+      }
+      const { data: { user }, error } = await client.auth.getUser()
 
       if (error || !user) {
         return { user: null, profile: null, error }
       }
 
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await client
         .from('profiles')
         .select('*')
         .eq('id', user.id)
@@ -130,7 +146,11 @@ class AuthService {
 
   async updateProfile(profileId: string, updates: Partial<Profile>): Promise<{ profile: Profile | null; error: AuthError | PostgrestError | null }> {
     try {
-      const { data, error } = await supabase
+      const client = supabase as any
+      if (!client) {
+        return { profile: null, error: { message: 'Supabase client not initialized' } as AuthError }
+      }
+      const { data, error } = await client
         .from('profiles')
         .update(updates)
         .eq('id', profileId)
@@ -144,7 +164,11 @@ class AuthService {
   }
 
   onAuthStateChange(callback: (event: string, session: any) => void) {
-    return supabase.auth.onAuthStateChange(callback)
+    const client = supabase as any
+    if (!client) {
+      return { data: { subscription: { unsubscribe: () => {} } } }
+    }
+    return client.auth.onAuthStateChange(callback)
   }
 }
 

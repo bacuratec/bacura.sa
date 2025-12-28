@@ -15,6 +15,9 @@ export class BaseService {
     operation: () => Promise<{ data: T | null; error: any }>
   ): Promise<{ data: T | null; error: string | null }> {
     try {
+      if (!supabase) {
+        return { data: null, error: 'Supabase client not initialized' }
+      }
       const { data, error } = await operation()
       
       if (error) {
@@ -31,7 +34,7 @@ export class BaseService {
 
   async getAll<T = any>() {
     return this.handleSupabaseOperation<T[]>(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from(this.tableName as any)
         .select('*')
       return { data, error }
@@ -40,7 +43,7 @@ export class BaseService {
 
   async getById<T = any>(id: string) {
     return this.handleSupabaseOperation<T>(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from(this.tableName as any)
         .select('*')
         .eq('id', id)
@@ -51,9 +54,9 @@ export class BaseService {
 
   async create<T = any>(data: any) {
     return this.handleSupabaseOperation<T>(async () => {
-      const { data: createdData, error } = await supabase
+      const { data: createdData, error } = await (supabase as any)
         .from(this.tableName as any)
-        .insert(data as any)
+        .insert(data)
         .select()
         .single()
       return { data: createdData, error }
@@ -62,9 +65,9 @@ export class BaseService {
 
   async update<T = any>(id: string, data: Record<string, any>) {
     return this.handleSupabaseOperation<T>(async () => {
-      const { data: updatedData, error } = await supabase
+      const { data: updatedData, error } = await (supabase as any)
         .from(this.tableName as any)
-        .update(data as any)
+        .update(data)
         .eq('id', id)
         .select()
         .single()
@@ -74,7 +77,7 @@ export class BaseService {
 
   async delete(id: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from(this.tableName)
         .delete()
         .eq('id', id)
@@ -90,7 +93,7 @@ export class ProfileService extends BaseService {
 
   async getByEmail(email: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('profiles')
         .select('*')
         .eq('email', email)
@@ -101,7 +104,7 @@ export class ProfileService extends BaseService {
 
   async getByRole(role: 'Admin' | 'Provider' | 'Requester') {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('profiles')
         .select('*')
         .eq('role', role)
@@ -129,7 +132,7 @@ export class RequestService extends BaseService {
 
   async getByRequester(requesterId: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('requests')
         .select(`
           *,
@@ -146,7 +149,7 @@ export class RequestService extends BaseService {
 
   async getByProvider(providerId: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('requests')
         .select(`
           *,
@@ -163,7 +166,13 @@ export class RequestService extends BaseService {
 
   async getPending() {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const statusRes = await (supabase as any)
+        .from('request_statuses')
+        .select('id')
+        .eq('code', 'pending')
+        .maybeSingle()
+      const statusId = statusRes?.data?.id
+      const { data, error } = await (supabase as any)
         .from('requests')
         .select(`
           *,
@@ -171,7 +180,7 @@ export class RequestService extends BaseService {
           requester:profiles!requests_requester_id_fkey(*),
           status:request_statuses(*)
         `)
-        .eq('status_id', (await supabase.from('request_statuses').select('id').eq('code', 'pending').single()).data?.id)
+        .eq('status_id', statusId)
         .order('created_at', { ascending: false })
       return { data, error }
     })
@@ -179,7 +188,7 @@ export class RequestService extends BaseService {
 
   async updateStatus(requestId: string, statusCode: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data: statusData } = await supabase
+      const { data: statusData } = await (supabase as any)
         .from('request_statuses')
         .select('id')
         .eq('code', statusCode)
@@ -189,7 +198,7 @@ export class RequestService extends BaseService {
         return { data: null, error: { message: 'Invalid status code' } }
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('requests')
         .update({ status_id: statusData.id })
         .eq('id', requestId)
@@ -207,7 +216,7 @@ export class ProjectService extends BaseService {
 
   async getByRequester(requesterId: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('projects')
         .select(`
           *,
@@ -224,7 +233,7 @@ export class ProjectService extends BaseService {
 
   async getByProvider(providerId: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('projects')
         .select(`
           *,
@@ -241,7 +250,23 @@ export class ProjectService extends BaseService {
 
   async getActive() {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const waitingApproval = await (supabase as any)
+        .from('project_statuses')
+        .select('id')
+        .eq('code', 'waiting_approval')
+        .maybeSingle()
+      const waitingStart = await (supabase as any)
+        .from('project_statuses')
+        .select('id')
+        .eq('code', 'waiting_start')
+        .maybeSingle()
+      const processing = await (supabase as any)
+        .from('project_statuses')
+        .select('id')
+        .eq('code', 'processing')
+        .maybeSingle()
+      const statusIds = [waitingApproval?.data?.id, waitingStart?.data?.id, processing?.data?.id].filter(Boolean)
+      const { data, error } = await (supabase as any)
         .from('projects')
         .select(`
           *,
@@ -250,11 +275,7 @@ export class ProjectService extends BaseService {
           provider:profiles!projects_provider_id_fkey(*),
           status:project_statuses(*)
         `)
-        .in('status_id', [
-          (await supabase.from('project_statuses').select('id').eq('code', 'waiting_approval').single()).data?.id,
-          (await supabase.from('project_statuses').select('id').eq('code', 'waiting_start').single()).data?.id,
-          (await supabase.from('project_statuses').select('id').eq('code', 'processing').single()).data?.id,
-        ])
+        .in('status_id', statusIds)
         .order('created_at', { ascending: false })
       return { data, error }
     })
@@ -262,17 +283,17 @@ export class ProjectService extends BaseService {
 
   async updateStatus(projectId: string, statusCode: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data: statusData } = await supabase
+      const { data: statusData } = await (supabase as any)
         .from('project_statuses')
         .select('id')
         .eq('code', statusCode)
-        .single()
+        .maybeSingle()
 
       if (!statusData) {
         return { data: null, error: { message: 'Invalid status code' } }
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('projects')
         .update({ status_id: statusData.id })
         .eq('id', projectId)
@@ -290,7 +311,7 @@ export class NotificationService extends BaseService {
 
   async getByUser(userId: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('notifications')
         .select('*')
         .eq('user_id', userId)
@@ -301,7 +322,7 @@ export class NotificationService extends BaseService {
 
   async getUnread(userId: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('notifications')
         .select('*')
         .eq('user_id', userId)
@@ -317,7 +338,7 @@ export class NotificationService extends BaseService {
 
   async markAllAsRead(userId: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('notifications')
         .update({ is_read: true })
         .eq('user_id', userId)

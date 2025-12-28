@@ -13,6 +13,7 @@ import { Eye, Edit, Trash } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
+import { useApproveProfileMutation, useRejectProfileMutation } from "@/redux/api/adminProfilesApi";
 
 const RequestersTable = ({ stats }) => {
   const { t } = useTranslation();
@@ -46,6 +47,8 @@ const RequestersTable = ({ stats }) => {
 
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [approveProfile] = useApproveProfileMutation();
+  const [rejectProfile] = useRejectProfileMutation();
 
   useEffect(() => {
     refetch();
@@ -74,6 +77,24 @@ const RequestersTable = ({ stats }) => {
           t("requesters.deleteError") ||
           "فشل حذف طالب الخدمة"
       );
+    }
+  };
+  const onApprove = async (id) => {
+    try {
+      await approveProfile(id).unwrap();
+      toast.success(t("requesters.approveSuccess") || "تم قبول الحساب بنجاح");
+      refetch();
+    } catch (err) {
+      toast.error(err?.data?.message || t("requesters.approveError") || "فشل قبول الحساب");
+    }
+  };
+  const onReject = async (id) => {
+    try {
+      await rejectProfile(id).unwrap();
+      toast.success(t("requesters.rejectSuccess") || "تم رفض/حظر الحساب");
+      refetch();
+    } catch (err) {
+      toast.error(err?.data?.message || t("requesters.rejectError") || "فشل رفض الحساب");
     }
   };
 
@@ -170,6 +191,20 @@ const RequestersTable = ({ stats }) => {
           >
             <Eye />
           </Link>
+          <button
+            onClick={() => onApprove(row.id)}
+            className="bg-green-600 text-white px-1 py-1 rounded-lg hover:bg-green-700 transition text-xs font-medium"
+            title={t("requesters.approve") || "قبول"}
+          >
+            {t("requesters.approve") || "قبول"}
+          </button>
+          <button
+            onClick={() => onReject(row.id)}
+            className="bg-orange-500 text-white px-1 py-1 rounded-lg hover:bg-orange-600 transition text-xs font-medium"
+            title={t("requesters.reject") || "رفض"}
+          >
+            {t("requesters.reject") || "رفض"}
+          </button>
           <Link
             href={`/admin/requesters/${row.id}`}
             className="bg-primary text-white px-1 py-1 rounded-lg hover:bg-primary/90 transition text-xs font-medium"

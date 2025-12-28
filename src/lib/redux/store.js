@@ -20,6 +20,7 @@ import { paymentApi } from "@/redux/api/paymentApi";
 import { customersApi } from "@/redux/api/customersApi";
 import { profileInfoApi } from "@/redux/api/profileInfoApi";
 import { providerStatisticsApi } from "@/redux/api/providerStatisticsApi";
+import { adminProfilesApi } from "@/redux/api/adminProfilesApi";
 
 export const makeStore = () => {
   return configureStore({
@@ -45,6 +46,7 @@ export const makeStore = () => {
       [profileInfoApi.reducerPath]: profileInfoApi.reducer,
       [paymentApi.reducerPath]: paymentApi.reducer,
       [providerStatisticsApi.reducerPath]: providerStatisticsApi.reducer,
+      [adminProfilesApi.reducerPath]: adminProfilesApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -67,7 +69,8 @@ export const makeStore = () => {
         .concat(customersApi.middleware)
         .concat(profileInfoApi.middleware)
         .concat(paymentApi.middleware)
-        .concat(providerStatisticsApi.middleware),
+        .concat(providerStatisticsApi.middleware)
+        .concat(adminProfilesApi.middleware),
   });
 };
 
