@@ -136,7 +136,10 @@ const Header = ({ data }) => {
                 <span className="hidden sm:inline">
                   {t("headerLanding.logout")}
                 </span>
-                <img src={logoutIcon} alt="" />
+                <img
+                  src={typeof logoutIcon === "string" ? logoutIcon : (logoutIcon?.src || "")}
+                  alt=""
+                />
               </button>
             </div>
           ) : (

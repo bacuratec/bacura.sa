@@ -21,7 +21,11 @@ const LanguageDropdown = () => {
         onClick={() => setOpen((prev) => !prev)}
         className="flex items-center gap-2 transition-all duration-200 mb-1"
       >
-        <img src={selectedLang.flag} alt={selectedLang.label} className="w-7" />
+        <img
+          src={typeof selectedLang.flag === "string" ? selectedLang.flag : (selectedLang.flag?.src || "")}
+          alt={selectedLang.label}
+          className="w-7 h-7 rounded-full"
+        />
         <span className="text-sm font-semibold hidden lg:block">
           {selectedLang.label}
         </span>
@@ -44,7 +48,7 @@ const LanguageDropdown = () => {
               }`}
             >
               <img
-                src={language.flag}
+                src={typeof language.flag === "string" ? language.flag : (language.flag?.src || "")}
                 alt={language.label}
                 className="w-5 h-5 rounded-full"
               />
