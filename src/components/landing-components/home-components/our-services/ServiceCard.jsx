@@ -1,4 +1,5 @@
 import React from "react";
+import OptimizedImage from "@/components/shared/OptimizedImage";
 
 const ServiceCard = ({ icon, title, description, index }) => {
   return (
@@ -15,7 +16,7 @@ const ServiceCard = ({ icon, title, description, index }) => {
       <div className="flex flex-col justify-around h-full gap-4">
         {/* الأيقونة */}
         <div className="icon rounded-xl sm:rounded-2xl bg-[#F1F1F1] group-hover:bg-[#2374BD] p-2 sm:p-3 w-fit flex items-center justify-center text-primary">
-          <img src={icon} alt="" className="w-6 sm:w-8" />
+          <OptimizedImage src={icon} alt={title || "Service"} width={32} height={32} />
         </div>
 
         {/* النصوص */}
