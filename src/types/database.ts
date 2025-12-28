@@ -62,6 +62,7 @@ export interface Database {
           description_ar: string | null
           description_en: string | null
           price: number | null
+          image_url: string | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -73,6 +74,7 @@ export interface Database {
           description_ar?: string | null
           description_en?: string | null
           price?: number | null
+          image_url?: string | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -84,6 +86,7 @@ export interface Database {
           description_ar?: string | null
           description_en?: string | null
           price?: number | null
+          image_url?: string | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
