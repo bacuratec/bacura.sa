@@ -93,49 +93,36 @@ export const getRoleFromUsersTable = async (userId, email) => {
  */
 export const getRoleFromRoleTables = async (userId) => {
   try {
-    const [adminResult, requesterResult, providerResult] =
-      await Promise.allSettled([
-        supabase
-          .from("admins")
-          .select("id, user_id")
-          .or(`id.eq.${userId},user_id.eq.${userId}`)
-          .maybeSingle(),
-        supabase
-          .from("requesters")
-          .select("id, user_id")
-          .or(`id.eq.${userId},user_id.eq.${userId}`)
-          .maybeSingle(),
-        supabase
-          .from("providers")
-          .select("id, user_id")
-          .or(`id.eq.${userId},user_id.eq.${userId}`)
-          .maybeSingle(),
-      ]);
+    // Check Admin
+    const { data: admin } = await supabase
+      .from("admins")
+      .select("id")
+      .or(`id.eq.${userId},user_id.eq.${userId}`)
+      .maybeSingle();
+    
+    if (admin) return "Admin";
 
-    // أولوية للأدمن
-    if (
-      adminResult.status === "fulfilled" &&
-      adminResult.value.data
-    ) {
-      return "Admin";
-    }
+    // Check Requester
+    const { data: requester } = await supabase
+      .from("requesters")
+      .select("id")
+      .or(`id.eq.${userId},user_id.eq.${userId}`)
+      .maybeSingle();
+      
+    if (requester) return "Requester";
 
-    if (
-      requesterResult.status === "fulfilled" &&
-      requesterResult.value.data
-    ) {
-      return "Requester";
-    }
-
-    if (
-      providerResult.status === "fulfilled" &&
-      providerResult.value.data
-    ) {
-      return "Provider";
-    }
+    // Check Provider
+    const { data: provider } = await supabase
+      .from("providers")
+      .select("id")
+      .or(`id.eq.${userId},user_id.eq.${userId}`)
+      .maybeSingle();
+      
+    if (provider) return "Provider";
 
     return null;
-  } catch {
+  } catch (err) {
+    console.error("Error in getRoleFromRoleTables:", err);
     return null;
   }
 };

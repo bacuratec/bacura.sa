@@ -92,14 +92,17 @@ const LoginForm = () => {
       // انتظار قصير للتأكد من أن الجلسة جاهزة
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      // تحديد role المستخدم
-      const userRole = await detectUserRole(user, session);
+      // تحديد role المستخدم مع timeout لتجنب التعليق
+      const userRolePromise = detectUserRole(user, session);
+      const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
+      
+      const userRole = await Promise.race([userRolePromise, timeoutPromise]);
 
       if (!userRole) {
         toast.error(
           t("loginForm.errors.roleNotFound") ||
-            `لم يتم العثور على صلاحيات المستخدم.\nالمشكلة: RLS (Row Level Security) policies تمنع قراءة البيانات.\nالحل: يجب تعديل RLS policies في Supabase للسماح للمستخدم بقراءة صفه من جدول users.\nUser ID: ${user.id}\nEmail: ${user.email}`,
-          { duration: 10000 }
+            `فشل في تحديد صلاحيات المستخدم. قد يكون هناك بطء في الشبكة أو مشكلة في الصلاحيات.`,
+          { duration: 5000 }
         );
         setLoading(false);
         return;
@@ -135,7 +138,8 @@ const LoginForm = () => {
         );
         navigate("/", { replace: true });
       }
-    } catch {
+    } catch (err) {
+      console.error("Login error:", err);
       toast.error(t("loginForm.errors.unknownError"));
     } finally {
       setLoading(false);
