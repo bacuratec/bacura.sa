@@ -1,19 +1,9 @@
-"use client";
+import { createClient } from '@/utils/supabase/server';
+import RequestServiceContent from './RequestServiceContent';
 
-import { Suspense } from "react";
-import dynamic from "next/dynamic";
-import { ProfileSkeleton } from "@/components/shared/skeletons/PageSkeleton";
+export default async function RequestServicePage() {
+  const supabase = await createClient();
+  const { data: services } = await supabase.from('services').select('*').order('created_at', { ascending: true });
 
-const RequestService = dynamic(() => import("@/views/landing/requestService/RequestService"), {
-  loading: () => <ProfileSkeleton />,
-  ssr: false,
-});
-
-export default function RequestServicePage() {
-  return (
-    <Suspense fallback={<ProfileSkeleton />}>
-      <RequestService />
-    </Suspense>
-  );
+  return <RequestServiceContent services={services} />;
 }
-

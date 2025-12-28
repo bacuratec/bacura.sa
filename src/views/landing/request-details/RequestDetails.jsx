@@ -11,18 +11,21 @@ import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import PaymentForm from "../../../components/landing-components/request-service/PaymentForm";
 
-const RequestDetails = () => {
+const RequestDetails = ({ initialData }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
   const [showPayment, setShowPayment] = useState(null);
 
-  const { id } = useParams();
+  const params = useParams();
+  const id = initialData?.id || params?.id;
+
   const {
     data: requestData,
     refetch: refetchRequesterDetails,
     isLoading: loadingRequester,
-  } = useGetRequestDetailsQuery(id);
-  const data = requestData;
+  } = useGetRequestDetailsQuery(id, { skip: !!initialData });
+
+  const data = initialData || requestData;
 
   const attachments = data?.attachments;
 

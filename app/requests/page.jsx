@@ -1,19 +1,33 @@
-"use client";
+import { createClient } from '@/utils/supabase/server';
+import ExploreContent from './ExploreContent';
 
-import { Suspense } from "react";
-import dynamic from "next/dynamic";
-import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
+export default async function RequestsPage() {
+  const supabase = await createClient();
+  
+  let stats = {
+    totalRequests: 0,
+    totalRequestsRequesters: 0,
+    projectsDiagnosisRequests: 0,
+    consultationsRequests: 0,
+    maintenanceContractsRequests: 0,
+    trainingRequests: 0,
+    projectsSupervisionRequests: 0,
+    executionContractsRequests: 0,
+    projectsManagementRequests: 0,
+    wholesaleSupplyRequests: 0,
+  };
 
-const Explore = dynamic(() => import("@/views/landing/exploreRequests/Explore"), {
-  loading: () => <TablePageSkeleton />,
-  ssr: false,
-});
+  try {
+    const { count, error } = await supabase
+      .from("requests")
+      .select("*", { count: "exact", head: true });
 
-export default function RequestsPage() {
-  return (
-    <Suspense fallback={<TablePageSkeleton />}>
-      <Explore />
-    </Suspense>
-  );
+    if (!error) {
+      stats.totalRequests = count || 0;
+    }
+  } catch (err) {
+    console.error("Error fetching requests stats:", err);
+  }
+
+  return <ExploreContent stats={stats} />;
 }
-
