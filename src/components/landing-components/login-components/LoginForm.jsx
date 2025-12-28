@@ -40,10 +40,33 @@ const LoginForm = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        toast.error(t("loginForm.errors.network") || "انقطع الاتصال بالشبكة. حاول لاحقاً.");
+        setLoading(false);
+        return;
+      }
+
+      const attempt = async () => {
+        return await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        });
+      };
+
+      let data, error;
+      for (let i = 0; i < 3; i++) {
+        const res = await attempt();
+        data = res.data;
+        error = res.error;
+        if (!error) break;
+        const msg = (error?.message || "").toLowerCase();
+        const isTransient =
+          msg.includes("failed to fetch") ||
+          msg.includes("network") ||
+          msg.includes("timeout");
+        if (!isTransient) break;
+        await new Promise((r) => setTimeout(r, 500 * (i + 1)));
+      }
 
       if (error) {
         toast.error(
