@@ -96,6 +96,28 @@ const ServicesTable = () => {
 
   const columns = [
     {
+      name: t("services.image") || "الصورة",
+      cell: (row) => (
+        <div className="w-12 h-12 rounded overflow-hidden border bg-gray-50">
+          {row?.image_url || row?.imageUrl ? (
+            <img
+              src={row.image_url || row.imageUrl}
+              alt="service"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+              -
+            </div>
+          )}
+        </div>
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      width: "80px",
+    },
+    {
       name: t("services.serviceTitle"),
       selector: (row) => (lang === "ar" ? row?.name_ar : row?.name_en) || "-",
       wrap: true,
@@ -132,6 +154,13 @@ const ServicesTable = () => {
       name: t("services.actions") || "الإجراءات",
       cell: (row) => (
         <div className="flex gap-2">
+          <Link
+            href={`/admin/services/${row.id}/edit`}
+            className="bg-blue-500 text-white px-1 py-1 rounded-md text-xs hover:bg-blue-600 transition"
+            title={t("services.editService") || "تعديل الخدمة"}
+          >
+            <Edit />
+          </Link>
           {row?.base_price && (
             <button
               onClick={() => handleEdit(row)}

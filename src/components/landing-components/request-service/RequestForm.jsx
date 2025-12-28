@@ -243,6 +243,13 @@ const RequestForm = ({ services }) => {
                           className="w-5 h-5 accent-primary"
                           disabled={disabled}
                         />
+                        {(item?.imageUrl || item?.image_url) && (
+                          <img
+                            src={item.imageUrl || item.image_url}
+                            alt="service"
+                            className="w-8 h-8 rounded object-cover border"
+                          />
+                        )}
                         {lang === "ar" ? item?.titleAr : item?.titleEn}
                       </label>
                     </div>

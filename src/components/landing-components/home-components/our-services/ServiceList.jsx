@@ -33,6 +33,7 @@ const ServiceList = ({ data }) => {
                   <ServiceCard
                     index={index + 1}
                     icon={icons[index] || s1}
+                    imageUrl={item.imageUrl || item.image_url || null}
                     title={lang === "ar" ? item.titleAr : item.titleEn}
                     description={
                       lang === "ar" ? item.descriptionAr : item.descriptionEn

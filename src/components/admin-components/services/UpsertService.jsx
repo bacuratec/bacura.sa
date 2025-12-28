@@ -1,30 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "@/utils/useNavigate";
+import { useParams } from "@/utils/useParams";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
 import {
-  useCreateServiceMutation,
+  useGetServiceQuery,
+  useUpdateServiceMutation,
   useGetServicesQuery,
-} from "../../../redux/api/servicesApi";
+} from "@/redux/api/servicesApi";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../shared/head-title/HeadTitle";
 
-const AddService = () => {
+const UpsertService = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const params = useParams();
+  const id = params?.id;
+  const isEdit = Boolean(id);
 
+  const { data, isLoading: isLoadingDetails } = useGetServiceQuery(id, {
+    skip: !isEdit,
+  });
   const { refetch } = useGetServicesQuery(undefined, { skip: true });
-  const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
+  const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
 
-  const [preview, setPreview] = React.useState(null);
+  const [preview, setPreview] = useState(null);
 
   const initialValues = {
-    titleAr: "",
-    titleEn: "",
-    price: "",
-    isPriced: false,
-    isActive: true,
+    titleAr: data?.name_ar || "",
+    titleEn: data?.name_en || "",
+    price: data?.base_price ?? "",
+    isPriced: !!data?.base_price,
+    isActive: data?.is_active !== undefined ? !!data.is_active : true,
     image: null,
   };
 
@@ -49,9 +57,9 @@ const AddService = () => {
     image: Yup.mixed().nullable(),
   });
 
-  const handleSubmit = async (values, { resetForm }) => {
+  const handleSubmit = async (values) => {
     try {
-      let imageUrl = null;
+      let imageUrl = data?.image_url || null;
 
       if (values.image) {
         const { uploadImageToStorage } = await import("../../../utils/imageUpload");
@@ -62,7 +70,7 @@ const AddService = () => {
         imageUrl = uploadedUrl;
       }
 
-      const payload = {
+      const body = {
         titleAr: values.titleAr,
         titleEn: values.titleEn,
         price: values.isPriced ? Number(values.price) : null,
@@ -71,76 +79,86 @@ const AddService = () => {
         imageUrl,
       };
 
-      await createService(payload).unwrap();
-      toast.success(
-        t("services.addService.successAdd") || "تم إضافة الخدمة بنجاح"
-      );
-      resetForm();
-      setPreview(null);
+      await updateService({ id, body }).unwrap();
+      toast.success(t("services.updateSuccess") || "تم تحديث الخدمة بنجاح");
       refetch?.();
       navigate("/admin/services");
     } catch (err) {
       toast.error(
         err?.data?.message ||
           t("services.addService.error") ||
-          "حدث خطأ أثناء إضافة الخدمة"
+          "حدث خطأ أثناء تحديث الخدمة"
       );
     }
   };
 
+  useEffect(() => {
+    if (isEdit && data?.image_url) {
+      setPreview(data.image_url);
+    }
+  }, [isEdit, data]);
+
+  if (isEdit && isLoadingDetails) return <p>{t("services.loading") || "جاري التحميل..."}</p>;
+
   return (
     <div>
-      <HeadTitle title={t("services.addService.title") || "إضافة خدمة"} />
+      <HeadTitle title={t("services.editService") || "تعديل خدمة"} />
       <div className="mx-auto p-4 rounded-lg">
         <h2 className="text-2xl font-bold mb-4">
-          {t("services.addService.title") || "إضافة خدمة جديدة"}
+          {t("services.editService") || "تعديل الخدمة"}
         </h2>
-
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
+        <Formik enableReinitialize initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
           {({ values, touched, errors, setFieldValue }) => (
             <Form>
               <div className="mb-4 border p-3 rounded-lg relative">
-                {/* Title Arabic */}
                 <label className="block text-gray-700 mb-1">
                   {t("services.addService.titleAr") || "العنوان بالعربية"} *
                 </label>
                 <Field
                   name="titleAr"
-                  placeholder={
-                    t("services.addService.titleArPlaceholder") ||
-                    "أدخل العنوان بالعربية"
-                  }
+                  placeholder={t("services.addService.titleArPlaceholder") || "أدخل العنوان بالعربية"}
                   className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                 />
                 {touched.titleAr && errors.titleAr && (
-                  <div className="text-red-500 text-sm mb-2">
-                    {errors.titleAr}
-                  </div>
+                  <div className="text-red-500 text-sm mb-2">{errors.titleAr}</div>
                 )}
 
-                {/* Title English */}
                 <label className="block text-gray-700 mb-1">
                   {t("services.addService.titleEn") || "العنوان بالإنجليزية"} *
                 </label>
                 <Field
                   name="titleEn"
-                  placeholder={
-                    t("services.addService.titleEnPlaceholder") ||
-                    "أدخل العنوان بالإنجليزية"
-                  }
+                  placeholder={t("services.addService.titleEnPlaceholder") || "أدخل العنوان بالإنجليزية"}
                   className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                 />
                 {touched.titleEn && errors.titleEn && (
-                  <div className="text-red-500 text-sm mb-2">
-                    {errors.titleEn}
-                  </div>
+                  <div className="text-red-500 text-sm mb-2">{errors.titleEn}</div>
                 )}
 
-                {/* Image */}
+                <label className="flex items-center gap-2 mb-2 mt-4">
+                  <Field type="checkbox" name="isPriced" className="w-5 h-5 accent-primary" />
+                  <span className="text-gray-700">
+                    {t("services.addService.isPriced") || "هل هذه الخدمة لها سعر محدد؟"}
+                  </span>
+                </label>
+
+                {values.isPriced && (
+                  <>
+                    <label className="block text-gray-700 mb-1">
+                      {t("services.addService.price") || "السعر"} *
+                    </label>
+                    <Field
+                      type="number"
+                      name="price"
+                      placeholder={t("services.addService.pricePlaceholder") || "أدخل السعر بالريال السعودي"}
+                      className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
+                    />
+                    {touched.price && errors.price && (
+                      <div className="text-red-500 text-sm mb-2">{errors.price}</div>
+                    )}
+                  </>
+                )}
+
                 <label className="block text-gray-700 mb-1">
                   {t("services.addService.image") || "صورة الخدمة"}
                 </label>
@@ -160,11 +178,7 @@ const AddService = () => {
                   />
                 ) : (
                   <div className="relative inline-block mt-2 mb-2">
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="w-32 h-32 object-cover rounded-md border"
-                    />
+                    <img src={preview} alt="Preview" className="w-32 h-32 object-cover rounded-md border" />
                     <button
                       type="button"
                       onClick={() => {
@@ -181,52 +195,10 @@ const AddService = () => {
                   <div className="text-red-500 text-sm mt-2">{errors.image}</div>
                 )}
 
-                {/* Is Priced */}
                 <label className="flex items-center gap-2 mb-2 mt-4">
-                  <Field
-                    type="checkbox"
-                    name="isPriced"
-                    className="w-5 h-5 accent-primary"
-                  />
+                  <Field type="checkbox" name="isActive" className="w-5 h-5 accent-primary" />
                   <span className="text-gray-700">
-                    {t("services.addService.isPriced") ||
-                      "هل هذه الخدمة لها سعر محدد؟"}
-                  </span>
-                </label>
-
-                {/* Price */}
-                {values.isPriced && (
-                  <>
-                    <label className="block text-gray-700 mb-1">
-                      {t("services.addService.price") || "السعر"} *
-                    </label>
-                    <Field
-                      type="number"
-                      name="price"
-                      placeholder={
-                        t("services.addService.pricePlaceholder") ||
-                        "أدخل السعر بالريال السعودي"
-                      }
-                      className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
-                    />
-                    {touched.price && errors.price && (
-                      <div className="text-red-500 text-sm mb-2">
-                        {errors.price}
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* Is Active */}
-                <label className="flex items-center gap-2 mb-2 mt-4">
-                  <Field
-                    type="checkbox"
-                    name="isActive"
-                    className="w-5 h-5 accent-primary"
-                  />
-                  <span className="text-gray-700">
-                    {t("services.addService.isActive") ||
-                      "تفعيل الخدمة (ستظهر في الموقع)"}
+                    {t("services.addService.isActive") || "تفعيل الخدمة (ستظهر في الموقع)"}
                   </span>
                 </label>
               </div>
@@ -234,12 +206,10 @@ const AddService = () => {
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  disabled={isCreating}
+                  disabled={isUpdating}
                   className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isCreating
-                    ? t("services.addService.saving") || "جاري الحفظ..."
-                    : t("services.addService.save") || "حفظ"}
+                  {isUpdating ? t("services.addService.saving") || "جاري الحفظ..." : t("services.addService.save") || "حفظ"}
                 </button>
                 <button
                   type="button"
@@ -257,4 +227,5 @@ const AddService = () => {
   );
 };
 
-export default AddService;
+export default UpsertService;
+
