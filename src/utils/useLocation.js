@@ -4,16 +4,13 @@
  */
 "use client";
 
-import { usePathname } from "next/navigation";
-
 export function useLocation() {
-  // Always call hooks at the top level - required by React rules
-  const pathname = usePathname() || "/";
-
+  const isBrowser = typeof window !== "undefined";
+  const pathname = isBrowser ? window.location.pathname || "/" : "/";
   return {
     pathname,
-    search: typeof window !== "undefined" ? window.location.search : "",
-    hash: typeof window !== "undefined" ? window.location.hash : "",
+    search: isBrowser ? window.location.search : "",
+    hash: isBrowser ? window.location.hash : "",
     state: null,
     key: "",
   };

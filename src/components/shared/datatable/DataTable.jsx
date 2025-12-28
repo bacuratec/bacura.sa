@@ -52,6 +52,10 @@ const CustomDataTable = ({
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const isProjectDetail =
+    /^\/projects\/[^/]+$/.test(path?.pathname || "") ||
+    /^\/admin\/projects\/[^/]+$/.test(path?.pathname || "") ||
+    /^\/provider\/projects\/[^/]+$/.test(path?.pathname || "");
   // تصفية البيانات حسب كلمات البحث في الحقول المحددة
   const filteredData = useMemo(() => {
     if (!search) return data;
@@ -144,12 +148,8 @@ const CustomDataTable = ({
         paginationTotalRows={totalRows} // 👈 اجمالي عدد العناصر
         paginationDefaultPage={parseInt(defaultPage)} // 👈 رقم الصفحة من props
         paginationPerPage={parseInt(defaultPageSize)} // 👈 حجم الصفحة من props
-        onChangePage={
-          path?.pathname.includes("/projects/") ? () => {} : handlePageChange
-        } // 👈 تغيير الصفحة
-        onChangeRowsPerPage={
-          path?.pathname.includes("/projects/") ? () => {} : handlePerRowsChange
-        } // 👈 تغيير حجم الصفحة
+        onChangePage={isProjectDetail ? () => {} : handlePageChange} // 👈 تغيير الصفحة
+        onChangeRowsPerPage={isProjectDetail ? () => {} : handlePerRowsChange} // 👈 تغيير حجم الصفحة
         progressPending={isLoading}
         progressComponent={
           <div className="py-10 text-center w-full">

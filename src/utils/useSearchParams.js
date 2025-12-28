@@ -3,17 +3,14 @@
  */
 "use client";
 
-import { useSearchParams as useNextSearchParams } from "next/navigation";
-
 export function useSearchParams() {
-  // Always call hooks at the top level - required by React rules
-  const searchParams = useNextSearchParams();
-
+  const isBrowser = typeof window !== "undefined";
+  const sp = isBrowser ? new URLSearchParams(window.location.search) : null;
   return {
-    get: (key) => searchParams?.get(key) || null,
-    getAll: (key) => searchParams?.getAll(key) || [],
-    has: (key) => searchParams?.has(key) || false,
-    toString: () => searchParams?.toString() || "",
+    get: (key) => (sp ? sp.get(key) : null),
+    getAll: (key) => (sp ? sp.getAll(key) : []),
+    has: (key) => (sp ? sp.has(key) : false),
+    toString: () => (sp ? sp.toString() : ""),
   };
 }
 
