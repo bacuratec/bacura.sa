@@ -18,9 +18,9 @@ const UsersDetails = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const location = useLocation();
+  const pathname = usePathname();
 
-  const isProvider = location.pathname.includes("/admin/provider");
+  const isProvider = pathname.includes("/admin/provider");
 
   const { id } = useParams();
 
