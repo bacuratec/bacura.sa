@@ -1,9 +1,10 @@
+"use client";
 import React, { useEffect } from "react";
 import {
   useGetTicketDetailsQuery,
   useUpdateTicketStatusMutation,
 } from "../../../redux/api/ticketApi";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 import HeadTitle from "../../../components/admin-components/users-details/HeadTitle";
 import TicketsDetailsComponent from "../../../components/admin-components/tickets/TicketsDetails";
 import LoadingPage from "../../LoadingPage";

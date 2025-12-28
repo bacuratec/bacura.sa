@@ -1,7 +1,8 @@
+"use client";
 import React, { useEffect } from "react";
 import HeadTitle from "../../../components/admin-components/users-details/HeadTitle";
 import UserData from "../../../components/admin-components/users-details/UserData";
-import { useLocation, useParams } from "react-router-dom";
+import { usePathname, useParams } from "next/navigation";
 import {
   useGetProviderDetailsQuery,
   useGetRequesterDetailsQuery,

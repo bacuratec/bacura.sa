@@ -1,7 +1,8 @@
+"use client";
 import React, { useContext, useEffect } from "react";
 import HeadTitle from "../../../components/admin-components/users-details/HeadTitle";
 import RequestDetailsInfo from "../../../components/admin-components/requests/RequestDetails";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";
 import { useGetRequestDetailsQuery } from "../../../redux/api/ordersApi";
