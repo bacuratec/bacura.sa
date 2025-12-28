@@ -19,7 +19,7 @@ const GuestGuard = ({ children }) => {
       } else if (role === "Provider") {
         path = "/provider";
       } else if (role === "Requester") {
-        path = "/";
+        path = "/profile";
       }
 
       if (path && pathname !== path) {

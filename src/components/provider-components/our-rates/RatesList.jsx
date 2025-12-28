@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 const RatesList = () => {
   const { t } = useTranslation(); // 🟢 استدعاء hook الترجمة
 
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const PageNumber = searchParams.get("PageNumber") || 1;
   const PageSize = searchParams.get("PageSize") || 30;
   const {

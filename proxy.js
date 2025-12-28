@@ -77,6 +77,24 @@ export default async function proxy(request) {
     return normalizeRole(data?.role || null)
   }
 
+  if (url.pathname.startsWith('/login')) {
+    if (user) {
+      const role = await getEffectiveUserRole(user)
+      if (role === 'Admin') {
+        url.pathname = '/admin'
+        return NextResponse.redirect(url)
+      }
+      if (role === 'Provider') {
+        url.pathname = '/provider'
+        return NextResponse.redirect(url)
+      }
+      if (role === 'Requester') {
+        url.pathname = '/profile'
+        return NextResponse.redirect(url)
+      }
+    }
+  }
+
   // 1. Admin Protection
   if (url.pathname.startsWith('/admin')) {
     if (user) {

@@ -18,7 +18,7 @@ const ProvidersTable = ({ stats }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
 
   // استخراج القيم من الـ URL
   const PageNumber = searchParams.get("PageNumber") || 1;

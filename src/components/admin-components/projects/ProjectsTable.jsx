@@ -19,7 +19,7 @@ const ProjectsTable = ({ stats }) => {
   const { lang } = useContext(LanguageContext);
   const { t } = useTranslation();
   const role = useSelector((state) => state.auth.role);
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
 
   const PageNumber = searchParams.get("PageNumber") || 1;
   const PageSize = searchParams.get("PageSize") || 30;

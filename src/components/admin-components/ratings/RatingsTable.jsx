@@ -13,7 +13,7 @@ import ModalDelete from "./ModalDelete";
 const RatingsTable = () => {
   const { t } = useTranslation();
 
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const PageNumber = searchParams.get("PageNumber") || 1;
   const PageSize = searchParams.get("PageSize") || 30;
   const {
