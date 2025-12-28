@@ -55,44 +55,55 @@ export default async function proxy(request) {
 
   const url = request.nextUrl.clone()
 
-  // Helper to get role safely
-  const getUserRole = (user) => {
-    return user?.user_metadata?.role || null
+  const normalizeRole = (role) => {
+    if (!role || typeof role !== 'string') return null
+    const r = role.toLowerCase()
+    if (r === 'admin') return 'Admin'
+    if (r === 'provider') return 'Provider'
+    if (r === 'requester') return 'Requester'
+    return null
+  }
+
+  const getEffectiveUserRole = async (user) => {
+    if (!user) return null
+    const metaRole = normalizeRole(user.user_metadata?.role || null)
+    if (metaRole) return metaRole
+    const { data, error } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
+    if (error) return null
+    return normalizeRole(data?.role || null)
   }
 
   // 1. Admin Protection
   if (url.pathname.startsWith('/admin')) {
-    if (!user) {
-      url.pathname = '/login'
-      return NextResponse.redirect(url)
-    }
-    
-    const role = getUserRole(user)
-    if (role !== 'Admin') {
-       if (role === 'Provider') {
-         url.pathname = '/provider'
-       } else {
-         url.pathname = '/profile' // Default for Requester
-       }
-       return NextResponse.redirect(url)
+    if (user) {
+      const role = await getEffectiveUserRole(user)
+      if (role !== 'Admin') {
+         if (role === 'Provider') {
+           url.pathname = '/provider'
+         } else {
+           url.pathname = '/profile' // Default for Requester
+         }
+         return NextResponse.redirect(url)
+      }
     }
   }
 
   // 2. Provider Protection
   if (url.pathname.startsWith('/provider')) {
-    if (!user) {
-      url.pathname = '/login'
-      return NextResponse.redirect(url)
-    }
-
-    const role = getUserRole(user)
-    if (role !== 'Provider') {
-       if (role === 'Admin') {
-         url.pathname = '/admin'
-       } else {
-         url.pathname = '/profile'
-       }
-       return NextResponse.redirect(url)
+    if (user) {
+      const role = await getEffectiveUserRole(user)
+      if (role !== 'Provider') {
+         if (role === 'Admin') {
+           url.pathname = '/admin'
+         } else {
+           url.pathname = '/profile'
+         }
+         return NextResponse.redirect(url)
+      }
     }
   }
 
@@ -101,38 +112,32 @@ export default async function proxy(request) {
   // but if it's under /admin or /provider it's already caught.
   // This block catches /profile which is the Requester dashboard.
   if (url.pathname.startsWith('/profile')) {
-     if (!user) {
-      url.pathname = '/login'
-      return NextResponse.redirect(url)
-    }
-    
-    const role = getUserRole(user)
-    if (role === 'Admin') {
-        url.pathname = '/admin'
-        return NextResponse.redirect(url)
-    }
-    if (role === 'Provider') {
-        url.pathname = '/provider'
-        return NextResponse.redirect(url)
+    if (user) {
+      const role = await getEffectiveUserRole(user)
+      if (role === 'Admin') {
+          url.pathname = '/admin'
+          return NextResponse.redirect(url)
+      }
+      if (role === 'Provider') {
+          url.pathname = '/provider'
+          return NextResponse.redirect(url)
+      }
     }
     // Requester allowed
   }
 
   // 4. Request Service Protection (Requester only)
   if (url.pathname.startsWith('/request-service')) {
-    if (!user) {
-      url.pathname = '/login'
-      return NextResponse.redirect(url)
-    }
-
-    const role = getUserRole(user)
-    if (role === 'Admin') {
-        url.pathname = '/admin'
-        return NextResponse.redirect(url)
-    }
-    if (role === 'Provider') {
-        url.pathname = '/provider'
-        return NextResponse.redirect(url)
+    if (user) {
+      const role = await getEffectiveUserRole(user)
+      if (role === 'Admin') {
+          url.pathname = '/admin'
+          return NextResponse.redirect(url)
+      }
+      if (role === 'Provider') {
+          url.pathname = '/provider'
+          return NextResponse.redirect(url)
+      }
     }
   }
 
