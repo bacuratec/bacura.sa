@@ -1,10 +1,21 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 export async function POST(request) {
   try {
+    const secretKey =
+      process.env.STRIPE_SECRET_KEY ||
+      process.env.STRIPE_API_KEY ||
+      process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+
+    if (!secretKey) {
+      return NextResponse.json(
+        { error: "Stripe secret key is missing in environment" },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(secretKey);
     const body = await request.json();
     const { amount, currency = "sar" } = body;
 

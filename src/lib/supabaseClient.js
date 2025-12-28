@@ -23,25 +23,16 @@ if (typeof window !== 'undefined') {
   });
 }
 
-// التحقق من وجود القيم المطلوبة
-if (!validUrl || !validAnonKey) {
-  const errorMessage = "Supabase environment variables are missing. Please check .env.local or Netlify settings.";
-  console.error(errorMessage);
-}
-
-// إنشاء Supabase client مع إعدادات محسّنة
-export const supabase = createClient(validUrl || 'https://placeholder.supabase.co', validAnonKey || 'placeholder', {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-  db: {
-    schema: 'public',
-  },
-  global: {
-    headers: {
-      'x-client-info': 'bacura-amal-frontend',
-    },
-  },
-});
+// إنشاء Supabase client فقط إذا كانت القيم صحيحة لتفادي أخطاء البناء
+export const supabase =
+  validUrl && validAnonKey
+    ? createClient(validUrl, validAnonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        },
+        db: { schema: "public" },
+        global: { headers: { "x-client-info": "bacura-amal-frontend" } },
+      })
+    : null;
