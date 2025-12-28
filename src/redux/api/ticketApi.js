@@ -27,8 +27,8 @@ export const ticketApi = createApi({
         filters: userId ? { user_id: userId } : {},
         orderBy: { column: "created_at", ascending: false },
         joins: [
-          "user:users(id,email)",
-          "related_order:orders(id,order_title)",
+          "user:users!tickets_user_id_fkey(id,email)",
+          "related_order:orders!tickets_related_order_id_fkey(id,order_title)",
           "status:lookup_values!tickets_status_id_fkey(id,name_ar,name_en,code)",
         ],
       }),
@@ -40,8 +40,8 @@ export const ticketApi = createApi({
         method: "GET",
         id,
         joins: [
-          "user:users(id,email)",
-          "related_order:orders(id,order_title)",
+          "user:users!tickets_user_id_fkey(id,email)",
+          "related_order:orders!tickets_related_order_id_fkey(id,order_title)",
           "status:lookup_values!tickets_status_id_fkey(id,name_ar,name_en,code)",
         ],
       }),

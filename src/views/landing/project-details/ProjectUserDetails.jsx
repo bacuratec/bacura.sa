@@ -26,7 +26,7 @@ const ProjectUserDetails = () => {
   }, []);
   const { id } = useParams();
   const {
-    data: projectData,
+    data,
     isLoading: loadingProject,
     refetch,
   } = useGetProjectDetailsQuery({ id });

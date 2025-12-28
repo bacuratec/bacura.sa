@@ -194,7 +194,7 @@ const ProjectsTable = ({ stats }) => {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Link
-            to={
+            href={
               role === "Admin"
                 ? `/admin/projects/${row.id}`
                 : role === "Requester"
@@ -209,7 +209,7 @@ const ProjectsTable = ({ stats }) => {
           {role === "Admin" && (
             <>
               <Link
-                to={`/admin/projects/${row.id}`}
+                href={`/admin/projects/${row.id}`}
                 className="bg-primary text-white px-1 py-1 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
                 title={t("projects.edit") || "تعديل"}
               >

@@ -27,7 +27,7 @@ export const providersApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "user:users(id,email,phone,role,is_blocked)",
+            "user:users!providers_user_id_fkey(id,email,phone,role,is_blocked)",
             "entity_type:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
           ],

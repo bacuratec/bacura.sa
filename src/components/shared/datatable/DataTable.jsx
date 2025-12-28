@@ -62,24 +62,24 @@ const CustomDataTable = ({
   }, [data, search, searchableFields]);
 
   const handlePageChange = (page) => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(location?.search || "");
     params.set("PageNumber", page);
-    navigate(`${location.pathname}?${params.toString()}`);
+    navigate(`${location?.pathname || ""}?${params.toString()}`);
   };
-  const handlePerRowsChange = (newPageSize, page) => {
-    const params = new URLSearchParams(location.search);
+  const handlePerRowsChange = (newPageSize, _) => {
+    const params = new URLSearchParams(location?.search || "");
     params.set("PageSize", newPageSize);
-    params.set("PageNumber", page);
-    navigate(`${location.pathname}?${params.toString()}`);
+    params.set("PageNumber", 1);
+    navigate(`${location?.pathname || ""}?${params.toString()}`);
   };
 
   const [searchParams] = useSearchParams();
   const AccountStatus =
-    searchParams.get("AccountStatus") ||
-    searchParams.get("RequestStatus") ||
-    searchParams.get("OrderStatusLookupId") ||
+    searchParams?.get("AccountStatus") ||
+    searchParams?.get("RequestStatus") ||
+    searchParams?.get("OrderStatusLookupId") ||
     "";
-  const PageSize = searchParams.get("PageSize") || 30;
+  const PageSize = searchParams?.get("PageSize") || 30;
 
   return (
     <div className="custom-table">

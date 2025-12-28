@@ -32,8 +32,8 @@ export const paymentApi = createApi({
           filters,
           orderBy: { column: "created_at", ascending: false },
           joins: [
-            "order:orders(id,order_title)",
-            "user:users(id,email)",
+            "order:orders!payments_order_id_fkey(id,order_title)",
+            "user:users!payments_user_id_fkey(id,email)",
           ],
         };
       },

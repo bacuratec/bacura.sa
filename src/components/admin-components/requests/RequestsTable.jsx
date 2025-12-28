@@ -176,14 +176,14 @@ const RequestsTable = ({ stats }) => {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Link
-            to={`/admin/requests/${row.id}`}
+            href={`/admin/requests/${row.id}`}
             className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium text-nowrap"
             title={t("requests.view") || "عرض"}
           >
             <EyeIcon />
           </Link>
           <Link
-            to={`/admin/requests/${row.id}`}
+            href={`/admin/requests/${row.id}`}
             className="bg-primary text-white px-1 py-1 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
             title={t("requests.edit") || "تعديل"}
           >

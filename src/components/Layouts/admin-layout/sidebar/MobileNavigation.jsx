@@ -1,130 +1,117 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import homeIcon from "../../../../assets/icons/homeIcon.svg";
-import homeIconActive from "../../../../assets/icons/homeIconActive.svg";
+import { 
+  LayoutDashboard, 
+  BriefcaseBusiness, 
+  Users, 
+  FileText, 
+  FolderKanban, 
+  Star, 
+  Layers, 
+  Ticket, 
+  HelpCircle, 
+  FileUser, 
+  Handshake, 
+  UsersRound,
+} from "lucide-react";
 
-import providers from "../../../../assets/icons/providers.svg";
-import providersActive from "../../../../assets/icons/providersActive.svg";
-
-import requester from "../../../../assets/icons/requester.svg";
-import requesterActive from "../../../../assets/icons/requesterActive.svg";
-
-import requestOrders from "../../../../assets/icons/requestOrders.svg";
-import requestOrdersActive from "../../../../assets/icons/requestOrdersActive.svg";
-
-import projectsManage from "../../../../assets/icons/projectsManage.svg";
-import projectsManageActive from "../../../../assets/icons/projectsManageActive.svg";
-
-import rates from "../../../../assets/icons/rates.svg";
-import ratesActive from "../../../../assets/icons/ratesActive.svg";
-
-import reports from "../../../../assets/icons/reports.svg";
-import reportsActive from "../../../../assets/icons/reportsActive.svg";
-import { File, FileQuestionMark } from "lucide-react";
 const navLinks = [
   {
-    name: "الصفحه الرئيسية",
+    name: "الرئيسية",
     href: "/admin",
-    icon: homeIcon,
-    iconActive: homeIconActive,
+    icon: LayoutDashboard,
+    exact: true,
   },
   {
     name: "مزودي الخدمة",
     href: "/admin/providers",
-    icon: providers,
-    iconActive: providersActive,
+    icon: BriefcaseBusiness,
   },
   {
     name: "طالبي الخدمة",
     href: "/admin/requesters",
-    icon: requester,
-    iconActive: requesterActive,
+    icon: Users,
   },
   {
     name: "الطلبات",
     href: "/admin/requests",
-    icon: requestOrders,
-    iconActive: requestOrdersActive,
+    icon: FileText,
   },
   {
     name: "المشاريع",
     href: "/admin/projects",
-    icon: projectsManage,
-    iconActive: projectsManageActive,
+    icon: FolderKanban,
   },
   {
     name: "التقييمات",
     href: "/admin/our-rates",
-    icon: rates,
-    iconActive: ratesActive,
+    icon: Star,
   },
   {
     name: "الخدمات",
     href: "/admin/services",
-    icon: requester,
-    iconActive: requesterActive,
+    icon: Layers,
   },
   {
     name: "البلاغات",
     href: "/admin/tickets",
-    icon: reports,
-    iconActive: reportsActive,
+    icon: Ticket,
   },
   {
     name: "الأسئلة الشائعة",
     href: "/admin/faqs",
-    icon: <FileQuestionMark width={15} />,
-    iconActive: reportsActive,
-    ic: true,
+    icon: HelpCircle,
   },
   {
-    name: "profile-info",
+    name: "الملف الشخصي",
     href: "/admin/profile-info",
-    icon: <File width={15} />,
-    iconActive: reportsActive,
-    ic: true,
+    icon: FileUser,
   },
   {
     name: "شركاؤنا",
     href: "/admin/partners",
-    icon: providers,
-    iconActive: providersActive,
+    icon: Handshake,
   },
   {
-    name: "شركاؤنا",
+    name: "العملاء",
     href: "/admin/customers",
-    icon: providers,
-    iconActive: providersActive,
+    icon: UsersRound,
   },
 ];
+
 const MobileNavigation = () => {
   const pathname = usePathname();
+  
   return (
-    <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-lg z-50">
-      <div className="flex justify-between items-center h-16 px-4">
-        {/* Navigation Links */}
-        <nav className="flex-1 flex justify-around items-center gap-1">
-          {navLinks?.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center justify-center space-y-1 text-sm text-gray-500 hover:text-primary transition-all ${
-                pathname === link?.href
-                  ? "text-primary font-semibold"
-                  : ""
-              }`}
-            >
-              {link?.ic === true ? (
-                link?.icon
-              ) : (
-                <img
-                  src={link.iconActive}
-                  alt={link.name}
-                  className="w-6 h-6"
+    <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50 pb-safe">
+      <div className="flex justify-between items-center h-16 px-2 overflow-x-auto no-scrollbar">
+        <nav className="flex w-full justify-between items-center min-w-max gap-4 px-2">
+          {navLinks?.map((link) => {
+             const isActive = link.exact 
+             ? pathname === link.href 
+             : pathname.includes(link.href) && link.href !== "/admin";
+             
+             const Icon = link.icon;
+             
+             return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 min-w-[64px] ${
+                  isActive
+                    ? "text-primary bg-primary/5 translate-y-[-4px]"
+                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                <Icon 
+                  size={20} 
+                  strokeWidth={isActive ? 2 : 1.5}
+                  className={isActive ? "fill-primary/20" : ""}
                 />
-              )}
-            </Link>
-          ))}
+                <span className="text-[10px] mt-1 font-medium truncate max-w-[60px]">{link.name}</span>
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </div>

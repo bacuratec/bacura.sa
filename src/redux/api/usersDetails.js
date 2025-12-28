@@ -12,7 +12,7 @@ export const detailsApi = createApi({
         method: "GET",
         id,
         joins: [
-          "user:users(id,email,phone,role,is_blocked)",
+          "user:users!providers_user_id_fkey(id,email,phone,role,is_blocked)",
           "entity_type:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
         ],
@@ -25,7 +25,7 @@ export const detailsApi = createApi({
         method: "GET",
         id,
         joins: [
-          "user:users(id,email,phone,role,is_blocked)",
+          "user:users!requesters_user_id_fkey(id,email,phone,role,is_blocked)",
           "entity_type:lookup_values!requesters_entity_type_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
         ],
@@ -38,7 +38,7 @@ export const detailsApi = createApi({
         method: "GET",
         id,
         joins: [
-          "user:users(id,email,phone,role,is_blocked)",
+          "user:users!admins_user_id_fkey(id,email,phone,role,is_blocked)",
         ],
       }),
       providesTags: ["AdminDetails"],

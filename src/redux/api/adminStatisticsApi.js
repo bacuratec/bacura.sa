@@ -16,7 +16,7 @@ const statisticsBaseQuery = async (args) => {
           supabase
             .from("requesters")
             .select("id", { count: "exact", head: true })
-            .eq("user:users.is_blocked", false),
+            .eq("users!requesters_user_id_fkey.is_blocked", false),
         ]);
         result = {
           totalRequestersCount: totalRequesters.count || 0,
@@ -32,7 +32,7 @@ const statisticsBaseQuery = async (args) => {
           supabase
             .from("providers")
             .select("id", { count: "exact", head: true })
-            .eq("user:users.is_blocked", false),
+            .eq("users!providers_user_id_fkey.is_blocked", false),
         ]);
         result = {
           totalProvidersCount: totalProviders.count || 0,
