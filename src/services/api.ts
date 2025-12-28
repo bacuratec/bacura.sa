@@ -32,7 +32,7 @@ export class BaseService {
   async getAll<T = any>() {
     return this.handleSupabaseOperation<T[]>(async () => {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from(this.tableName as any)
         .select('*')
       return { data, error }
     })
@@ -41,7 +41,7 @@ export class BaseService {
   async getById<T = any>(id: string) {
     return this.handleSupabaseOperation<T>(async () => {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from(this.tableName as any)
         .select('*')
         .eq('id', id)
         .single()
@@ -52,19 +52,19 @@ export class BaseService {
   async create<T = any>(data: any) {
     return this.handleSupabaseOperation<T>(async () => {
       const { data: createdData, error } = await supabase
-        .from(this.tableName)
-        .insert(data)
+        .from(this.tableName as any)
+        .insert(data as any)
         .select()
         .single()
       return { data: createdData, error }
     })
   }
 
-  async update<T = any>(id: string, data: Partial<any>) {
+  async update<T = any>(id: string, data: Record<string, any>) {
     return this.handleSupabaseOperation<T>(async () => {
       const { data: updatedData, error } = await supabase
-        .from(this.tableName)
-        .update(data)
+        .from(this.tableName as any)
+        .update(data as any)
         .eq('id', id)
         .select()
         .single()

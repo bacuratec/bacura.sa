@@ -17,6 +17,7 @@ import NotificationButton from "./NotificationButton";
 import LanguageDropdown from "../../LanguageDropdown";
 import { useTranslation } from "react-i18next";
 import { getAppBaseUrl } from "../../../../utils/env";
+import OptimizedImage from "@/components/shared/OptimizedImage";
 
 const Header = ({ data }) => {
   const { t } = useTranslation(); // 👈 استخدام hook الترجمة
@@ -59,7 +60,7 @@ const Header = ({ data }) => {
             onClick={() => scrollToTop()}
             className="logo w-[76px] h-[51px]"
           >
-            <img src={logo} alt="logo" className="w-full h-full" />
+            <OptimizedImage src={logo} alt="logo" width={76} height={51} />
           </Link>
           <div className="flex items-center gap-2 lg:gap-4">
             <div className="lg:hidden">
@@ -114,11 +115,14 @@ const Header = ({ data }) => {
               <NotificationsModal open={isModalOpen} setOpen={setIsModalOpen} />
 
               <Link href="/profile" className="flex items-center gap-1 border-2 border-primary/50 rounded-full w-10 h-10 overflow-hidden p-1">
-                <img
-                  src={imageUrl}
-                  alt="user"
-                  className="w-full h-full object-cover rounded-full"
-                />
+                <div className="relative w-full h-full">
+                  <OptimizedImage
+                    src={imageUrl}
+                    alt="user"
+                    fill
+                    className="object-cover rounded-full"
+                  />
+                </div>
               </Link>
               <Link href="/request-service" className="py-2 px-6 bg-primary text-white rounded-lg">
                 {t("headerLanding.requestService")}

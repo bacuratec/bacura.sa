@@ -3,6 +3,7 @@ import './globals.css'
 import { Toaster } from 'sonner'
 import { dir } from 'i18next'
 import { languages } from '../i18n/settings'
+import Providers from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -36,7 +37,7 @@ export default function RootLayout({
     <html lang={lng} dir={dir(lng)}>
       <head />
       <body className={inter.className}>
-        {children}
+        <Providers>{children}</Providers>
         <Toaster
           position="top-center"
           richColors

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useGetTicketsQuery } from "../../../redux/api/ticketApi";
 import LoadingPage from "../../LoadingPage";
 import logo from "@/assets/images/logo.png";
+import OptimizedImage from "@/components/shared/OptimizedImage";
 import TicketModal from "../../../components/landing-components/profile-components/TicketModal";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -62,11 +63,12 @@ const Tickets = () => {
                 key={item?.id}
                 className="flex items-start gap-4 p-4 bg-white rounded-xl shadow hover:shadow-md transition duration-300 cursor-pointer"
               >
-                <div className="image rounded-full w-16 h-16 overflow-hidden border-2 border-primary">
-                  <img
+                <div className="image rounded-full w-16 h-16 overflow-hidden border-2 border-primary relative">
+                  <OptimizedImage
                     src={logo}
                     alt="User"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <div className="Info flex-1">
@@ -81,11 +83,14 @@ const Tickets = () => {
             ))
           ) : (
             <div className="text-center py-10">
-              <img
-                src={logo}
-                alt="No Tickets"
-                className="w-20 h-20 mx-auto mb-4 opacity-70"
-              />
+              <div className="relative w-20 h-20 mx-auto mb-4">
+                <OptimizedImage
+                  src={logo}
+                  alt="No Tickets"
+                  fill
+                  className="opacity-70 object-contain"
+                />
+              </div>
               <p className="text-gray-600 text-lg font-medium">
                 {t("ticket.noTicketsTitle")}
               </p>

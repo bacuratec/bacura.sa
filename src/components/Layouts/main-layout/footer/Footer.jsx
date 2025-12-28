@@ -13,6 +13,7 @@ import { useGetProfileInfoQuery } from "../../../../redux/api/profileInfoApi";
 import { getAppBaseUrl } from "../../../../utils/env";
 import { formatLastUpdate, getLastUpdateTime } from "../../../../utils/buildInfo";
 import { useEffect, useState } from "react";
+import OptimizedImage from "@/components/shared/OptimizedImage";
 
 const Footer = () => {
   const { t, i18n } = useTranslation();
@@ -52,11 +53,13 @@ const Footer = () => {
       <div className="container">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10 lg:gap-16 xl:gap-20">
           <div className="desc flex flex-col justify-between items-center gap-4 col-span-2 lg:col-span-3 xl:col-span-2">
-            <div className="logo w-full h-32">
-              <img
+            <div className="logo w-full h-32 relative">
+              <OptimizedImage
                 src={logo}
                 alt="logo"
-                className="w-full h-full object-contain"
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 33vw"
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -78,7 +81,7 @@ const Footer = () => {
                       {social?.ic ? (
                         social?.icon
                       ) : (
-                        <img src={social.icon} alt="Social" />
+                        <OptimizedImage src={social.icon} alt="Social" width={20} height={20} />
                       )}
                     </a>
                   </li>
@@ -137,7 +140,7 @@ const Footer = () => {
                     {social?.ic ? (
                       social?.icon
                     ) : (
-                      <img src={social.icon} alt="Social" />
+                      <OptimizedImage src={social.icon} alt="Social" width={16} height={16} />
                     )}
                   </a>
                 </li>
