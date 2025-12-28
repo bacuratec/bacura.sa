@@ -1,15 +1,49 @@
 
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 
-const supabaseUrl = 'https://tqskjoufozgyactjnrix.supabase.co';
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxc2tqb3Vmb3pneWFjdGpucml4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjQxMTM0NywiZXhwIjoyMDgxOTg3MzQ3fQ.xRU624hUrN8FTprG-LDYBiRhfLYb1oxDn2JowoX3QtU';
+function loadDotEnvFallback() {
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      for (const line of content.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eq = trimmed.indexOf('=');
+        if (eq === -1) continue;
+        const key = trimmed.slice(0, eq).trim();
+        const value = trimmed.slice(eq + 1).trim();
+        if (key && !(key in process.env)) {
+          process.env[key] = value;
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+}
+
+loadDotEnvFallback();
+
+const supabaseUrl =
+  process.env.SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.VITE_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-const email = 'rafrs2030@gmail.com';
-const password = 'Admin@123';
+const email = process.env.ADMIN_EMAIL || 'rafrs2030@gmail.com';
+const password = process.env.ADMIN_PASSWORD || 'Admin@123';
 
 async function fixUser() {
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('Missing Supabase credentials in environment.');
+    process.exit(1);
+  }
+
   console.log(`Checking user: ${email}...`);
 
   // 1. Check if user exists in Auth
@@ -24,7 +58,7 @@ async function fixUser() {
 
   if (user) {
     console.log(`User found (ID: ${user.id}). Updating password...`);
-    const { data, error: updateError } = await supabase.auth.admin.updateUserById(
+    const { error: updateError } = await supabase.auth.admin.updateUserById(
       user.id,
       { password: password, email_confirm: true, user_metadata: { role: 'Admin' } }
     );

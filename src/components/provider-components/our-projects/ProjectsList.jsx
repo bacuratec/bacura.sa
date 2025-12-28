@@ -157,23 +157,24 @@ const ProjectsList = ({ stats }) => {
     {
       name: t("orders.columns.action"),
       cell: (row) => (
-        <Link
-          href={
-            role === "Admin"
-              ? `/admin/projects/${row.id}`
-              : role === "Requester"
-              ? `/projects/${row.id}`
-              : `/provider/projects/${row.id}?IsRejected=${
-                  row?.orderStatus?.id === 604 ? true : false
-                }&IsExpired=${row?.orderStatus?.id === 605 ? true : false}`
-          }
-          className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium ml-5 text-nowrap"
-        >
-          <Eye />
-        </Link>
+        <div className="overflow-visible">
+          <Link
+            href={
+              role === "Admin"
+                ? `/admin/projects/${row.id}`
+                : role === "Requester"
+                ? `/projects/${row.id}`
+                : `/provider/projects/${row.id}?IsRejected=${
+                    row?.orderStatus?.id === 604 ? true : false
+                  }&IsExpired=${row?.orderStatus?.id === 605 ? true : false}`
+            }
+            className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium ml-5 text-nowrap"
+          >
+            <Eye />
+          </Link>
+        </div>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useContext } from "react";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"; // ✅ استيراد Framer Motion
 import ServiceCard from "./ServiceCard";
 import s1 from "../../../../assets/icons/s1.svg";

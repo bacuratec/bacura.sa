@@ -13,7 +13,6 @@ import AttachmentsTable from "../../../components/admin-components/projects/Atta
 import { useGetTicketsQuery } from "../../../redux/api/ticketApi";
 import { useGetProjectStatisticsQuery } from "../../../redux/api/projectsApi";
 import { useTranslation } from "react-i18next";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 import {

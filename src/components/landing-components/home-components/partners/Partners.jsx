@@ -6,8 +6,9 @@ import "swiper/css/autoplay"; // أحيانًا مفيد لو autoplay مش شغ
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import { useGetPartnersQuery } from "../../../../redux/api/partnersApi";
 import { useTranslation } from "react-i18next";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import OptimizedImage from "@/components/shared/OptimizedImage";
+import { normalizeImageSrc } from "@/utils/image";
 
 const Partners = () => {
   const { t } = useTranslation();
@@ -73,9 +74,11 @@ const Partners = () => {
                     viewport={{ once: true }}
                   >
                     <div className="relative w-full lg:h-[200px] h-[150px] rounded-xl overflow-hidden shadow-md">
-                      <img
-                        src={logo?.imageBase64}
+                      <OptimizedImage
+                        src={normalizeImageSrc(logo?.imageBase64 || logo?.imageUrl || logo?.image_url)}
                         alt={`brand-logo-${i}`}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                         className="w-full h-full object-fill"
                       />
                     </div>

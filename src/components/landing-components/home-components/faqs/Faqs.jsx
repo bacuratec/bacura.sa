@@ -1,5 +1,4 @@
 import React from "react";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"; // ✅ استيراد Framer Motion
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import CustomAccordion from "./accordion";

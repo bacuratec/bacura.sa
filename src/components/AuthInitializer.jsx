@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "@/lib/supabaseClient";
-import { setCredentials, logoutUser, logout } from "@/redux/slices/authSlice";
+import { setCredentials, logout } from "@/redux/slices/authSlice";
 import { detectUserRole } from "@/utils/roleDetection";
 import LoadingPage from "@/views/LoadingPage";
 

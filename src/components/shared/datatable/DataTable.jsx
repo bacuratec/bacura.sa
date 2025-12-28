@@ -19,6 +19,7 @@ const CustomDataTable = ({
   defaultPage = 1, // 👈 قيمة الصفحة الحالية
   defaultPageSize = 10, // 👈 قيمة عدد العناصر في كل صفحة
   isLoading,
+  allowOverflow,
   ...rest
 }) => {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ const CustomDataTable = ({
     tableWrapper: {
       style: {
         borderRadius: tabs?.length > 0 ? "0 0 12px 12px" : "12px", // أو أي قيمة تحبها
-        overflow: "hidden", // مهم جدًا عشان المحتوى ما يطلعش بره
+        overflow: allowOverflow ? "visible" : "hidden", // التحكم في التدفق حسب الخاصية
         border: "1px solid #e5e7eb", // لون البوردر اختياري
       },
     },

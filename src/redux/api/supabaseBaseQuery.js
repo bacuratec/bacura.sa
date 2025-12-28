@@ -27,14 +27,14 @@ export const supabaseBaseQuery = async (args) => {
       throw new Error("Supabase client is not initialized");
     }
 
-    // تحديد select string للاستخدام في الاستعلامات
-    let selectString = select;
-    if (joins.length > 0) {
-      if (select === "*") {
-        selectString = `${select},${joins.join(",")}`;
-      } else {
-        selectString = `${select},${joins.join(",")}`;
-      }
+    // تحديد select string للاستخدام في الاستعلامات مع تنظيف المدخلات
+    const baseSelect = typeof select === "string" && select.trim() ? select.trim() : "*";
+    const safeJoins = Array.isArray(joins)
+      ? joins.filter((j) => typeof j === "string" && j.trim().length > 0).map((j) => j.trim())
+      : [];
+    let selectString = baseSelect;
+    if (safeJoins.length > 0) {
+      selectString = `${baseSelect},${safeJoins.join(",")}`;
     }
 
     switch (method) {
@@ -43,22 +43,22 @@ export const supabaseBaseQuery = async (args) => {
         let query = supabase.from(table);
 
         // Apply joins if needed (for related data)
-        if (joins.length > 0) {
+        if (safeJoins.length > 0) {
           // Supabase joins syntax: "foreign_table!inner(column1,column2)"
           // بناء select string بشكل صحيح - Supabase يتطلب تنسيق محدد
           let selectWithJoins;
-          if (select === "*") {
+          if (baseSelect === "*") {
             // إذا كان select = "*", نضيف joins بعدها مباشرة بدون فاصلة إضافية
-            selectWithJoins = `*,${joins.join(",")}`;
+            selectWithJoins = `*,${safeJoins.join(",")}`;
           } else {
             // إذا كان select محدد، نضيف joins بعد الحقول المحددة
-            selectWithJoins = `${select},${joins.join(",")}`;
+            selectWithJoins = `${baseSelect},${safeJoins.join(",")}`;
           }
           
           // استخدام select بدون options إضافية لتجنب مشاكل 406
           query = query.select(selectWithJoins);
         } else {
-          query = query.select(select);
+          query = query.select(baseSelect);
         }
 
         // Apply filters
@@ -111,7 +111,8 @@ export const supabaseBaseQuery = async (args) => {
         }
 
         if (id) {
-          result = await query.eq("id", id).single();
+          // استخدم maybeSingle لتفادي أخطاء no rows (PGRST116) وتحسين التوافق
+          result = await query.eq("id", id).maybeSingle();
         } else {
           result = await query;
         }
@@ -196,9 +197,9 @@ export const supabaseBaseQuery = async (args) => {
         });
         
         // محاولة إعادة المحاولة بدون joins إذا فشلت
-        if (joins.length > 0 && method === "GET") {
+        if (safeJoins.length > 0 && method === "GET") {
           try {
-            const simpleQuery = supabase.from(table).select(select === "*" ? "*" : select);
+            const simpleQuery = supabase.from(table).select(baseSelect === "*" ? "*" : baseSelect);
             
             // تطبيق الفلاتر
             Object.entries(filters).forEach(([key, value]) => {
@@ -222,7 +223,7 @@ export const supabaseBaseQuery = async (args) => {
             });
             
             if (id) {
-              const simpleResult = await simpleQuery.eq("id", id).single();
+              const simpleResult = await simpleQuery.eq("id", id).maybeSingle();
               if (!simpleResult.error) {
                 console.warn(`Supabase query with joins failed (406), returned data without joins for table: ${table}`);
                 return { data: simpleResult.data };
