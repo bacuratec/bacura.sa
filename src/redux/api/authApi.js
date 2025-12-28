@@ -9,7 +9,7 @@ export const authApi = createApi({
     getProfile: builder.query({
       query: (userId) => {
         return {
-          table: "profiles",
+          table: "users",
           method: "GET",
           id: userId,
         };
@@ -18,7 +18,7 @@ export const authApi = createApi({
     }),
     toggleBlockUser: builder.mutation({
       query: ({ userId, isBlocked }) => ({
-        table: "profiles",
+        table: "users",
         method: "PUT",
         id: userId,
         body: {

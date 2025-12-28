@@ -115,7 +115,7 @@ const RequestersTable = ({ stats }) => {
       name: t("requestersTable.columns.name"),
       cell: (row) => (
         <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
-          {row.full_name}
+          {row.name}
         </span>
       ),
     },
@@ -127,13 +127,13 @@ const RequestersTable = ({ stats }) => {
     },
     {
       name: t("requestersTable.columns.email"),
-      selector: (row) => row.email,
+      selector: (row) => row.user?.email,
       sortable: true,
       wrap: true,
     },
     {
       name: t("requestersTable.columns.phone"),
-      selector: (row) => row.phone_number,
+      selector: (row) => row.user?.phone,
       wrap: true,
     },
     {
@@ -147,18 +147,14 @@ const RequestersTable = ({ stats }) => {
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
               ${
-                !row.is_blocked && row.is_active
+                !row.user?.is_blocked
                   ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                  : row.is_blocked
-                  ? "bg-red-100 text-red-700"
-                  : "bg-gray-100 text-gray-600"
+                  : "bg-red-100 text-red-700"
               }`}
         >
-          {row.is_blocked
+          {row.user?.is_blocked
             ? t("status.blocked") || "محظور"
-            : row.is_active
-            ? t("status.active") || "نشط"
-            : t("status.inactive") || "غير نشط"}
+            : t("status.active") || "نشط"}
         </span>
       ),
       wrap: true,

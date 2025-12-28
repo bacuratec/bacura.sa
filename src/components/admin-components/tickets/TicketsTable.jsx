@@ -23,7 +23,7 @@ const TicketsTable = () => {
   const columns = [
     {
       name: t("tickets.username"),
-      selector: (row) => row?.user?.full_name || "-",
+      selector: (row) => row?.user?.email || "-",
       wrap: true,
     },
     {
@@ -35,8 +35,8 @@ const TicketsTable = () => {
       name: t("tickets.complaint_status"),
       selector: (row) => {
         return lang === "ar"
-          ? row?.ticketStatus?.name_ar
-          : row?.ticketStatus?.name_en || "-";
+          ? row?.status?.name_ar
+          : row?.status?.name_en || "-";
       },
       wrap: true,
     },

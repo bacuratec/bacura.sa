@@ -12,7 +12,7 @@ export const ticketApi = createApi({
         method: "POST",
         body: {
           user_id: body.userId,
-          // related_order_id: body.relatedOrderId || null, // Not in schema
+          related_order_id: body.relatedOrderId || null,
           title: body.title,
           description: body.description || null,
           status_id: body.statusId, // Should be open status
@@ -27,9 +27,9 @@ export const ticketApi = createApi({
         filters: userId ? { user_id: userId } : {},
         orderBy: { column: "created_at", ascending: false },
         joins: [
-          "user:profiles!tickets_user_id_fkey(id,email,full_name)",
-          // "related_order:orders!tickets_related_order_id_fkey(id,order_title)", // Not in schema
-          "ticketStatus:ticket_statuses!tickets_status_id_fkey(id,name_ar,name_en,code)",
+          "user:users!tickets_user_id_fkey(id,email)",
+          "related_order:orders!tickets_related_order_id_fkey(id,order_title)",
+          "status:lookup_values!tickets_status_id_fkey(id,name_ar,name_en,code)",
         ],
       }),
       providesTags: ["Tickets"],
@@ -40,9 +40,9 @@ export const ticketApi = createApi({
         method: "GET",
         id,
         joins: [
-          "user:profiles!tickets_user_id_fkey(id,email,full_name)",
-          // "related_order:orders!tickets_related_order_id_fkey(id,order_title)", // Not in schema
-          "ticketStatus:ticket_statuses!tickets_status_id_fkey(id,name_ar,name_en,code)",
+          "user:users!tickets_user_id_fkey(id,email)",
+          "related_order:orders!tickets_related_order_id_fkey(id,order_title)",
+          "status:lookup_values!tickets_status_id_fkey(id,name_ar,name_en,code)",
         ],
       }),
       providesTags: ["Tickets"],
@@ -55,7 +55,7 @@ export const ticketApi = createApi({
         body: {
           status_id: body.statusId,
           updated_at: new Date().toISOString(),
-          resolved_at: body.statusId === 3 ? new Date().toISOString() : null, // 3 = closed/resolved? Check lookup
+          closed_at: body.statusId === 3 ? new Date().toISOString() : null, // 3 = closed
         },
       }),
       invalidatesTags: ["Tickets"],

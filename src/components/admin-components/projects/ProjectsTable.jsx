@@ -142,7 +142,7 @@ const ProjectsTable = ({ stats }) => {
     },
     {
       name: t("projects.requester"),
-      selector: (row) => row?.requester?.full_name || "-",
+      selector: (row) => row?.request?.requester?.name || "-",
       wrap: true,
     },
     {
@@ -155,7 +155,7 @@ const ProjectsTable = ({ stats }) => {
       ? {}
       : {
           name: t("projects.provider"),
-          selector: (row) => row?.provider?.full_name || "-",
+          selector: (row) => row?.provider?.name || "-",
           wrap: true,
         },
     {

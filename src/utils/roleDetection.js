@@ -43,40 +43,40 @@ export const getRoleFromMetadata = (user, session) => {
 };
 
 /**
- * Get role from profiles table
+ * Get role from users table
  */
-export const getRoleFromProfilesTable = async (userId) => {
+export const getRoleFromUsersTable = async (userId) => {
   try {
-    const { data: profile, error } = await supabase
-      .from("profiles")
+    const { data: user, error } = await supabase
+      .from("users")
       .select("role")
       .eq("id", userId)
       .maybeSingle();
 
     if (error) {
-      console.error("Error fetching profile role:", error);
+      console.error("Error fetching user role:", error);
       return null;
     }
 
-    if (profile?.role) {
-      return normalizeRole(profile.role);
+    if (user?.role) {
+      return normalizeRole(user.role);
     }
 
     return null;
   } catch (err) {
-    console.error("Unexpected error in getRoleFromProfilesTable:", err);
+    console.error("Unexpected error in getRoleFromUsersTable:", err);
     return null;
   }
 };
 
 /**
  * Detect user role (Main function)
- * Priority 1: 'profiles' table in Supabase
+ * Priority 1: 'users' table in Supabase
  * Priority 2: user_metadata or JWT (fallback)
  */
 export const detectUserRole = async (user, session) => {
-  // Priority 1: Check profiles table
-  let role = await getRoleFromProfilesTable(user.id);
+  // Priority 1: Check users table
+  let role = await getRoleFromUsersTable(user.id);
   if (role) return role;
 
   // Priority 2: Check metadata/JWT

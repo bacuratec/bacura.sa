@@ -16,13 +16,13 @@ export const projectsApi = createApi({
       }) => {
         const filters = {};
         if (OrderStatusLookupId) {
-          filters.status_id = OrderStatusLookupId;
+          filters.order_status_id = OrderStatusLookupId;
         }
         if (OrderTitle) {
-          filters.title = { operator: "ilike", value: `%${OrderTitle}%` };
+          filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };
         }
         return {
-          table: "projects",
+          table: "orders",
           method: "GET",
           filters,
           pagination: {
@@ -30,10 +30,9 @@ export const projectsApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "requester:profiles!projects_requester_id_fkey(id,full_name,email)",
-            "request:requests(id,title,description,requester_id, service:services(id,name_ar,name_en))",
-            "provider:profiles!projects_provider_id_fkey(id,full_name,email)",
-            "status:project_statuses!projects_status_id_fkey(id,name_ar,name_en,code)",
+            "request:requests(id,title,description,requester_id, requester:requesters(id,name))",
+            "provider:providers(id,name,specialization)",
+            "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
           ],
         };
       },
@@ -53,13 +52,13 @@ export const projectsApi = createApi({
           filters.provider_id = providerId;
         }
         if (OrderStatusLookupId) {
-          filters.status_id = OrderStatusLookupId;
+          filters.order_status_id = OrderStatusLookupId;
         }
         if (OrderTitle) {
-          filters.title = { operator: "ilike", value: `%${OrderTitle}%` };
+          filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };
         }
         return {
-          table: "projects",
+          table: "orders",
           method: "GET",
           filters,
           pagination: {
@@ -67,10 +66,9 @@ export const projectsApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "requester:profiles!projects_requester_id_fkey(id,full_name,email)",
-            "request:requests(id,title,description,requester_id, service:services(id,name_ar,name_en))",
-            "provider:profiles!projects_provider_id_fkey(id,full_name,email)",
-            "status:project_statuses!projects_status_id_fkey(id,name_ar,name_en,code)",
+            "request:requests(id,title,description,requester_id, requester:requesters(id,name))",
+            "provider:providers(id,name,specialization)",
+            "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
           ],
         };
       },
@@ -79,14 +77,13 @@ export const projectsApi = createApi({
     // Get Project Details
     getProjectDetails: builder.query({
       query: ({ id }) => ({
-        table: "projects",
+        table: "orders",
         method: "GET",
         id,
         joins: [
-          "requester:profiles!projects_requester_id_fkey(id,full_name,email)",
-          "request:requests(id,title,description,requester_id, service:services(id,name_ar,name_en,price))",
-          "provider:profiles!projects_provider_id_fkey(id,full_name,email)",
-          "status:project_statuses!projects_status_id_fkey(id,name_ar,name_en,code)",
+          "request:requests(id,title,description,requester_id,service_id, requester:requesters(id,name))",
+          "provider:providers(id,name,specialization,avg_rate)",
+          "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
         ],
       }),
       providesTags: ["Orders"],
@@ -96,7 +93,7 @@ export const projectsApi = createApi({
       query: () => {
         // This would need custom logic - for now return orders count
         return {
-          table: "projects",
+          table: "orders",
           method: "GET",
           filters: {},
         };
@@ -106,11 +103,11 @@ export const projectsApi = createApi({
     // Provider Update Order Status
     ProviderProjectState: builder.mutation({
       query: (body) => ({
-        table: "projects",
+        table: "orders",
         method: "PUT",
         id: body.orderId,
         body: {
-          status_id: body.statusId,
+          order_status_id: body.statusId,
           updated_at: new Date().toISOString(),
         },
       }),
@@ -119,11 +116,11 @@ export const projectsApi = createApi({
     // Add Order Attachments
     addOrderAttachments: builder.mutation({
       query: ({ body, projectId }) => ({
-        table: "projects",
+        table: "orders",
         method: "PUT",
         id: projectId,
         body: {
-          // order_attachments_group_key: body.attachmentsGroupKey, // Not in schema
+          order_attachments_group_key: body.attachmentsGroupKey,
           updated_at: new Date().toISOString(),
         },
       }),
@@ -132,11 +129,11 @@ export const projectsApi = createApi({
     // Complete Order
     completeOrder: builder.mutation({
       query: ({ body, projectId }) => ({
-        table: "projects",
+        table: "orders",
         method: "PUT",
         id: projectId,
         body: {
-          status_id: body.statusId, // completed status
+          order_status_id: body.statusId, // completed status
           completed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -146,7 +143,7 @@ export const projectsApi = createApi({
     // Delete Project/Order
     deleteProject: builder.mutation({
       query: (id) => ({
-        table: "projects",
+        table: "orders",
         method: "DELETE",
         id,
       }),

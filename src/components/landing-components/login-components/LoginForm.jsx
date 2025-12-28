@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { useLocation } from "@/utils/useLocation";
-import { useNavigate } from "@/utils/useNavigate";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
@@ -14,13 +13,12 @@ import { detectUserRole } from "@/utils/roleDetection";
 
 const LoginForm = () => {
   const { t } = useTranslation();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
- 
-  const searchParams = typeof window !== "undefined" ? new URLSearchParams(location.search) : null;
-  const fromParam = searchParams?.get("from") || searchParams?.get("redirect") || null;
-  const from = location.state?.from?.pathname || (fromParam ? decodeURIComponent(fromParam) : null) || "/";
+
+  const fromParam = searchParams.get("from") || searchParams.get("redirect") || null;
+  const from = fromParam ? decodeURIComponent(fromParam) : "/";
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,7 +36,6 @@ const LoginForm = () => {
       .min(6, t("loginForm.validation.passwordMin"))
       .required(t("loginForm.validation.required")),
   });
-
 
   const handleSubmit = async (values) => {
     setLoading(true);
@@ -65,7 +62,7 @@ const LoginForm = () => {
         return;
       }
 
-      // التأكد من أن الجلسة معينة بشكل صحيح
+      // Ensure session is set correctly
       const {
         data: { session: verifiedSession },
       } = await supabase.auth.getSession();
@@ -89,10 +86,10 @@ const LoginForm = () => {
         }
       }
 
-      // انتظار قصير للتأكد من أن الجلسة جاهزة
+      // Short delay to ensure session is ready
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      // تحديد role المستخدم مع timeout لتجنب التعليق
+      // Detect role
       const userRolePromise = detectUserRole(user, session);
       const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
       
@@ -117,26 +114,25 @@ const LoginForm = () => {
         })
       );
 
-      // انتظار قصير لضمان تحديث Redux state
+      // Short delay for Redux state update
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // توجيه حسب الدور إلى لوحة التحكم المناسبة
+      // Redirect based on role
       const normalizedRole = userRole.toLowerCase();
       
       if (normalizedRole === "admin") {
-        navigate("/admin", { replace: true });
+        router.replace("/admin");
       } else if (normalizedRole === "provider") {
-        navigate("/provider", { replace: true });
+        router.replace("/provider");
       } else if (normalizedRole === "requester") {
-        // توجيه طالب الخدمة إلى لوحة التحكم الخاصة به (Profile) أو الصفحة التي جاء منها
         const targetPath = from && from !== "/login" && from !== "/" ? from : "/profile";
-        navigate(targetPath, { replace: true });
+        router.replace(targetPath);
       } else {
         toast.warning(
           t("loginForm.errors.unknownRole") ||
             "دور المستخدم غير معروف. سيتم توجيهك للصفحة الرئيسية."
         );
-        navigate("/", { replace: true });
+        router.replace("/");
       }
     } catch (err) {
       console.error("Login error:", err);
