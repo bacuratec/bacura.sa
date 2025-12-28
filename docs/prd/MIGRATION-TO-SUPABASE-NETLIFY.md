@@ -1,5 +1,5 @@
 # وثيقة التحويل إلى Supabase و Netlify و Next.js
-## منصة بكورة أمل - Bakora Amal Platform Migration Guide
+## منصة باكورة أعمل - Bakora Amal Platform Migration Guide
 
 ---
 

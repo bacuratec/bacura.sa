@@ -331,8 +331,8 @@
   
   <!-- Project Metadata -->
   <metadata>
-    <name>Bakora Amal Front-end</name>
-    <description>React + Vite single page application for Bakora Amal platform</description>
+    <name>Bakora A'mal Front-end</name>
+    <description>React + Vite single page application for Bakora A'mal platform</description>
     <framework>React 19.1.0</framework>
     <buildTool>Vite 6.3.5</buildTool>
     <styling>Tailwind CSS</styling>

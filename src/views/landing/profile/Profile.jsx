@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import WelcomeTitle from "../../../components/landing-components/profile-components/welcomeTitle";
 import DashboardInfo from "../../../components/landing-components/profile-components/DashboardInfo";
 import Services from "../../../components/landing-components/profile-components/Services";
-import Mesages from "../../../components/landing-components/profile-components/Mesages";
+import Messages from "../../../components/landing-components/profile-components/Messages";
 import Support from "../../../components/landing-components/profile-components/Support";
 import { useGetRequesterDetailsQuery } from "../../../redux/api/usersDetails";
 import { useSelector } from "react-redux";
@@ -134,7 +134,7 @@ const Profile = () => {
               </motion.div>
               {/* <ExploreRequests /> */}
               <Services />
-              <Mesages tickets={tickets} />
+              <Messages tickets={tickets} />
               <Support refetch={refetchTickets} />
               <button
                 onClick={() => setOpenSuspend(true)}

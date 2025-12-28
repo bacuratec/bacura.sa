@@ -1,4 +1,4 @@
-# Bakora Amal – Front-end
+# Bakora A'mal – Front-end
 
 React + Vite single page application that powers the Bakora Amal platform.
 

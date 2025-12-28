@@ -120,7 +120,7 @@ const ProfileContent = ({ requester, tickets, stats }) => {
                 />
               </motion.div>
               <Services />
-              <Mesages tickets={tickets} />
+              <Messages tickets={tickets} />
               <Support />
               <button
                 onClick={() => setOpenSuspend(true)}

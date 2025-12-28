@@ -14,12 +14,12 @@ export async function generateStaticParams() {
 export const metadata = {
   title: 'بكورة أمل - منصة الخدمات الرقمية',
   description: 'منصة متكاملة تربط بين طالبي الخدمات ومقدمي الخدمات في مجال أنظمة التيار الخفيف',
-  keywords: 'بكورة أمل, خدمات, التيار الخفيف, مقدمي خدمات, طالبي خدمات',
-  authors: [{ name: 'بكورة أمل' }],
+  keywords: 'باكورة أعمل, خدمات, التيار الخفيف, مقدمي خدمات, طالبي خدمات',
+  authors: [{ name: 'باكورة أعمل' }],
   viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
-    title: 'بكورة أمل - منصة الخدمات الرقمية',
+    title: 'باكورة أعمل - منصة الخدمات الرقمية',
     description: 'منصة متكاملة تربط بين طالبي الخدمات ومقدمي الخدمات في مجال أنظمة التيار الخفيف',
     type: 'website',
     locale: 'ar_SA',

@@ -48,4 +48,4 @@ const Mesages = ({ tickets }) => {
   );
 };
 
-export default Mesages;
+export default Messages;
