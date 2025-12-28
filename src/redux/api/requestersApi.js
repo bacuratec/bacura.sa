@@ -9,11 +9,9 @@ export const requestersApi = createApi({
     // Get Requesters Accounts (Admin)
     getRequestersAccounts: builder.query({
       query: ({ PageNumber = 1, PageSize = 10 }) => {
-        const filters = {};
-        // AccountStatus would need to be mapped to user.is_blocked
-        // For now, we'll get all requesters with their user info
+        const filters = { role: "Requester" };
         return {
-          table: "requesters",
+          table: "profiles",
           method: "GET",
           filters,
           pagination: {
@@ -21,8 +19,7 @@ export const requestersApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "user:users!requesters_user_id_fkey(id,email,phone,role,is_blocked)",
-            "entity_type:lookup_values!requesters_entity_type_id_fkey(id,name_ar,name_en,code)",
+            "entity_type:entity_types(id,name_ar,name_en,type)",
             "city:cities(id,name_ar,name_en)",
           ],
         };
@@ -32,7 +29,7 @@ export const requestersApi = createApi({
     // Delete Requester
     deleteRequester: builder.mutation({
       query: (id) => ({
-        table: "requesters",
+        table: "profiles",
         method: "DELETE",
         id,
       }),
@@ -41,12 +38,10 @@ export const requestersApi = createApi({
     // Update Requester Status (Block/Unblock User)
     updateRequesterStatus: builder.mutation({
       query: ({ body }) => {
-        // First get the requester to find user_id
-        // Then update users table
         return {
-          table: "users",
-        method: "PUT",
-          id: body.userId, // Should be passed from component
+          table: "profiles",
+          method: "PUT",
+          id: body.userId, 
           body: {
             is_blocked: body.isBlocked,
             updated_at: new Date().toISOString(),

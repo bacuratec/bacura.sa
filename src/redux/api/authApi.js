@@ -8,21 +8,17 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     getProfile: builder.query({
       query: (userId) => {
-        // Get user profile - need to determine role and get appropriate details
         return {
-          table: "users",
-        method: "GET",
+          table: "profiles",
+          method: "GET",
           id: userId,
-          joins: [
-            // This would need to be handled based on role
-          ],
         };
       },
       providesTags: ["Profile"],
     }),
     toggleBlockUser: builder.mutation({
       query: ({ userId, isBlocked }) => ({
-        table: "users",
+        table: "profiles",
         method: "PUT",
         id: userId,
         body: {

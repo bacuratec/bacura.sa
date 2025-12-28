@@ -115,14 +115,14 @@ const RequestersTable = ({ stats }) => {
       name: t("requestersTable.columns.name"),
       cell: (row) => (
         <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
-          {row.name}
+          {row.full_name}
         </span>
       ),
     },
     {
       name: t("requestersTable.columns.entityType"),
       selector: (row) =>
-        lang === "ar" ? row.entityType?.nameAr : row.entityType?.nameEn,
+        lang === "ar" ? row.entity_type?.name_ar : row.entity_type?.name_en,
       wrap: true,
     },
     {
@@ -133,12 +133,12 @@ const RequestersTable = ({ stats }) => {
     },
     {
       name: t("requestersTable.columns.phone"),
-      selector: (row) => row.phoneNumber,
+      selector: (row) => row.phone_number,
       wrap: true,
     },
     {
       name: t("requestersTable.columns.region"),
-      selector: (row) => (lang === "ar" ? row.city?.nameAr : row.city?.nameEn),
+      selector: (row) => (lang === "ar" ? row.city?.name_ar : row.city?.name_en),
       wrap: true,
     },
     {
@@ -147,16 +147,18 @@ const RequestersTable = ({ stats }) => {
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
               ${
-                row.profileStatus?.id === 201
+                !row.is_blocked && row.is_active
                   ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                  : row.profileStatus?.id === 202
+                  : row.is_blocked
                   ? "bg-red-100 text-red-700"
                   : "bg-gray-100 text-gray-600"
               }`}
         >
-          {lang === "ar"
-            ? row.profileStatus?.nameAr
-            : row.profileStatus?.nameEn}
+          {row.is_blocked
+            ? t("status.blocked") || "محظور"
+            : row.is_active
+            ? t("status.active") || "نشط"
+            : t("status.inactive") || "غير نشط"}
         </span>
       ),
       wrap: true,
