@@ -1,19 +1,15 @@
 /**
  * Unified navigate hook that works with both React Router and Next.js
  */
-"use client";
-
-import { useRouter } from "next/navigation";
+import { useNavigate as useReactNavigate } from "react-router-dom";
 
 export function useNavigate() {
-  // Always call hooks at the top level - required by React rules
-  const router = useRouter();
-
-  return (to, _options) => {
+  const navigate = useReactNavigate();
+  return (to) => {
     if (typeof to === "string") {
-      router.push(to);
+      navigate(to);
     } else if (to && typeof to === "object") {
-      router.push(to.pathname + (to.search || ""));
+      navigate(to.pathname + (to.search || ""));
     }
   };
 }

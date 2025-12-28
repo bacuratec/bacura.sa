@@ -124,7 +124,7 @@ const ServicesTable = () => {
     },
     {
       name: t("services.price"),
-      selector: (row) => (row?.base_price ? `${row.base_price} ر.س` : "-"),
+      selector: (row) => (row?.price ? `${row.price} ر.س` : "-"),
       wrap: true,
     },
     {
@@ -161,7 +161,7 @@ const ServicesTable = () => {
           >
             <Edit />
           </Link>
-          {row?.base_price && (
+          {row?.price && (
             <button
               onClick={() => handleEdit(row)}
               className="bg-yellow-500 text-white px-1 py-1 rounded-md text-xs hover:bg-yellow-600 transition"
@@ -211,7 +211,7 @@ const ServicesTable = () => {
             <CustomDataTable
               columns={columns}
               data={localData}
-              searchableFields={["name_ar", "base_price", "name_en"]}
+              searchableFields={["name_ar", "price", "name_en"]}
               searchPlaceholder={t("searchPlaceholder")}
               isLoading={isLoading}
             />

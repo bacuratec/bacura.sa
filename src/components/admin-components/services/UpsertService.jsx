@@ -30,8 +30,8 @@ const UpsertService = () => {
   const initialValues = {
     titleAr: data?.name_ar || "",
     titleEn: data?.name_en || "",
-    price: data?.base_price ?? "",
-    isPriced: !!data?.base_price,
+    price: data?.price ?? "",
+    isPriced: !!data?.price,
     isActive: data?.is_active !== undefined ? !!data.is_active : true,
     image: null,
     removeImage: false,

@@ -61,6 +61,7 @@ const UpdateQuestion = lazy(() => import("./components/admin-components/faqs/Upd
 const UpsertPartner = lazy(() => import("./components/admin-components/partners/UpsertPartner"));
 const UpsertCustomer = lazy(() => import("./components/admin-components/customers/UpsertCustomer"));
 const AddService = lazy(() => import("./components/admin-components/services/AddService"));
+const UpsertService = lazy(() => import("./components/admin-components/services/UpsertService"));
 
 import AuthGuard from "./components/AuthGuard";
 import GuestGuard from "./components/GuestGuard";
@@ -194,6 +195,7 @@ const router = createBrowserRouter([
       // Services
       { path: "services", element: withSuspense(<ServicesPage />) },
       { path: "add-service", element: withSuspense(<AddService />) },
+      { path: "services/:id/edit", element: withSuspense(<UpsertService />) },
 
       // Projects
       { path: "projects", element: withSuspense(<ProjectsAdmin />, "table") },

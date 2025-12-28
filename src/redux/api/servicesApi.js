@@ -28,8 +28,9 @@ export const servicesApi = createApi({
         body: {
           name_ar: body.titleAr,
           name_en: body.titleEn,
-          description: body.description || null,
-          base_price: body.price || null,
+          description_ar: null,
+          description_en: null,
+          price: body.price || null,
           image_url: body.imageUrl || null,
           is_active: body.isActive !== undefined ? body.isActive : true,
         },
@@ -44,8 +45,9 @@ export const servicesApi = createApi({
         body: {
           name_ar: body.titleAr,
           name_en: body.titleEn,
-          description: body.description || null,
-          base_price: body.price || null,
+          description_ar: null,
+          description_en: null,
+          price: body.price || null,
           image_url: body.imageUrl || null,
           is_active: body.isActive !== undefined ? body.isActive : true,
           updated_at: new Date().toISOString(),
@@ -83,7 +85,7 @@ export const servicesApi = createApi({
         method: "PUT",
         id,
         body: {
-          base_price: body.price,
+          price: body.price,
           updated_at: new Date().toISOString(),
         },
     }),
