@@ -11,12 +11,16 @@ export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }))
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata = {
   title: 'باكورة أعمال - منصة الخدمات الرقمية',
   description: 'منصة متكاملة تربط بين طالبي الخدمات ومقدمي الخدمات في مجال أنظمة التيار الخفيف',
   keywords: 'باكورة أعمال, خدمات, التيار الخفيف, مقدمي خدمات, طالبي خدمات',
   authors: [{ name: 'باكورة أعمال' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     title: 'باكورة أعمال - منصة الخدمات الرقمية',

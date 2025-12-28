@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
-export async function middleware(request) {
+export default async function proxy(request) {
   // 1. Create an initial response
   let supabaseResponse = NextResponse.next({
     request,
@@ -13,7 +13,7 @@ export async function middleware(request) {
   if (!supabaseUrl || !supabaseAnonKey) {
     // If config is missing, we can't do auth checks. 
     // Just return the response (or you could redirect to an error page)
-    console.error('Supabase env vars missing in middleware')
+    console.error('Supabase env vars missing in proxy')
     return supabaseResponse
   }
 

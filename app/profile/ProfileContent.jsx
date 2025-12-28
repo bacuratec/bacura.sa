@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import WelcomeTitle from "@/components/landing-components/profile-components/welcomeTitle";
 import DashboardInfo from "@/components/landing-components/profile-components/DashboardInfo";
 import Services from "@/components/landing-components/profile-components/Services";
-import Mesages from "@/components/landing-components/profile-components/Mesages";
+import Messages from "@/components/landing-components/profile-components/Messages";
 import Support from "@/components/landing-components/profile-components/Support";
 import LoadingPage from "@/views/LoadingPage";
 import UserData from "@/components/shared/profile-details/UserData";

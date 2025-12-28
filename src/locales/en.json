@@ -311,7 +311,7 @@
       "Consultations by expert specialists.",
       "Training for engineers, technicians, and administrators."
     ],
-    "more": "More About Bacura Aamal"
+    "more": "More About Bacura A'mal"
   },
 
   "review": {
@@ -366,7 +366,7 @@
     "signup": "Sign Up"
   },
   "loginContent": {
-    "welcome": "Welcome back to Bacura Amal",
+    "welcome": "Welcome back to Bacura A'mal",
     "subtitle": "Log in to access your account, track your requests, and execute projects.",
     "description": "We provide you with a secure and smooth experience to manage your services and execute your projects with confidence."
   },
@@ -522,13 +522,13 @@
     "succeeded": "Payment completed successfully"
   },
   "signup": {
-    "title": "Create a new account at Bacura Aamal",
+    "title": "Create a new account at Bacura A'mal",
     "description1": "Create a new account to access our services, track your requests, and execute your projects.",
     "description2": "We provide you with a secure and smooth experience to manage your services and execute your projects with confidence."
   },
   "signupForm": {
     "welcome": "Welcome to",
-    "appName": "Bacura Amal",
+    "appName": "Bacura A'mal",
     "haveAccount": "Already have an account",
     "login": "Login",
     "title": "Create Account",

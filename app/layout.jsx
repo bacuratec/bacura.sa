@@ -9,7 +9,7 @@ const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME || new Date().toISOString()
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const metadata = {
-  title: "Bacura Amal - باكورة أعمال",
+  title: "Bacura A'mal - باكورة أعمال",
   description: "منصة رقمية متكاملة تربط بين طالبي الخدمات ومقدمي الخدمات",
   other: {
     "last-update": buildTime,

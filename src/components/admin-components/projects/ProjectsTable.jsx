@@ -25,15 +25,16 @@ const ProjectsTable = ({ stats }) => {
   const PageSize = searchParams.get("PageSize") || 30;
   const OrderStatusLookupId = searchParams.get("OrderStatusLookupId") || "";
   const totalRows = (() => {
-    if (OrderStatusLookupId === "600")
+    // These mappings should ideally come from an API or shared constant
+    if (OrderStatusLookupId === "waiting_approval")
       return stats?.waitingForApprovalOrdersCount || 0;
-    if (OrderStatusLookupId === "601")
+    if (OrderStatusLookupId === "waiting_start")
       return stats?.waitingToStartOrdersCount || 0;
-    if (OrderStatusLookupId === "602") return stats?.ongoingOrdersCount || 0;
-    if (OrderStatusLookupId === "603") return stats?.completedOrdersCount || 0;
-    if (OrderStatusLookupId === "604") return stats?.rejectedOrdersCount || 0;
-    if (OrderStatusLookupId === "605")
-      return stats?.serviceCompletedOrdersCount || 0;
+    if (OrderStatusLookupId === "processing") return stats?.ongoingOrdersCount || 0;
+    if (OrderStatusLookupId === "completed") return stats?.completedOrdersCount || 0;
+    if (OrderStatusLookupId === "rejected") return stats?.rejectedOrdersCount || 0;
+    if (OrderStatusLookupId === "ended")
+      return stats?.serviceCompletedOrdersCount || 0; // Assuming ended = service completed
     return stats?.totalOrdersCount || 0;
   })();
   const {
@@ -87,44 +88,44 @@ const ProjectsTable = ({ stats }) => {
     },
     {
       name: t("projects.waitingApproval"),
-      href: "?OrderStatusLookupId=600",
+      href: "?OrderStatusLookupId=waiting_approval",
       numbers: stats?.waitingForApprovalOrdersCount,
       color: "#B76E00",
     },
     {
       name: t("projects.waitingStart"),
-      href: "?OrderStatusLookupId=601",
+      href: "?OrderStatusLookupId=waiting_start",
       numbers: stats?.waitingToStartOrdersCount,
       color: "#B76E00",
     },
     {
       name: t("projects.processing"),
-      href: "?OrderStatusLookupId=602",
+      href: "?OrderStatusLookupId=processing",
       numbers: stats?.ongoingOrdersCount,
       color: "#b76f21",
     },
 
     {
       name: t("projects.completed"),
-      href: "?OrderStatusLookupId=606",
+      href: "?OrderStatusLookupId=completed",
       numbers: stats?.serviceCompletedOrdersCount,
       color: "#007867",
     },
     {
       name: t("projects.ended"),
-      href: "?OrderStatusLookupId=603",
+      href: "?OrderStatusLookupId=ended",
       numbers: stats?.completedOrdersCount,
       color: "#007867",
     },
     {
       name: t("projects.rejected"),
-      href: "?OrderStatusLookupId=604",
+      href: "?OrderStatusLookupId=rejected",
       numbers: stats?.rejectedOrdersCount,
       color: "#B71D18",
     },
     {
       name: t("projects.expired"),
-      href: "?OrderStatusLookupId=605",
+      href: "?OrderStatusLookupId=expired",
       numbers: stats?.expiredOrdersCount,
       color: "#B71D18",
     },
@@ -135,36 +136,36 @@ const ProjectsTable = ({ stats }) => {
       name: t("projects.orderNumber"),
       cell: (row) => (
         <span className="rounded-lg text-xs text-blue-600 font-normal">
-          {row?.orderNumber}
+          {row?.id ? row.id.substring(0, 8) : "-"}
         </span>
       ),
     },
     {
       name: t("projects.requester"),
-      selector: (row) => row.requester.fullName,
+      selector: (row) => row?.requester?.full_name || "-",
       wrap: true,
     },
     {
       name: t("projects.serviceType"),
       selector: (row) =>
-        lang === "ar" ? row.services[0].titleAr : row.services[0].titleEn,
+        lang === "ar" ? row?.request?.service?.name_ar : row?.request?.service?.name_en,
       wrap: true,
     },
     role === "Requester"
       ? {}
       : {
           name: t("projects.provider"),
-          selector: (row) => row.providers[0]?.fullName,
+          selector: (row) => row?.provider?.full_name || "-",
           wrap: true,
         },
     {
       name: t("projects.startDate"),
-      selector: (row) => dayjs(row.startDate).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) => row?.started_at ? dayjs(row.started_at).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
       name: t("projects.endDate"),
-      selector: (row) => dayjs(row.endDate).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) => row?.completed_at ? dayjs(row.completed_at).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
@@ -173,18 +174,18 @@ const ProjectsTable = ({ stats }) => {
         <span
           className={`px-0 py-1 rounded-lg text-[11px] font-normal
             ${
-              row.orderStatus?.id === 603
+              row.status?.code === 'completed'
                 ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                : row.orderStatus?.id === 602
+                : row.status?.code === 'processing'
                 ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                : row.orderStatus?.id === 605 || row.orderStatus?.id === 604
+                : row.status?.code === 'rejected' || row.status?.code === 'expired'
                 ? "bg-red-100 text-red-700"
-                : row.orderStatus?.id === 601
+                : row.status?.code === 'waiting_start'
                 ? "bg-red-100 text-[#B76E00]"
                 : "bg-gray-100 text-gray-600"
             }`}
         >
-          {lang === "ar" ? row.orderStatus?.nameAr : row.orderStatus?.nameEn}
+          {lang === "ar" ? row?.status?.name_ar : row?.status?.name_en}
         </span>
       ),
       wrap: true,
@@ -234,7 +235,7 @@ const ProjectsTable = ({ stats }) => {
 
   const sortedData = projects
     ? [...projects]?.sort(
-        (a, b) => Number(b?.orderNumber) - Number(a?.orderNumber)
+        (a, b) => new Date(b?.created_at) - new Date(a?.created_at)
       )
     : [];
 

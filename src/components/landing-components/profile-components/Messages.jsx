@@ -3,7 +3,7 @@ import userTest from "../../../assets/images/userTest.png";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-const Mesages = ({ tickets }) => {
+const Messages = ({ tickets }) => {
   const { t } = useTranslation();
 
   const latestTickets = [...(tickets || [])]

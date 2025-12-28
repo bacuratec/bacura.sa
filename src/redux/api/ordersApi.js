@@ -49,16 +49,16 @@ export const ordersApi = createApi({
         }
         return {
           table: "requests",
-        method: "GET",
+          method: "GET",
           filters,
           pagination: {
             page: Number(PageNumber),
             pageSize: Number(PageSize),
           },
           joins: [
-            "requester:requesters(id,name)",
+            "requester:profiles!requests_requester_id_fkey(id,full_name)",
             "service:services(id,name_ar,name_en)",
-            "status:lookup_values(id,name_ar,name_en,code)",
+            "status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
           ],
         };
@@ -72,19 +72,23 @@ export const ordersApi = createApi({
         if (RequestStatus) {
           filters.status_id = RequestStatus;
         }
-        // Get requester_id from user_id
+        // Get requester_id from user_id - assumes RLS handles this filtering if we don't pass id, or we need to pass it?
+        // Supabase query usually uses auth.uid() automatically for RLS, but if we want to filter by requester_id column explicitly:
+        // However, `requests` table has `requester_id`. If `getUserOrders` is called with userId, we should use it.
+        // But here the arguments are pagination and status.
+        // We might rely on RLS or need to pass userId.
         return {
           table: "requests",
-        method: "GET",
+          method: "GET",
           filters,
           pagination: {
             page: Number(PageNumber),
             pageSize: Number(PageSize),
           },
           joins: [
-            "requester:requesters!inner(id,name,user_id)",
+            "requester:profiles!requests_requester_id_fkey(id,full_name,role)",
             "service:services(id,name_ar,name_en)",
-            "status:lookup_values(id,name_ar,name_en,code)",
+            "status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
           ],
         };
@@ -98,9 +102,9 @@ export const ordersApi = createApi({
         method: "GET",
         id,
         joins: [
-          "requester:requesters(id,name,user_id)",
-          "service:services(id,name_ar,name_en,base_price)",
-          "status:lookup_values(id,name_ar,name_en,code)",
+          "requester:profiles!requests_requester_id_fkey(id,full_name,role)",
+          "service:services(id,name_ar,name_en,price)",
+          "status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
         ],
       }),
