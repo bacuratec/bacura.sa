@@ -118,11 +118,13 @@ const LoginForm = () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       // توجيه حسب الدور إلى لوحة التحكم المناسبة
-      if (userRole === "Admin") {
+      const normalizedRole = userRole.toLowerCase();
+      
+      if (normalizedRole === "admin") {
         navigate("/admin", { replace: true });
-      } else if (userRole === "Provider") {
+      } else if (normalizedRole === "provider") {
         navigate("/provider", { replace: true });
-      } else if (userRole === "Requester") {
+      } else if (normalizedRole === "requester") {
         // توجيه طالب الخدمة إلى لوحة التحكم الخاصة به (Profile) أو الصفحة التي جاء منها
         const targetPath = from && from !== "/login" && from !== "/" ? from : "/profile";
         navigate(targetPath, { replace: true });

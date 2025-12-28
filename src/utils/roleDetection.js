@@ -172,9 +172,19 @@ export const detectUserRole = async (user, session) => {
     // تجاهل الخطأ
   }
 
-  // إذا كان المستخدم مسجلاً للدخول ولكن لم يتم العثور على دور (مثلاً تم إنشاؤه عبر CLI بدون metadata)
-  // نفترض أنه "Requester" كدور افتراضي لتمكينه من استخدام المنصة
+  // إذا كان المستخدم مسجلاً للدخول ولكن لم يتم العثور على دور
   if (user && user.aud === "authenticated") {
+    // نحاول إعادة البحث في Requesters مرة أخرى كحل أخير (قد يكون تم إنشاؤه للتو)
+    try {
+      const { data: requester } = await supabase
+        .from("requesters")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+        
+      if (requester) return "Requester";
+    } catch {}
+
     return "Requester";
   }
 
