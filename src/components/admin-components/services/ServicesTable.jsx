@@ -156,7 +156,7 @@ const ServicesTable = () => {
         <div className="flex gap-2">
           <Link
             href={`/admin/services/${row.id}/edit`}
-            className="bg-blue-500 text-white px-1 py-1 rounded-md text-xs hover:bg-blue-600 transition"
+            className="btn btn-blue px-2 py-1 text-xs"
             title={t("services.editService") || "تعديل الخدمة"}
           >
             <Edit />
@@ -164,7 +164,7 @@ const ServicesTable = () => {
           {row?.price && (
             <button
               onClick={() => handleEdit(row)}
-              className="bg-yellow-500 text-white px-1 py-1 rounded-md text-xs hover:bg-yellow-600 transition"
+              className="btn btn-yellow px-2 py-1 text-xs"
               title={t("services.editPrice") || "تعديل السعر"}
             >
               <Edit />
@@ -172,7 +172,7 @@ const ServicesTable = () => {
           )}
           <button
             onClick={() => askToDelete(row.id)}
-            className="bg-red-500 text-white px-1 py-1 rounded-lg hover:bg-red-600 transition text-xs font-medium"
+            className="btn btn-danger px-2 py-1 text-xs font-medium"
             title={t("services.delete") || "حذف"}
           >
             <Trash width={15} />
@@ -196,7 +196,7 @@ const ServicesTable = () => {
               </h2>
               <Link
                 href="/admin/add-service"
-                className="flex items-center gap-2 bg-primary text-white py-2 px-4 rounded-lg text-sm md:text-base font-medium hover:bg-primary/90 transition"
+                className="btn btn-primary text-sm md:text-base"
               >
                 <PlusIcon className="w-4 h-4" />{" "}
                 {t("services.addService") || "إضافة خدمة"}

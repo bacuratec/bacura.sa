@@ -16,6 +16,9 @@ const OurServices = ({ data }) => {
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-snug lg:leading-[60px] lg:basis-[40%]">
             {t("services.title")}
           </h2>
+          <p className="mt-3 text-sm text-gray-600 lg:basis-[50%] rtl:text-right ltr:text-left">
+            {t("services.description")}
+          </p>
         </div>
 
         {/* قائمة الخدمات */}

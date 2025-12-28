@@ -49,3 +49,48 @@ a {
     color-scheme: dark;
   }
 }
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  button {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-blue-400;
+  }
+  input, textarea, select {
+    @apply outline-none focus:ring-2 focus:ring-blue-400;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition shadow-btn;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary/90 disabled:opacity-60;
+  }
+  .btn-blue {
+    @apply bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-60;
+  }
+  .btn-yellow {
+    @apply bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-60;
+  }
+  .btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600 disabled:opacity-60;
+  }
+  .btn-ghost {
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-60;
+  }
+  .input {
+    @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm;
+  }
+  .input-search {
+    @apply pr-10;
+  }
+  .card {
+    @apply rounded-2xl bg-white p-5 shadow-custom;
+  }
+  .modal {
+    @apply bg-white rounded-xl p-6 shadow-lg;
+  }
+}

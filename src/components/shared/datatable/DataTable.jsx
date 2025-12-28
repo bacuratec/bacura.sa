@@ -96,7 +96,7 @@ const CustomDataTable = ({
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border border-gray-300 rounded-xl px-4 pl-10 py-2 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+            className="input input-search rounded-xl pl-10 w-full max-w-md"
           />
           <div className="relative rtl:left-10 ltr:right-10 top-2">
             <img src={searchIcon} alt="" />
@@ -144,6 +144,13 @@ const CustomDataTable = ({
         responsive
         selectableRows
         customStyles={customStyles}
+        noDataComponent={
+          <div className="py-10 text-center w-full">
+            <p className="mt-2 text-sm text-gray-500">
+              {t("noData") || "لا توجد بيانات"}
+            </p>
+          </div>
+        }
         paginationServer // 👈 مهم جدًا: عشان البيانات server-side
         paginationTotalRows={totalRows} // 👈 اجمالي عدد العناصر
         paginationDefaultPage={parseInt(defaultPage)} // 👈 رقم الصفحة من props
