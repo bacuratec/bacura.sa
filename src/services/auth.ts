@@ -1,11 +1,11 @@
 import { supabase } from '@/lib/supabase'
-import type { User, AuthError } from '@supabase/supabase-js'
+import type { User, AuthError, PostgrestError } from '@supabase/supabase-js'
 import type { Profile } from '@/lib/supabase'
 
 export interface AuthResponse {
   user: User | null
   profile: Profile | null
-  error: AuthError | null
+  error: AuthError | PostgrestError | null
 }
 
 export interface LoginCredentials {
@@ -128,7 +128,7 @@ class AuthService {
     }
   }
 
-  async updateProfile(profileId: string, updates: Partial<Profile>): Promise<{ profile: Profile | null; error: AuthError | null }> {
+  async updateProfile(profileId: string, updates: Partial<Profile>): Promise<{ profile: Profile | null; error: AuthError | PostgrestError | null }> {
     try {
       const { data, error } = await supabase
         .from('profiles')

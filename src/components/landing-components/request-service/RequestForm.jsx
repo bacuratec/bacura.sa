@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import fileUpload from "../../../assets/icons/fileUpload.svg";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   useCreateOrderMutation,
   useCreateOrderPricedMutation,
@@ -15,7 +15,6 @@ import { LanguageContext } from "@/context/LanguageContext";
 import { createAttachmentGroupKey, uploadAttachmentsToStorage } from "@/utils/attachmentUtils";
 
 const RequestForm = ({ services }) => {
-  const pathname = usePathname();
   const router = useRouter();
   const itemId = null;
 
@@ -42,7 +41,6 @@ const RequestForm = ({ services }) => {
 
   const userId = useSelector((state) => state.auth.userId);
   const [selectedFiles, setSelectedFiles] = useState(null);
-  const navigate = useNavigate();
   const [createOrder, { isLoading: loadingCreateOrder }] =
     useCreateOrderMutation();
   const [createOrderPriced, { isLoading: loadingCreateOrderPriced }] =

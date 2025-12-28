@@ -23,7 +23,6 @@ const Header = ({ data }) => {
   const { t } = useTranslation(); // 👈 استخدام hook الترجمة
 
   const pathname = usePathname(); // 👈 نجيب اللينك الحالي
-  const location = { pathname }; // Compatibility wrapper if needed, or just use pathname
   const router = useRouter();
   const { token, role } = useSelector((state) => state.auth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);

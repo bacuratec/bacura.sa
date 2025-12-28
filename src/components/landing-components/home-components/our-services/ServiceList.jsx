@@ -9,12 +9,10 @@ import s2 from "../../../../assets/icons/s2.svg";
 import s3 from "../../../../assets/icons/s3.svg";
 import { LanguageContext } from "@/context/LanguageContext";
 import { AppLink } from "../../../../utils/routing";
-import { useSelector } from "react-redux";
 
 const ServiceList = ({ data }) => {
   const icons = [s1, s2, s3];
   const { lang } = useContext(LanguageContext);
-  const userId = useSelector((state) => state.auth.userId);
 
   return (
     <div>

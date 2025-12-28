@@ -7,14 +7,12 @@ import s2 from "../../../../assets/icons/s2.svg";
 import s3 from "../../../../assets/icons/s3.svg";
 import { AppLink } from "../../../../utils/routing";
 import { LanguageContext } from "@/context/LanguageContext";
-import { useSelector } from "react-redux";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const ServiceList = ({ data }) => {
   const { lang } = useContext(LanguageContext);
   const icons = [s1, s2, s3];
-  const userId = useSelector((state) => state.auth.userId);
   const containerRef = useRef(null);
 
   useEffect(() => {

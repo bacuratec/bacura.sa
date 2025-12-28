@@ -56,7 +56,7 @@ const HowItWorkList = () => {
 
   return (
     <div ref={containerRef} className="flex flex-col gap-2">
-      {howItWork?.map((item, i) => (
+      {howItWork?.map((item) => (
         <div
           key={item?.id}
           className="how-it-work-item"

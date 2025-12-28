@@ -58,7 +58,7 @@ export function formatLastUpdate(date, locale = 'ar-SA') {
 
   try {
     return new Intl.DateTimeFormat(locale, options).format(date);
-  } catch (error) {
+  } catch {
     // Fallback to simple format
     try {
       return date.toLocaleDateString(locale, {
@@ -66,7 +66,7 @@ export function formatLastUpdate(date, locale = 'ar-SA') {
         month: 'long',
         day: 'numeric',
       });
-    } catch (e) {
+    } catch {
       return date.toISOString().split('T')[0];
     }
   }
