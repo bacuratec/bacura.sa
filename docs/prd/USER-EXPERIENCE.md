@@ -1,5 +1,5 @@
 # وثيقة تجربة المستخدم (User Experience)
-## منصة باكورة أعمل - Bakora Amal Platform
+## منصة باكورة أعمال - Bakora Amal Platform
 
 ---
 

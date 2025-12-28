@@ -1,4 +1,4 @@
-# توثيق منصة باكورة أعمل - Bakora Amal Platform Documentation
+# توثيق منصة باكورة أعمال - Bakora Amal Platform Documentation
 
 مرحباً بك في توثيق منصة باكورة أعمل. هذا الدليل يحتوي على جميع الوثائق المتعلقة بالمنصة.
 

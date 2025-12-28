@@ -1,5 +1,5 @@
 # وثيقة تصميم واجهة المستخدم وتجربة المستخدم (UI/UX Design)
-## منصة باكورة أعمل - Bakora Amal Platform
+## منصة باكورة أعمال - Bakora Amal Platform
 
 ---
 

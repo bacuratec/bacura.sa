@@ -1,5 +1,5 @@
 # وثيقة الهندسة المعمارية
-## منصة باكورة أعمل - Bakora Amal Platform
+## منصة باكورة أعمال - Bakora Amal Platform
 
 ---
 
