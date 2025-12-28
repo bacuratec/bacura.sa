@@ -10,6 +10,15 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
+  // Safety check for role (Middleware should handle this, but double check)
+  const role = user.user_metadata?.role;
+  if (role === 'Admin') {
+    redirect('/admin');
+  }
+  if (role === 'Provider') {
+    redirect('/provider');
+  }
+
   // Fetch requester details
   const { data: requester } = await supabase
     .from('requesters')
