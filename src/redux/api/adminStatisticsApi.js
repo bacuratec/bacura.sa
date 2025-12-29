@@ -27,28 +27,58 @@ const statisticsBaseQuery = async (args) => {
       }
 
       case "providers": {
-        const [totalProviders, activeProviders] = await Promise.all([
+        const [
+          total,
+          pending,
+          active,
+          blocked,
+          suspended
+        ] = await Promise.all([
           supabase.from("providers").select("id", { count: "exact", head: true }),
-          supabase
-            .from("providers")
-            .select("id", { count: "exact", head: true })
-            .eq("users!providers_user_id_fkey.is_blocked", false),
+          supabase.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 200),
+          supabase.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 201),
+          supabase.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 202),
+          supabase.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 203),
         ]);
+        
         result = {
-          totalProvidersCount: totalProviders.count || 0,
-          activeProvidersCount: activeProviders.count || 0,
-          inactiveProvidersCount: (totalProviders.count || 0) - (activeProviders.count || 0),
+          totalAccountsCount: total.count || 0,
+          pendingAccountsCount: pending.count || 0,
+          activeAccountsCount: active.count || 0,
+          blockedAccountsCount: blocked.count || 0,
+          suspendedAccountsCount: suspended.count || 0,
         };
         break;
       }
 
       case "requests": {
         // Count requests by status
-        const requestsCountResult = await supabase
-          .from("requests")
-          .select("status_id", { count: "exact" });
+        const [
+          total,
+          processing,
+          initialApproval,
+          waitingPayment,
+          rejected,
+          completed,
+          newRequests
+        ] = await Promise.all([
+          supabase.from("requests").select("id", { count: "exact", head: true }),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 500),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 501),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 502),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 503),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 504),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 505),
+        ]);
+
         result = {
-          totalRequests: requestsCountResult.count || 0,
+          totalRequestsCount: total.count || 0,
+          underProcessingRequestsCount: processing.count || 0,
+          initiallyApprovedRequestsCount: initialApproval.count || 0,
+          waitingForPaymentRequestsCount: waitingPayment.count || 0,
+          rejectedRequestsCount: rejected.count || 0,
+          approvedRequestsCount: completed.count || 0,
+          newRequestsCount: newRequests.count || 0,
         };
         break;
       }

@@ -12,12 +12,16 @@ export const providersApi = createApi({
         PageNumber = 1,
         PageSize = 10,
         name = "",
+        AccountStatus = "",
       }) => {
         const filters = {};
         if (name) {
           filters.name = { operator: "ilike", value: `%${name}%` };
         }
-        // AccountStatus would need to be mapped to user.is_blocked
+        if (AccountStatus) {
+          filters.profile_status_id = AccountStatus;
+        }
+        
         return {
           table: "providers",
           method: "GET",
@@ -28,8 +32,9 @@ export const providersApi = createApi({
           },
           joins: [
             "user:users!providers_user_id_fkey(id,email,phone,role,is_blocked)",
-            "entity_type:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
+            "entityType:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
+            "profileStatus:lookup_values!providers_profile_status_id_fkey(id,name_ar,name_en,code)",
           ],
         };
       },

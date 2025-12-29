@@ -22,6 +22,10 @@ const nextConfig = {
         protocol: 'http',
         hostname: '51.112.209.149',
       },
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
     ],
     unoptimized: false,
   },

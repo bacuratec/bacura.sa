@@ -62,18 +62,23 @@ const Partners = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: i * 0.1 }}
                       viewport={{ once: true }}
+                      className="group p-2"
                     >
-                      <div className="relative w-full lg:h-[200px] h-[150px] rounded-xl overflow-hidden shadow-md bg-white border border-gray-200 flex items-center justify-center">
-                        <OptimizedImage
-                          src={normalizeImageSrc(logo?.imageBase64 || logo?.imageUrl || logo?.image_url)}
-                          alt={`brand-logo-${i}`}
-                          fill
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                          className="object-contain p-2"
-                        />
+                      <div className="relative w-full lg:h-[180px] h-[140px] rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-xl transition-all duration-300 flex items-center justify-center p-6">
+                        <div className="relative w-full h-full">
+                          <OptimizedImage
+                            src={normalizeImageSrc(logo?.logo_url || logo?.imageBase64 || logo?.imageUrl || logo?.image_url)}
+                            alt={`brand-logo-${i}`}
+                            fill
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                            className="object-contain transition-transform duration-500 group-hover:scale-110"
+                          />
+                        </div>
                       </div>
                       {logo?.name ? (
-                        <p className="mt-2 text-center text-xs text-gray-600">{logo.name}</p>
+                        <p className="mt-4 text-center text-sm font-semibold text-gray-600 group-hover:text-primary transition-colors duration-300">
+                          {logo.name}
+                        </p>
                       ) : null}
                     </motion.div>
                   </SwiperSlide>

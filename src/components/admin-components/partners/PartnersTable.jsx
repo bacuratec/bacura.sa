@@ -9,6 +9,7 @@ import {
   useGetPartnersQuery,
 } from "../../../redux/api/partnersApi";
 import { useTranslation } from "react-i18next";
+import TableActions from "../../shared/TableActions";
 
 const PartnersTable = () => {
   const { t } = useTranslation();
@@ -76,8 +77,7 @@ const PartnersTable = () => {
         />
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
+      style: { overflow: "visible" },
     },
   ];
 

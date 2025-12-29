@@ -87,7 +87,7 @@ const RequestsTable = ({ stats }) => {
     {
       name: t("request.newRequest"),
       href: "?RequestStatus=505",
-      numbers: stats?.newRequestssCount,
+      numbers: stats?.newRequestsCount,
       color: "#B76E00",
     },
     {
