@@ -207,43 +207,38 @@ const ProvidersTable = ({ stats }) => {
     {
       name: t("providersTable.columns.action") || "الإجراءات",
       cell: (row) => (
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/admin/providers/${row.id}`}
-            className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium text-nowrap"
-            title={t("providers.view") || "عرض"}
-          >
-            <Eye />
-          </Link>
-          <button
-            onClick={() => onApprove(row.id)}
-            className="bg-green-600 text-white px-1 py-1 rounded-lg hover:bg-green-700 transition text-xs font-medium"
-            title={t("providers.approve") || "قبول"}
-          >
-            {t("providers.approve") || "قبول"}
-          </button>
-          <button
-            onClick={() => onReject(row.id)}
-            className="bg-orange-500 text-white px-1 py-1 rounded-lg hover:bg-orange-600 transition text-xs font-medium"
-            title={t("providers.reject") || "رفض"}
-          >
-            {t("providers.reject") || "رفض"}
-          </button>
-          <Link
-            href={`/admin/providers/${row.id}`}
-            className="bg-primary text-white px-1 py-1 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
-            title={t("providers.edit") || "تعديل"}
-          >
-            <Edit width={15} />
-          </Link>
-          <button
-            onClick={() => askToDelete(row.id)}
-            className="bg-red-500 text-white px-1 py-1 rounded-lg hover:bg-red-600 transition text-xs font-medium"
-            title={t("providers.delete") || "حذف"}
-          >
-            <Trash width={15} />
-          </button>
-        </div>
+        <TableActions
+          actions={[
+            {
+              label: t("providers.view") || "عرض",
+              icon: <Eye className="w-4 h-4" />,
+              href: `/admin/providers/${row.id}`,
+            },
+            {
+              label: t("providers.approve") || "قبول",
+              icon: <div className="w-2 h-2 rounded-full bg-green-500 mx-1" />,
+              onClick: () => onApprove(row.id),
+              variant: "success",
+            },
+            {
+              label: t("providers.reject") || "رفض",
+              icon: <div className="w-2 h-2 rounded-full bg-orange-500 mx-1" />,
+              onClick: () => onReject(row.id),
+              variant: "destructive",
+            },
+            {
+              label: t("providers.edit") || "تعديل",
+              icon: <Edit className="w-4 h-4" />,
+              href: `/admin/providers/${row.id}`,
+            },
+            {
+              label: t("providers.delete") || "حذف",
+              icon: <Trash className="w-4 h-4" />,
+              onClick: () => askToDelete(row.id),
+              variant: "destructive",
+            },
+          ]}
+        />
       ),
       ignoreRowClick: true,
       allowOverflow: true,

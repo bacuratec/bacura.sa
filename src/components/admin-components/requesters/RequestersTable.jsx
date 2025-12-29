@@ -15,6 +15,7 @@ import { LanguageContext } from "@/context/LanguageContext";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
 import { useApproveProfileMutation, useRejectProfileMutation } from "@/redux/api/adminProfilesApi";
+import TableActions from "../../shared/TableActions";
 
 const RequestersTable = ({ stats }) => {
   const { t } = useTranslation();

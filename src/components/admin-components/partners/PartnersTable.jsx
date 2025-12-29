@@ -59,20 +59,21 @@ const PartnersTable = () => {
     {
       name: t("partners.actions"),
       cell: (row) => (
-        <div className="flex items-center gap-3">
-          <Link
-            to={`/admin/update-partner/${row.id}`}
-            className="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
-          >
-            <Edit width={15} />
-          </Link>
-          <button
-            onClick={() => askToDelete(row.id)}
-            className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition text-xs font-medium"
-          >
-            <Trash width={15} />
-          </button>
-        </div>
+        <TableActions
+          actions={[
+            {
+              label: t("partners.edit") || "تعديل",
+              icon: <Edit className="w-4 h-4" />,
+              href: `/admin/update-partner/${row.id}`,
+            },
+            {
+              label: t("partners.delete") || "حذف",
+              icon: <Trash className="w-4 h-4" />,
+              onClick: () => askToDelete(row.id),
+              variant: "destructive",
+            },
+          ]}
+        />
       ),
       ignoreRowClick: true,
       allowOverflow: true,

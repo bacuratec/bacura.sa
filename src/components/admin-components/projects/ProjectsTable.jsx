@@ -151,13 +151,15 @@ const ProjectsTable = ({ stats }) => {
         lang === "ar" ? row?.request?.service?.name_ar : row?.request?.service?.name_en,
       wrap: true,
     },
-    role === "Requester"
-      ? {}
-      : {
-          name: t("projects.provider"),
-          selector: (row) => row?.provider?.name || "-",
-          wrap: true,
-        },
+    ...(role !== "Requester"
+      ? [
+          {
+            name: t("projects.provider"),
+            selector: (row) => row?.provider?.name || "-",
+            wrap: true,
+          },
+        ]
+      : []),
     {
       name: t("projects.startDate"),
       selector: (row) => row?.started_at ? dayjs(row.started_at).format("DD/MM/YYYY hh:mm A") : "-",
