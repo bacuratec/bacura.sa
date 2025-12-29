@@ -35,7 +35,7 @@ export default function NotificationsModal({ open, setOpen }) {
   useEffect(() => {
     if (open && data.length > 0) {
       const unseenIds = data
-        .filter((notification) => !notification.seen)
+        .filter((notification) => !notification.is_seen)
         .map((n) => n.id);
 
       if (unseenIds.length > 0) {
@@ -83,16 +83,16 @@ export default function NotificationsModal({ open, setOpen }) {
                       <div
                         key={idx}
                         className={`p-3 rounded-md border ${
-                          !notification.seen
+                          !notification.is_seen
                             ? "bg-primary/10 border-primary/30"
                             : "bg-gray-100 border-gray-200"
                         }`}
                       >
                         <h3 className="text-sm font-bold text-gray-800 mb-1">
-                          {notification.header}
+                          {notification.title}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {notification.message}
+                          {notification.body}
                         </p>
                       </div>
                     ))}

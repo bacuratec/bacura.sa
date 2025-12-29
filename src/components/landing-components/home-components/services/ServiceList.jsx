@@ -10,10 +10,13 @@ import { LanguageContext } from "@/context/LanguageContext";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const ServiceList = ({ data }) => {
+import { SkeletonCard } from "../../../shared/skeletons/Skeleton";
+
+const ServiceList = ({ data, isLoading }) => {
   const { lang } = useContext(LanguageContext);
   const icons = [s1, s2, s3];
   const containerRef = useRef(null);
+
   const items = useMemo(() => {
     if (!Array.isArray(data)) return [];
     return data.map((item, idx) => {
@@ -61,6 +64,18 @@ const ServiceList = ({ data }) => {
 
     return () => ctx.revert();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="container">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef}>

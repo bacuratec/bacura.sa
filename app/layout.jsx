@@ -11,6 +11,11 @@ const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME || new Date().toISOString()
 export const metadata = {
   title: "Bacura A'mal - باكورة أعمال",
   description: "منصة رقمية متكاملة تربط بين طالبي الخدمات ومقدمي الخدمات",
+  icons: {
+    icon: "/vite.png",
+    shortcut: "/vite.png",
+    apple: "/vite.png",
+  },
   other: {
     "last-update": buildTime,
     "app-version": process.env.npm_package_version || "1.0.0",
@@ -20,11 +25,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head />
       <body className={inter.className}>
         <script
           dangerouslySetInnerHTML={{
-            __html:
-              `try{var l=localStorage.getItem('lang')||'ar';var d=l==='ar'?'rtl':'ltr';var h=document.documentElement;h&&h.setAttribute('lang',l);h&&h.setAttribute('dir',d);}catch(e){}`,
+            __html: `try{var l=localStorage.getItem('lang')||'ar';var d=l==='ar'?'rtl':'ltr';var h=document.documentElement;h&&h.setAttribute('lang',l);h&&h.setAttribute('dir',d);}catch(e){}`,
           }}
         />
         <script
@@ -37,4 +42,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

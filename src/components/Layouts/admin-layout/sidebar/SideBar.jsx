@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getAppBaseUrl } from "../../../../utils/env";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const SideBar = ({ data }) => {
   const { t } = useTranslation();
@@ -90,10 +92,18 @@ const SideBar = ({ data }) => {
     ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
     : logo;
 
+  const [collapsed, setCollapsed] = useState(false);
   return (
-    <aside className="min-h-screen fixed w-[260px] bg-primary top-0 right-0 hidden lg:flex flex-col justify-between shadow-2xl z-50">
-      <div className="logo p-6 flex justify-center border-b border-white/10">
-        <img src={logo} alt="Bacura" className="h-12 w-auto object-contain" />
+    <aside className={`min-h-screen fixed ${collapsed ? "w-[88px]" : "w-[260px]"} bg-white border-r border-gray-200 top-0 right-0 hidden lg:flex flex-col justify-between shadow-sm z-50`}>
+      <div className="logo p-4 flex items-center justify-between border-b border-gray-200 bg-white">
+        <img src={logo} alt="Bacura" className={collapsed ? "h-8 w-8 object-contain" : "h-12 w-auto object-contain"} />
+        <button
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="rounded-md p-2 hover:bg-gray-100 text-gray-700"
+          onClick={() => setCollapsed((c) => !c)}
+        >
+          {collapsed ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+        </button>
       </div>
       
       <nav className="flex-1 overflow-y-auto py-6 sidebar-scroll">
@@ -109,20 +119,21 @@ const SideBar = ({ data }) => {
               <li key={i}>
                 <Link
                   href={item.href}
+                  aria-current={isActive ? "page" : undefined}
                   className={`group flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-300 ${
                     isActive
-                      ? "bg-white text-primary shadow-lg translate-x-[-5px]"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                      ? "bg-gray-100 text-primary shadow-sm translate-x-[-3px]"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-primary"
                   }`}
                 >
-                  <Icon 
-                    size={22} 
-                    className={`transition-colors duration-300 ${
-                      isActive ? "text-primary" : "text-white/80 group-hover:text-white"
-                    }`}
-                    strokeWidth={1.5}
-                  />
-                  <span className="font-medium text-sm whitespace-nowrap">{item.name}</span>
+                <Icon 
+                  size={22} 
+                  className={`transition-colors duration-300 ${
+                      isActive ? "text-primary" : "text-gray-500 group-hover:text-primary"
+                  }`}
+                  strokeWidth={1.5}
+                />
+                  {!collapsed && <span className="font-medium text-sm whitespace-nowrap truncate">{item.name}</span>}
                   
                   {isActive && (
                     <div className="mr-auto w-1.5 h-1.5 rounded-full bg-primary" />
@@ -135,17 +146,19 @@ const SideBar = ({ data }) => {
       </nav>
       
       <div
-        className="info flex items-center gap-3 px-6 py-6 bg-black/10 backdrop-blur-sm"
+        className="info flex items-center gap-3 px-6 py-6 border-t border-gray-200 bg-white"
       >
-        <div className="rounded-full w-10 h-10 overflow-hidden border-2 border-white/30 shadow-sm">
+        <div className="rounded-full w-10 h-10 overflow-hidden border-2 border-gray-200 shadow-sm">
           <img src={imageUrl} alt="" className="w-full h-full object-cover" />
         </div>
-        <Link href={"/admin/profile"} className="content text-white flex-1 min-w-0">
-          <h3 className="font-medium text-sm truncate">{data?.fullName || "Admin User"}</h3>
-          <span className="text-xs text-white/60 block truncate">
-            {t("nav.admin")}
-          </span>
-        </Link>
+        {!collapsed && (
+          <Link href={"/admin/profile"} className="content text-gray-700 flex-1 min-w-0">
+            <h3 className="font-medium text-sm truncate">{data?.fullName || "Admin User"}</h3>
+            <span className="text-xs text-gray-500 block truncate">
+              {t("nav.admin")}
+            </span>
+          </Link>
+        )}
       </div>
     </aside>
   );

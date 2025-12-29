@@ -42,8 +42,7 @@ export default function AdminDbStatusPage() {
         if (!mounted) return;
         setError(e?.message || "Failed to load metrics");
       } finally {
-        if (!mounted) return;
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     load();

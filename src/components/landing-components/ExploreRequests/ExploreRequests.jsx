@@ -15,17 +15,14 @@ import CustomDataTable from "../../shared/datatable/DataTable";
 import { useGetUserOrdersQuery } from "../../../redux/api/ordersApi";
 import dayjs from "dayjs";
 
+import { TablePageSkeleton } from "../../shared/skeletons/PageSkeleton";
+
 const ExploreRequests = ({ stats }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
   const searchParams = useSearchParams();
-  // استخراج القيم من الـ URL
-  const PageNumber = searchParams.get("PageNumber") || 1;
-  const PageSize = searchParams.get("PageSize") || 30;
-  const RequestStatus = searchParams.get("RequestStatus") || "";
-  const CityId = searchParams.get("CityId") || "";
-  const ServiceId = searchParams.get("ServiceId") || "";
+  // ... existing code ...
 
   const {
     data: orders,
@@ -104,6 +101,10 @@ const ExploreRequests = ({ stats }) => {
     refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [PageNumber, PageSize, RequestStatus]);
+
+  if (isLoading) {
+    return <TablePageSkeleton />;
+  }
 
   const tabs = [
     {

@@ -20,9 +20,9 @@ const RequestServiceContent = ({ services }) => {
   return (
     <div className="relative min-h-screen mb-20">
       <title>{t("headerLanding.requestService")}</title>
-      <div className="absolute top-0 left-0 w-full z-10 h-screen lg:h-[60vh] bg-primary py-20"></div>
+      <div className="absolute top-0 left-0 w-full z-10 h-screen lg:h-[60vh] bg-bgSlide py-20"></div>
       <div className="container">
-        <div className=" relative z-20 flex lg:flex-row flex-col-reverse gap-3 text-white pt-6 sm:pt-8 md:pt-10 lg:pt-16 xl:pt-20">
+        <div className=" relative z-20 flex lg:flex-row flex-col-reverse gap-3 text-gray-800 pt-6 sm:pt-8 md:pt-10 lg:pt-16 xl:pt-20">
           <RequestForm services={services} />
           <RequestContent />
         </div>

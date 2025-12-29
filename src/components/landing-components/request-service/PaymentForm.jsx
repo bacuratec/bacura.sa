@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import { useCreatePaymentMutation } from "../../../redux/api/paymentApi";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { LanguageContext } from "@/context/LanguageContext";
 
 const stripePublishableKey = 
   (typeof process !== "undefined" ? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY : null) ||
@@ -20,6 +21,7 @@ const stripePromise = stripePublishableKey && stripePublishableKey.trim()
 
 export default function PaymentForm({ amount, consultationId, refetch }) {
   const { t } = useTranslation();
+  const { lang } = useContext(LanguageContext);
   const [clientSecret, setClientSecret] = useState("");
   const [paymentId, setPaymentId] = useState(null); // Store DB Payment ID
   const [createPayment, { isLoading, error }] = useCreatePaymentMutation();
@@ -88,6 +90,7 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
   const options = {
     clientSecret,
     appearance,
+    locale: lang === "ar" ? "ar" : "en",
   };
 
   return clientSecret ? (

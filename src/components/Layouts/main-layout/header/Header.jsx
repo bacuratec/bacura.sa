@@ -40,7 +40,7 @@ const Header = ({ data }) => {
     skip: !token,
   });
   const unseenNotifications =
-    notificationsData?.filter((notification) => notification.seen === false) ||
+    notificationsData?.filter((notification) => notification.is_seen === false) ||
     [];
   const dispatch = useDispatch();
   const imageUrl = data?.profilePictureUrl

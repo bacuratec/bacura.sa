@@ -1,69 +1,3 @@
-// import {
-//   useStripe,
-//   useElements,
-//   PaymentElement,
-// } from "@stripe/react-stripe-js";
-// import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import toast from "react-hot-toast";
-// import { useCreateOrderMutation } from "../../../redux/api/ordersApi";
-
-// export default function CheckoutForm({ payload }) {
-//   const stripe = useStripe();
-//   const elements = useElements();
-//   const [loading, setLoading] = useState(false);
-//   const [message, setMessage] = useState("");
-//   const navigate = useNavigate();
-//   const [createOrder] = useCreateOrderMutation();
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!stripe || !elements) return;
-//     setLoading(true);
-
-//     const { error, paymentIntent } = await stripe.confirmPayment({
-//       elements,
-//       confirmParams: { return_url: window.location.href },
-//       redirect: "if_required",
-//     });
-
-//     if (error) {
-//       setMessage(error.message);
-//       setLoading(false);
-//       return;
-//     }
-
-//     if (paymentIntent?.status === "succeeded") {
-//       setMessage("تم الدفع بنجاح");
-
-//       try {
-//         await createOrder(payload).unwrap();
-//         toast.success("تم الدفع وإنشاء الطلب بنجاح");
-//         navigate("/login");
-//       } catch (err) {
-//         console.error("فشل في إنشاء الأوردر:", err);
-//         toast.error("تم الدفع ولكن فشل إنشاء الطلب، راجع الدعم");
-//       }
-//     }
-
-//     setLoading(false);
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit}>
-//       <PaymentElement />
-//       <button
-//         type="submit"
-//         disabled={loading || !stripe || !elements}
-//         className="bg-green-600 text-white px-4 py-2 mt-4 rounded"
-//       >
-//         {loading ? "جاري الدفع..." : "ادفع الآن"}
-//       </button>
-//       {message && <div className="mt-2 text-red-500">{message}</div>}
-//     </form>
-//   );
-// }
-
 import {
   PaymentElement,
   useElements,
@@ -83,8 +17,8 @@ export default function CheckoutForm({ refetch, paymentId }) {
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
-  const navigate = (path) => router.push(path);
   const [updatePaymentStatus] = useUpdatePaymentStatusMutation();
 
   const handleSubmit = async (e) => {
@@ -127,10 +61,12 @@ export default function CheckoutForm({ refetch, paymentId }) {
         }
 
         toast.success(t("payment.success"));
+        setIsSuccess(true); // Show success UI
+        
         if (location?.pathname?.includes("requests/")) {
           refetch();
         }
-        navigate("/"); // غير المسار حسب المطلوب
+        // No auto-redirect, let user see the success message
       } else {
         setMessage(t("payment.notConfirmed"));
       }
@@ -143,17 +79,46 @@ export default function CheckoutForm({ refetch, paymentId }) {
     }
   };
 
+  if (isSuccess) {
+    return (
+      <div className="text-center py-6">
+        <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">{t("payment.succeeded")}</h3>
+        <p className="text-gray-600 mb-6">{t("payment.success")}</p>
+        <button
+          onClick={() => {
+             // If we are on a request page, maybe we just want to reload or scroll up? 
+             // Or simply do nothing as refetch() already happened.
+             // Let's reload the page to be safe and ensure fresh state if needed, or redirect to home if not on request details.
+             if (location?.pathname?.includes("requests/")) {
+               window.location.reload(); 
+             } else {
+               router.push("/");
+             }
+          }}
+          className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition"
+        >
+          {t("continue") || "Continue"}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       <PaymentElement />
       <button
         type="submit"
         disabled={loading || !stripe || !elements}
-        className="bg-green-600 text-white px-4 py-2 mt-4 rounded"
+        className="bg-green-600 text-white px-4 py-2 mt-4 rounded w-full disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? t("payment.processing") : t("payment.payNow")}
       </button>
-      {message && <div className="mt-2 text-red-500">{message}</div>}
+      {message && <div className="mt-2 text-red-500 text-sm">{message}</div>}
     </form>
   );
 }

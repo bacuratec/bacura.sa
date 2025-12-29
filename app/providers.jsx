@@ -27,21 +27,23 @@ export default function Providers({ children }) {
                 toastOptions={{
                   duration: 4000,
                   style: {
-                    background: "#363636",
-                    color: "#fff",
+                    background: "#ffffff",
+                    color: "#1f2937",
+                    border: "1px solid #e5e7eb",
+                    boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
                   },
                   success: {
                     duration: 3000,
                     iconTheme: {
                       primary: "#10b981",
-                      secondary: "#fff",
+                      secondary: "#ffffff",
                     },
                   },
                   error: {
                     duration: 4000,
                     iconTheme: {
                       primary: "#ef4444",
-                      secondary: "#fff",
+                      secondary: "#ffffff",
                     },
                   },
                 }}

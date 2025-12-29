@@ -11,6 +11,8 @@ import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import PaymentForm from "../../../components/landing-components/request-service/PaymentForm";
 
+import { DetailPageSkeleton } from "../../../components/shared/skeletons/PageSkeleton";
+
 const RequestDetails = ({ initialData, id }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
@@ -42,7 +44,7 @@ const RequestDetails = ({ initialData, id }) => {
     window.scrollTo(0, 0);
   }, []);
   if (loadingRequester) {
-    return <LoadingPage />;
+    return <DetailPageSkeleton />;
   }
 
   if (!data) {
