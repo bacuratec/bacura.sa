@@ -10,7 +10,9 @@ const getDefaultLang = () => {
     try {
       const l = window.localStorage && window.localStorage.getItem("lang");
       if (l) return l;
-    } catch {}
+    } catch {
+      // Ignore local storage errors
+    }
   }
   if (typeof process !== "undefined" && process.env) {
     return process.env.NEXT_PUBLIC_DEFAULT_LANG;

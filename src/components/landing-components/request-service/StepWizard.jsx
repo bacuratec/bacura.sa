@@ -1,9 +1,9 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 
-const StepWizard = ({ currentStep, steps, onChangeStep }) => {
-  const { t } = useTranslation();
+const StepWizard = ({ currentStep, steps }) => {
+  // const { t } = useTranslation();
 
   return (
     <div className="w-full mb-8">

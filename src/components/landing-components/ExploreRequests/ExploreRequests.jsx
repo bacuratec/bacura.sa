@@ -68,7 +68,7 @@ const ExploreRequests = ({ stats }) => {
   })();
 
   // Dynamic count that respects CityId/ServiceId filters
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
     const loadCount = async () => {
       try {

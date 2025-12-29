@@ -18,7 +18,9 @@ async function getUserRole() {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options)
           );
-        } catch {}
+        } catch {
+          // Ignore cookie errors
+        }
       },
     },
   });
