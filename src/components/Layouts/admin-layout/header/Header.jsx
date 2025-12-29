@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import NotificationsModal from "../../NotificationsModal";
 import { useGetNotificationsQuery } from "../../../../redux/api/notificationsApi";
 import LanguageDropdown from "../../LanguageDropdown";
+import { seedDemoData } from "../../../../utils/supabase/seedDemoData";
 
 import userImg from "../../../../assets/images/user.jpg";
 import logoutIcon from "../../../../assets/icons/logout.svg";
@@ -61,6 +62,17 @@ const Header = ({ data }) => {
 
           <div className="buttons flex items-center xl:gap-6 lg:gap-4 md:gap-3 sm:gap-2 gap-1">
             <LanguageDropdown />
+            {process.env.NODE_ENV !== "production" && (
+              <button
+                onClick={async () => {
+                  await seedDemoData();
+                }}
+                className="border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm bg-primary/10 hover:bg-primary/20 text-primary"
+                title="Seed demo data"
+              >
+                Seed
+              </button>
+            )}
             <button
               onClick={() => setIsModalOpen(true)}
               className="notification border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
