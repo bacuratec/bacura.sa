@@ -147,7 +147,7 @@ const UploadAdminAttachments = ({ projectData, refetch, onSuccess }) => {
             htmlFor="file-upload"
             className="flex flex-col items-center justify-center border-2 border-dashed border-[#ADADAD] rounded-xl px-4 py-10 cursor-pointer text-center text-[#808080] hover:border-primary transition"
           >
-            <img src={fileUpload} alt="" />
+            <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt="upload" loading="lazy" decoding="async" />
             <span className="text-sm font-normal">
               {t("uploadAdminAttachments.uploadPrompt")}
             </span>

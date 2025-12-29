@@ -66,9 +66,11 @@ const Header = ({ data }) => {
               className="notification border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >
               <img
-                src={notifications}
-                alt=""
+                src={typeof notifications === "string" ? notifications : (notifications?.src || "")}
+                alt={t("header.notifications") || "notifications"}
                 className="w-5 md:w-6 lg:w-auto"
+                loading="lazy"
+                decoding="async"
               />
               <span className="rounded-md bg-primary text-white w-4 h-4 text-[10px] flex items-center justify-center">
                 {unseenNotifications?.length}
@@ -82,7 +84,7 @@ const Header = ({ data }) => {
               className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >
               <span className="hidden sm:inline">{t("header.logout")}</span>
-              <img src={logoutIcon} alt="" className="w-5 md:w-6 lg:w-auto" />
+              <img src={typeof logoutIcon === "string" ? logoutIcon : (logoutIcon?.src || "")} alt={t("header.logout")} className="w-5 md:w-6 lg:w-auto" loading="lazy" decoding="async" />
             </button>
           </div>
           <NotificationsModal open={isModalOpen} setOpen={setIsModalOpen} />

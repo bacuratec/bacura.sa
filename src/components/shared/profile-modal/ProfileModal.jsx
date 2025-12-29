@@ -279,7 +279,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                           className="flex items-center justify-center w-20 h-8 bg-gray-200 rounded-full hover:bg-gray-300"
                           onClick={openCamera}
                         >
-                          <img src={camIcon} alt="camera" />
+                          <img src={typeof camIcon === "string" ? camIcon : (camIcon?.src || "")} alt="camera" loading="lazy" decoding="async" />
                         </button>
                         <label className="flex items-center justify-center w-20 h-8 bg-gray-200 rounded-full hover:bg-gray-300 cursor-pointer">
                           <input
@@ -290,7 +290,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                             }
                             className="hidden"
                           />
-                          <img src={fileIcon} alt="upload" />
+                          <img src={typeof fileIcon === "string" ? fileIcon : (fileIcon?.src || "")} alt="upload" loading="lazy" decoding="async" />
                         </label>
                       </div>
                     </div>
@@ -462,7 +462,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                       htmlFor="file-upload"
                       className="flex flex-col items-center justify-center border-2 border-dashed border-[#ADADAD] rounded-xl px-4 py-10 cursor-pointer text-center text-[#808080] hover:border-primary transition"
                     >
-                      <img src={fileUpload} alt="" />
+                      <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt={t("profile.attachments")} loading="lazy" decoding="async" />
                       <span className="text-sm font-normal">
                         {t("profile.attachments")}
                       </span>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useGetTicketsQuery } from "../../../redux/api/ticketApi";
 import LoadingPage from "../../LoadingPage";
-import logo from "@/assets/images/logo.png";
+const logo = "/vite.png";
 import OptimizedImage from "@/components/shared/OptimizedImage";
 import TicketModal from "../../../components/landing-components/profile-components/TicketModal";
 import { useTranslation } from "react-i18next";

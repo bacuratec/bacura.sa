@@ -80,7 +80,7 @@ const AboutComponent = () => {
               href={"/about-us"}
               className="w-fit flex items-center rounded-3xl border-[1.5px] px-2 sm:px-3 md:px-4 py-1 md:py-2 lg:py-3 mt-6 sm:mt-8 md:mt-10 lg:mt-16 xl:mt-[100px] relative z-20"
             >
-              <img src={more} alt="" />
+              <img src={typeof more === "string" ? more : (more?.src || "")} alt={t("about.more")} loading="lazy" decoding="async" />
               <span className="text-white font-bold text-sm md:text-base xl:text-lg">
                 {t("about.more")}
               </span>

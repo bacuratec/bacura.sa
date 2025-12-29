@@ -140,7 +140,7 @@ const UserData = ({ data, refetch }) => {
                   className="flex items-center gap-2 bg-[#1A71F61F] rounded-2xl px-4 py-2"
                 >
                   <span className="text-primary">{t("user.block")}</span>
-                  <img src={block} alt="" className="w-4 h-4" />
+                  <img src={typeof block === "string" ? block : (block?.src || "")} alt="block" className="w-4 h-4" loading="lazy" decoding="async" />
                 </button>
               ) : (
                 <button
@@ -149,7 +149,7 @@ const UserData = ({ data, refetch }) => {
                   className="flex items-center gap-2 bg-[#1A71F61F] rounded-2xl px-4 py-2"
                 >
                   <span className="text-primary">{t("user.activate")}</span>
-                  <img src={active} alt="" className="w-4 h-4" />
+                  <img src={typeof active === "string" ? active : (active?.src || "")} alt="active" className="w-4 h-4" loading="lazy" decoding="async" />
                 </button>
               )}
             </div>

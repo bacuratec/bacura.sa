@@ -1,4 +1,4 @@
-import logo from "../../../../assets/images/logo.png";
+const logo = "/vite.png";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -64,7 +64,7 @@ const SideBar = ({ data }) => {
   return (
     <aside className={`min-h-screen fixed ${collapsed ? "w-[80px]" : "w-[250px]"} bg-white border-l lg:border-r border-gray-200 top-0 right-0 hidden lg:flex flex-col justify-between`}>
       <div className="logo px-6 py-3 border-b border-gray-200 flex items-center justify-between">
-        <img src={logo} alt="" className={collapsed ? "h-8 w-8 object-contain" : "h-10 w-auto object-contain"} />
+        <img src={typeof logo === "string" ? logo : (logo?.src || "")} alt="" className={collapsed ? "h-8 w-8 object-contain" : "h-10 w-auto object-contain"} />
         <button
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className="rounded-md p-2 hover:bg-gray-100 text-gray-700"
@@ -105,15 +105,11 @@ const SideBar = ({ data }) => {
                     : "hover:text-primary"
                 }`}
               >
-                <img
-                  src={
-                    pathname.includes(item.href)
-                      ? item.iconActive
-                      : item.icon
-                  }
-                  alt={item.name}
-                  className="w-6 h-6"
-                />
+                {(() => {
+                  const iconSrc = pathname.includes(item.href) ? item.iconActive : item.icon;
+                  const src = typeof iconSrc === "string" ? iconSrc : (iconSrc?.src || "");
+                  return <img src={src} alt={item.name} className="w-6 h-6" loading="lazy" decoding="async" />;
+                })()}
                 {!collapsed && <span className="truncate">{item.name}</span>}
                 {!collapsed && item.href === "/provider/our-projects" && typeof providerStats?.totalOrders === "number" && (
                   <span className="ml-auto text-xs rounded-lg px-2 py-0.5 bg-primary/10 text-primary">
@@ -128,7 +124,7 @@ const SideBar = ({ data }) => {
       </nav>
       <div className="info flex items-center gap-2 px-6 py-7 border-t border-gray-200">
         <div className="rounded-full w-8 h-8 overflow-hidden border-2 border-[#D8D8FE]">
-          <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+          <img src={imageUrl} alt="user" className="w-full h-full object-cover" loading="lazy" decoding="async" />
         </div>
         {!collapsed && (
           <Link href={"/provider/profile"} className="content text-gray-700">

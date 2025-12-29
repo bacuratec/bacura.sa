@@ -18,7 +18,15 @@ const DashboardInfo = ({ stats, title }) => {
                 {item?.number}
               </span>
             </div>
-            {item?.ic ? item?.icon : <img src={item?.icon} />}
+            {item?.ic ? item?.icon : (
+              <img
+                src={typeof item?.icon === "string" ? item.icon : (item?.icon?.src || "")}
+                alt={item?.title || "icon"}
+                loading="lazy"
+                decoding="async"
+                className="w-6 h-6"
+              />
+            )}
           </div>
         ))}
       </div>

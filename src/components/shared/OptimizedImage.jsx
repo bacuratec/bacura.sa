@@ -13,15 +13,17 @@ export default function OptimizedImage({
   quality = 75,
   className = "",
 }) {
+  const resolvedSrc =
+    typeof src === "string" ? src : (src?.src || "");
   const isSvg =
-    typeof src === "string" ? src.toLowerCase().endsWith(".svg") : false;
+    typeof resolvedSrc === "string" ? resolvedSrc.toLowerCase().endsWith(".svg") : false;
   if (isSvg) {
-    return <img src={src} alt={alt} className={className} />;
+    return <img src={resolvedSrc} alt={alt} className={className} loading="lazy" decoding="async" />;
   }
   if (fill) {
     return (
       <Image
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         fill
         sizes={sizes || "100vw"}
@@ -33,7 +35,7 @@ export default function OptimizedImage({
   }
   return (
     <Image
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       width={width}
       height={height}

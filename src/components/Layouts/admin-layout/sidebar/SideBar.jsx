@@ -1,4 +1,4 @@
-import logo from "../../../../assets/images/logo.png";
+const logo = "/vite.png";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 

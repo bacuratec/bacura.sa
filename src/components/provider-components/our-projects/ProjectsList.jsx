@@ -109,33 +109,40 @@ const ProjectsList = ({ stats }) => {
     },
     {
       name: t("orders.columns.requester"),
-      selector: (row) => row.requester.fullName,
+      selector: (row) => row?.requester?.fullName || t("unknown") || "-",
       wrap: true,
     },
     {
       name: t("orders.columns.provider"),
-      selector: (row) => row.providers.fullName,
+      selector: (row) => row?.providers?.fullName || t("unknown") || "-",
       wrap: true,
     },
     {
       name: t("projects.serviceType"),
       selector: (row) =>
-        lang === "ar" ? row.services[0].titleAr : row.services[0].titleEn,
+        lang === "ar"
+          ? row?.services?.[0]?.titleAr || "-"
+          : row?.services?.[0]?.titleEn || "-",
       wrap: true,
     },
     {
       name: t("orders.columns.startDate"),
-      selector: (row) => dayjs(row.startDate).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) =>
+        row?.startDate ? dayjs(row.startDate).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
       name: t("orders.columns.endDate"),
-      selector: (row) => dayjs(row.endDate).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) =>
+        row?.endDate ? dayjs(row.endDate).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
       name: t("services.price"),
-      selector: (row) => formatCurrency(row.request?.service?.base_price, lang),
+      selector: (row) => {
+        const amount = row?.request?.service?.base_price;
+        return typeof amount === "number" ? formatCurrency(amount, lang) : "-";
+      },
       wrap: true,
       sortable: true,
     },
@@ -145,18 +152,20 @@ const ProjectsList = ({ stats }) => {
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
               ${
-                row.orderStatus?.id === 603
+                row?.orderStatus?.id === 603
                   ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                  : row.orderStatus?.id === 602
+                  : row?.orderStatus?.id === 602
                   ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                  : row.orderStatus?.id === 605 || row.orderStatus?.id === 604
+                  : row?.orderStatus?.id === 605 || row?.orderStatus?.id === 604
                   ? "bg-red-100 text-red-700"
-                  : row.orderStatus?.id === 601
+                  : row?.orderStatus?.id === 601
                   ? "bg-red-100 text-[#B76E00]"
                   : "bg-gray-100 text-gray-600"
               }`}
         >
-          {lang === "ar" ? row.orderStatus?.nameAr : row.orderStatus?.nameEn}
+          {lang === "ar"
+            ? row?.orderStatus?.nameAr || "-"
+            : row?.orderStatus?.nameEn || "-"}
         </span>
       ),
       wrap: true,

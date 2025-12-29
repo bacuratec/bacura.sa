@@ -83,7 +83,7 @@ const ProfileDetails = () => {
             onClick={() => setOpen(true)}
             className="bg-primary py-2 px-4 rounded-lg text-white font-medium flex items-center gap-2 mr-auto"
           >
-            <img src={edit} alt="edit" className="w-6" />{" "}
+            <img src={typeof edit === "string" ? edit : (edit?.src || "")} alt="edit" className="w-6" loading="lazy" decoding="async" />{" "}
             {t("profile.editData")}
           </button>
         )}

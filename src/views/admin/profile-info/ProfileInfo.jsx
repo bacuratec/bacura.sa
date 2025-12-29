@@ -67,7 +67,7 @@ const SelectedAttachmentCard = ({ file, onRemove }) => {
       </button>
 
       {isPdf ? (
-        <img src={pdfIcon} alt="pdf" className="w-12 h-12 object-contain" />
+        <img src={typeof pdfIcon === "string" ? pdfIcon : (pdfIcon?.src || "")} alt="pdf" className="w-12 h-12 object-contain" loading="lazy" decoding="async" />
       ) : (
         <img
           src={previewUrl}
@@ -158,7 +158,7 @@ const ProfileInfo = () => {
               htmlFor="file-upload"
               className="flex flex-col items-center justify-center border-2 border-dashed border-[#ADADAD] rounded-xl px-4 py-10 cursor-pointer text-center text-[#808080] hover:border-primary transition"
             >
-              <img src={fileUploadImg} alt="upload" className="mb-2 w-20" />
+              <img src={typeof fileUploadImg === "string" ? fileUploadImg : (fileUploadImg?.src || "")} alt="upload" className="mb-2 w-20" loading="lazy" decoding="async" />
               <span className="text-sm font-normal">
                 {t("formRequest.attachmentsPlaceholder")}
               </span>

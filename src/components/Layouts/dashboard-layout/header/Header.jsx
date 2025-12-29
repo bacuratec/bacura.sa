@@ -1,6 +1,6 @@
 "use client";
 
-import userImg from "../../../../assets/images/logo.png";
+const userImg = "/vite.png";
 import logoutIcon from "../../../../assets/icons/logout.svg";
 import notifications from "../../../../assets/icons/notifications.svg";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,9 +31,12 @@ const Header = ({ data }) => {
 
   const dispatch = useDispatch();
 
-  const imageUrl = data?.profilePictureUrl
-    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
-    : userImg;
+  const imageUrl =
+    typeof data?.profilePictureUrl === "string" && data.profilePictureUrl.length > 0
+      ? (data.profilePictureUrl.startsWith("http")
+          ? data.profilePictureUrl
+          : `${getAppBaseUrl()}/${data.profilePictureUrl}`)
+      : (typeof userImg === "string" ? userImg : (userImg?.src || ""));
 
   return (
     <header className="lg:mr-[250px] sticky top-0 right-0 bg-white py-6 border-b-2 border-b-[#E7E7E7] z-[500]">
@@ -67,9 +70,11 @@ const Header = ({ data }) => {
               className="notification border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >
               <img
-                src={notifications}
-                alt=""
+                src={typeof notifications === "string" ? notifications : (notifications?.src || "")}
+                alt={t("header.notifications") || "notifications"}
                 className="w-5 md:w-6 lg:w-auto"
+                loading="lazy"
+                decoding="async"
               />
               <span className="rounded-md bg-primary text-white w-4 h-4 text-[10px] flex items-center justify-center">
                 {unseenNotifications?.length}
@@ -83,7 +88,7 @@ const Header = ({ data }) => {
               className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >
               <span className="hidden sm:inline">{t("header.logout")}</span>
-              <img src={logoutIcon} alt="" className="w-5 md:w-6 lg:w-auto" />
+              <img src={typeof logoutIcon === "string" ? logoutIcon : (logoutIcon?.src || "")} alt={t("header.logout")} className="w-5 md:w-6 lg:w-auto" loading="lazy" decoding="async" />
             </button>
             <NotificationsModal open={isModalOpen} setOpen={setIsModalOpen} />
           </div>

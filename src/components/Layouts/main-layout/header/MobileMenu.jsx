@@ -53,7 +53,7 @@ const MobileMenu = ({
             className="logout border border-[#ccc] rounded-lg gap-1 p-2 font-medium text-sm flex justify-between items-center"
           >
             <span className="inline">{t("mobileMenu.logout")}</span>
-            <img src={logoutIcon} alt="logout" />
+            <img src={typeof logoutIcon === "string" ? logoutIcon : (logoutIcon?.src || "")} alt="logout" loading="lazy" decoding="async" />
           </button>
         </div>
       ) : (

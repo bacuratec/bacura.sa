@@ -115,7 +115,7 @@ const CustomDataTable = ({
             className="input input-search rounded-xl pl-10 w-full max-w-md"
           />
           <div className="relative rtl:left-10 ltr:right-10 top-2">
-            <img src={searchIcon} alt="" />
+            <img src={typeof searchIcon === "string" ? searchIcon : (searchIcon?.src || "")} alt={t("search") || "search"} loading="lazy" decoding="async" />
           </div>
         </div>
       )}

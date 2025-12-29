@@ -369,7 +369,7 @@ const RequestForm = ({ services }) => {
                         className="flex flex-col items-center justify-center border-2 border-dashed border-[#ADADAD] rounded-2xl px-4 py-16 cursor-pointer text-center text-[#808080] hover:border-primary hover:bg-primary/5 transition-all group"
                         >
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-white transition-colors">
-                             <img src={fileUpload} alt="" className="w-8 h-8 opacity-60 group-hover:opacity-100 transition-opacity" />
+                             <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt={t("formRequest.attachmentsLabel")} className="w-8 h-8 opacity-60 group-hover:opacity-100 transition-opacity" loading="lazy" decoding="async" />
                         </div>
                         <span className="text-base font-medium text-gray-700 mb-1">
                             {t("formRequest.clickToUpload") || "اضغط لرفع الملفات"}
