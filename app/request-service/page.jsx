@@ -9,7 +9,7 @@ export default async function RequestServicePage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/login?next=/request-service');
+    redirect('/login?redirect=/request-service');
   }
   
   const { data: services } = await supabase.from('services').select('*').order('created_at', { ascending: true });
