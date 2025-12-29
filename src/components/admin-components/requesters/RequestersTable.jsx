@@ -248,8 +248,7 @@ const RequestersTable = ({ stats }) => {
         </div>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
+      style: { overflow: "visible" },
     },
   ];
 
@@ -268,6 +267,7 @@ const RequestersTable = ({ stats }) => {
               defaultPageSize={PageSize}
               isLoading={isLoading}
               totalRows={totalRows} // 👈 لازم ده عشان الباجينيشن يعرف عدد الصفوف
+              allowOverflow={true}
             />
           </div>
         </div>

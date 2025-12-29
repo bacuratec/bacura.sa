@@ -37,7 +37,7 @@ const ProjectListInfo = ({ data }) => {
     ...(role === "Admin"
       ? [
           { label: t("projects.requester"), value: data.requester?.fullName },
-          { label: t("projects.provider"), value: data.providers[0]?.fullName },
+          { label: t("projects.provider"), value: data.providers?.[0]?.fullName },
         ]
       : [{ label: t("projects.requester"), value: data.requester?.fullName }]),
     {

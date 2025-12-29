@@ -26,6 +26,10 @@ const CustomDataTable = ({
 }) => {
   const { t } = useTranslation();
   const path = useLocation();
+  const tr = (key, fallback) => {
+    const v = t(key);
+    return v === key ? fallback : v;
+  };
 
   const customStyles = {
     tableWrapper: {
@@ -109,13 +113,13 @@ const CustomDataTable = ({
         <div className="relative mb-4 flex justify-center">
           <input
             type="text"
-            placeholder={searchPlaceholder}
+            placeholder={searchPlaceholder || tr("searchPlaceholder", "ابحث...")}
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="input input-search rounded-xl pl-10 w-full max-w-md"
           />
           <div className="relative rtl:left-10 ltr:right-10 top-2">
-            <img src={typeof searchIcon === "string" ? searchIcon : (searchIcon?.src || "")} alt={t("search") || "search"} loading="lazy" decoding="async" />
+            <img src={typeof searchIcon === "string" ? searchIcon : (searchIcon?.src || "")} alt={tr("search", "search")} loading="lazy" decoding="async" />
           </div>
         </div>
       )}
@@ -162,8 +166,8 @@ const CustomDataTable = ({
         customStyles={customStyles}
         noDataComponent={
           <EmptyState 
-            title={t("noData") || "لا توجد بيانات"}
-            description={t("noDataDesc") || "لم يتم العثور على سجلات مطابقة"}
+            title={tr("noData", "لا توجد بيانات")}
+            description={tr("noDataDesc", "لم يتم العثور على سجلات مطابقة")}
             icon={FileQuestion}
             className="w-full py-8"
           />
@@ -178,7 +182,7 @@ const CustomDataTable = ({
         progressComponent={
           <div className="py-10 text-center w-full">
             <span className="loader inline-block w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
-            <p className="mt-2 text-sm text-gray-500">{t("loading")}</p>
+            <p className="mt-2 text-sm text-gray-500">{tr("loading", "جاري التحميل...")}</p>
           </div>
         }
         {...rest}

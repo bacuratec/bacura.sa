@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import { supabase } from "@/lib/supabaseClient";
+import { adminGet, adminUpdate, adminDelete } from "@/utils/adminSupabase";
 import UpdatePriceModal from "./UpdatePriceModal";
 import { useTranslation } from "react-i18next";
 import { Edit, PlusIcon, Trash } from "lucide-react";
@@ -14,20 +15,26 @@ import { formatCurrency } from "@/utils/currency";
 const ServicesTable = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
+  const tr = (key, fallback) => {
+    const v = t(key);
+    return v === key ? fallback : v;
+  };
 
   const [isLoading, setIsLoading] = useState(true);
 
   const [service, setService] = useState("");
   const [openPriceModal, setOpenPriceModal] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const seedAttemptedRef = useRef(false);
 
   const handleUpdatePrice = async (newPrice) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase
-        .from("services")
-        .update({ price: newPrice, updated_at: new Date().toISOString() })
-        .eq("id", service.id);
-      if (error) throw error;
+      await adminUpdate({
+        table: "services",
+        id: service.id,
+        values: { price: newPrice, updated_at: new Date().toISOString() },
+      });
       toast.success(t("services.updatePriceSuccess") || "تم تحديث السعر");
       await refetch();
     } catch (err) {
@@ -48,15 +55,17 @@ const ServicesTable = () => {
   const refetch = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
-        .from("services")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
+      const data = await adminGet({
+        table: "services",
+        select: "*",
+        orderBy: "created_at",
+        orderAsc: false,
+        limit: 500,
+      });
       setLocalData(data || []);
     } catch (err) {
       toast.error(
-        err?.message || t("services.fetchError") || "فشل جلب الخدمات"
+        err?.message || tr("services.fetchError", "فشل جلب الخدمات")
       );
     } finally {
       setIsLoading(false);
@@ -66,10 +75,49 @@ const ServicesTable = () => {
     refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development" && !seeding && !seedAttemptedRef.current) {
+      if (Array.isArray(localData) && localData.length === 0) {
+        seedAttemptedRef.current = true;
+        seedDemo();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localData]);
 
   const handleEdit = (service) => {
     setService(service);
     setOpenPriceModal(true);
+  };
+  
+  const seedDemo = async () => {
+    try {
+      setSeeding(true);
+      const existing = await adminGet({
+        table: "services",
+        select: "id,name_en",
+        orderBy: "created_at",
+        orderAsc: false,
+        limit: 1000,
+      });
+      const names = new Set((existing || []).map((r) => (r?.name_en || "").toLowerCase()));
+      const demo = [
+        { name_ar: "خدمة التصميم الهندسي", name_en: "Engineering Design", price: 2500, image_url: null, is_active: true },
+        { name_ar: "إدارة المشاريع", name_en: "Project Management", price: 0, image_url: null, is_active: true },
+        { name_ar: "استشارات تقنية", name_en: "Technical Consulting", price: 1200, image_url: null, is_active: true },
+        { name_ar: "تحليل الأعمال", name_en: "Business Analysis", price: 1500, image_url: null, is_active: true },
+        { name_ar: "اختبار وضمان الجودة", name_en: "QA & Testing", price: 800, image_url: null, is_active: true },
+      ].filter((s) => !names.has((s.name_en || "").toLowerCase()));
+      for (const s of demo) {
+        await adminInsert({ table: "services", values: { ...s } });
+      }
+      toast.success(tr("services.seedSuccess", "تم إضافة بيانات تجريبية"));
+      await refetch();
+    } catch (e) {
+      toast.error(e?.message || tr("services.seedError", "فشل إضافة البيانات التجريبية"));
+    } finally {
+      setSeeding(false);
+    }
   };
 
   const askToDelete = (id) => {
@@ -82,15 +130,14 @@ const ServicesTable = () => {
 
     try {
       setIsDeleting(true);
-      const { error } = await supabase.from("services").delete().eq("id", selectedId);
-      if (error) throw error;
+      await adminDelete({ table: "services", id: selectedId });
       toast.success(t("services.deleteSuccess") || "تم حذف الخدمة بنجاح");
       setOpenDelete(false);
       setSelectedId(null);
       await refetch();
     } catch (err) {
       toast.error(
-        err?.data?.message || t("services.deleteError") || "فشل حذف الخدمة"
+        err?.data?.message || tr("services.deleteError", "فشل حذف الخدمة")
       );
     } finally {
       setIsDeleting(false);
@@ -105,14 +152,14 @@ const ServicesTable = () => {
 
     try {
       const next = !service.is_active;
-      const { error } = await supabase
-        .from("services")
-        .update({ is_active: next, updated_at: new Date().toISOString() })
-        .eq("id", service.id);
-      if (error) throw error;
+      await adminUpdate({
+        table: "services",
+        id: service.id,
+        values: { is_active: next, updated_at: new Date().toISOString() },
+      });
     } catch (err) {
       toast.error(
-        err?.data?.message || t("services.statusChangeError") || "فشل تغيير الحالة"
+        err?.data?.message || tr("services.statusChangeError", "فشل تغيير الحالة")
       );
 
       // Rollback if API fails
@@ -219,15 +266,25 @@ const ServicesTable = () => {
           <div className="rounded-3xl bg-white p-5">
             <div className="flex justify-between items-center mb-5">
               <h2 className="text-lg font-semibold text-gray-700">
-                {t("services.title") || "الخدمات"}
+                {tr("services.title", "الخدمات")}
               </h2>
-              <Link
-                href="/admin/add-service"
-                className="btn btn-primary text-sm md:text-base"
-              >
-                <PlusIcon className="w-4 h-4" />{" "}
-                {t("services.addService") || "إضافة خدمة"}
-              </Link>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={seedDemo}
+                  disabled={seeding}
+                  className="btn btn-gray text-sm md:text-base"
+                  title={tr("services.addDemoData", "إضافة بيانات تجريبية")}
+                >
+                  {seeding ? tr("services.seeding", "جاري الإضافة...") : tr("services.addDemoData", "إضافة بيانات تجريبية")}
+                </button>
+                <Link
+                  href="/admin/add-service"
+                  className="btn btn-primary text-sm md:text-base"
+                >
+                  <PlusIcon className="w-4 h-4" />{" "}
+                  {tr("services.addService", "إضافة خدمة")}
+                </Link>
+              </div>
             </div>
             <UpdatePriceModal
               open={openPriceModal}
@@ -239,7 +296,7 @@ const ServicesTable = () => {
               columns={columns}
               data={localData}
               searchableFields={["name_ar", "price", "name_en"]}
-              searchPlaceholder={t("searchPlaceholder")}
+              searchPlaceholder={tr("searchPlaceholder", "ابحث...")}
               isLoading={isLoading}
             />
           </div>

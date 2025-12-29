@@ -146,6 +146,18 @@ const LoginForm = () => {
       // Short delay for Redux state update
       await new Promise((resolve) => setTimeout(resolve, 100));
 
+      // Persist role into auth metadata for server-side checks
+      try {
+        const { data: updatedUser, error: updateMetaError } = await supabase.auth.updateUser({
+          data: { role: userRole },
+        });
+        if (updateMetaError) {
+          console.warn("Failed to update user metadata role:", updateMetaError.message);
+        }
+      } catch (e) {
+        console.warn("Error updating user metadata role:", e?.message || e);
+      }
+
       // Redirect based on role
       const normalizedRole = userRole.toLowerCase();
       

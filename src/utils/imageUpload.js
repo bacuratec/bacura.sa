@@ -17,6 +17,10 @@ export const uploadImageToStorage = async (
   folder = "general"
 ) => {
   try {
+    if (!supabase || !supabase.storage) {
+      toast.error("اتصال Supabase غير متاح. تحقق من مفاتيح البيئة.");
+      return null;
+    }
     if (!file) {
       return null;
     }
@@ -41,7 +45,7 @@ export const uploadImageToStorage = async (
     .substring(7)}.${fileExt}`;
 
   // Upload file to Supabase Storage
-  let { error } = await supabase?.storage?.from(bucket).upload(fileName, file, {
+  let { error } = await supabase.storage.from(bucket).upload(fileName, file, {
     cacheControl: "3600",
     upsert: false,
   });
@@ -103,25 +107,34 @@ export const uploadImageToStorage = async (
  * @param {string} bucket - Storage bucket name (default: 'images')
  * @returns {Promise<boolean>} Success status
  */
-export const deleteImageFromStorage = async (
-  imageUrl,
-  bucket = "images"
-) => {
+export const deleteImageFromStorage = async (imageUrl, bucket) => {
   try {
     if (!imageUrl) {
       return true; // No image to delete
     }
 
-    // Extract file path from URL
-    const urlParts = imageUrl.split(`/${bucket}/`);
-    if (urlParts.length < 2) {
-      return false;
+    // Auto-detect bucket and file path if not provided
+    let detectedBucket = bucket;
+    let filePath = null;
+    if (!detectedBucket) {
+      const m = imageUrl.match(/storage\/v1\/object\/(?:public|authenticated|private)\/([^/]+)\/(.+?)(?:\?|$)/);
+      if (m && m[1] && m[2]) {
+        detectedBucket = m[1];
+        filePath = m[2];
+      }
     }
-
-    const filePath = urlParts[1].split("?")[0]; // Remove query params
+    if (!filePath) {
+      const parts = imageUrl.split("/");
+      const bucketIndex = parts.findIndex((p) => p === detectedBucket);
+      if (bucketIndex > -1) {
+        filePath = parts.slice(bucketIndex + 1).join("/");
+        if (filePath.includes("?")) filePath = filePath.split("?")[0];
+      }
+    }
+    if (!detectedBucket || !filePath) return false;
 
     // Delete file from Supabase Storage
-    const { error } = await supabase.storage.from(bucket).remove([filePath]);
+    const { error } = await supabase.storage.from(detectedBucket).remove([filePath]);
 
     if (error) {
       console.error("Delete error:", error);
