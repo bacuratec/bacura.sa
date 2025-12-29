@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Eye } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
+import { formatCurrency } from "@/utils/currency";
 
 const ProjectsList = ({ stats }) => {
   const { t } = useTranslation();
@@ -131,6 +132,12 @@ const ProjectsList = ({ stats }) => {
       name: t("orders.columns.endDate"),
       selector: (row) => dayjs(row.endDate).format("DD/MM/YYYY hh:mm A"),
       wrap: true,
+    },
+    {
+      name: t("services.price"),
+      selector: (row) => formatCurrency(row.request?.service?.base_price, lang),
+      wrap: true,
+      sortable: true,
     },
     {
       name: t("orders.columns.status"),

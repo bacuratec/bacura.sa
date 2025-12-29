@@ -93,7 +93,6 @@ const CustomDataTable = ({
     navigate(`${location?.pathname || ""}?${params.toString()}`);
   };
 
-  const searchParams = useSearchParams();
   const AccountStatus =
     searchParams?.get("AccountStatus") ||
     searchParams?.get("RequestStatus") ||

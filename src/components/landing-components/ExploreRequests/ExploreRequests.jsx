@@ -265,7 +265,7 @@ const ExploreRequests = ({ stats }) => {
                     {lang === "ar" ? c.name_ar : c.name_en}
                   </option>
                 ))
-                }
+                )}
               </select>
             </div>
             <div>
@@ -286,7 +286,7 @@ const ExploreRequests = ({ stats }) => {
                     {lang === "ar" ? s.name_ar : s.name_en}
                   </option>
                 ))
-                }
+                )}
               </select>
             </div>
           </div>

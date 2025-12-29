@@ -82,6 +82,7 @@ const ServiceList = ({ data }) => {
                   description={item.description}
                   price={item.price}
                   isActive={item.isActive}
+                  lang={lang}
                 />
               </div>
             ))}

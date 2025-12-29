@@ -30,7 +30,7 @@ export const projectsApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "request:requests(id,title,description,requester_id, requester:requesters(id,name))",
+            "request:requests(id,title,description,requester_id, requester:requesters(id,name), service:services(base_price))",
             "provider:providers(id,name,specialization)",
             "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
           ],
@@ -66,7 +66,7 @@ export const projectsApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "request:requests(id,title,description,requester_id, requester:requesters(id,name))",
+            "request:requests(id,title,description,requester_id, requester:requesters(id,name), service:services(base_price))",
             "provider:providers(id,name,specialization)",
             "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
           ],

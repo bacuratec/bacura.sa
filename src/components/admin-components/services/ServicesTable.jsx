@@ -15,6 +15,8 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
 
+import { formatCurrency } from "@/utils/currency";
+
 const ServicesTable = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
@@ -124,8 +126,9 @@ const ServicesTable = () => {
     },
     {
       name: t("services.price"),
-      selector: (row) => (row?.price ? `${row.price} ر.س` : "-"),
+      selector: (row) => formatCurrency(row?.price, lang),
       wrap: true,
+      sortable: true,
     },
     {
       name: t("services.status"),

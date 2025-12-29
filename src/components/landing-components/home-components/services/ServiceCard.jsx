@@ -1,7 +1,8 @@
 import React from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
+import { formatCurrency } from "@/utils/currency";
 
-const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive }) => {
+const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive, lang }) => {
   return (
     <div
       title={description}
@@ -11,7 +12,7 @@ const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActiv
         <span className="text-sm sm:text-base text-gray-400">{index}</span>
         {price !== null && price !== undefined ? (
           <span className="inline-flex items-center rounded-lg bg-primary/10 text-primary px-2 py-1 text-xs sm:text-sm">
-            {price} ر.س
+            {formatCurrency(price, lang)}
           </span>
         ) : null}
       </div>

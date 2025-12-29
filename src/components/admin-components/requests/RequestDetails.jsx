@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
+import { formatCurrency } from "@/utils/currency";
 
 const RequestDetails = ({ data }) => {
   const { t } = useTranslation();
@@ -41,7 +42,7 @@ const RequestDetails = ({ data }) => {
               lang === "ar" ? requestStatus?.nameAr : requestStatus?.nameEn
             }
           />
-          <DetailRow label={t("request.price")} value={price} />
+          <DetailRow label={t("request.price")} value={formatCurrency(price, lang)} />
           {pricingNotes && (
             <DetailRow label={t("request.notes")} value={pricingNotes} />
           )}
