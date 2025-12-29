@@ -23,6 +23,12 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <script
           dangerouslySetInnerHTML={{
+            __html:
+              `try{var l=localStorage.getItem('lang')||'ar';var d=l==='ar'?'rtl':'ltr';var h=document.documentElement;h&&h.setAttribute('lang',l);h&&h.setAttribute('dir',d);}catch(e){}`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
             __html: `window.__BUILD_TIME__ = "${buildTime}";`,
           }}
         />

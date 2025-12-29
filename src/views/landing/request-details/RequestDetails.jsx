@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import HeadTitle from "../../../components/admin-components/users-details/HeadTitle";
 import RequestDetailsInfo from "../../../components/admin-components/requests/RequestDetails";
-import { useParams } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";
 import { useGetRequestDetailsQuery } from "../../../redux/api/ordersApi";
@@ -11,19 +11,19 @@ import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import PaymentForm from "../../../components/landing-components/request-service/PaymentForm";
 
-const RequestDetails = ({ initialData }) => {
+const RequestDetails = ({ initialData, id }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
   const [showPayment, setShowPayment] = useState(null);
+  const router = useRouter();
 
-  const params = useParams();
-  const id = initialData?.id || params?.id;
+  const requestId = initialData?.id || id;
 
   const {
     data: requestData,
     refetch: refetchRequesterDetails,
     isLoading: loadingRequester,
-  } = useGetRequestDetailsQuery(id, { skip: !!initialData });
+  } = useGetRequestDetailsQuery(requestId, { skip: !!initialData || !requestId });
 
   const data = initialData || requestData;
 
@@ -53,6 +53,15 @@ const RequestDetails = ({ initialData }) => {
       <title>{t("requestDetails.title")}</title>
       <meta name="description" content={t("request.requestDescription")} />
       <div className="container">
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="text-sm bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-2"
+          >
+            {t("back") || "Back"}
+          </button>
+        </div>
         <HeadTitle
           title={t("requestDetails.title")}
           type={

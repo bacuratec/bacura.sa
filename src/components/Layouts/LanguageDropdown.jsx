@@ -41,7 +41,6 @@ const LanguageDropdown = () => {
                 changeLanguage(language.code);
                 setLang(language.code);
                 setOpen(false);
-                window.location.reload(); // ✅ reload بعد تغيير اللغة
               }}
               className={`flex items-center w-full gap-2 px-4 py-2 text-sm hover:bg-gray-100 ${
                 lang === language.code ? "bg-gray-100 font-bold" : ""

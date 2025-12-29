@@ -5,8 +5,13 @@ import { initReactI18next } from "react-i18next";
 import translationsEN from "../locales/en.json";
 import translationsAR from "../locales/ar.json";
 
-// Get default language from environment variables (support both Vite and Next.js)
 const getDefaultLang = () => {
+  if (typeof window !== "undefined") {
+    try {
+      const l = window.localStorage && window.localStorage.getItem("lang");
+      if (l) return l;
+    } catch {}
+  }
   if (typeof process !== "undefined" && process.env) {
     return process.env.NEXT_PUBLIC_DEFAULT_LANG;
   }

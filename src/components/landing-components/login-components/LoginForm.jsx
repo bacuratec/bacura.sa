@@ -41,10 +41,24 @@ const LoginForm = () => {
     setLoading(true);
     try {
       if (typeof navigator !== "undefined" && !navigator.onLine) {
-        toast.error(t("loginForm.errors.network") || "انقطع الاتصال بالشبكة. حاول لاحقاً.");
+        toast.error(t("loginForm.errors.network"));
         setLoading(false);
         return;
       }
+
+      const mapErrorKey = (message) => {
+        const msg = (message || "").toLowerCase();
+        if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+          return "loginForm.errors.invalidCredentials";
+        }
+        if (msg.includes("network")) {
+          return "loginForm.errors.network";
+        }
+        if (msg.includes("timeout")) {
+          return "loginForm.errors.timeout";
+        }
+        return "loginForm.errors.unknownError";
+      };
 
       const attempt = async () => {
         return await supabase.auth.signInWithPassword({
@@ -69,9 +83,8 @@ const LoginForm = () => {
       }
 
       if (error) {
-        toast.error(
-          error.message || t("loginForm.errors.invalidCredentials")
-        );
+        const key = mapErrorKey(error.message);
+        toast.error(t(key));
         setLoading(false);
         return;
       }
@@ -100,10 +113,7 @@ const LoginForm = () => {
         });
 
         if (setSessionError) {
-          toast.error(
-            t("loginForm.errors.sessionError") ||
-              "فشل في تعيين جلسة المستخدم. يرجى المحاولة مرة أخرى."
-          );
+          toast.error(t("loginForm.errors.sessionError"));
           setLoading(false);
           return;
         }
@@ -119,11 +129,7 @@ const LoginForm = () => {
       const userRole = await Promise.race([userRolePromise, timeoutPromise]);
 
       if (!userRole) {
-        toast.error(
-          t("loginForm.errors.roleNotFound") ||
-            `فشل في تحديد صلاحيات المستخدم. قد يكون هناك بطء في الشبكة أو مشكلة في الصلاحيات.`,
-          { duration: 5000 }
-        );
+        toast.error(t("loginForm.errors.roleNotFound"), { duration: 5000 });
         setLoading(false);
         return;
       }
@@ -151,10 +157,7 @@ const LoginForm = () => {
         const targetPath = from && from !== "/login" && from !== "/" ? from : "/profile";
         router.replace(targetPath);
       } else {
-        toast.warning(
-          t("loginForm.errors.unknownRole") ||
-            "دور المستخدم غير معروف. سيتم توجيهك للصفحة الرئيسية."
-        );
+        toast.warning(t("loginForm.errors.unknownRole"));
         router.replace("/");
       }
     } catch (err) {

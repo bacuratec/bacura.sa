@@ -67,10 +67,16 @@ export const ordersApi = createApi({
     }),
     // Get User Requests (Requester)
     getUserOrders: builder.query({
-      query: ({ PageNumber = 1, PageSize = 10, RequestStatus = "" }) => {
+      query: ({ PageNumber = 1, PageSize = 10, RequestStatus = "", CityId = "", ServiceId = "" }) => {
         const filters = {};
         if (RequestStatus) {
           filters.status_id = RequestStatus;
+        }
+        if (CityId) {
+          filters.city_id = CityId;
+        }
+        if (ServiceId) {
+          filters.service_id = ServiceId;
         }
         // Get requester_id from user_id - assumes RLS handles this filtering if we don't pass id, or we need to pass it?
         // Supabase query usually uses auth.uid() automatically for RLS, but if we want to filter by requester_id column explicitly:

@@ -380,6 +380,15 @@
     "password": "Password",
     "loginButton": "Login",
     "loggingIn": "Logging in...",
+    "errors": {
+      "network": "Network connection lost. Please try again later.",
+      "invalidCredentials": "Invalid email or password",
+      "timeout": "Request timed out. Please retry.",
+      "unknownError": "An unknown error occurred. Please try again.",
+      "sessionError": "Failed to establish user session. Please try again.",
+      "roleNotFound": "Failed to determine user role. Please try again.",
+      "unknownRole": "Unknown user role. Redirecting to home."
+    },
     "validation": {
       "invalidEmail": "Invalid email address",
       "required": "Required",
@@ -519,7 +528,8 @@
     "payNow": "Pay Now",
     "failed": "Order creation or payment failed",
     "notConfirmed": "Payment not confirmed yet.",
-    "succeeded": "Payment completed successfully"
+    "succeeded": "Payment completed successfully",
+    "stripeError": "An error occurred creating the payment intent"
   },
   "signup": {
     "title": "Create a new account at Bacura A'mal",
@@ -933,5 +943,10 @@
     "deleting": "Deleting...",
     "uploading": "Uploading...",
     "processing": "Processing..."
-  }
+  },
+  "city": "City",
+  "all": "All",
+  "clearFilters": "Clear Filters",
+  "back": "Back",
+  "error": "An error occurred"
 }

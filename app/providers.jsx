@@ -11,6 +11,7 @@ import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import BackToTopButton from "@/components/BackTop";
 import AuthInitializer from "@/components/AuthInitializer";
+import DirManager from "@/components/shared/DirManager";
 
 export default function Providers({ children }) {
   return (
@@ -19,6 +20,7 @@ export default function Providers({ children }) {
         <LanguageProvider>
           <StoreProvider>
             <AuthInitializer>
+              <DirManager />
               <Toaster
                 position="top-center"
                 reverseOrder={false}
