@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
  */
 export const uploadImageToStorage = async (
   file,
-  bucket = "images",
+  bucket = process.env.NEXT_PUBLIC_SUPABASE_IMAGES_BUCKET || "images",
   folder = "general"
 ) => {
   try {
@@ -41,7 +41,7 @@ export const uploadImageToStorage = async (
     .substring(7)}.${fileExt}`;
 
   // Upload file to Supabase Storage
-  let { error } = await supabase.storage.from(bucket).upload(fileName, file, {
+  let { error } = await supabase?.storage?.from(bucket).upload(fileName, file, {
     cacheControl: "3600",
     upsert: false,
   });
@@ -50,31 +50,38 @@ export const uploadImageToStorage = async (
     const msg = (error?.message || "").toLowerCase();
     const isBucketMissing =
       msg.includes("bucket") && msg.includes("not found");
-    if (isBucketMissing) {
-      const fallbackBucket = "attachments";
-      const fallbackPath = `services/${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(7)}.${fileExt}`;
-      const retry = await supabase.storage
-        .from(fallbackBucket)
-        .upload(fallbackPath, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-      if (retry.error) {
-        console.error("Upload error:", retry.error);
-        toast.error("فشل رفع الصورة: " + retry.error.message);
-        return null;
+    const fallbacks = [
+      process.env.NEXT_PUBLIC_SUPABASE_FALLBACK_BUCKET || "attachments",
+      "public",
+    ];
+    for (const fb of fallbacks) {
+      try {
+        const fallbackPath = `services/${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(7)}.${fileExt}`;
+        const retry = await supabase.storage
+          .from(fb)
+          .upload(fallbackPath, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+        if (!retry.error) {
+          const {
+            data: { publicUrl },
+          } = supabase.storage.from(fb).getPublicUrl(fallbackPath);
+          return publicUrl;
+        }
+      } catch (e) {
+        void e;
       }
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(fallbackBucket).getPublicUrl(fallbackPath);
-      return publicUrl;
-    } else {
-      console.error("Upload error:", error);
-      toast.error("فشل رفع الصورة: " + error.message);
-      return null;
     }
+    console.error("Upload error:", error);
+    toast.error(
+      isBucketMissing
+        ? "لم يتم العثور على حاوية التخزين. أنشئ الحاوية أو حدّد اسمًا صالحًا."
+        : "فشل رفع الصورة: " + error.message
+    );
+    return null;
   }
 
   // Get public URL
