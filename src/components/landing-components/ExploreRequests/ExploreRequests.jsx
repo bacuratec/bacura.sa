@@ -41,8 +41,8 @@ const ExploreRequests = ({ stats }) => {
     ServiceId,
   });
 
-  const { data: cities } = useGetCitiesQuery();
-  const { data: services } = useGetServicesQuery();
+  const { data: cities, isLoading: citiesLoading } = useGetCitiesQuery();
+  const { data: services, isLoading: servicesLoading } = useGetServicesQuery();
   const navigate = useNavigate();
   const [dynamicTotal, setDynamicTotal] = useState(null);
 
@@ -254,13 +254,18 @@ const ExploreRequests = ({ stats }) => {
                 value={CityId}
                 onChange={(e) => onFilterChange("CityId", e.target.value)}
                 className="w-full border rounded-lg px-3 py-2"
+                disabled={citiesLoading}
               >
                 <option value="">{t("all") || "All"}</option>
-                {(cities || []).map((c) => (
+                {citiesLoading ? (
+                  <option value="">{t("loading.default")}</option>
+                ) : (
+                  (cities || []).map((c) => (
                   <option key={c.id} value={c.id}>
                     {lang === "ar" ? c.name_ar : c.name_en}
                   </option>
-                ))}
+                ))
+                }
               </select>
             </div>
             <div>
@@ -270,13 +275,18 @@ const ExploreRequests = ({ stats }) => {
                 value={ServiceId}
                 onChange={(e) => onFilterChange("ServiceId", e.target.value)}
                 className="w-full border rounded-lg px-3 py-2"
+                disabled={servicesLoading}
               >
                 <option value="">{t("all") || "All"}</option>
-                {(services || []).map((s) => (
+                {servicesLoading ? (
+                  <option value="">{t("loading.default")}</option>
+                ) : (
+                  (services || []).map((s) => (
                   <option key={s.id} value={s.id}>
                     {lang === "ar" ? s.name_ar : s.name_en}
                   </option>
-                ))}
+                ))
+                }
               </select>
             </div>
           </div>

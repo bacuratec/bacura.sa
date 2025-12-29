@@ -49,7 +49,9 @@ const CustomDataTable = ({
       },
     },
   };
-  const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const initialQ = (searchParams?.get && searchParams.get("q")) || "";
+  const [search, setSearch] = useState(initialQ);
   const navigate = useNavigate();
   const location = useLocation();
   const isProjectDetail =
@@ -65,6 +67,19 @@ const CustomDataTable = ({
       )
     );
   }, [data, search, searchableFields]);
+
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    const params = new URLSearchParams(location?.search || "");
+    if (value) {
+      params.set("q", value);
+      params.set("PageNumber", 1);
+    } else {
+      params.delete("q");
+      params.set("PageNumber", 1);
+    }
+    navigate(`${location?.pathname || ""}?${params.toString()}`);
+  };
 
   const handlePageChange = (page) => {
     const params = new URLSearchParams(location?.search || "");
@@ -95,7 +110,7 @@ const CustomDataTable = ({
             type="text"
             placeholder={searchPlaceholder}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="input input-search rounded-xl pl-10 w-full max-w-md"
           />
           <div className="relative rtl:left-10 ltr:right-10 top-2">
