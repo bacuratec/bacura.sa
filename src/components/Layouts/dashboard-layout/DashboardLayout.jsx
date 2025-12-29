@@ -9,8 +9,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useGetProviderDetailsQuery } from "../../../redux/api/usersDetails";
 import { supabase } from "../../../lib/supabaseClient";
 import { detectUserRole } from "../../../utils/roleDetection";
-import { logoutUser } from "../../../redux/slices/authSlice";
+import { logout } from "../../../redux/slices/authSlice";
 import LoadingPage from "../../../views/LoadingPage";
+import { safeReplace } from "../../../utils/safeNavigate";
 
 const DashboardLayout = ({ children }) => {
   const userId = useSelector((state) => state.auth.userId);
@@ -31,7 +32,7 @@ const DashboardLayout = ({ children }) => {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError || !session || !session.user) {
-          dispatch(logoutUser());
+          dispatch(logout());
           setIsProvider(false);
           setIsVerifying(false);
           return;
@@ -44,13 +45,12 @@ const DashboardLayout = ({ children }) => {
         if (userRole === "Provider") {
           setIsProvider(true);
         } else {
-          // إذا لم يكن Provider، تسجيل الخروج وإعادة التوجيه
-          dispatch(logoutUser());
+          dispatch(logout());
           setIsProvider(false);
         }
       } catch (error) {
         console.error("Error verifying provider role:", error);
-        dispatch(logoutUser());
+        dispatch(logout());
         setIsProvider(false);
       } finally {
         setIsVerifying(false);
@@ -60,17 +60,17 @@ const DashboardLayout = ({ children }) => {
     verifyProviderRole();
   }, [userId, dispatch]);
 
+  useEffect(() => {
+    if (!isVerifying && (!isProvider || role !== "Provider")) {
+      safeReplace(router, "/login");
+    }
+  }, [isVerifying, isProvider, role, router]);
+
   if (isVerifying) {
     return <LoadingPage />;
   }
 
-  if (!isProvider || role !== "Provider") {
-    // Perform client-side redirect
-    if (typeof window !== 'undefined') {
-      router.replace("/login");
-    }
-    return null;
-  }
+  if (!isProvider || role !== "Provider") return null;
 
   return (
     <div>

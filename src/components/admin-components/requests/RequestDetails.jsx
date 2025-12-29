@@ -8,15 +8,17 @@ const RequestDetails = ({ data }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const {
-    fullName,
-    creationTime,
-    description,
-    requestNumber,
-    requestStatus,
-    pricingNotes,
-    servicePrice: price,
-  } = data;
+  const fullName =
+    data?.fullName ||
+    data?.requester?.full_name ||
+    data?.requester?.name ||
+    "-";
+  const creationTime = data?.creationTime || data?.created_at;
+  const description = data?.description || "";
+  const requestNumber = data?.requestNumber || data?.id;
+  const requestStatus = data?.requestStatus || data?.status || null;
+  const pricingNotes = data?.pricingNotes || "";
+  const price = data?.servicePrice ?? data?.service?.price ?? null;
 
   const joiningDateFormatted = dayjs(creationTime).format("DD/MM/YYYY hh:mm A");
 

@@ -8,6 +8,7 @@ import {
   useGetServiceQuery,
   useUpdateServiceMutation,
   useGetServicesQuery,
+  useDeleteServiceMutation,
 } from "@/redux/api/servicesApi";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../shared/head-title/HeadTitle";
@@ -24,6 +25,7 @@ const UpsertService = () => {
   });
   const { refetch } = useGetServicesQuery(undefined, { skip: true });
   const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
+  const [deleteService, { isLoading: isDeleting }] = useDeleteServiceMutation();
 
   const [preview, setPreview] = useState(null);
 
@@ -96,6 +98,20 @@ const UpsertService = () => {
       );
     }
   };
+  const handleDelete = async () => {
+    try {
+      await deleteService(id).unwrap();
+      toast.success(t("services.deleteSuccess") || "تم حذف الخدمة بنجاح");
+      refetch?.();
+      navigate("/admin/services");
+    } catch (err) {
+      toast.error(
+        err?.data?.message ||
+          t("services.deleteError") ||
+          "فشل حذف الخدمة"
+      );
+    }
+  };
 
   useEffect(() => {
     if (isEdit && data?.image_url) {
@@ -109,9 +125,27 @@ const UpsertService = () => {
     <div>
       <HeadTitle title={t("services.editService") || "تعديل خدمة"} />
       <div className="mx-auto p-4 rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">
-          {t("services.editService") || "تعديل الخدمة"}
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold">
+              {t("services.editService") || "تعديل الخدمة"}
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {t("services.editServiceHint") || "قم بتحديث عناوين الخدمة، السعر، الصورة والحالة."}
+            </p>
+          </div>
+          {isEdit && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              title={t("services.delete") || "حذف"}
+            >
+              {isDeleting ? (t("services.deleting") || "جاري الحذف...") : (t("services.delete") || "حذف")}
+            </button>
+          )}
+        </div>
         <Formik enableReinitialize initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
           {({ values, touched, errors, setFieldValue }) => (
             <Form>
@@ -124,6 +158,9 @@ const UpsertService = () => {
                   placeholder={t("services.addService.titleArPlaceholder") || "أدخل العنوان بالعربية"}
                   className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                 />
+                <p className="text-xs text-gray-500 mb-2">
+                  {t("services.addService.titleArHelp") || "استخدم اسمًا واضحًا بالعربية يصف الخدمة بدقة."}
+                </p>
                 {touched.titleAr && errors.titleAr && (
                   <div className="text-red-500 text-sm mb-2">{errors.titleAr}</div>
                 )}
@@ -136,6 +173,9 @@ const UpsertService = () => {
                   placeholder={t("services.addService.titleEnPlaceholder") || "أدخل العنوان بالإنجليزية"}
                   className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                 />
+                <p className="text-xs text-gray-500 mb-2">
+                  {t("services.addService.titleEnHelp") || "استخدم اسمًا واضحًا بالإنجليزية يصف الخدمة بدقة."}
+                </p>
                 {touched.titleEn && errors.titleEn && (
                   <div className="text-red-500 text-sm mb-2">{errors.titleEn}</div>
                 )}
@@ -158,6 +198,9 @@ const UpsertService = () => {
                       placeholder={t("services.addService.pricePlaceholder") || "أدخل السعر بالريال السعودي"}
                       className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                     />
+                    <p className="text-xs text-gray-500 mb-2">
+                      {t("services.addService.priceHelp") || "أدخل قيمة رقمية؛ اتركه فارغًا إذا كانت الخدمة بدون سعر ثابت."}
+                    </p>
                     {touched.price && errors.price && (
                       <div className="text-red-500 text-sm mb-2">{errors.price}</div>
                     )}
@@ -200,6 +243,11 @@ const UpsertService = () => {
                 )}
                 {!preview && touched.image && errors.image && (
                   <div className="text-red-500 text-sm mt-2">{errors.image}</div>
+                )}
+                {!preview && (
+                  <p className="text-xs text-gray-500 mb-2">
+                    {t("services.addService.imageHelp") || "الحد الأقصى 5MB؛ يتم حفظ الصورة في التخزين العام."}
+                  </p>
                 )}
                 {data?.image_url && (
                   <label className="flex items-center gap-2 mt-2">

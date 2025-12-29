@@ -7,7 +7,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import logo from "../../../../assets/images/logo-landing.png";
 import userImg from "../../../../assets/images/user.jpg";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../../../redux/slices/authSlice";
+import { appLogout } from "../../../../utils/logout";
 import logoutIcon from "@/assets/icons/logout.svg";
 import { useGetNotificationsQuery } from "../../../../redux/api/notificationsApi";
 import NotificationsModal from "../../NotificationsModal";
@@ -128,8 +128,7 @@ const Header = ({ data }) => {
               </Link>
               <button
                 onClick={async () => {
-                  await dispatch(logoutUser());
-                  router.replace("/login");
+                  await appLogout(dispatch, router);
                 }}
                 className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
               >
@@ -164,8 +163,7 @@ const Header = ({ data }) => {
           unseenCount={unseenNotifications.length}
           imageUrl={imageUrl}
           onLogout={async () => {
-            await dispatch(logoutUser());
-            router.replace("/login");
+            await appLogout(dispatch, router);
           }}
           onClose={() => setIsMenuOpen(false)}
         />

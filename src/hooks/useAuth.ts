@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store'
 import { authService } from '@/services/auth'
 import type { LoginCredentials, SignupCredentials } from '@/services/auth'
 import { useRouter } from 'next/navigation'
+import { safeReplace, safePush } from '@/utils/safeNavigate'
 import { toast } from 'sonner'
 
 export const useAuth = () => {
@@ -26,11 +27,11 @@ export const useAuth = () => {
         
         // Redirect based on role
         if (userProfile.role === 'Admin') {
-          router.push('/admin')
+          safeReplace(router, '/admin')
         } else if (userProfile.role === 'Provider') {
-          router.push('/provider')
+          safeReplace(router, '/provider')
         } else {
-          router.push('/profile')
+          safeReplace(router, '/profile')
         }
         
         return { success: true }
@@ -61,7 +62,7 @@ export const useAuth = () => {
         setUser(authUser)
         setProfile(userProfile)
         toast.success('تم إنشاء الحساب بنجاح')
-        router.push('/profile')
+      safeReplace(router, '/profile')
         return { success: true }
       } else {
         // Handle case where authUser or userProfile is missing
@@ -86,7 +87,7 @@ export const useAuth = () => {
       }
       
       storeLogout()
-      router.push('/login')
+      safeReplace(router, '/login')
       toast.success('تم تسجيل الخروج بنجاح')
       return { success: true }
     } catch (error) {
@@ -140,7 +141,7 @@ export const useRequireAuth = (allowedRoles?: string[]) => {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login')
+      safePush(router, '/login')
       return
     }
 

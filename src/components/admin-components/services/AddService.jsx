@@ -95,6 +95,9 @@ const AddService = () => {
         <h2 className="text-2xl font-bold mb-4">
           {t("services.addService.title") || "إضافة خدمة جديدة"}
         </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          {t("services.addService.hint") || "أدخل بيانات الخدمة بدقة؛ يمكنك إضافة صورة اختيارية وحالة التفعيل."}
+        </p>
 
         <Formik
           initialValues={initialValues}
@@ -116,6 +119,9 @@ const AddService = () => {
                   }
                   className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                 />
+                <p className="text-xs text-gray-500 mb-2">
+                  {t("services.addService.titleArHelp") || "استخدم اسمًا واضحًا بالعربية يصف الخدمة بدقة."}
+                </p>
                 {touched.titleAr && errors.titleAr && (
                   <div className="text-red-500 text-sm mb-2">
                     {errors.titleAr}
@@ -134,6 +140,9 @@ const AddService = () => {
                   }
                   className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                 />
+                <p className="text-xs text-gray-500 mb-2">
+                  {t("services.addService.titleEnHelp") || "استخدم اسمًا واضحًا بالإنجليزية يصف الخدمة بدقة."}
+                </p>
                 {touched.titleEn && errors.titleEn && (
                   <div className="text-red-500 text-sm mb-2">
                     {errors.titleEn}
@@ -180,6 +189,11 @@ const AddService = () => {
                 {!preview && touched.image && errors.image && (
                   <div className="text-red-500 text-sm mt-2">{errors.image}</div>
                 )}
+                {!preview && (
+                  <p className="text-xs text-gray-500 mb-2">
+                    {t("services.addService.imageHelp") || "الحد الأقصى 5MB؛ يتم حفظ الصورة في التخزين العام."}
+                  </p>
+                )}
 
                 {/* Is Priced */}
                 <label className="flex items-center gap-2 mb-2 mt-4">
@@ -209,6 +223,9 @@ const AddService = () => {
                       }
                       className="w-full border rounded p-2 mb-2 bg-primary/10 focus:outline-primary"
                     />
+                    <p className="text-xs text-gray-500 mb-2">
+                      {t("services.addService.priceHelp") || "أدخل قيمة رقمية؛ اتركه فارغًا إذا كانت الخدمة بدون سعر ثابت."}
+                    </p>
                     {touched.price && errors.price && (
                       <div className="text-red-500 text-sm mb-2">
                         {errors.price}

@@ -35,11 +35,11 @@ export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, { dispatch }) => {
     try {
-      // تسجيل الخروج من Supabase
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Error signing out from Supabase:", error);
-      // نستمر في مسح Redux state حتى لو فشل signOut
+      if (supabase && supabase.auth && typeof supabase.auth.signOut === "function") {
+        await supabase.auth.signOut().catch(() => {});
+      }
+    } catch {
+      // ignore
     }
     
     // مسح Redux state

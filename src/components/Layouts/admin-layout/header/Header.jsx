@@ -1,7 +1,7 @@
 "use client";
 
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../../../redux/slices/authSlice";
+import { appLogout } from "../../../../utils/logout";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -90,8 +90,7 @@ const Header = ({ data }) => {
             </button>
             <button
               onClick={async () => {
-                await dispatch(logoutUser());
-                router.replace("/login");
+                await appLogout(dispatch, router);
               }}
               className="logout border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
             >

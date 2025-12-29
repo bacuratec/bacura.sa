@@ -69,6 +69,91 @@ const ensureProvider = async (pv) => {
   return inserted.id;
 };
 
+const ensurePartner = async (p) => {
+  const { data } = await supabase
+    .from("partners")
+    .select("id,name")
+    .ilike("name", p.name)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("partners")
+    .insert({
+      name: p.name,
+      logo_url: p.logo_url || null,
+      website_url: p.website_url || null,
+      description: p.description || null,
+      is_active: p.is_active ?? true,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
+
+const ensureCustomer = async (c) => {
+  const { data } = await supabase
+    .from("customers")
+    .select("id,name")
+    .ilike("name", c.name)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("customers")
+    .insert({
+      name: c.name,
+      logo_url: c.logo_url || null,
+      description: c.description || null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
+
+const ensureFaq = async (f) => {
+  const { data } = await supabase
+    .from("faq_questions")
+    .select("id,question_en")
+    .ilike("question_en", f.question_en)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("faq_questions")
+    .insert({
+      question_ar: f.question_ar,
+      question_en: f.question_en,
+      answer_ar: f.answer_ar,
+      answer_en: f.answer_en,
+      is_active: f.is_active ?? true,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
+
+const ensureTicket = async (t) => {
+  const { data } = await supabase
+    .from("tickets")
+    .select("id,title")
+    .ilike("title", t.title)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("tickets")
+    .insert({
+      user_id: t.user_id,
+      related_order_id: t.related_order_id || null,
+      title: t.title,
+      description: t.description || null,
+      status_id: t.status_id || 1,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
 const ensureRequest = async (req) => {
   const { data } = await supabase
     .from("requests")
@@ -90,6 +175,84 @@ const ensureRequest = async (req) => {
   return inserted.id;
 };
 
+const ensureCity = async (c) => {
+  const { data } = await supabase
+    .from("cities")
+    .select("id,name_ar")
+    .ilike("name_ar", c.name_ar)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("cities")
+    .insert({
+      name_ar: c.name_ar,
+      name_en: c.name_en,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
+
+const ensureLookupType = async (code) => {
+  const { data } = await supabase
+    .from("lookup_types")
+    .select("id,code")
+    .eq("code", code)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("lookup_types")
+    .insert({ code })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
+
+const ensureLookupValue = async (typeId, v) => {
+  const { data } = await supabase
+    .from("lookup_values")
+    .select("id,name_en,lookup_type_id")
+    .eq("lookup_type_id", typeId)
+    .ilike("name_en", v.name_en)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("lookup_values")
+    .insert({
+      lookup_type_id: typeId,
+      name_ar: v.name_ar,
+      name_en: v.name_en,
+      code: v.code || null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
+
+const ensureRating = async (r) => {
+  const { data } = await supabase
+    .from("order_ratings")
+    .select("id,order_id,rated_by_user_id")
+    .eq("order_id", r.order_id)
+    .eq("rated_by_user_id", r.rated_by_user_id)
+    .maybeSingle();
+  if (data?.id) return data.id;
+  const { data: inserted, error } = await supabase
+    .from("order_ratings")
+    .insert({
+      order_id: r.order_id,
+      rated_by_user_id: r.rated_by_user_id,
+      rating_value: r.rating_value,
+      comment: r.comment || null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return inserted.id;
+};
 const ensureOrder = async (ord) => {
   const { data } = await supabase
     .from("orders")
@@ -119,11 +282,20 @@ export async function seedDemoData() {
     return { ok: false, message: "supabase not initialized" };
   }
   try {
+    const { data: userData } = await supabase.auth.getUser();
+    const currentUserId = userData?.user?.id || null;
     const servicesOk = await tryTable("services");
     const requestersOk = await tryTable("requesters");
     const providersOk = await tryTable("providers");
     const requestsOk = await tryTable("requests");
     const ordersOk = await tryTable("orders");
+    const partnersOk = await tryTable("partners");
+    const customersOk = await tryTable("customers");
+    const faqsOk = await tryTable("faq_questions");
+    const ticketsOk = await tryTable("tickets");
+    const citiesOk = await tryTable("cities");
+    const lookupTypesOk = await tryTable("lookup_types");
+    const lookupValuesOk = await tryTable("lookup_values");
 
     const svcIds = [];
     if (servicesOk) {
@@ -159,13 +331,13 @@ export async function seedDemoData() {
     }
 
     if (ordersOk && reqId && pvId) {
-      await ensureOrder({
+      const ord1 = await ensureOrder({
         order_title: "طلب تصميم واجهة",
         order_status_id: 601,
         request_id: reqId,
         provider_id: pvId,
       });
-      await ensureOrder({
+      const ord2 = await ensureOrder({
         order_title: "طلب تحليل متطلبات",
         order_status_id: 603,
         request_id: await ensureRequest({
@@ -176,6 +348,37 @@ export async function seedDemoData() {
         }),
         provider_id: pvId,
       });
+      if (currentUserId) {
+        await ensureRating({ order_id: ord1, rated_by_user_id: currentUserId, rating_value: 4, comment: "جيد جدًا" });
+        await ensureRating({ order_id: ord2, rated_by_user_id: currentUserId, rating_value: 5, comment: "ممتاز" });
+      }
+    }
+    if (partnersOk) {
+      await ensurePartner({ name: "Vercel", logo_url: null, website_url: "https://vercel.com", description: "Hosting Partner", is_active: true });
+      await ensurePartner({ name: "Netlify", logo_url: null, website_url: "https://www.netlify.com", description: "CI/CD Partner", is_active: true });
+    }
+    if (customersOk) {
+      await ensureCustomer({ name: "ACME Corp", logo_url: null, description: "عميل تجريبي" });
+      await ensureCustomer({ name: "Globex", logo_url: null, description: "عميل تجريبي 2" });
+    }
+    if (faqsOk) {
+      await ensureFaq({ question_ar: "كيف أطلب خدمة؟", question_en: "How to request a service?", answer_ar: "اختر الخدمة واتبع الخطوات.", answer_en: "Choose service and follow the steps.", is_active: true });
+      await ensureFaq({ question_ar: "ما طرق الدفع؟", question_en: "What are payment methods?", answer_ar: "بطاقة، تحويل.", answer_en: "Card, transfer.", is_active: true });
+    }
+    if (ticketsOk && currentUserId) {
+      await ensureTicket({ user_id: currentUserId, related_order_id: null, title: "اختبار البلاغ", description: "بلاغ تجريبي", status_id: 1 });
+    }
+    if (citiesOk) {
+      await ensureCity({ name_ar: "الرياض", name_en: "Riyadh" });
+      await ensureCity({ name_ar: "جدة", name_en: "Jeddah" });
+    }
+    if (lookupTypesOk && lookupValuesOk) {
+      const requesterTypeId = await ensureLookupType("requester-entity-types");
+      const providerTypeId = await ensureLookupType("provider-entity-types");
+      await ensureLookupValue(requesterTypeId, { name_ar: "فرد", name_en: "Individual", code: "requester-individual" });
+      await ensureLookupValue(requesterTypeId, { name_ar: "شركة", name_en: "Company", code: "requester-company" });
+      await ensureLookupValue(providerTypeId, { name_ar: "فرد", name_en: "Individual", code: "provider-individual" });
+      await ensureLookupValue(providerTypeId, { name_ar: "مؤسسة", name_en: "Organization", code: "provider-organization" });
     }
 
     toast.success("تم إدخال بيانات تجريبية بنجاح");

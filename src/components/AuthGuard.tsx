@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { safeReplace, safePush } from '@/utils/safeNavigate'
 import { useAuth } from '@/hooks/useAuth'
 import type { UserRole } from '@/lib/supabase'
 
@@ -15,7 +16,7 @@ export default function AuthGuard({ children, allowedRoles, fallbackUrl = '/logi
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push(fallbackUrl)
+      safePush(router, fallbackUrl)
       return
     }
 
@@ -23,11 +24,11 @@ export default function AuthGuard({ children, allowedRoles, fallbackUrl = '/logi
       if (!allowedRoles.includes(profile.role)) {
         // Redirect to appropriate dashboard based on role
         if (profile.role === 'Admin') {
-          router.push('/admin')
+          safeReplace(router, '/admin')
         } else if (profile.role === 'Provider') {
-          router.push('/provider')
+          safeReplace(router, '/provider')
         } else {
-          router.push('/profile')
+          safeReplace(router, '/profile')
         }
       }
     }

@@ -127,24 +127,34 @@ const RequestsTable = ({ stats }) => {
       name: t("request.requestNumber"),
       cell: (row) => (
         <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
-          {row?.requestNumber}
+          {row?.requestNumber || row?.id}
         </span>
       ),
     },
     {
       name: t("projects.serviceType"),
-      selector: (row) =>
-        lang === "ar" ? row.services[0].titleAr : row.services[0].titleEn,
+      selector: (row) => {
+        const ar = row?.services?.[0]?.titleAr || row?.service?.name_ar;
+        const en = row?.services?.[0]?.titleEn || row?.service?.name_en;
+        return lang === "ar" ? (ar || "-") : (en || "-");
+      },
       wrap: true,
     },
     {
       name: t("request.requesterName"),
-      selector: (row) => row.fullName,
+      selector: (row) =>
+        row?.fullName ||
+        row?.requester?.full_name ||
+        row?.requester?.name ||
+        "-",
       wrap: true,
     },
     {
       name: t("request.requestDate"),
-      selector: (row) => dayjs(row.creationTime).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) =>
+        dayjs(row?.creationTime || row?.created_at).format(
+          "DD/MM/YYYY hh:mm A"
+        ),
       wrap: true,
     },
     {
@@ -153,20 +163,20 @@ const RequestsTable = ({ stats }) => {
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
               ${
-                row.requestStatus?.id === 504
+                (row.requestStatus?.id || row.status?.id) === 504
                   ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                  : row.requestStatus?.id === 501
+                  : (row.requestStatus?.id || row.status?.id) === 501
                   ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                  : row.requestStatus?.id === 503
+                  : (row.requestStatus?.id || row.status?.id) === 503
                   ? "bg-red-100 text-red-700"
-                  : row.requestStatus?.id === 502
+                  : (row.requestStatus?.id || row.status?.id) === 502
                   ? "bg-red-100 text-[#B76E00]"
                   : "bg-gray-100 text-gray-600"
               }`}
         >
           {lang === "ar"
-            ? row.requestStatus?.nameAr
-            : row.requestStatus?.nameEn}
+            ? row?.requestStatus?.nameAr || row?.status?.name_ar || "-"
+            : row?.requestStatus?.nameEn || row?.status?.name_en || "-"}
         </span>
       ),
       wrap: true,
@@ -221,7 +231,7 @@ const RequestsTable = ({ stats }) => {
               tabs={tabs}
               columns={columns}
               data={sortedData}
-              searchableFields={["fullName", "email", "requestNumber"]}
+              searchableFields={["fullName", "email", "requestNumber", "title"]}
               searchPlaceholder={t("searchPlaceholder")}
               defaultPage={PageNumber}
               defaultPageSize={PageSize}

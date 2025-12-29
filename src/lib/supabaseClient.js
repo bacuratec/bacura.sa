@@ -13,14 +13,16 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env
 const validUrl = supabaseUrl?.trim() || '';
 const validAnonKey = supabaseAnonKey?.trim() || '';
 
-// Debugging (remove in production if sensitive, but safe to log presence/length)
-if (typeof window !== 'undefined') {
-  console.log('Supabase Init:', {
-    url: validUrl,
-    keyLength: validAnonKey ? validAnonKey.length : 0,
-    envUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    envKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  });
+if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  const debug = typeof localStorage !== 'undefined' && localStorage.getItem('SUPABASE_DEBUG') === '1';
+  if (debug) {
+    console.log('Supabase Init:', {
+      url: validUrl,
+      keyLength: validAnonKey ? validAnonKey.length : 0,
+      envUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      envKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    });
+  }
 }
 
 // إنشاء Supabase client فقط إذا كانت القيم صحيحة لتفادي أخطاء البناء

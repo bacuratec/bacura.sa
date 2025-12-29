@@ -15,9 +15,12 @@ export function useParams() {
   if (!isBrowser) return {};
   const pathname = window.location.pathname || "/";
   const segments = pathname.split("/").filter(Boolean);
-  const last = segments[segments.length - 1];
-  if (last && /^[A-Za-z0-9-_]+$/.test(last)) {
-    return { id: last };
+  const last = segments[segments.length - 1] || "";
+  const prev = segments[segments.length - 2] || "";
+  const isEditLike = ["edit", "details", "view"].includes(last.toLowerCase());
+  const candidate = isEditLike ? prev : last;
+  if (candidate && /^[A-Za-z0-9-_]+$/.test(candidate)) {
+    return { id: candidate };
   }
   return {};
 }

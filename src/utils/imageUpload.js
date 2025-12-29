@@ -36,30 +36,53 @@ export const uploadImageToStorage = async (
 
     // Generate unique filename
     const fileExt = file.name.split(".").pop();
-    const fileName = `${folder}/${Date.now()}-${Math.random()
-      .toString(36)
-      .substring(7)}.${fileExt}`;
+  const fileName = `${folder}/${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(7)}.${fileExt}`;
 
-    // Upload file to Supabase Storage
-    const { error } = await supabase.storage
-      .from(bucket)
-      .upload(fileName, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+  // Upload file to Supabase Storage
+  let { error } = await supabase.storage.from(bucket).upload(fileName, file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
 
-    if (error) {
+  if (error) {
+    const msg = (error?.message || "").toLowerCase();
+    const isBucketMissing =
+      msg.includes("bucket") && msg.includes("not found");
+    if (isBucketMissing) {
+      const fallbackBucket = "attachments";
+      const fallbackPath = `services/${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}.${fileExt}`;
+      const retry = await supabase.storage
+        .from(fallbackBucket)
+        .upload(fallbackPath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+      if (retry.error) {
+        console.error("Upload error:", retry.error);
+        toast.error("فشل رفع الصورة: " + retry.error.message);
+        return null;
+      }
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(fallbackBucket).getPublicUrl(fallbackPath);
+      return publicUrl;
+    } else {
       console.error("Upload error:", error);
       toast.error("فشل رفع الصورة: " + error.message);
       return null;
     }
+  }
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from(bucket).getPublicUrl(fileName);
+  // Get public URL
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(bucket).getPublicUrl(fileName);
 
-    return publicUrl;
+  return publicUrl;
   } catch (error) {
     console.error("Image upload error:", error);
     toast.error("حدث خطأ أثناء رفع الصورة");
