@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams } from "@/utils/useSearchParams";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import { useContext, useEffect } from "react";
 import dayjs from "dayjs";

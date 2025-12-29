@@ -89,16 +89,19 @@ const SideBar = ({ data }) => {
     },
   ];
 
-  const imageUrl = data?.profilePictureUrl
-    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
-    : logo;
+  const imageUrl =
+    typeof data?.profilePictureUrl === "string" && data.profilePictureUrl.length > 0
+      ? (data.profilePictureUrl.startsWith("http")
+          ? data.profilePictureUrl
+          : `${getAppBaseUrl()}/${data.profilePictureUrl}`)
+      : (typeof logo === "string" ? logo : (logo?.src || ""));
 
   const [collapsed, setCollapsed] = useState(false);
   const { data: stats } = useGetAdminStatisticsQuery();
   return (
     <aside className={`min-h-screen fixed ${collapsed ? "w-[88px]" : "w-[260px]"} bg-white border-r border-gray-200 top-0 right-0 hidden lg:flex flex-col justify-between shadow-sm z-50`}>
       <div className="logo p-4 flex items-center justify-between border-b border-gray-200 bg-white">
-        <img src={logo} alt="Bacura" className={collapsed ? "h-8 w-8 object-contain" : "h-12 w-auto object-contain"} />
+        <img src={typeof logo === "string" ? logo : (logo?.src || "")} alt="Bacura" className={collapsed ? "h-8 w-8 object-contain" : "h-12 w-auto object-contain"} />
         <button
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className="rounded-md p-2 hover:bg-gray-100 text-gray-700"

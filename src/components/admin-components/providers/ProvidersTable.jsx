@@ -7,6 +7,7 @@ import {
   useDeleteProviderMutation,
 } from "../../../redux/api/providersApi";
 import CustomDataTable from "../../shared/datatable/DataTable";
+import Avatar from "../../shared/Avatar";
 import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Eye, Edit, Trash } from "lucide-react";
@@ -129,6 +130,18 @@ const ProvidersTable = ({ stats }) => {
 
   const columns = [
     {
+      name: t("providersTable.columns.avatar") || "",
+      width: "60px",
+      cell: (row) => (
+        <Avatar
+          src={row?.logoUrl || null}
+          name={row?.name || row?.email || ""}
+          size={36}
+          className="bg-white"
+        />
+      ),
+    },
+    {
       name: t("providersTable.columns.name"),
       cell: (row) => (
         <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
@@ -139,23 +152,36 @@ const ProvidersTable = ({ stats }) => {
     {
       name: t("providersTable.columns.entityType"),
       selector: (row) =>
-        lang === "ar" ? row.entityType?.nameAr : row.entityType?.nameEn,
+        lang === "ar"
+          ? row.entityType?.nameAr || row.entity_type?.name_ar
+          : row.entityType?.nameEn || row.entity_type?.name_en,
       wrap: true,
     },
     {
       name: t("providersTable.columns.email"),
-      selector: (row) => row.email,
+      cell: (row) => (
+        <a href={`mailto:${row?.email || ""}`} className="text-blue-600 hover:underline">
+          {row?.email || ""}
+        </a>
+      ),
       sortable: true,
       wrap: true,
     },
     {
       name: t("providersTable.columns.phone"),
-      selector: (row) => row.phoneNumber,
+      cell: (row) => (
+        <a href={`tel:${row?.phoneNumber || ""}`} className="text-gray-700 hover:text-black">
+          {row?.phoneNumber || ""}
+        </a>
+      ),
       wrap: true,
     },
     {
       name: t("providersTable.columns.region"),
-      selector: (row) => (lang === "ar" ? row.city?.nameAr : row.city?.nameEn),
+      selector: (row) =>
+        lang === "ar"
+          ? row.city?.nameAr || row.city?.name_ar
+          : row.city?.nameEn || row.city?.name_en,
       wrap: true,
     },
     {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../shared/datatable/DataTable";
+import Avatar from "../../shared/Avatar";
 import {
   useGetRequestersAccountsQuery,
   useDeleteRequesterMutation,
@@ -133,6 +134,18 @@ const RequestersTable = ({ stats }) => {
   ];
   const columns = [
     {
+      name: t("requestersTable.columns.avatar") || "",
+      width: "60px",
+      cell: (row) => (
+        <Avatar
+          src={row?.logoUrl || null}
+          name={row?.name || row?.user?.email || ""}
+          size={36}
+          className="bg-white"
+        />
+      ),
+    },
+    {
       name: t("requestersTable.columns.name"),
       cell: (row) => (
         <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
@@ -143,23 +156,36 @@ const RequestersTable = ({ stats }) => {
     {
       name: t("requestersTable.columns.entityType"),
       selector: (row) =>
-        lang === "ar" ? row.entity_type?.name_ar : row.entity_type?.name_en,
+        lang === "ar"
+          ? row.entity_type?.name_ar || row.entity_type?.nameAr
+          : row.entity_type?.name_en || row.entity_type?.nameEn,
       wrap: true,
     },
     {
       name: t("requestersTable.columns.email"),
-      selector: (row) => row.user?.email,
+      cell: (row) => (
+        <a href={`mailto:${row?.user?.email || ""}`} className="text-blue-600 hover:underline">
+          {row?.user?.email || ""}
+        </a>
+      ),
       sortable: true,
       wrap: true,
     },
     {
       name: t("requestersTable.columns.phone"),
-      selector: (row) => row.user?.phone,
+      cell: (row) => (
+        <a href={`tel:${row?.user?.phone || ""}`} className="text-gray-700 hover:text-black">
+          {row?.user?.phone || ""}
+        </a>
+      ),
       wrap: true,
     },
     {
       name: t("requestersTable.columns.region"),
-      selector: (row) => (lang === "ar" ? row.city?.name_ar : row.city?.name_en),
+      selector: (row) =>
+        lang === "ar"
+          ? row.city?.name_ar || row.city?.nameAr
+          : row.city?.name_en || row.city?.nameEn,
       wrap: true,
     },
     {

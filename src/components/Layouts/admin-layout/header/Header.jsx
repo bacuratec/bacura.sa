@@ -31,9 +31,12 @@ const Header = ({ data }) => {
     [];
 
   const dispatch = useDispatch();
-  const imageUrl = data?.profilePictureUrl
-    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
-    : userImg;
+  const imageUrl =
+    typeof data?.profilePictureUrl === "string" && data.profilePictureUrl.length > 0
+      ? (data.profilePictureUrl.startsWith("http")
+          ? data.profilePictureUrl
+          : `${getAppBaseUrl()}/${data.profilePictureUrl}`)
+      : (typeof userImg === "string" ? userImg : (userImg?.src || ""));
 
   return (
     <header className="lg:mr-[250px] sticky top-0 right-0 bg-white py-6 border-b-2 border-b-[#E7E7E7] z-[500]">
@@ -44,11 +47,7 @@ const Header = ({ data }) => {
             className="profile flex items-center gap-1"
           >
             <div className="w-10 h-10 overflow-hidden rounded-md">
-              <img
-                src={imageUrl}
-                alt="user"
-                className="w-full h-full object-cover"
-              />
+              <img src={imageUrl} alt="user" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col ">
               <h1 className="text-xs font-medium ">
