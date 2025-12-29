@@ -7,6 +7,8 @@ import { useLocation } from "@/utils/useLocation";
 import { useNavigate } from "@/utils/useNavigate";
 import { useSearchParams } from "@/utils/useSearchParams";
 import { useTranslation } from "react-i18next";
+import EmptyState from "../../shared/EmptyState";
+import { FileQuestion } from "lucide-react";
 const CustomDataTable = ({
   columns,
   pagination,
@@ -159,11 +161,12 @@ const CustomDataTable = ({
         selectableRows
         customStyles={customStyles}
         noDataComponent={
-          <div className="py-10 text-center w-full">
-            <p className="mt-2 text-sm text-gray-500">
-              {t("noData") || "لا توجد بيانات"}
-            </p>
-          </div>
+          <EmptyState 
+            title={t("noData") || "لا توجد بيانات"}
+            description={t("noDataDesc") || "لم يتم العثور على سجلات مطابقة"}
+            icon={FileQuestion}
+            className="w-full py-8"
+          />
         }
         paginationServer // 👈 مهم جدًا: عشان البيانات server-side
         paginationTotalRows={totalRows} // 👈 اجمالي عدد العناصر

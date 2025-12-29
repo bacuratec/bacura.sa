@@ -11,13 +11,15 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { SkeletonCard } from "../../../shared/skeletons/Skeleton";
+import EmptyState from "../../../shared/EmptyState";
+import { Layers } from "lucide-react";
 
 const ServiceList = ({ data, isLoading }) => {
   const { lang } = useContext(LanguageContext);
-  const icons = [s1, s2, s3];
   const containerRef = useRef(null);
 
   const items = useMemo(() => {
+    const icons = [s1, s2, s3];
     if (!Array.isArray(data)) return [];
     return data.map((item, idx) => {
       const title =
@@ -102,8 +104,12 @@ const ServiceList = ({ data, isLoading }) => {
               </div>
             ))}
           {items.length === 0 && (
-            <div className="col-span-full text-center text-sm text-gray-500 py-10">
-              لا توجد خدمات متاحة حالياً
+            <div className="col-span-full">
+              <EmptyState
+                title={lang === "ar" ? "لا توجد خدمات" : "No Services"}
+                description={lang === "ar" ? "لم يتم العثور على خدمات مطابقة" : "No matching services found"}
+                icon={Layers}
+              />
             </div>
           )}
         </div>

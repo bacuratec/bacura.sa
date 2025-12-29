@@ -11,7 +11,7 @@ const getDefaultLang = () => {
       const l = window.localStorage && window.localStorage.getItem("lang");
       if (l) return l;
     } catch {
-      // Ignore local storage errors
+      void 0;
     }
   }
   if (typeof process !== "undefined" && process.env) {

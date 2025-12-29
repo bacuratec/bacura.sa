@@ -19,7 +19,7 @@ async function getUserRole() {
             cookieStore.set(name, value, options)
           );
         } catch {
-          // Ignore cookie errors
+          void 0;
         }
       },
     },
@@ -133,4 +133,3 @@ export async function DELETE(request) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-

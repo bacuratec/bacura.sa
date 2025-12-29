@@ -16,13 +16,18 @@ import { useGetUserOrdersQuery } from "../../../redux/api/ordersApi";
 import dayjs from "dayjs";
 
 import { TablePageSkeleton } from "../../shared/skeletons/PageSkeleton";
+import FadeIn from "../../shared/FadeIn";
 
 const ExploreRequests = ({ stats }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
   const searchParams = useSearchParams();
-  // ... existing code ...
+  const PageNumber = searchParams.get("PageNumber") || 1;
+  const PageSize = searchParams.get("PageSize") || 30;
+  const RequestStatus = searchParams.get("RequestStatus") || "";
+  const CityId = searchParams.get("CityId") || "";
+  const ServiceId = searchParams.get("ServiceId") || "";
 
   const {
     data: orders,
@@ -69,6 +74,11 @@ const ExploreRequests = ({ stats }) => {
 
   // Dynamic count that respects CityId/ServiceId filters
   useEffect(() => {
+    if (!CityId && !ServiceId) {
+      setDynamicTotal(null);
+      return;
+    }
+
     let mounted = true;
     const loadCount = async () => {
       try {
@@ -225,7 +235,7 @@ const ExploreRequests = ({ stats }) => {
       })
     : [];
   return (
-    <div className="py-5">
+    <FadeIn className="py-5">
       <div className="container">
         <div className="rounded-3xl bg-white xl:p-6">
           <h3 className="font-bold text-xl mb-3">
@@ -338,7 +348,7 @@ const ExploreRequests = ({ stats }) => {
           )}
         </div>
       </div>
-    </div>
+    </FadeIn>
   );
 };
 

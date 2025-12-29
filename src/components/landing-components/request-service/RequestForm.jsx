@@ -184,15 +184,16 @@ const RequestForm = ({ services }) => {
 
   return (
     <div
-      className="rounded-[40px] bg-white basis-1/2 text-black pt-5 pb-10 px-6"
+      className="rounded-[32px] bg-white basis-1/2 text-black pt-8 pb-10 px-6 sm:px-8 border border-gray-100"
       style={{
-        boxShadow: "0px 4px 35px 0px rgba(0, 0, 0, 0.08)",
+        boxShadow: "0px 10px 40px -10px rgba(0, 0, 0, 0.08)",
         direction: "rtl",
       }}
     >
-      <h4 className="text-3xl md:text-5xl font-medium mt-6 mb-8 text-center">
+      <h4 className="text-2xl md:text-3xl font-bold mt-2 mb-6 text-center text-gray-800">
         {t("formRequest.requestService")}
       </h4>
+      <div className="w-20 h-1 bg-primary/20 mx-auto mb-8 rounded-full"></div>
 
       <StepWizard currentStep={currentStep} steps={steps} />
 
@@ -268,7 +269,7 @@ const RequestForm = ({ services }) => {
                             ? !values.selectedServices.includes(String(item.id))
                             : false;
                         return (
-                            <div key={item?.id} className={`p-3 border rounded-xl transition-all ${values.selectedServices.includes(String(item?.id)) ? 'border-primary bg-primary/5' : 'border-gray-200'}`}>
+                            <div key={item?.id} className={`p-3 border rounded-xl transition-all hover:bg-gray-50 ${values.selectedServices.includes(String(item?.id)) ? 'border-primary bg-primary/5 ring-1 ring-primary/20' : 'border-gray-200'}`}>
                             <label className="text-sm font-normal text-[#333] flex items-center ltr:flex-row-reverse gap-3 cursor-pointer w-full">
                                 <input
                                 type="checkbox"
@@ -287,7 +288,7 @@ const RequestForm = ({ services }) => {
                                 />
                                 )}
                                 <span className="flex-1 font-medium text-base">
-                                    {lang === "ar" ? item?.titleAr : item?.titleEn}
+                                    {(lang === "ar" ? item?.titleAr : item?.titleEn) || (lang === "ar" ? item?.name_ar : item?.name_en) || item?.title || "خدمة"}
                                 </span>
                                 {item.price && (
                                     <span className="text-primary font-bold text-sm">
@@ -334,6 +335,7 @@ const RequestForm = ({ services }) => {
                         <input
                             type="number"
                             name="budget"
+                            inputMode="numeric"
                             disabled
                             className="w-full rounded-xl border border-[#ADADAD] bg-gray-100 py-3 px-5 text-gray-500 cursor-not-allowed"
                             value={(() => {

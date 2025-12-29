@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { getAppBaseUrl } from "../../../../utils/env";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useGetAdminStatisticsQuery } from "@/redux/api/adminStatisticsApi";
 
 const SideBar = ({ data }) => {
   const { t } = useTranslation();
@@ -93,6 +94,7 @@ const SideBar = ({ data }) => {
     : logo;
 
   const [collapsed, setCollapsed] = useState(false);
+  const { data: stats } = useGetAdminStatisticsQuery();
   return (
     <aside className={`min-h-screen fixed ${collapsed ? "w-[88px]" : "w-[260px]"} bg-white border-r border-gray-200 top-0 right-0 hidden lg:flex flex-col justify-between shadow-sm z-50`}>
       <div className="logo p-4 flex items-center justify-between border-b border-gray-200 bg-white">
@@ -134,6 +136,35 @@ const SideBar = ({ data }) => {
                   strokeWidth={1.5}
                 />
                   {!collapsed && <span className="font-medium text-sm whitespace-nowrap truncate">{item.name}</span>}
+                  {!collapsed && (
+                    <>
+                      {item.href === "/admin/providers" && typeof stats?.totalProviders === "number" && (
+                        <span className="ml-auto text-xs rounded-lg px-2 py-0.5 bg-primary/10 text-primary">
+                          {stats.totalProviders}
+                        </span>
+                      )}
+                      {item.href === "/admin/requesters" && typeof stats?.totalRequesters === "number" && (
+                        <span className="ml-auto text-xs rounded-lg px-2 py-0.5 bg-primary/10 text-primary">
+                          {stats.totalRequesters}
+                        </span>
+                      )}
+                      {item.href === "/admin/requests" && typeof stats?.totalRequests === "number" && (
+                        <span className="ml-auto text-xs rounded-lg px-2 py-0.5 bg-primary/10 text-primary">
+                          {stats.totalRequests}
+                        </span>
+                      )}
+                      {item.href === "/admin/projects" && typeof stats?.totalProjects === "number" && (
+                        <span className="ml-auto text-xs rounded-lg px-2 py-0.5 bg-primary/10 text-primary">
+                          {stats.totalProjects}
+                        </span>
+                      )}
+                      {item.href === "/admin/tickets" && typeof stats?.totalTickets === "number" && (
+                        <span className="ml-auto text-xs rounded-lg px-2 py-0.5 bg-primary/10 text-primary">
+                          {stats.totalTickets}
+                        </span>
+                      )}
+                    </>
+                  )}
                   
                   {isActive && (
                     <div className="mr-auto w-1.5 h-1.5 rounded-full bg-primary" />

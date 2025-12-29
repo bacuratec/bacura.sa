@@ -1,10 +1,7 @@
 import React from 'react';
-// import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 
 const StepWizard = ({ currentStep, steps }) => {
-  // const { t } = useTranslation();
-
   return (
     <div className="w-full mb-8">
       <div className="flex items-center justify-between relative">
@@ -29,7 +26,7 @@ const StepWizard = ({ currentStep, steps }) => {
               >
                 {isCompleted ? <Check size={16} /> : <span>{stepNumber}</span>}
               </div>
-              <span className={`text-xs md:text-sm font-medium ${isCurrent ? 'text-primary' : 'text-gray-500'}`}>
+              <span className={`text-[10px] md:text-sm font-medium text-center ${isCurrent ? 'text-primary' : 'text-gray-500'}`}>
                 {step.label}
               </span>
             </div>

@@ -6,6 +6,8 @@ import {
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import EmptyState from "../shared/EmptyState";
+import { Bell } from "lucide-react";
 
 function usePrevious(value) {
   const ref = useRef();
@@ -98,9 +100,12 @@ export default function NotificationsModal({ open, setOpen }) {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center text-gray-500 py-10">
-                    {t("notifications.empty")}
-                  </div>
+                  <EmptyState 
+                    title={t("notifications.empty") || "لا توجد إشعارات"} 
+                    description={t("notifications.emptyDesc") || "سنخبرك عند وجود أي تحديثات جديدة."}
+                    icon={Bell}
+                    className="py-6"
+                  />
                 )}
               </>
             )}

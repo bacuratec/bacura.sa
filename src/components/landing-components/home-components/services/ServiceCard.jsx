@@ -1,12 +1,15 @@
 import React from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
 import { formatCurrency } from "@/utils/currency";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
 const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive, lang }) => {
   return (
-    <div
+    <motion.div
       title={description}
-      className="relative rounded-2xl bg-[#F8F8F8] transition-all duration-300 hover:shadow-custom group p-4 sm:p-6 flex flex-col gap-4"
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+      className="relative rounded-2xl bg-[#F8F8F8] transition-shadow duration-300 hover:shadow-custom group p-4 sm:p-6 flex flex-col gap-4 h-full"
     >
       <div className="flex items-start justify-between">
         <span className="text-sm sm:text-base text-gray-400">{index}</span>
@@ -35,12 +38,14 @@ const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActiv
         </p>
       </div>
 
-      <div className="flex justify-end">
-        <a href="/request-service" className="btn btn-primary">
-          اطلب الخدمة
-        </a>
+      <div className="flex justify-end mt-auto">
+        <Link href="/request-service">
+            <motion.span whileTap={{ scale: 0.95 }} className="btn btn-primary inline-block">
+                اطلب الخدمة
+            </motion.span>
+        </Link>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

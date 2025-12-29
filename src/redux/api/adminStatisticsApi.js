@@ -62,6 +62,8 @@ const statisticsBaseQuery = async (args) => {
           requestsCount,
           ordersCount,
           paymentsCount,
+          projectsCount,
+          ticketsCount,
         ] = await Promise.all([
           supabase.from("users").select("id", { count: "exact", head: true }),
           supabase.from("requesters").select("id", { count: "exact", head: true }),
@@ -71,6 +73,8 @@ const statisticsBaseQuery = async (args) => {
           supabase
             .from("payments")
             .select("amount", { count: "exact", head: false }),
+          supabase.from("projects").select("id", { count: "exact", head: true }),
+          supabase.from("tickets").select("id", { count: "exact", head: true }),
         ]);
 
         const totalAmount =
@@ -85,6 +89,8 @@ const statisticsBaseQuery = async (args) => {
           totalProviders: providersCount.count || 0,
           totalRequests: requestsCount.count || 0,
           totalOrders: ordersCount.count || 0,
+          totalProjects: projectsCount.count || 0,
+          totalTickets: ticketsCount.count || 0,
           totalFinancialAmounts: totalAmount,
           consultationsFinancialAmounts: 0,
         };

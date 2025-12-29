@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useSelector } from "react-redux";
+import { useGetProviderOrderStatisticsQuery } from "@/redux/api/adminStatisticsApi";
 
 import homeIcon from "../../../../assets/icons/homeIcon.svg";
 import homeIconActive from "../../../../assets/icons/homeIconActive.svg";
@@ -57,6 +59,8 @@ const SideBar = ({ data }) => {
   const pathname = usePathname();
 
   const [collapsed, setCollapsed] = useState(false);
+  const userId = useSelector((state) => state.auth.userId);
+  const { data: providerStats } = useGetProviderOrderStatisticsQuery({ providerId: userId }, { skip: !userId });
   return (
     <aside className={`min-h-screen fixed ${collapsed ? "w-[80px]" : "w-[250px]"} bg-white border-l lg:border-r border-gray-200 top-0 right-0 hidden lg:flex flex-col justify-between`}>
       <div className="logo px-6 py-3 border-b border-gray-200 flex items-center justify-between">
@@ -111,6 +115,11 @@ const SideBar = ({ data }) => {
                   className="w-6 h-6"
                 />
                 {!collapsed && <span className="truncate">{item.name}</span>}
+                {!collapsed && item.href === "/provider/our-projects" && typeof providerStats?.totalOrders === "number" && (
+                  <span className="ml-auto text-xs rounded-lg px-2 py-0.5 bg-primary/10 text-primary">
+                    {providerStats.totalOrders}
+                  </span>
+                )}
                 {pathname.includes(item.href) && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
               </Link>
             </li>
