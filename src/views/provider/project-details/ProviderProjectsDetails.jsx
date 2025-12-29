@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import HeadTitle from "../../../components/admin-components/users-details/HeadTitle";
 import ProjectListInfo from "../../../components/admin-components/projects/ProjectListInfo";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "@/utils/useParams";
+import { useSearchParams } from "@/utils/useSearchParams";
 import {
   useGetProjectDetailsQuery,
   useProviderProjectStateMutation,
@@ -23,7 +24,7 @@ const ProviderProjectsDetails = () => {
     window.scrollTo(0, 0);
   }, []);
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const IsRejected = searchParams.get("IsRejected");
   const IsExpired = searchParams.get("IsExpired");
   const {

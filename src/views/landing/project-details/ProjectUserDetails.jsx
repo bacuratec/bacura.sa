@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import HeadTitle from "@/components/admin-components/users-details/HeadTitle";
 import ProjectListInfo from "@/components/admin-components/projects/ProjectListInfo";
-import { useParams } from "react-router-dom";
+import { useParams } from "@/utils/useParams";
 import { useGetProjectDetailsQuery } from "@/redux/api/projectsApi";
 import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";

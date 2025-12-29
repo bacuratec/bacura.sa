@@ -1,9 +1,23 @@
 /**
- * Unified params hook that works with both React Router and Next.js
+ * Unified params hook that works in Next.js and plain browser
  */
-import { useParams as useReactParams } from "react-router-dom";
+"use client";
+import { useParams as useNextParams } from "next/navigation";
 
 export function useParams() {
-  return useReactParams() || {};
+  try {
+    const params = useNextParams();
+    if (params && typeof params === "object") return params;
+  } catch {
+    // ignore
+  }
+  const isBrowser = typeof window !== "undefined";
+  if (!isBrowser) return {};
+  const pathname = window.location.pathname || "/";
+  const segments = pathname.split("/").filter(Boolean);
+  const last = segments[segments.length - 1];
+  if (last && /^[A-Za-z0-9-_]+$/.test(last)) {
+    return { id: last };
+  }
+  return {};
 }
-
