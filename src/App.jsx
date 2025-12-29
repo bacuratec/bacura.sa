@@ -1,4 +1,5 @@
 import { Suspense, lazy, useContext, useEffect, useState } from "react";
+import "./utils/consolePatch";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "./lib/supabaseClient";

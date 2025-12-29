@@ -1,12 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import {
-  useActiveServiceStatusMutation,
-  useDeActiveServiceStatusMutation,
-  useGetServicesQuery,
-  useUpdateServicePriceMutation,
-  useDeleteServiceMutation,
-} from "../../../redux/api/servicesApi";
+import { supabase } from "@/lib/supabaseClient";
 import UpdatePriceModal from "./UpdatePriceModal";
 import { useTranslation } from "react-i18next";
 import { Edit, PlusIcon, Trash } from "lucide-react";
@@ -21,29 +15,57 @@ const ServicesTable = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const { data: services = [], isLoading, refetch } = useGetServicesQuery();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [service, setService] = useState("");
   const [openPriceModal, setOpenPriceModal] = useState(false);
 
-  const [updateServicePrice] = useUpdateServicePriceMutation();
   const handleUpdatePrice = async (newPrice) => {
-    // هنا تحط استدعاء API بتاعك
-    await updateServicePrice({ id: service.id, body: { price: newPrice } });
+    try {
+      setIsLoading(true);
+      const { error } = await supabase
+        .from("services")
+        .update({ price: newPrice, updated_at: new Date().toISOString() })
+        .eq("id", service.id);
+      if (error) throw error;
+      toast.success(t("services.updatePriceSuccess") || "تم تحديث السعر");
+      await refetch();
+    } catch (err) {
+      toast.error(
+        err?.message || t("services.updatePriceError") || "فشل تحديث السعر"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const [ActiveServiceStatus] = useActiveServiceStatusMutation();
-  const [deActiveServiceStatus] = useDeActiveServiceStatusMutation();
-  const [deleteService, { isLoading: isDeleting }] = useDeleteServiceMutation();
+  const [isDeleting, setIsDeleting] = useState(false);
   const [localData, setLocalData] = useState([]);
 
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
-  // Sync localData with API data once
+  const refetch = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setLocalData(data || []);
+    } catch (err) {
+      toast.error(
+        err?.message || t("services.fetchError") || "فشل جلب الخدمات"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
-    setLocalData(services);
-  }, [services]);
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleEdit = (service) => {
     setService(service);
@@ -59,15 +81,19 @@ const ServicesTable = () => {
     if (!selectedId) return;
 
     try {
-      await deleteService(selectedId).unwrap();
+      setIsDeleting(true);
+      const { error } = await supabase.from("services").delete().eq("id", selectedId);
+      if (error) throw error;
       toast.success(t("services.deleteSuccess") || "تم حذف الخدمة بنجاح");
       setOpenDelete(false);
       setSelectedId(null);
-      refetch();
+      await refetch();
     } catch (err) {
       toast.error(
         err?.data?.message || t("services.deleteError") || "فشل حذف الخدمة"
       );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -75,14 +101,15 @@ const ServicesTable = () => {
     const updatedServices = localData?.map((s) =>
       s.id === service.id ? { ...s, is_active: !s.is_active } : s
     );
-    setLocalData(updatedServices); // Update UI immediately (optimistic)
+    setLocalData(updatedServices);
 
     try {
-      if (service.is_active) {
-        await deActiveServiceStatus({ id: service.id }).unwrap();
-      } else {
-        await ActiveServiceStatus({ id: service.id }).unwrap();
-      }
+      const next = !service.is_active;
+      const { error } = await supabase
+        .from("services")
+        .update({ is_active: next, updated_at: new Date().toISOString() })
+        .eq("id", service.id);
+      if (error) throw error;
     } catch (err) {
       toast.error(
         err?.data?.message || t("services.statusChangeError") || "فشل تغيير الحالة"
@@ -115,7 +142,6 @@ const ServicesTable = () => {
         </div>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
       width: "80px",
     },
@@ -150,7 +176,6 @@ const ServicesTable = () => {
         </label>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
     {
@@ -183,7 +208,6 @@ const ServicesTable = () => {
         </div>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];

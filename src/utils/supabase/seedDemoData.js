@@ -18,8 +18,6 @@ const ensureService = async (svc) => {
     .insert({
       name_ar: svc.name_ar,
       name_en: svc.name_en,
-      description_ar: svc.description_ar || null,
-      description_en: svc.description_en || null,
       price: svc.price ?? null,
       image_url: svc.image_url || null,
       is_active: svc.is_active ?? true,
