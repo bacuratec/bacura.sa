@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
 /**
  * Create Moyasar Invoice and return redirect URL
  * Body: { amount:number, currency?:string, description?:string, orderId?:string, supportedSources?:string[] }
@@ -22,6 +23,7 @@ export async function POST(request) {
       currency = "SAR",
       description = "Service Request Payment",
       orderId,
+      userId,
       supportedSources = ["creditcard", "mada", "applepay"],
       callbackUrl =
         process.env.NEXT_PUBLIC_MOYASAR_CALLBACK_URL ||
@@ -64,10 +66,33 @@ export async function POST(request) {
     }
 
     const invoiceUrl = data?.url || data?.invoice_url || null;
+    let paymentRecordId = null;
+
+    // Create pending payment record in DB if possible
+    if (supabaseAdmin && orderId && userId) {
+      const insertRes = await supabaseAdmin
+        .from("payments")
+        .insert({
+          order_id: orderId,
+          user_id: userId,
+          amount: Number(amount),
+          currency,
+          stripe_payment_intent_id: data?.id || null, // store invoice id temporarily
+          status: "pending",
+        })
+        .select("id")
+        .single();
+
+      if (!insertRes.error && insertRes.data?.id) {
+        paymentRecordId = insertRes.data.id;
+      }
+    }
+
     return NextResponse.json({
       invoiceId: data?.id || null,
       invoiceUrl,
       status: data?.status || "created",
+      paymentId: paymentRecordId,
     });
   } catch (error) {
     return NextResponse.json(

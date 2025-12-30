@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { getMoyasarPublishableKey } from "@/utils/env";
 
-export default function MoyasarInvoiceButton({ amount, orderId }) {
+export default function MoyasarInvoiceButton({ amount, orderId, userId }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const publishable = getMoyasarPublishableKey();
@@ -19,6 +19,7 @@ export default function MoyasarInvoiceButton({ amount, orderId }) {
           currency: "SAR",
           description: t("payment.title") || "الدفع",
           orderId,
+          userId,
           supportedSources: ["creditcard", "mada", "applepay"],
         }),
       });

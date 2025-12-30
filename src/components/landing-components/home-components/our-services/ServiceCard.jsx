@@ -1,5 +1,6 @@
 import React from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
+import { getServiceIcon } from "@/utils/serviceIcon";
 import { formatCurrency } from "@/utils/currency";
 
 const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive, lang }) => {
@@ -19,7 +20,7 @@ const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActiv
 
       <div className="flex items-center gap-3">
         <div className="rounded-xl bg-[#F1F1F1] p-3 w-fit flex items-center justify-center text-primary">
-          <OptimizedImage src={imageUrl || icon} alt={title || ""} width={40} height={40} />
+          <OptimizedImage src={imageUrl || icon} alt={title || ""} width={40} height={40} className="object-cover" fallbackSrc={getServiceIcon(title, description)} />
         </div>
         {isActive === false ? (
           <span className="text-xs text-red-600">غير متاحة حالياً</span>

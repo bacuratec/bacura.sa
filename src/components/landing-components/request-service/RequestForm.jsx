@@ -526,6 +526,7 @@ const RequestForm = ({ services }) => {
             <MoyasarInvoiceButton
               amount={showPayment.amount}
               orderId={showPayment.consultationId}
+              userId={userId}
             />
           </div>
         </div>

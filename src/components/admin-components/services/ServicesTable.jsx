@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import OptimizedImage from "@/components/shared/OptimizedImage";
+import { getServiceIcon } from "@/utils/serviceIcon";
 import { supabase } from "@/lib/supabaseClient";
 import UpdatePriceModal from "./UpdatePriceModal";
 import { useTranslation } from "react-i18next";
@@ -180,6 +181,7 @@ const ServicesTable = () => {
       name: t("services.image") || "الصورة",
       cell: (row) => {
         const src = row?.image_url || row?.imageUrl || "";
+        const fb = getServiceIcon(row?.name_en || row?.name_ar || "", "");
         return (
           <div className="w-12 h-12 rounded overflow-hidden border bg-gray-50">
             {src ? (
@@ -190,9 +192,16 @@ const ServicesTable = () => {
                 height={48}
                 quality={80}
                 className="w-full h-full object-cover"
+                fallbackSrc={fb}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">-</div>
+              <OptimizedImage
+                src={fb}
+                alt={row?.name_en || row?.name_ar || "service"}
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+              />
             )}
           </div>
         );
