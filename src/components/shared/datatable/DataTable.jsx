@@ -9,6 +9,8 @@ import { useSearchParams } from "@/utils/useSearchParams";
 import { useTranslation } from "react-i18next";
 import EmptyState from "../../shared/EmptyState";
 import { FileQuestion } from "lucide-react";
+import { SkeletonTable } from "../../shared/skeletons/Skeleton";
+
 const CustomDataTable = ({
   columns,
   pagination,
@@ -180,9 +182,8 @@ const CustomDataTable = ({
         onChangeRowsPerPage={isProjectDetail ? () => {} : handlePerRowsChange} // 👈 تغيير حجم الصفحة
         progressPending={isLoading}
         progressComponent={
-          <div className="py-10 text-center w-full">
-            <span className="loader inline-block w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
-            <p className="mt-2 text-sm text-gray-500">{tr("loading", "جاري التحميل...")}</p>
+          <div className="w-full py-4">
+            <SkeletonTable rows={5} columns={columns?.length || 5} />
           </div>
         }
         {...rest}

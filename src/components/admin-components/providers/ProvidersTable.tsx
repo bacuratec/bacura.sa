@@ -9,7 +9,7 @@ import { LanguageContext } from "@/context/LanguageContext";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
 import { providerService, profileService } from "@/services/api";
-import TableActions from "../../shared/datatable/TableActions";
+import TableActions from "../../shared/TableActions";
 
 interface ProvidersTableProps {
     stats: any;

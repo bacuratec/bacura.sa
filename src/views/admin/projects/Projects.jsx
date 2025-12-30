@@ -15,25 +15,45 @@ const Projects = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { count, error } = await supabase
-          .from("orders")
-          .select("*", { count: "exact", head: true });
-
-        if (error) throw error;
+        const [
+          total,
+          waitingApproval,
+          waitingStart,
+          processing,
+          completed,
+          rejected,
+          expired
+        ] = await Promise.all([
+          supabase.from("orders").select("id", { count: "exact", head: true }),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 17),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 18),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 13),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 15),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 19),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 20),
+        ]);
 
         setProjectsStats({
-          totalOrdersCount: count || 0,
-          inProgressOrdersCount: 0,
-          completedOrdersCount: 0,
-          cancelledOrdersCount: 0,
+          totalOrdersCount: total.count || 0,
+          waitingForApprovalOrdersCount: waitingApproval.count || 0,
+          waitingToStartOrdersCount: waitingStart.count || 0,
+          ongoingOrdersCount: processing.count || 0,
+          completedOrdersCount: completed.count || 0,
+          serviceCompletedOrdersCount: completed.count || 0, // Mapping 'Ended' to 'Completed' for now
+          rejectedOrdersCount: rejected.count || 0,
+          expiredOrdersCount: expired.count || 0,
         });
       } catch (err) {
         console.error("Error fetching projects stats:", err);
         setProjectsStats({
           totalOrdersCount: 0,
-          inProgressOrdersCount: 0,
+          waitingForApprovalOrdersCount: 0,
+          waitingToStartOrdersCount: 0,
+          ongoingOrdersCount: 0,
           completedOrdersCount: 0,
-          cancelledOrdersCount: 0,
+          serviceCompletedOrdersCount: 0,
+          rejectedOrdersCount: 0,
+          expiredOrdersCount: 0,
         });
       }
     };

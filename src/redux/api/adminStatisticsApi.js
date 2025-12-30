@@ -53,6 +53,7 @@ const statisticsBaseQuery = async (args) => {
 
       case "requests": {
         // Count requests by status
+        // Mapped to DB IDs: 7=pending, 8=priced, 9=accepted, 10=rejected, 11=completed
         const [
           total,
           processing,
@@ -63,12 +64,12 @@ const statisticsBaseQuery = async (args) => {
           newRequests
         ] = await Promise.all([
           supabase.from("requests").select("id", { count: "exact", head: true }),
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 500),
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 501),
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 502),
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 503),
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 504),
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 505),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 8), // Priced
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 9), // Accepted
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 21), // Waiting Payment (Was 0, now 21)
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 10), // Rejected
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 11), // Completed
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 7), // Pending
         ]);
 
         result = {
@@ -103,7 +104,7 @@ const statisticsBaseQuery = async (args) => {
           supabase
             .from("payments")
             .select("amount", { count: "exact", head: false }),
-          supabase.from("projects").select("id", { count: "exact", head: true }),
+          supabase.from("orders").select("id", { count: "exact", head: true }), // Fixed: projects -> orders
           supabase.from("tickets").select("id", { count: "exact", head: true }),
         ]);
 

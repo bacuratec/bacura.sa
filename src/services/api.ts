@@ -448,19 +448,19 @@ export class AdminStatisticsService extends BaseService {
         newRequests
       ] = await Promise.all([
         supabase!.from("requests").select("id", { count: "exact", head: true }),
-        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 500),
-        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 501),
-        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 502),
-        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 503),
-        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 504),
-        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 505),
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 8), // Priced (Initially Approved)
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 9), // Accepted (Waiting Payment/Start)
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 0), // Placeholder for Waiting Payment if distinct
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 10), // Rejected
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 11), // Completed
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 7), // Pending (New)
       ]);
 
       return {
         data: {
           totalRequestsCount: total.count || 0,
-          underProcessingRequestsCount: processing.count || 0,
-          initiallyApprovedRequestsCount: initialApproval.count || 0,
+          underProcessingRequestsCount: processing.count || 0, // Using Priced as Under Processing/Negotiation
+          initiallyApprovedRequestsCount: initialApproval.count || 0, // Using Accepted
           waitingForPaymentRequestsCount: waitingPayment.count || 0,
           rejectedRequestsCount: rejected.count || 0,
           approvedRequestsCount: completed.count || 0,

@@ -24,6 +24,23 @@ const ProjectsTable = ({ stats }) => {
   const PageNumber = searchParams.get("PageNumber") || 1;
   const PageSize = searchParams.get("PageSize") || 30;
   const OrderStatusLookupId = searchParams.get("OrderStatusLookupId") || "";
+  
+  // Map string codes to IDs for API query
+  const getStatusId = (code) => {
+    switch (code) {
+      case "waiting_approval": return 17;
+      case "waiting_start": return 18;
+      case "processing": return 13;
+      case "completed": return 15;
+      case "ended": return 15;
+      case "rejected": return 19;
+      case "expired": return 20;
+      case "cancelled": return 16;
+      case "on-hold": return 14;
+      default: return "";
+    }
+  };
+
   const totalRows = (() => {
     // These mappings should ideally come from an API or shared constant
     if (OrderStatusLookupId === "waiting_approval")
@@ -35,6 +52,8 @@ const ProjectsTable = ({ stats }) => {
     if (OrderStatusLookupId === "rejected") return stats?.rejectedOrdersCount || 0;
     if (OrderStatusLookupId === "ended")
       return stats?.serviceCompletedOrdersCount || 0; // Assuming ended = service completed
+    if (OrderStatusLookupId === "expired")
+      return stats?.expiredOrdersCount || 0;
     return stats?.totalOrdersCount || 0;
   })();
   const {
@@ -44,7 +63,7 @@ const ProjectsTable = ({ stats }) => {
   } = useGetProjectsQuery({
     PageNumber,
     PageSize,
-    OrderStatusLookupId,
+    OrderStatusLookupId: getStatusId(OrderStatusLookupId),
   });
 
   const [deleteProject, { isLoading: isDeleting }] =

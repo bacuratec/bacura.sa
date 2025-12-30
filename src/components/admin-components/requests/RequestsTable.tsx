@@ -22,15 +22,15 @@ const RequestsTable = ({ stats }: { stats: any }) => {
     const RequestStatus = searchParams.get("RequestStatus") || "";
 
     const totalRows = (() => {
-        if (RequestStatus === "500")
+        if (RequestStatus === "8") // Priced (Under Processing)
             return stats?.underProcessingRequestsCount || 0;
-        if (RequestStatus === "501")
+        if (RequestStatus === "9") // Accepted (Initial Approval)
             return stats?.initiallyApprovedRequestsCount || 0;
-        if (RequestStatus === "502")
+        if (RequestStatus === "21") // Waiting Payment
             return stats?.waitingForPaymentRequestsCount || 0;
-        if (RequestStatus === "503") return stats?.rejectedRequestsCount || 0;
-        if (RequestStatus === "504") return stats?.approvedRequestsCount || 0;
-        if (RequestStatus === "505") return stats?.newRequestssCount || 0;
+        if (RequestStatus === "10") return stats?.rejectedRequestsCount || 0; // Rejected
+        if (RequestStatus === "11") return stats?.approvedRequestsCount || 0; // Completed
+        if (RequestStatus === "7") return stats?.newRequestsCount || 0; // Pending (New)
         return stats?.totalRequestsCount || 0;
     })();
 
@@ -98,37 +98,37 @@ const RequestsTable = ({ stats }: { stats: any }) => {
         },
         {
             name: t("request.newRequest"),
-            href: "?RequestStatus=505",
+            href: "?RequestStatus=7",
             numbers: stats?.newRequestsCount,
             color: "#B76E00",
         },
         {
             name: t("request.underProcessing"),
-            href: "?RequestStatus=500",
+            href: "?RequestStatus=8",
             numbers: stats?.underProcessingRequestsCount,
             color: "#B76E00",
         },
         {
             name: t("request.initialApproval"),
-            href: "?RequestStatus=501",
+            href: "?RequestStatus=9",
             numbers: stats?.initiallyApprovedRequestsCount,
             color: "#007867",
         },
         {
             name: t("request.awaitingPayment"),
-            href: "?RequestStatus=502",
+            href: "?RequestStatus=21",
             numbers: stats?.waitingForPaymentRequestsCount,
             color: "#b76f21",
         },
         {
             name: t("request.rejected"),
-            href: "?RequestStatus=503",
+            href: "?RequestStatus=10",
             numbers: stats?.rejectedRequestsCount,
             color: "#B71D18",
         },
         {
             name: t("request.completed"),
-            href: "?RequestStatus=504",
+            href: "?RequestStatus=11",
             numbers: stats?.approvedRequestsCount,
             color: "#007867",
         },
@@ -174,13 +174,13 @@ const RequestsTable = ({ stats }: { stats: any }) => {
             cell: (row: any) => (
                 <span
                     className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-              ${(row.requestStatus?.id || row.status?.id) === 504
+              ${(row.requestStatus?.id || row.status?.id) === 11
                             ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                            : (row.requestStatus?.id || row.status?.id) === 501
+                            : (row.requestStatus?.id || row.status?.id) === 9
                                 ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                                : (row.requestStatus?.id || row.status?.id) === 503
+                                : (row.requestStatus?.id || row.status?.id) === 10
                                     ? "bg-red-100 text-red-700"
-                                    : (row.requestStatus?.id || row.status?.id) === 502
+                                    : (row.requestStatus?.id || row.status?.id) === 21
                                         ? "bg-red-100 text-[#B76E00]"
                                         : "bg-gray-100 text-gray-600"
                         }`}
