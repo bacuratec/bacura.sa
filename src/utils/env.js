@@ -74,3 +74,36 @@ export const getStripePublishableKey = () => {
   );
 };
 
+/**
+ * Get Moyasar Publishable Key
+ */
+export const getMoyasarPublishableKey = () => {
+  return (
+    getEnv("NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY") ||
+    getEnv("VITE_MOYASAR_PUBLISHABLE_KEY") ||
+    ""
+  );
+};
+
+/**
+ * Get Moyasar Account ID (optional)
+ */
+export const getMoyasarAccountId = () => {
+  return (
+    getEnv("NEXT_PUBLIC_MOYASAR_ACCOUNT_ID") ||
+    getEnv("VITE_MOYASAR_ACCOUNT_ID") ||
+    ""
+  );
+};
+
+/**
+ * Get Callback URL for payment redirects
+ */
+export const getMoyasarCallbackUrl = () => {
+  return (
+    getEnv("NEXT_PUBLIC_MOYASAR_CALLBACK_URL") ||
+    getAppBaseUrl() ||
+    ""
+  );
+};
+

@@ -15,6 +15,7 @@ import { LanguageContext } from "@/context/LanguageContext";
 import { createAttachmentGroupKey, uploadAttachmentsToStorage } from "@/utils/attachmentUtils";
 import StepWizard from "./StepWizard";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import MoyasarInvoiceButton from "./MoyasarInvoiceButton";
 
 const RequestForm = ({ services }) => {
   const router = useRouter();
@@ -520,6 +521,13 @@ const RequestForm = ({ services }) => {
             amount={showPayment.amount}
             consultationId={showPayment.consultationId}
           />
+          <div className="mt-4">
+            {/* بديل للدفع عبر Moyasar */}
+            <MoyasarInvoiceButton
+              amount={showPayment.amount}
+              orderId={showPayment.consultationId}
+            />
+          </div>
         </div>
       )}
     </div>
