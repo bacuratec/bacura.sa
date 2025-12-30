@@ -137,7 +137,7 @@ const UpsertService = () => {
         const svc = Array.isArray(rows) ? rows[0] : rows;
         setData(svc || null);
         if (svc?.image_url) setPreview(svc.image_url);
-      } catch (e) {
+      } catch {
         toast.error(tr("services.fetchError", "فشل جلب بيانات الخدمة"));
       } finally {
         setIsLoadingDetails(false);

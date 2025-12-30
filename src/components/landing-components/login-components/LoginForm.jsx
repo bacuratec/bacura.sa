@@ -148,7 +148,7 @@ const LoginForm = () => {
 
       // Persist role into auth metadata for server-side checks
       try {
-        const { data: updatedUser, error: updateMetaError } = await supabase.auth.updateUser({
+        const { error: updateMetaError } = await supabase.auth.updateUser({
           data: { role: userRole },
         });
         if (updateMetaError) {

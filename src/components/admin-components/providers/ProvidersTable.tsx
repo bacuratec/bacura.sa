@@ -277,7 +277,7 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                             tabs={tabs as any}
                             columns={columns}
                             data={providers}
-                            searchableFields={["name", "email", "phoneNumber"]}
+                            searchableFields={["name", "email", "phoneNumber"] as any}
                             searchPlaceholder={t("searchPlaceholder")}
                             defaultPage={PageNumber}
                             defaultPageSize={PageSize}

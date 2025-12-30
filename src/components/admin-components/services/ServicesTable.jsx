@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import { supabase } from "@/lib/supabaseClient";
-import { adminGet, adminUpdate, adminDelete } from "@/utils/adminSupabase";
+import { adminGet, adminUpdate, adminDelete, adminInsert } from "@/utils/adminSupabase";
 import UpdatePriceModal from "./UpdatePriceModal";
 import { useTranslation } from "react-i18next";
 import { Edit, PlusIcon, Trash } from "lucide-react";
