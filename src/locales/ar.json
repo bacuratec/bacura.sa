@@ -444,6 +444,8 @@
       "passwordMin": "كلمة المرور يجب أن تكون على الأقل 6 أحرف"
     }
   },
+  "loginForm.errors.emailNotConfirmed": "البريد غير مؤكد. رجاءً تحقق من بريدك واضغط رابط التفعيل.",
+  "loginForm.errors.unauthorized": "غير مصرح. يرجى التحقق من بيانات الدخول أو المحاولة لاحقاً.",
   "exploreRequests": {
     "pageTitle": "تصفح الطلبات",
     "columns": {
@@ -634,6 +636,8 @@
       "agreeRequired": "يجب الموافقة على الشروط والأحكام"
     }
   },
+  "signupForm.companyName": "اسم المنشأة",
+  "signupForm.companyNamePlaceholder": "اسم المنشأة",
   "header": {
     "goodMorning": "صباح الخير",
     "role": "مسؤول",

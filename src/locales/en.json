@@ -395,6 +395,8 @@
       "passwordMin": "Password must be at least 6 characters"
     }
   },
+  "loginForm.errors.emailNotConfirmed": "Email not confirmed. Please check your inbox and verify your email.",
+  "loginForm.errors.unauthorized": "Unauthorized. Please check your credentials or try again later.",
   "exploreRequests": {
     "pageTitle": "Explore Requests",
     "columns": {
@@ -584,6 +586,8 @@
       "agreeRequired": "You must agree to the terms and conditions"
     }
   },
+  "signupForm.companyName": "Entity Name",
+  "signupForm.companyNamePlaceholder": "Entity Name",
   "header": {
     "goodMorning": "Good morning",
     "role": "Admin",

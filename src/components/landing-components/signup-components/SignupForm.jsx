@@ -67,7 +67,7 @@ const SignupForm = () => {
 
         const { data: typesData, error: typesError } = await supabase
           .from("lookup_values")
-          .select("id, name_ar, name_en")
+          .select("id, code, name_ar, name_en")
           .eq("lookup_type_id", lookupType.id);
 
         if (typesError) throw typesError;
@@ -75,6 +75,7 @@ const SignupForm = () => {
         setTypes(
           (typesData || []).map((item) => ({
             id: item.id,
+            code: item.code,
             nameAr: item.name_ar,
             nameEn: item.name_en,
           }))
@@ -121,12 +122,28 @@ const SignupForm = () => {
         t("signupForm.validation.phoneInvalid")
       ),
     region: Yup.string().required(t("signupForm.validation.regionRequired")),
-    commercialRecord: Yup.string().required(
-      t("signupForm.validation.commercialRecordRequired")
-    ),
-    commercialRegistrationDate: Yup.string().required(
-      t("signupForm.validation.commercialDateRequired")
-    ),
+    commercialRecord: Yup.string().when("entityType", (et, schema) => {
+      const selected = types.find((x) => String(x.id) === String(et));
+      const code = selected?.code;
+      const isRequester = !isProvider;
+      const shouldRequire =
+        (isRequester && code !== "individual") ||
+        (isProvider && code === "company");
+      return shouldRequire
+        ? schema.required(t("signupForm.validation.commercialRecordRequired"))
+        : schema.optional();
+    }),
+    commercialRegistrationDate: Yup.string().when("entityType", (et, schema) => {
+      const selected = types.find((x) => String(x.id) === String(et));
+      const code = selected?.code;
+      const isRequester = !isProvider;
+      const shouldRequire =
+        (isRequester && code !== "individual") ||
+        (isProvider && code === "company");
+      return shouldRequire
+        ? schema.required(t("signupForm.validation.commercialDateRequired"))
+        : schema.optional();
+    }),
     password: Yup.string()
       .min(6, t("signupForm.validation.passwordShort"))
       .required(t("signupForm.validation.passwordRequired")),
@@ -299,14 +316,28 @@ const SignupForm = () => {
             <div className="flex flex-col gap-4">
               <label>
                 <label>
-                  {t("signupForm.fullName")}{" "}
+                  {(() => {
+                    const selected = types.find((x) => String(x.id) === String(values.entityType));
+                    const code = selected?.code;
+                    const isRequester = !isProvider;
+                    const isCompanyContext = (isRequester && code && code !== "individual") || isProvider;
+                    return isCompanyContext ? (t("signupForm.companyName") || "اسم المنشأة") : t("signupForm.fullName");
+                  })()}{" "}
                   <span className="text-red-500">*</span>
                 </label>
               </label>
               <Field
                 type="text"
                 name="fullName"
-                placeholder={t("signupForm.fullNamePlaceholder")}
+                placeholder={(() => {
+                  const selected = types.find((x) => String(x.id) === String(values.entityType));
+                  const code = selected?.code;
+                  const isRequester = !isProvider;
+                  const isCompanyContext = (isRequester && code && code !== "individual") || isProvider;
+                  return isCompanyContext
+                    ? (t("signupForm.companyNamePlaceholder") || "اسم المنشأة")
+                    : t("signupForm.fullNamePlaceholder");
+                })()}
                 className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5 placeholder:text-sm"
               />
               <ErrorMessage
@@ -436,6 +467,15 @@ const SignupForm = () => {
             </div>
 
             {/* السجل التجاري */}
+            {(() => {
+              const selected = types.find((x) => String(x.id) === String(values.entityType));
+              const code = selected?.code;
+              const isRequester = !isProvider;
+              const shouldShow =
+                (isRequester && code && code !== "individual") ||
+                (isProvider && code === "company");
+              if (!shouldShow) return null;
+              return (
             <div className="flex flex-col gap-4">
               <label>
                 {t("signupForm.commercialRecord")}
@@ -458,9 +498,20 @@ const SignupForm = () => {
                 </div>
               )}
             </div>
+              );
+            })()}
+            {(() => {
+              const selected = types.find((x) => String(x.id) === String(values.entityType));
+              const code = selected?.code;
+              const isRequester = !isProvider;
+              const shouldShow =
+                (isRequester && code && code !== "individual") ||
+                (isProvider && code === "company");
+              if (!shouldShow) return null;
+              return (
             <div className="flex flex-col gap-4">
               <label>
-                {t("signupForm.commercialDate")}
+                {t("signupForm.commercialDate") || "تاريخ انتهاء السجل التجاري"}
                 <span className="text-red-500">*</span>
               </label>
               <Field
@@ -479,6 +530,8 @@ const SignupForm = () => {
                 </div>
               )}
             </div>
+              );
+            })()}
 
             <div className="flex flex-col gap-4">
               <label>

@@ -15,7 +15,12 @@ DECLARE
 BEGIN
     -- تحديد الدور من metadata أو افتراضياً 'Requester'
     user_role := COALESCE(new.raw_user_meta_data->>'role', 'Requester');
-    user_name := COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1));
+    user_name := COALESCE(
+        new.raw_user_meta_data->>'full_name',
+        new.raw_user_meta_data->>'fullName',
+        new.raw_user_meta_data->>'name',
+        split_part(new.email, '@', 1)
+    );
 
     -- إدخال المستخدم في جدول users
     INSERT INTO public.users (id, email, phone, role, created_at, updated_at)
@@ -27,30 +32,42 @@ BEGIN
 
     -- إنشاء ملف تعريف بناءً على الدور
     IF user_role = 'Requester' THEN
-        -- محاولة العثور على نوع كيان افتراضي (مثلاً 'individual')
-        SELECT id INTO entity_type FROM public.lookup_values 
-        WHERE code = 'individual' AND lookup_type_id IN (SELECT id FROM public.lookup_types WHERE code = 'requester-entity-types')
-        LIMIT 1;
-        
-        -- إذا لم يوجد، نستخدم أي قيمة من النوع المناسب
+        -- استخدام entityTypeId من metadata إذا توفر
+        entity_type := NULLIF(new.raw_user_meta_data->>'entityTypeId', '')::INT;
         IF entity_type IS NULL THEN
+            -- محاولة العثور على نوع كيان افتراضي (individual)
+            SELECT id INTO entity_type FROM public.lookup_values 
+            WHERE code = 'individual' AND lookup_type_id IN (SELECT id FROM public.lookup_types WHERE code = 'requester-entity-types')
+            LIMIT 1;
+        END IF;
+        IF entity_type IS NULL THEN
+            -- احتياط: أي قيمة من النوع المناسب
             SELECT id INTO entity_type FROM public.lookup_values 
             WHERE lookup_type_id IN (SELECT id FROM public.lookup_types WHERE code = 'requester-entity-types') 
             LIMIT 1;
         END IF;
 
-        -- إذا لم يوجد أي قيمة، نستخدم 1 كقيمة احتياطية (يجب التأكد من وجودها)
-        INSERT INTO public.requesters (user_id, name, entity_type_id)
-        VALUES (new.id, user_name, COALESCE(entity_type, 1))
+        -- إدراج السجل مع السجل التجاري إن وُجد في metadata
+        INSERT INTO public.requesters (user_id, name, entity_type_id, commercial_reg_no)
+        VALUES (
+            new.id,
+            user_name,
+            COALESCE(entity_type, 1),
+            NULLIF(new.raw_user_meta_data->>'commercialRecord', '')
+        )
         ON CONFLICT (user_id) DO NOTHING;
 
     ELSIF user_role = 'Provider' THEN
-        -- محاولة العثور على نوع كيان افتراضي
-        SELECT id INTO entity_type FROM public.lookup_values 
-        WHERE code = 'company' AND lookup_type_id IN (SELECT id FROM public.lookup_types WHERE code = 'provider-entity-types')
-        LIMIT 1;
-        
+        -- استخدام entityTypeId من metadata إذا توفر
+        entity_type := NULLIF(new.raw_user_meta_data->>'entityTypeId', '')::INT;
         IF entity_type IS NULL THEN
+            -- محاولة العثور على نوع كيان افتراضي (company)
+            SELECT id INTO entity_type FROM public.lookup_values 
+            WHERE code = 'company' AND lookup_type_id IN (SELECT id FROM public.lookup_types WHERE code = 'provider-entity-types')
+            LIMIT 1;
+        END IF;
+        IF entity_type IS NULL THEN
+            -- احتياط: أي قيمة من النوع المناسب
             SELECT id INTO entity_type FROM public.lookup_values 
             WHERE lookup_type_id IN (SELECT id FROM public.lookup_types WHERE code = 'provider-entity-types') 
             LIMIT 1;

@@ -51,6 +51,12 @@ const LoginForm = () => {
         if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
           return "loginForm.errors.invalidCredentials";
         }
+        if (msg.includes("email not confirmed") || msg.includes("confirm your email") || msg.includes("email_confirmation")) {
+          return "loginForm.errors.emailNotConfirmed";
+        }
+        if (msg.includes("unauthorized") || msg.includes("forbidden")) {
+          return "loginForm.errors.unauthorized";
+        }
         if (msg.includes("network")) {
           return "loginForm.errors.network";
         }
@@ -84,7 +90,11 @@ const LoginForm = () => {
 
       if (error) {
         const key = mapErrorKey(error.message);
-        toast.error(t(key));
+        if (key === "loginForm.errors.emailNotConfirmed") {
+          toast.error(t(key), { duration: 6000 });
+        } else {
+          toast.error(t(key));
+        }
         setLoading(false);
         return;
       }

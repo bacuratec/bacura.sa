@@ -70,6 +70,26 @@ export const getRoleFromUsersTable = async (userId) => {
 };
 
 /**
+ * Fallback: Detect role by membership in requesters/providers/admins tables
+ */
+export const getRoleByMembership = async (userId) => {
+  try {
+    const [{ data: req }, { data: prov }, { data: adm }] = await Promise.all([
+      supabase.from("requesters").select("user_id").eq("user_id", userId).maybeSingle(),
+      supabase.from("providers").select("user_id").eq("user_id", userId).maybeSingle(),
+      supabase.from("admins").select("user_id").eq("user_id", userId).maybeSingle(),
+    ]);
+    if (adm?.user_id) return "Admin";
+    if (prov?.user_id) return "Provider";
+    if (req?.user_id) return "Requester";
+    return null;
+  } catch (e) {
+    console.error("Error in getRoleByMembership:", e);
+    return null;
+  }
+};
+
+/**
  * Detect user role (Main function)
  * Priority 1: 'users' table in Supabase
  * Priority 2: user_metadata or JWT (fallback)
@@ -77,6 +97,10 @@ export const getRoleFromUsersTable = async (userId) => {
 export const detectUserRole = async (user, session) => {
   // Priority 1: Check users table
   let role = await getRoleFromUsersTable(user.id);
+  if (role) return role;
+
+  // Fallback: Membership in specific tables
+  role = await getRoleByMembership(user.id);
   if (role) return role;
 
   // Priority 2: Check metadata/JWT
