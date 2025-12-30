@@ -58,6 +58,16 @@ export const uploadImageToStorage = async (
       process.env.NEXT_PUBLIC_SUPABASE_FALLBACK_BUCKET || "attachments",
       "public",
     ];
+    try {
+      const target = bucket || fallbacks[0];
+      await fetch("/api/admin-storage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucket: target, public: true }),
+      });
+    } catch (e) {
+      void e;
+    }
     for (const fb of fallbacks) {
       try {
         const fallbackPath = `services/${Date.now()}-${Math.random()

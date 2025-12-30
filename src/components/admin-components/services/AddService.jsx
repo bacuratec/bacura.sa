@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import toast from "react-hot-toast";
 import { useGetServicesQuery } from "../../../redux/api/servicesApi";
 import { adminInsert } from "@/utils/adminSupabase";
+import { supabase } from "@/lib/supabaseClient";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../shared/head-title/HeadTitle";
 
@@ -52,7 +53,7 @@ const AddService = () => {
 
       if (values.image) {
         const { uploadImageToStorage } = await import("../../../utils/imageUpload");
-        const uploadedUrl = await uploadImageToStorage(values.image, "images", "services");
+        const uploadedUrl = await uploadImageToStorage(values.image, undefined, "services");
         if (!uploadedUrl) {
           setIsCreating(false);
           return;
@@ -61,25 +62,48 @@ const AddService = () => {
       }
 
       const payload = {
-        name_ar: values.titleAr,
-        name_en: values.titleEn,
+        titleAr: values.titleAr,
+        titleEn: values.titleEn,
         price: values.isPriced ? Number(values.price) : null,
-        is_active: values.isActive,
-        image_url: imageUrl || null,
+        isActive: values.isActive,
+        imageUrl: imageUrl || null,
       };
 
-      await adminInsert({ table: "services", values: payload });
+      let supabaseError = null;
+      try {
+        const { error } = await supabase
+          .from("services")
+          .insert({
+            name_ar: payload.titleAr,
+            name_en: payload.titleEn,
+            price: payload.price,
+            image_url: payload.imageUrl,
+            is_active: payload.isActive,
+            created_at: new Date().toISOString(),
+          });
+        supabaseError = error || null;
+      } catch (e) {
+        supabaseError = e;
+      }
+      if (supabaseError) {
+        await adminInsert({
+          table: "services",
+          values: {
+            name_ar: payload.titleAr,
+            name_en: payload.titleEn,
+            price: payload.price,
+            image_url: payload.imageUrl,
+            is_active: payload.isActive,
+          },
+        });
+      }
       toast.success(tr("services.addService.successAdd", "تم إضافة الخدمة بنجاح"));
       resetForm();
       setPreview(null);
       refetch?.();
       navigate("/admin/services");
     } catch (err) {
-      toast.error(
-        err?.data?.message ||
-          t("services.addService.error") ||
-          "حدث خطأ أثناء إضافة الخدمة"
-      );
+      toast.error(err?.message || tr("services.addService.error", "حدث خطأ أثناء إضافة الخدمة"));
     }
     finally {
       setIsCreating(false);
