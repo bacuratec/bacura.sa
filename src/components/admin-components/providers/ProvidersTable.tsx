@@ -274,10 +274,10 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                 <div className="mx-2">
                     <div className="rounded-3xl bg-white p-5">
                         <CustomDataTable
-                            tabs={tabs as any}
+                            tabs={tabs}
                             columns={columns}
                             data={providers}
-                            searchableFields={["name", "email", "phoneNumber"] as any}
+                            searchableFields={["name", "email", "phoneNumber"]}
                             searchPlaceholder={t("searchPlaceholder")}
                             pagination={true}
                             title={t("providersTable.title") || ""}

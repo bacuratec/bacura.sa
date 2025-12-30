@@ -239,10 +239,10 @@ const RequestsTable = ({ stats }: { stats: any }) => {
                 <div className="mx-2">
                     <div className="rounded-3xl bg-white p-5">
                         <CustomDataTable
-                            tabs={tabs as any}
+                            tabs={tabs}
                             columns={columns}
                             data={sortedData}
-                            searchableFields={["fullName", "email", "requestNumber", "title"] as any}
+                            searchableFields={["fullName", "email", "requestNumber", "title"]}
                             searchPlaceholder={t("searchPlaceholder")}
                             pagination={true}
                             title={t("request.title") || ""}

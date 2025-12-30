@@ -18,6 +18,7 @@ import LanguageDropdown from "../../LanguageDropdown";
 import { useTranslation } from "react-i18next";
 import { getAppBaseUrl } from "../../../../utils/env";
 import OptimizedImage from "@/components/shared/OptimizedImage";
+import RoleBadge from "@/components/shared/RoleBadge";
 
 const Header = ({ data }) => {
   const { t } = useTranslation(); // 👈 استخدام hook الترجمة
@@ -102,6 +103,9 @@ const Header = ({ data }) => {
               />
             </ul>
             <LanguageDropdown />
+            <div className="ml-3">
+              <RoleBadge />
+            </div>
           </nav>
 
           {/* Desktop Buttons */}

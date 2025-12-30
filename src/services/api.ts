@@ -137,9 +137,9 @@ export class RequestService extends BaseService {
         .select(`
           *,
           service:services(*),
-          requester:profiles!requests_requester_id_fkey(*),
-          provider:profiles!requests_provider_id_fkey(*),
-          status:request_statuses(*)
+          requester:requesters!requests_requester_id_fkey(*),
+          provider:providers!requests_provider_id_fkey(*),
+          status:lookup_values!requests_status_id_fkey(*)
         `)
         .eq('requester_id', requesterId)
         .order('created_at', { ascending: false })
@@ -154,9 +154,9 @@ export class RequestService extends BaseService {
         .select(`
           *,
           service:services(*),
-          requester:profiles!requests_requester_id_fkey(*),
-          provider:profiles!requests_provider_id_fkey(*),
-          status:request_statuses(*)
+          requester:requesters!requests_requester_id_fkey(*),
+          provider:providers!requests_provider_id_fkey(*),
+          status:lookup_values!requests_status_id_fkey(*)
         `)
         .eq('provider_id', providerId)
         .order('created_at', { ascending: false })
@@ -166,19 +166,25 @@ export class RequestService extends BaseService {
 
   async getPending() {
     return this.handleSupabaseOperation(async () => {
-      const statusRes = await (supabase as any)
-        .from('request_statuses')
+      const { data: typeRow } = await (supabase as any)
+        .from('lookup_types')
         .select('id')
+        .eq('code', 'request-status')
+        .single()
+      const { data: statusRow } = await (supabase as any)
+        .from('lookup_values')
+        .select('id')
+        .eq('lookup_type_id', typeRow?.id)
         .eq('code', 'pending')
-        .maybeSingle()
-      const statusId = statusRes?.data?.id
+        .single()
+      const statusId = statusRow?.id
       const { data, error } = await (supabase as any)
         .from('requests')
         .select(`
           *,
           service:services(*),
-          requester:profiles!requests_requester_id_fkey(*),
-          status:request_statuses(*)
+          requester:requesters!requests_requester_id_fkey(*),
+          status:lookup_values!requests_status_id_fkey(*)
         `)
         .eq('status_id', statusId)
         .order('created_at', { ascending: false })
@@ -188,9 +194,15 @@ export class RequestService extends BaseService {
 
   async updateStatus(requestId: string, statusCode: string) {
     return this.handleSupabaseOperation(async () => {
-      const { data: statusData } = await (supabase as any)
-        .from('request_statuses')
+      const { data: typeRow } = await (supabase as any)
+        .from('lookup_types')
         .select('id')
+        .eq('code', 'request-status')
+        .single()
+      const { data: statusData } = await (supabase as any)
+        .from('lookup_values')
+        .select('id')
+        .eq('lookup_type_id', typeRow?.id)
         .eq('code', statusCode)
         .single()
 
@@ -214,9 +226,9 @@ export class RequestService extends BaseService {
         .from('requests')
         .select(`
           *,
-          requester:profiles!requests_requester_id_fkey(id,full_name),
+          requester:requesters!requests_requester_id_fkey(id,name),
           service:services(id,name_ar,name_en),
-          status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code),
+          status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code),
           city:cities(id,name_ar,name_en)
         `, { count: 'exact' })
 
@@ -450,7 +462,7 @@ export class AdminStatisticsService extends BaseService {
         supabase!.from("requests").select("id", { count: "exact", head: true }),
         supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 8), // Priced (Initially Approved)
         supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 9), // Accepted (Waiting Payment/Start)
-        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 0), // Placeholder for Waiting Payment if distinct
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 21), // Waiting Payment
         supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 10), // Rejected
         supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 11), // Completed
         supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 7), // Pending (New)

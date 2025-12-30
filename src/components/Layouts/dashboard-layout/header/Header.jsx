@@ -13,6 +13,7 @@ import NotificationsModal from "../../NotificationsModal";
 import { useTranslation } from "react-i18next";
 import LanguageDropdown from "../../LanguageDropdown";
 import { getAppBaseUrl } from "../../../../utils/env";
+import RoleBadge from "../../../shared/RoleBadge";
 
 const Header = ({ data }) => {
   const { t } = useTranslation();
@@ -65,6 +66,7 @@ const Header = ({ data }) => {
 
           <div className="buttons flex items-center xl:gap-6 lg:gap-4 md:gap-3 sm:gap-2 gap-1">
             <LanguageDropdown />
+            <RoleBadge />
             <button
               onClick={() => setIsModalOpen(true)}
               className="notification border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"

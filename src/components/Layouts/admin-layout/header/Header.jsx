@@ -10,6 +10,7 @@ import NotificationsModal from "../../NotificationsModal";
 import { useGetNotificationsQuery } from "../../../../redux/api/notificationsApi";
 import LanguageDropdown from "../../LanguageDropdown";
 import { seedDemoData } from "../../../../utils/supabase/seedDemoData";
+import RoleBadge from "../../../shared/RoleBadge";
 
 import userImg from "../../../../assets/images/user.jpg";
 import logoutIcon from "../../../../assets/icons/logout.svg";
@@ -62,6 +63,7 @@ const Header = ({ data }) => {
 
           <div className="buttons flex items-center xl:gap-6 lg:gap-4 md:gap-3 sm:gap-2 gap-1">
             <LanguageDropdown />
+            <RoleBadge />
             {process.env.NODE_ENV !== "production" && (
               <button
                 onClick={async () => {

@@ -56,9 +56,9 @@ export const ordersApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "requester:profiles!requests_requester_id_fkey(id,full_name)",
+            "requester:requesters!requests_requester_id_fkey(id,name,full_name)",
             "service:services(id,name_ar,name_en)",
-            "status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code)",
+            "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
           ],
         };
@@ -92,9 +92,9 @@ export const ordersApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "requester:profiles!requests_requester_id_fkey(id,full_name,role)",
+            "requester:requesters!requests_requester_id_fkey(id,name,full_name)",
             "service:services(id,name_ar,name_en)",
-            "status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code)",
+            "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
           ],
         };
@@ -108,9 +108,9 @@ export const ordersApi = createApi({
         method: "GET",
         id,
         joins: [
-          "requester:profiles!requests_requester_id_fkey(id,full_name,role)",
+          "requester:requesters!requests_requester_id_fkey(id,name,full_name)",
           "service:services(id,name_ar,name_en,price)",
-          "status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code)",
+          "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
         ],
       }),
@@ -165,7 +165,7 @@ export const ordersApi = createApi({
               request_id: requestId,
               provider_id: providerId,
               order_title: "مشروع جديد", // Should be set properly
-              order_status_id: 1, // Should get from lookup_values
+              order_status_id: 17, // Waiting Approval
             },
           };
         }
