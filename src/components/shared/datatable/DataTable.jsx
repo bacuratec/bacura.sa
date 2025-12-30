@@ -157,6 +157,9 @@ const CustomDataTable = ({
       ) : (
         ""
       )}
+      {/*
+        تنظيف الخصائص غير المدعومة لمنع تمريرها لعناصر DOM الداخلية
+      */}
       <DataTable
         data={filteredData}
         columns={columns}
@@ -186,7 +189,10 @@ const CustomDataTable = ({
             <SkeletonTable rows={5} columns={columns?.length || 5} />
           </div>
         }
-        {...rest}
+        {...(() => {
+          const { button: _btn, allowOverflow: _ao, ...clean } = rest || {};
+          return clean;
+        })()}
       />
     </div>
   );

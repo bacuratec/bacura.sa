@@ -237,31 +237,33 @@ const ServicesTable = () => {
     {
       name: t("services.actions") || "الإجراءات",
       cell: (row) => (
-        <TableActions
-          actions={[
-            {
-              label: t("services.editService") || "تعديل الخدمة",
-              icon: <Edit className="w-4 h-4" />,
-              href: `/admin/services/${row.id}/edit`,
-            },
-            {
-              label: t("services.editPrice") || "تعديل السعر",
-              icon: <Edit className="w-4 h-4" />,
-              onClick: () => handleEdit(row),
-              hidden: !row?.price,
-            },
-            {
-              label: t("services.delete") || "حذف",
-              icon: <Trash className="w-4 h-4" />,
-              onClick: () => askToDelete(row.id),
-              variant: "destructive",
-            },
-          ]}
-        />
+        <div className="flex gap-2">
+          <Link
+            href={`/admin/services/${row.id}/edit`}
+            className="btn btn-blue px-2 py-1 text-xs"
+            title={t("services.editService") || "تعديل الخدمة"}
+          >
+            <Edit className="w-4 h-4" />
+          </Link>
+          {row?.price && (
+            <button
+              onClick={() => handleEdit(row)}
+              className="btn btn-yellow px-2 py-1 text-xs"
+              title={t("services.editPrice") || "تعديل السعر"}
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            onClick={() => askToDelete(row.id)}
+            className="btn btn-danger px-2 py-1 text-xs font-medium"
+            title={t("services.delete") || "حذف"}
+          >
+            <Trash className="w-4 h-4" />
+          </button>
+        </div>
       ),
       ignoreRowClick: true,
-      button: true,
-      allowOverflow: true,
     },
   ];
 
