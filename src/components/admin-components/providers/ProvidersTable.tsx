@@ -274,7 +274,7 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                 <div className="mx-2">
                     <div className="rounded-3xl bg-white p-5">
                         <CustomDataTable
-                            tabs={tabs}
+                            tabs={tabs as any}
                             columns={columns}
                             data={providers}
                             searchableFields={["name", "email", "phoneNumber"]}

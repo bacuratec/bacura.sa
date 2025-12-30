@@ -239,7 +239,7 @@ const RequestsTable = ({ stats }: { stats: any }) => {
                 <div className="mx-2">
                     <div className="rounded-3xl bg-white p-5">
                         <CustomDataTable
-                            tabs={tabs}
+                            tabs={tabs as any}
                             columns={columns}
                             data={sortedData}
                             searchableFields={["fullName", "email", "requestNumber", "title"]}
