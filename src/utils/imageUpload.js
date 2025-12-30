@@ -54,20 +54,23 @@ export const uploadImageToStorage = async (
     const msg = (error?.message || "").toLowerCase();
     const isBucketMissing =
       msg.includes("bucket") && msg.includes("not found");
-    const fallbacks = [
-      process.env.NEXT_PUBLIC_SUPABASE_FALLBACK_BUCKET || "attachments",
-      "public",
-    ];
+    const fallbacks = [bucket, process.env.NEXT_PUBLIC_SUPABASE_FALLBACK_BUCKET || "attachments", "public"].filter(Boolean);
+    // Try server-side upload via API route
     try {
-      const target = bucket || fallbacks[0];
-      await fetch("/api/admin-storage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bucket: target, public: true }),
-      });
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("bucket", bucket);
+      fd.append("folder", folder);
+      const res = await fetch("/api/storage/upload", { method: "POST", body: fd });
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        const json = await res.json();
+        if (res.ok && json?.url) return json.url;
+      }
     } catch (e) {
       void e;
     }
+    // Fallback to alternative buckets if server route fails
     for (const fb of fallbacks) {
       try {
         const fallbackPath = `services/${Date.now()}-${Math.random()

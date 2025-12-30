@@ -6,6 +6,11 @@ export const adminGet = async (params) => {
     }
   });
   const res = await fetch(url.toString(), { method: "GET" });
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    const text = await res.text();
+    throw new Error(text || "Admin GET error");
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json?.error || "Admin GET error");
   return json?.data ?? null;
@@ -17,6 +22,11 @@ export const adminInsert = async ({ table, values }) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ table, values }),
   });
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    const text = await res.text();
+    throw new Error(text || "Admin POST error");
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json?.error || "Admin POST error");
   return json?.data ?? null;
@@ -28,6 +38,11 @@ export const adminUpdate = async ({ table, id, match, values }) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ table, id, match, values }),
   });
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    const text = await res.text();
+    throw new Error(text || "Admin PUT error");
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json?.error || "Admin PUT error");
   return json?.data ?? null;
@@ -39,8 +54,12 @@ export const adminDelete = async ({ table, id, match }) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ table, id, match }),
   });
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    const text = await res.text();
+    throw new Error(text || "Admin DELETE error");
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json?.error || "Admin DELETE error");
   return json?.data ?? null;
 };
-

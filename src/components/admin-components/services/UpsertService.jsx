@@ -4,7 +4,7 @@ import { useParams } from "@/utils/useParams";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
-import { adminGet, adminUpdate, adminDelete } from "@/utils/adminSupabase";
+import { supabase } from "@/lib/supabaseClient";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../shared/head-title/HeadTitle";
 import { SkeletonFormField } from "../../shared/skeletons/Skeleton";
@@ -82,16 +82,18 @@ const UpsertService = () => {
         imageUrl = uploadedUrl;
       }
 
-      const body = {
+      const updateBody = {
         name_ar: values.titleAr,
         name_en: values.titleEn,
-        price: values.isPriced ? Number(values.price) : null,
         image_url: imageUrl,
         is_active: values.isActive,
         updated_at: new Date().toISOString(),
       };
-
-      await adminUpdate({ table: "services", id, values: body });
+      if (values.isPriced) {
+        updateBody.price = Number(values.price);
+      }
+      const { error } = await supabase.from("services").update(updateBody).eq("id", id);
+      if (error) throw error;
       toast.success(tr("services.updateSuccess", "تم تحديث الخدمة بنجاح"));
       navigate("/admin/services");
     } catch (err) {
@@ -109,7 +111,8 @@ const UpsertService = () => {
     if (!window.confirm(tr("services.confirmDelete", "هل أنت متأكد من حذف هذه الخدمة؟"))) return;
     try {
       setIsDeleting(true);
-      await adminDelete({ table: "services", id });
+      const { error } = await supabase.from("services").delete().eq("id", id);
+      if (error) throw error;
       toast.success(tr("services.deleteSuccess", "تم حذف الخدمة بنجاح"));
       navigate("/admin/services");
     } catch (err) {
@@ -128,13 +131,12 @@ const UpsertService = () => {
       if (!isEdit) return;
       try {
         setIsLoadingDetails(true);
-        const rows = await adminGet({
-          table: "services",
-          select: "*",
-          match: { id },
-          limit: 1,
-        });
-        const svc = Array.isArray(rows) ? rows[0] : rows;
+        const { data: svc, error } = await supabase
+          .from("services")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+        if (error) throw error;
         setData(svc || null);
         if (svc?.image_url) setPreview(svc.image_url);
       } catch {

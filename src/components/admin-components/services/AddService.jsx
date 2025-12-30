@@ -4,7 +4,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
 import { useGetServicesQuery } from "../../../redux/api/servicesApi";
-import { adminInsert } from "@/utils/adminSupabase";
+import OptimizedImage from "@/components/shared/OptimizedImage";
 import { supabase } from "@/lib/supabaseClient";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../shared/head-title/HeadTitle";
@@ -69,34 +69,18 @@ const AddService = () => {
         imageUrl: imageUrl || null,
       };
 
-      let supabaseError = null;
-      try {
-        const { error } = await supabase
-          .from("services")
-          .insert({
-            name_ar: payload.titleAr,
-            name_en: payload.titleEn,
-            price: payload.price,
-            image_url: payload.imageUrl,
-            is_active: payload.isActive,
-            created_at: new Date().toISOString(),
-          });
-        supabaseError = error || null;
-      } catch (e) {
-        supabaseError = e;
+      const insertBody = {
+        name_ar: payload.titleAr,
+        name_en: payload.titleEn,
+        image_url: payload.imageUrl,
+        is_active: payload.isActive,
+        created_at: new Date().toISOString(),
+      };
+      if (payload.price !== null) {
+        insertBody.price = payload.price;
       }
-      if (supabaseError) {
-        await adminInsert({
-          table: "services",
-          values: {
-            name_ar: payload.titleAr,
-            name_en: payload.titleEn,
-            price: payload.price,
-            image_url: payload.imageUrl,
-            is_active: payload.isActive,
-          },
-        });
-      }
+      const { error } = await supabase.from("services").insert(insertBody);
+      if (error) throw error;
       toast.success(tr("services.addService.successAdd", "تم إضافة الخدمة بنجاح"));
       resetForm();
       setPreview(null);
@@ -182,9 +166,12 @@ const AddService = () => {
                   />
                 ) : (
                   <div className="relative inline-block mt-2 mb-2">
-                    <img
+                    <OptimizedImage
                       src={preview}
                       alt="Preview"
+                      width={128}
+                      height={128}
+                      quality={80}
                       className="w-32 h-32 object-cover rounded-md border"
                     />
                     <button

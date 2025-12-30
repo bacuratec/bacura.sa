@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import { adminGet, adminUpdate, adminDelete, adminInsert } from "@/utils/adminSupabase";
+import OptimizedImage from "@/components/shared/OptimizedImage";
+import { supabase } from "@/lib/supabaseClient";
 import UpdatePriceModal from "./UpdatePriceModal";
 import { useTranslation } from "react-i18next";
 import { Edit, PlusIcon, Trash } from "lucide-react";
@@ -29,11 +30,11 @@ const ServicesTable = () => {
   const handleUpdatePrice = async (newPrice) => {
     try {
       setIsLoading(true);
-      await adminUpdate({
-        table: "services",
-        id: service.id,
-        values: { price: newPrice, updated_at: new Date().toISOString() },
-      });
+      const { error } = await supabase
+        .from("services")
+        .update({ price: newPrice, updated_at: new Date().toISOString() })
+        .eq("id", service.id);
+      if (error) throw error;
       toast.success(t("services.updatePriceSuccess") || "تم تحديث السعر");
       await refetch();
     } catch (err) {
@@ -54,13 +55,12 @@ const ServicesTable = () => {
   const refetch = async () => {
     try {
       setIsLoading(true);
-      const data = await adminGet({
-        table: "services",
-        select: "*",
-        orderBy: "created_at",
-        orderAsc: false,
-        limit: 500,
-      });
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
       setLocalData(data || []);
     } catch (err) {
       toast.error(
@@ -92,13 +92,12 @@ const ServicesTable = () => {
   const seedDemo = async () => {
     try {
       setSeeding(true);
-      const existing = await adminGet({
-        table: "services",
-        select: "id,name_en",
-        orderBy: "created_at",
-        orderAsc: false,
-        limit: 1000,
-      });
+      const { data: existing, error } = await supabase
+        .from("services")
+        .select("id,name_en")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+      if (error) throw error;
       const names = new Set((existing || []).map((r) => (r?.name_en || "").toLowerCase()));
       const demo = [
         { name_ar: "خدمة التصميم الهندسي", name_en: "Engineering Design", price: 2500, image_url: null, is_active: true },
@@ -108,7 +107,10 @@ const ServicesTable = () => {
         { name_ar: "اختبار وضمان الجودة", name_en: "QA & Testing", price: 800, image_url: null, is_active: true },
       ].filter((s) => !names.has((s.name_en || "").toLowerCase()));
       for (const s of demo) {
-        await adminInsert({ table: "services", values: { ...s } });
+        const { error: insError } = await supabase
+          .from("services")
+          .insert({ ...s });
+        if (insError) throw insError;
       }
       toast.success(tr("services.seedSuccess", "تم إضافة بيانات تجريبية"));
       await refetch();
@@ -129,7 +131,11 @@ const ServicesTable = () => {
 
     try {
       setIsDeleting(true);
-      await adminDelete({ table: "services", id: selectedId });
+      const { error } = await supabase
+        .from("services")
+        .delete()
+        .eq("id", selectedId);
+      if (error) throw error;
       toast.success(t("services.deleteSuccess") || "تم حذف الخدمة بنجاح");
       setOpenDelete(false);
       setSelectedId(null);
@@ -151,11 +157,11 @@ const ServicesTable = () => {
 
     try {
       const next = !service.is_active;
-      await adminUpdate({
-        table: "services",
-        id: service.id,
-        values: { is_active: next, updated_at: new Date().toISOString() },
-      });
+      const { error } = await supabase
+        .from("services")
+        .update({ is_active: next, updated_at: new Date().toISOString() })
+        .eq("id", service.id);
+      if (error) throw error;
     } catch (err) {
       toast.error(
         err?.data?.message || tr("services.statusChangeError", "فشل تغيير الحالة")
@@ -172,21 +178,25 @@ const ServicesTable = () => {
   const columns = [
     {
       name: t("services.image") || "الصورة",
-      cell: (row) => (
-        <div className="w-12 h-12 rounded overflow-hidden border bg-gray-50">
-          {row?.image_url || row?.imageUrl ? (
-            <img
-              src={row.image_url || row.imageUrl}
-              alt="service"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-              -
-            </div>
-          )}
-        </div>
-      ),
+      cell: (row) => {
+        const src = row?.image_url || row?.imageUrl || "";
+        return (
+          <div className="w-12 h-12 rounded overflow-hidden border bg-gray-50">
+            {src ? (
+              <OptimizedImage
+                src={src}
+                alt={row?.name_en || row?.name_ar || "service"}
+                width={48}
+                height={48}
+                quality={80}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">-</div>
+            )}
+          </div>
+        );
+      },
       ignoreRowClick: true,
       button: true,
       width: "80px",
