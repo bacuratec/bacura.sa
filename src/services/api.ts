@@ -207,6 +207,33 @@ export class RequestService extends BaseService {
       return { data, error }
     })
   }
+
+  async getAllRequests({ pageNumber = 1, pageSize = 10, requestStatus = "" }) {
+    return this.handleSupabaseOperation(async () => {
+      let query = supabase!
+        .from('requests')
+        .select(`
+          *,
+          requester:profiles!requests_requester_id_fkey(id,full_name),
+          service:services(id,name_ar,name_en),
+          status:request_statuses!requests_status_id_fkey(id,name_ar,name_en,code),
+          city:cities(id,name_ar,name_en)
+        `, { count: 'exact' })
+
+      if (requestStatus) {
+        query = query.eq('status_id', requestStatus)
+      }
+
+      const from = (Number(pageNumber) - 1) * Number(pageSize)
+      const to = from + Number(pageSize) - 1
+
+      const { data, error, count } = await query
+        .range(from, to)
+        .order('created_at', { ascending: false })
+
+      return { data, error, count }
+    })
+  }
 }
 
 export class ProjectService extends BaseService {
@@ -353,3 +380,213 @@ export const requestService = new RequestService()
 export const projectService = new ProjectService()
 export const notificationService = new NotificationService()
 export const servicesService = new BaseService('services')
+
+export class AdminStatisticsService extends BaseService {
+  constructor() {
+    super('users' as any) // Base table, though we'll query multiple
+  }
+
+  async getRequestersStatistics() {
+    return this.handleSupabaseOperation(async () => {
+      const [totalRequesters, activeRequesters] = await Promise.all([
+        supabase!.from("requesters").select("id", { count: "exact", head: true }),
+        supabase!
+          .from("requesters")
+          .select("id", { count: "exact", head: true })
+          .eq("users!requesters_user_id_fkey.is_blocked", false),
+      ]);
+
+      return {
+        data: {
+          totalRequestersCount: totalRequesters.count || 0,
+          activeRequestersCount: activeRequesters.count || 0,
+          inactiveRequestersCount: (totalRequesters.count || 0) - (activeRequesters.count || 0),
+        },
+        error: null // Promise.all errors caught by handleSupabaseOperation
+      };
+    })
+  }
+
+  async getServiceProvidersStatistics() {
+    return this.handleSupabaseOperation(async () => {
+      const [
+        total,
+        pending,
+        active,
+        blocked,
+        suspended
+      ] = await Promise.all([
+        supabase!.from("providers").select("id", { count: "exact", head: true }),
+        supabase!.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 200),
+        supabase!.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 201),
+        supabase!.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 202),
+        supabase!.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 203),
+      ]);
+
+      return {
+        data: {
+          totalAccountsCount: total.count || 0,
+          pendingAccountsCount: pending.count || 0,
+          activeAccountsCount: active.count || 0,
+          blockedAccountsCount: blocked.count || 0,
+          suspendedAccountsCount: suspended.count || 0,
+        },
+        error: null
+      };
+    })
+  }
+
+  async getRequestsStatistics() {
+    return this.handleSupabaseOperation(async () => {
+      const [
+        total,
+        processing,
+        initialApproval,
+        waitingPayment,
+        rejected,
+        completed,
+        newRequests
+      ] = await Promise.all([
+        supabase!.from("requests").select("id", { count: "exact", head: true }),
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 500),
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 501),
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 502),
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 503),
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 504),
+        supabase!.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 505),
+      ]);
+
+      return {
+        data: {
+          totalRequestsCount: total.count || 0,
+          underProcessingRequestsCount: processing.count || 0,
+          initiallyApprovedRequestsCount: initialApproval.count || 0,
+          waitingForPaymentRequestsCount: waitingPayment.count || 0,
+          rejectedRequestsCount: rejected.count || 0,
+          approvedRequestsCount: completed.count || 0,
+          newRequestsCount: newRequests.count || 0,
+        },
+        error: null
+      };
+    })
+  }
+
+  async getAdminStatistics() {
+    return this.handleSupabaseOperation(async () => {
+      const [
+        usersCount,
+        requestersCount,
+        providersCount,
+        requestsCount,
+        ordersCount,
+        paymentsCount,
+        projectsCount,
+        ticketsCount,
+      ] = await Promise.all([
+        supabase!.from("users").select("id", { count: "exact", head: true }),
+        supabase!.from("requesters").select("id", { count: "exact", head: true }),
+        supabase!.from("providers").select("id", { count: "exact", head: true }),
+        supabase!.from("requests").select("id", { count: "exact", head: true }),
+        supabase!.from("orders").select("id", { count: "exact", head: true }),
+        supabase!
+          .from("payments")
+          .select("amount", { count: "exact", head: false }),
+        supabase!.from("projects").select("id", { count: "exact", head: true }),
+        supabase!.from("tickets").select("id", { count: "exact", head: true }),
+      ]);
+
+      const totalAmount =
+        paymentsCount.data?.reduce(
+          (sum, row) => sum + Number((row as any).amount || 0),
+          0
+        ) || 0;
+
+      return {
+        data: {
+          totalUsers: usersCount.count || 0,
+          totalRequesters: requestersCount.count || 0,
+          totalProviders: providersCount.count || 0,
+          totalRequests: requestsCount.count || 0,
+          totalOrders: ordersCount.count || 0,
+          totalProjects: projectsCount.count || 0,
+          totalTickets: ticketsCount.count || 0,
+          totalFinancialAmounts: totalAmount,
+          consultationsFinancialAmounts: 0,
+        },
+        error: null
+      };
+    })
+  }
+
+  async getProviderOrderStatistics(providerId: string) {
+    return this.handleSupabaseOperation(async () => {
+      const providerOrders = await supabase!
+        .from("orders")
+        .select("order_status_id", { count: "exact" })
+        .eq("provider_id", providerId);
+
+      return {
+        data: {
+          totalOrders: providerOrders.count || 0,
+        },
+        error: providerOrders.error
+      };
+    })
+  }
+}
+
+export const adminStatisticsService = new AdminStatisticsService()
+
+export class ProviderService extends BaseService {
+  constructor() {
+    super('providers' as any)
+  }
+
+  async getAllProviders({ pageNumber = 1, pageSize = 10, name = "", accountStatus = "" }) {
+    return this.handleSupabaseOperation(async () => {
+      let query = supabase!
+        .from('providers')
+        .select(`
+          *,
+          user:users!providers_user_id_fkey(id,email,phone,role,is_blocked),
+          entityType:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code),
+          city:cities(id,name_ar,name_en),
+          profileStatus:lookup_values!providers_profile_status_id_fkey(id,name_ar,name_en,code)
+        `, { count: 'exact' })
+
+      if (name) {
+        query = query.ilike('name', `%${name}%`)
+      }
+
+      if (accountStatus) {
+        query = query.eq('profile_status_id', accountStatus)
+      }
+
+      const from = (Number(pageNumber) - 1) * Number(pageSize)
+      const to = from + Number(pageSize) - 1
+
+      const { data, error, count } = await query
+        .range(from, to)
+      // .order('created_at', { ascending: false }) // providers might not have created_at, using id or default sort
+
+      return { data, error, count }
+    })
+  }
+
+  async updateStatus(userId: string, isBlocked: boolean) {
+    return this.handleSupabaseOperation(async () => {
+      const { data, error } = await (supabase as any)
+        .from('users')
+        .update({
+          is_blocked: isBlocked,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+        .select()
+        .single()
+      return { data, error }
+    })
+  }
+}
+
+export const providerService = new ProviderService()

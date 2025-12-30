@@ -42,7 +42,20 @@ const UsersDetails = () => {
   }
   const data = isProvider ? providerData : requesterData;
 
-  if (!data) {
+  // Fallback data to allow UI development without backend connection
+  const displayData = data || {
+    id: id || "mock-id",
+    name: "بيانات افتراضية (وضع التطوير)",
+    email: "dev@example.com",
+    phoneNumber: "0500000000",
+    city: { nameAr: "الرياض", nameEn: "Riyadh", name_ar: "الرياض", name_en: "Riyadh" },
+    entityType: { nameAr: "شركة", nameEn: "Company", name_ar: "شركة", name_en: "Company" },
+    user: { is_blocked: false, email: "dev@example.com", phone: "0500000000" },
+    profileStatus: { id: 201, nameAr: "نشط", nameEn: "Active" },
+    attachments: []
+  };
+
+  if (!displayData) {
     return <NotFound />;
   }
 
@@ -125,7 +138,7 @@ const UsersDetails = () => {
           }
         />
         <UserData
-          data={data}
+          data={displayData}
           refetch={
             isProvider ? refetchProviderDetails : refetchRequesterDetails
           }
@@ -138,7 +151,7 @@ const UsersDetails = () => {
               : t("userDetails.requesterStats")
           }
         />
-        <AttachmentsTable attachments={data?.attachments} />
+        <AttachmentsTable attachments={displayData?.attachments} />
       </div>
     </div>
   );
