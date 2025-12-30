@@ -144,6 +144,18 @@ const LoginForm = () => {
         return;
       }
 
+      // Sync session cookies on server
+      try {
+        await fetch("/api/auth/set-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          }),
+        });
+      } catch {}
+
       dispatch(
         setCredentials({
           token: session.access_token,
@@ -176,11 +188,10 @@ const LoginForm = () => {
       } else if (normalizedRole === "provider") {
         router.replace("/provider");
       } else if (normalizedRole === "requester") {
-        const targetPath = from && from !== "/login" && from !== "/" ? from : "/profile";
-        router.replace(targetPath);
+        router.replace("/profile");
       } else {
         toast.warning(t("loginForm.errors.unknownRole"));
-        router.replace("/");
+        router.replace("/profile");
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -294,6 +305,44 @@ const LoginForm = () => {
           </Form>
         )}
       </Formik>
+      {/* Resend activation helper */}
+      <div className="mt-4 text-center text-sm text-gray-600">
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              const emailInput = document.querySelector('input[name="email"]');
+              const email = emailInput?.value?.trim();
+              if (!email) {
+                toast.error(t("loginForm.enterEmailFirst") || "أدخل البريد أولاً");
+                return;
+              }
+              const res = await fetch("/api/auth/resend-link", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email,
+                  redirectTo:
+                    process.env.NEXT_PUBLIC_SUPABASE_REDIRECT_URL ||
+                    "http://localhost:3000/auth/callback",
+                }),
+              });
+              const data = await res.json();
+              if (!res.ok || !data?.actionLink) {
+                throw new Error(data?.error || "فشل إرسال رابط التفعيل");
+              }
+              toast.success(t("loginForm.activationLinkSent") || "تم إرسال رابط التفعيل");
+              // Optionally open the link
+              // window.open(data.actionLink, "_blank");
+            } catch (e) {
+              toast.error(e?.message || "حدث خطأ أثناء إرسال الرابط");
+            }
+          }}
+          className="text-primary underline"
+        >
+          {t("loginForm.resendActivation") || "إعادة إرسال رابط التفعيل"}
+        </button>
+      </div>
     </div>
   );
 };

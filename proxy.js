@@ -11,9 +11,6 @@ export default async function proxy(request) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    // If config is missing, we can't do auth checks. 
-    // Just return the response (or you could redirect to an error page)
-    console.error('Supabase env vars missing in proxy')
     return supabaseResponse
   }
 
@@ -92,6 +89,9 @@ export default async function proxy(request) {
         url.pathname = '/profile'
         return NextResponse.redirect(url)
       }
+      // Unknown role: default to requester dashboard
+      url.pathname = '/profile'
+      return NextResponse.redirect(url)
     }
   }
 
@@ -130,6 +130,11 @@ export default async function proxy(request) {
   // but if it's under /admin or /provider it's already caught.
   // This block catches /profile which is the Requester dashboard.
   if (url.pathname.startsWith('/profile')) {
+    if (!user) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('from', '/profile')
+      return NextResponse.redirect(loginUrl)
+    }
     if (user) {
       const role = await getEffectiveUserRole(user)
       if (role === 'Admin') {
@@ -146,6 +151,11 @@ export default async function proxy(request) {
 
   // 4. Request Service Protection (Requester only)
   if (url.pathname.startsWith('/request-service')) {
+    if (!user) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('from', '/request-service')
+      return NextResponse.redirect(loginUrl)
+    }
     if (user) {
       const role = await getEffectiveUserRole(user)
       if (role === 'Admin') {

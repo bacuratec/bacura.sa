@@ -9,19 +9,14 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUP
 // It is only safe for server-side operations.
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-// التحقق من وجود المتغيرات المطلوبة
 const validUrl = supabaseUrl?.trim() || '';
 const validAnonKey = supabaseAnonKey?.trim() || '';
 
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  const debug = typeof localStorage !== 'undefined' && localStorage.getItem('SUPABASE_DEBUG') === '1';
-  if (debug) {
-    console.log('Supabase Init:', {
-      url: validUrl,
-      keyLength: validAnonKey ? validAnonKey.length : 0,
-      envUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      envKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    });
+let __warnedMissingEnv = false;
+if (!validUrl || !validAnonKey) {
+  if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production' && !__warnedMissingEnv) {
+    __warnedMissingEnv = true;
+    console.warn('Supabase configuration missing: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.');
   }
 }
 

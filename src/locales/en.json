@@ -387,7 +387,9 @@
       "unknownError": "An unknown error occurred. Please try again.",
       "sessionError": "Failed to establish user session. Please try again.",
       "roleNotFound": "Failed to determine user role. Please try again.",
-      "unknownRole": "Unknown user role. Redirecting to home."
+      "unknownRole": "Unknown user role. Redirecting to home.",
+      "emailNotConfirmed": "Email not confirmed. Please check your inbox and verify your email.",
+      "unauthorized": "Unauthorized. Please check your credentials or try again later."
     },
     "validation": {
       "invalidEmail": "Invalid email address",
@@ -395,8 +397,9 @@
       "passwordMin": "Password must be at least 6 characters"
     }
   },
-  "loginForm.errors.emailNotConfirmed": "Email not confirmed. Please check your inbox and verify your email.",
-  "loginForm.errors.unauthorized": "Unauthorized. Please check your credentials or try again later.",
+  "loginForm.resendActivation": "Resend activation link",
+  "loginForm.activationLinkSent": "Activation link sent to your email",
+  "loginForm.enterEmailFirst": "Enter your email first",
   "exploreRequests": {
     "pageTitle": "Explore Requests",
     "columns": {
