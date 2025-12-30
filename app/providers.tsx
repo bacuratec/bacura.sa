@@ -5,8 +5,9 @@ import { Suspense } from "react";
 // Initialize i18n before anything else
 import "@/lib/i18n";
 
-import StoreProvider from "@/lib/redux/StoreProvider";
+
 import { LanguageProvider } from "@/context/LanguageContext";
+import StoreProvider from "@/lib/redux/StoreProvider";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import BackToTopButton from "@/components/BackTop";
@@ -17,8 +18,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     return (
         <ErrorBoundary>
             <Suspense fallback={<div>Loading...</div>}>
-                <LanguageProvider>
-                    <StoreProvider>
+                <StoreProvider>
+                    <LanguageProvider>
                         <AuthInitializer>
                             <DirManager />
                             <Toaster
@@ -51,8 +52,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                             {children}
                             <BackToTopButton />
                         </AuthInitializer>
-                    </StoreProvider>
-                </LanguageProvider>
+                    </LanguageProvider>
+                </StoreProvider>
             </Suspense>
         </ErrorBoundary>
     );

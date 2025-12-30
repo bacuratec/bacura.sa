@@ -19,12 +19,12 @@ export class BaseService {
         return { data: null, error: 'Supabase client not initialized' }
       }
       const { data, error } = await operation()
-      
+
       if (error) {
         console.error(`Error in ${this.tableName}:`, error)
         return { data: null, error: error.message || 'An error occurred' }
       }
-      
+
       return { data, error: null }
     } catch (error) {
       console.error(`Unexpected error in ${this.tableName}:`, error)
@@ -352,3 +352,4 @@ export const profileService = new ProfileService()
 export const requestService = new RequestService()
 export const projectService = new ProjectService()
 export const notificationService = new NotificationService()
+export const servicesService = new BaseService('services')
