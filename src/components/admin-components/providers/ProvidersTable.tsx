@@ -279,6 +279,9 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                             data={providers}
                             searchableFields={["name", "email", "phoneNumber"] as any}
                             searchPlaceholder={t("searchPlaceholder")}
+                            pagination={true}
+                            title={t("providersTable.title") || ""}
+                            allowOverflow={true}
                             defaultPage={Number(PageNumber)}
                             defaultPageSize={Number(PageSize)}
                             isLoading={isLoading}

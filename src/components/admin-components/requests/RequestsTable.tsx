@@ -244,6 +244,9 @@ const RequestsTable = ({ stats }: { stats: any }) => {
                             data={sortedData}
                             searchableFields={["fullName", "email", "requestNumber", "title"] as any}
                             searchPlaceholder={t("searchPlaceholder")}
+                            pagination={true}
+                            title={t("request.title") || ""}
+                            allowOverflow={true}
                             defaultPage={Number(PageNumber)}
                             defaultPageSize={Number(PageSize)}
                             isLoading={isLoading}
