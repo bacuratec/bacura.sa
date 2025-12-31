@@ -37,7 +37,7 @@ const RequestDetails = ({ initialData, id }) => {
     const status = requestData?.status || data?.status;
     const code = status?.code || "";
     if (code === "priced" || code === "accepted") {
-      const amt = data?.servicePrice ?? data?.service?.price;
+      const amt = data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price;
       if (typeof amt === "number" && Number.isFinite(amt) && amt > 0) {
         setShowPayment({
           amount: amt,

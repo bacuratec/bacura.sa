@@ -43,33 +43,43 @@ const RecentRequests = ({ orders }) => {
                     <tbody>
                         {orders.map((item) => {
                             const service =
-                              item.request?.service ||
-                              item.service ||
-                              null;
+                                item.request?.service ||
+                                item.service ||
+                                null;
                             const serviceName =
-                              service?.[isRtl ? "name_ar" : "name_en"] ||
-                              item.request?.title ||
-                              item.title ||
-                              "-";
+                                service?.[isRtl ? "name_ar" : "name_en"] ||
+                                item.request?.title ||
+                                item.title ||
+                                "-";
                             const statusObj = item.status || item.request?.status || null;
                             const statusName =
-                              statusObj?.[isRtl ? "name_ar" : "name_en"] || t("common.status");
+                                statusObj?.[isRtl ? "name_ar" : "name_en"] || t("common.status");
                             const createdAt = item.created_at || item.request?.created_at;
                             return (
-                            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-4 py-4 font-medium text-gray-900">
-                                    {serviceName}
-                                </td>
-                                <td className="px-4 py-4 text-gray-500">
-                                    {createdAt ? dayjs(createdAt).locale(isRtl ? "ar" : "en").format("DD MMM YYYY") : "-"}
-                                </td>
-                                <td className="px-4 py-4">
-                                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {statusName}
-                                    </span>
-                                </td>
-                            </tr>
-                        )})}
+                                <tr key={item.id} className="bg-white border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                                    <td className="px-4 py-4">
+                                        <div className="font-bold text-gray-800">{serviceName}</div>
+                                        <div className="text-[10px] text-gray-400 mt-0.5">#{item.id?.substring(0, 8)}</div>
+                                    </td>
+                                    <td className="px-4 py-4 text-gray-500 whitespace-nowrap">
+                                        {createdAt ? dayjs(createdAt).locale(isRtl ? "ar" : "en").format("DD MMM YYYY") : "-"}
+                                    </td>
+                                    <td className="px-4 py-4">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-all
+                                        ${statusObj?.code === 'approved' || statusObj?.code === 'completed'
+                                                ? "border-green-200 bg-green-50 text-green-700"
+                                                : statusObj?.code === 'under_processing' || statusObj?.code === 'initially_approved'
+                                                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                                                    : statusObj?.code === 'rejected'
+                                                        ? "border-red-200 bg-red-50 text-red-700"
+                                                        : "border-gray-200 bg-gray-50 text-gray-600"
+                                            }`}>
+                                            {statusName}
+                                        </span>
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>

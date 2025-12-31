@@ -8,17 +8,15 @@ const UserData = ({ data }) => {
   const { lang } = useContext(LanguageContext);
 
   const {
-    fullName,
+    full_name: fullName,
     email,
-    phoneNumber,
-    joiningDate,
-    name,
-    creationTime,
-    commercialRegistrationNumber,
-    entityType,
+    phone: phoneNumber,
+    creation_time: creationTime,
+    commercial_registration_number: commercialRegistrationNumber,
+    entity_type: entityType,
     city,
-    commercialRegistrationDate: commercialRegistration,
-  } = data;
+    commercial_registration_date: commercialRegistration,
+  } = (data?.user || data);
 
   const joiningDateFormatted = new Date(creationTime).toLocaleDateString(
     "ar-EG",
@@ -44,7 +42,7 @@ const UserData = ({ data }) => {
         <div className="flex items-center xl:gap-10 lg:gap-8 md:gap-5 sm:gap-3 gap-2 flex-wrap">
           <div className="shrink-0 profile w-[150px] h-[150px] bg-gray-500 rounded-xl col-span-1 overflow-hidden">
             <img
-              src={`${base}${data?.profilePictureUrl}`}
+              src={data?.profile_picture_url ? `${base}${data.profile_picture_url}` : "/vite.png"}
               alt=""
               className="w-full h-full object-cover"
             />
@@ -55,13 +53,13 @@ const UserData = ({ data }) => {
                 <span className="text-primary font-bold">
                   {t("userData.fullName")}:
                 </span>
-                <span>{fullName ?? name}</span>
+                <span>{fullName || data?.name || "-"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-primary font-bold">
                   {t("userData.email")}:
                 </span>
-                <span>{email}</span>
+                <span>{email || data?.user?.email || "-"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-primary font-bold">
@@ -73,7 +71,7 @@ const UserData = ({ data }) => {
                 <span className="text-primary font-bold">
                   {t("userData.registrationDate")}:
                 </span>
-                <span>{joiningDate ?? joiningDateFormatted}</span>
+                <span>{creationTime ? new Date(creationTime).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US") : "-"}</span>
               </div>
               {commercialRegistrationNumber && (
                 <div className="flex items-center gap-2">
@@ -97,7 +95,7 @@ const UserData = ({ data }) => {
                     {t("userData.entityType")}:
                   </span>
                   <span>
-                    {lang === "ar" ? entityType.nameAr : entityType.nameEn}
+                    {lang === "ar" ? (entityType.name_ar || entityType.nameAr) : (entityType.name_en || entityType.nameEn)}
                   </span>
                 </div>
               )}
@@ -106,7 +104,7 @@ const UserData = ({ data }) => {
                   <span className="text-primary font-bold">
                     {t("userData.workRegion")}:
                   </span>
-                  <span> {lang === "ar" ? city.nameAr : city.nameEn}</span>
+                  <span> {lang === "ar" ? (city.name_ar || city.nameAr) : (city.name_en || city.nameEn)}</span>
                 </div>
               )}
             </div>

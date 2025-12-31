@@ -30,7 +30,7 @@ export const projectsApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "request:requests(id,title,description,requester_id, requester:requesters(id,name), service:services(base_price))",
+            "request:requests(id,title,description,requester_id, requester:requesters(id,name), service:services(name_ar,name_en,base_price))",
             "provider:providers(id,name,specialization)",
             "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
           ],
@@ -66,7 +66,7 @@ export const projectsApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "request:requests(id,title,description,requester_id, requester:requesters(id,name), service:services(base_price))",
+            "request:requests(id,title,description,requester_id, requester:requesters(id,name), service:services(name_ar,name_en,base_price))",
             "provider:providers(id,name,specialization)",
             "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
           ],
@@ -103,7 +103,7 @@ export const projectsApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "request:requests!inner(id,title,description,requester_id, requester:requesters(id,name), service:services(base_price))",
+            "request:requests!inner(id,title,description,requester_id, requester:requesters(id,name), service:services(name_ar,name_en,base_price))",
             "provider:providers(id,name,specialization)",
             "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
           ],
@@ -127,12 +127,13 @@ export const projectsApi = createApi({
     }),
     // Get Project Statistics
     getProjectStatistics: builder.query({
-      query: () => {
-        // This would need custom logic - for now return orders count
+      query: (filters = {}) => {
         return {
           table: "orders",
           method: "GET",
-          filters: {},
+          count: "exact",
+          pagination: { page: 1, pageSize: 1 }, // Just get count
+          filters,
         };
       },
       providesTags: ["Orders"],

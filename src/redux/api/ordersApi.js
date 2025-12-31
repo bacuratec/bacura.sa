@@ -109,7 +109,7 @@ export const ordersApi = createApi({
         id,
         joins: [
           "requester:requesters!requests_requester_id_fkey(id,name)",
-          "service:services(id,name_ar,name_en,price)",
+          "service:services(id,name_ar,name_en,base_price)",
           "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
         ],

@@ -8,10 +8,10 @@ const UserRequestDetails = dynamic(() => import("@/views/landing/request-details
   loading: () => <DetailPageSkeleton />,
 });
 
-export default function RequestDetailsContent({ id }) {
+export default function RequestDetailsContent({ id, initialData }) {
   return (
     <Suspense fallback={<DetailPageSkeleton />}>
-      <UserRequestDetails id={id} />
+      <UserRequestDetails id={id} initialData={initialData} />
     </Suspense>
   );
 }

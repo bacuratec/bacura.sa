@@ -40,21 +40,20 @@ const ProjectUserDetails = () => {
   }
   return (
     <div className="py-6">
-      <title>{`${t("projectDetails.title")} #${
-        data?.orderNumber
-      }`}</title>
+      <title>{`${t("projectDetails.title")} #${data?.id?.slice(0, 8)
+        }`}</title>
       <meta name="description" content={data?.description} />
       <div className="container">
         <HeadTitle
-          title={`${t("projectDetails.title")} #${data?.orderNumber}`}
+          title={`${t("projectDetails.title")} #${data?.id?.slice(0, 8)}`}
           nav1={t("projectDetails.nav1")}
           nav2={t("projectDetails.nav2")}
           typeProject={
             lang === "ar"
-              ? data?.orderStatus?.nameAr
-              : data?.orderStatus?.nameEn
+              ? (data?.status?.name_ar || data?.orderStatus?.nameAr)
+              : (data?.status?.name_en || data?.orderStatus?.nameEn)
           }
-          statusProject={data?.orderStatus?.id}
+          statusProject={data?.status?.id || data?.orderStatus?.id}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 lg:gap-6 xl:gap-8 mt-5">

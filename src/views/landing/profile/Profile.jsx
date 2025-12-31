@@ -146,6 +146,13 @@ const Profile = () => {
             </div>
 
             <SuspendModal open={openSuspend} setOpen={setOpenSuspend} />
+            {/* تاريخ الاشتراك */}
+            <div className="w-fit mt-4">
+              <div className="border border-gray-100 bg-gray-50/50 rounded-xl px-4 py-2 text-sm font-bold text-gray-500 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                {t("profile.joinedSince", { date: formattedDate })}
+              </div>
+            </div>
           </div>
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
@@ -159,17 +166,32 @@ const Profile = () => {
                 {t("profile.suspendAccount")}
               </button>
             </div>
-            <div className="mt-4 bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-              <h4 className="font-bold text-sm mb-3">{t("profile.quickActions") || "إجراءات سريعة"}</h4>
-              <div className="grid grid-cols-1 gap-2">
-                <Link href="/request-service" className="w-full text-center bg-primary/10 text-primary hover:bg-primary/20 transition-colors rounded-lg py-2 font-medium">
-                  {t("navSeeker.postRequest") || "طلب خدمة جديدة"}
+            <div className="mt-4 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h4 className="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                {t("profile.quickActions") || "إجراءات سريعة"}
+              </h4>
+              <div className="grid grid-cols-1 gap-3">
+                <Link href="/request-service" className="group flex items-center justify-between w-full bg-primary/[0.03] text-primary border border-primary/10 hover:bg-primary hover:text-white transition-all duration-300 rounded-xl px-4 py-3 font-bold text-sm">
+                  <span className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                    {t("navSeeker.postRequest") || "طلب خدمة جديدة"}
+                  </span>
+                  <span className="rtl:rotate-180 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                 </Link>
-                <Link href="/requests" className="w-full text-center bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg py-2 font-medium">
-                  {t("navSeeker.explore") || "تصفح طلباتي"}
+                <Link href="/requests" className="group flex items-center justify-between w-full bg-gray-50 text-gray-700 border border-gray-100 hover:bg-gray-800 hover:text-white transition-all duration-300 rounded-xl px-4 py-3 font-bold text-sm">
+                  <span className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /></svg>
+                    {t("navSeeker.explore") || "تصفح طلباتي"}
+                  </span>
+                  <span className="rtl:rotate-180 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                 </Link>
-                <Link href="/support" className="w-full text-center bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg py-2 font-medium">
-                  {t("navSeeker.support") || "الدعم الفني"}
+                <Link href="/support" className="group flex items-center justify-between w-full bg-gray-50 text-gray-700 border border-gray-100 hover:bg-gray-800 hover:text-white transition-all duration-300 rounded-xl px-4 py-3 font-bold text-sm">
+                  <span className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                    {t("navSeeker.support") || "الدعم الفني"}
+                  </span>
+                  <span className="rtl:rotate-180 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                 </Link>
               </div>
             </div>

@@ -8,25 +8,35 @@ const DashboardInfo = ({ stats, title }) => {
         {stats?.map((item, i) => (
           <div
             key={i}
-            className={`p-4 md:p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 rounded-xl bg-white group`}
+            className="group relative p-6 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-500 overflow-hidden"
           >
-            <div className="flex flex-col gap-2">
-              <h4 className="font-medium text-gray-500 text-sm">
-                {item?.title}
-              </h4>
-              <span className="font-bold text-lg md:text-xl lg:text-2xl">
-                {item?.number}
-              </span>
+            <div className="flex items-start justify-between">
+              <div className="flex flex-col">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                  {item?.title}
+                </p>
+                <h4 className="text-2xl font-black text-gray-800">
+                  {item?.number}
+                </h4>
+              </div>
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500"
+                style={{ backgroundColor: `${item?.color}20`, color: item?.color }}
+              >
+                {item?.ic ? React.cloneElement(item?.icon, { size: 24, strokeWidth: 2.5 }) : (
+                  <img
+                    src={typeof item?.icon === "string" ? item.icon : (item?.icon?.src || "")}
+                    alt={item?.title || "icon"}
+                    className="w-6 h-6 object-contain"
+                  />
+                )}
+              </div>
             </div>
-            {item?.ic ? item?.icon : (
-              <img
-                src={typeof item?.icon === "string" ? item.icon : (item?.icon?.src || "")}
-                alt={item?.title || "icon"}
-                loading="lazy"
-                decoding="async"
-                className="w-6 h-6"
-              />
-            )}
+
+            <div
+              className="absolute bottom-0 left-0 h-1 bg-primary transition-all duration-500 rounded-full"
+              style={{ width: '0%', backgroundColor: item?.color }}
+            />
           </div>
         ))}
       </div>

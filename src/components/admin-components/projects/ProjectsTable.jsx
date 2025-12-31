@@ -164,10 +164,11 @@ const ProjectsTable = ({ stats, requesterId }) => {
     {
       name: t("projects.orderNumber"),
       cell: (row) => (
-        <span className="rounded-lg text-xs text-blue-600 font-normal">
-          {row?.id ? row.id.substring(0, 8) : "-"}
+        <span className="text-xs font-medium text-gray-400">
+          #{row?.id ? row.id.substring(0, 8) : "-"}
         </span>
       ),
+      width: "100px",
     },
     {
       name: t("projects.requester"),
@@ -195,24 +196,19 @@ const ProjectsTable = ({ stats, requesterId }) => {
       wrap: true,
     },
     {
-      name: t("projects.endDate"),
-      selector: (row) => row?.completed_at ? dayjs(row.completed_at).format("DD/MM/YYYY hh:mm A") : "-",
-      wrap: true,
-    },
-    {
       name: t("projects.orderStatus"),
       cell: (row) => (
         <span
-          className={`px-0 py-1 rounded-lg text-[11px] font-normal
-            ${row.status?.code === 'completed'
-              ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-              : row.status?.code === 'processing'
-                ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                : row.status?.code === 'rejected' || row.status?.code === 'expired'
-                  ? "bg-red-100 text-red-700"
-                  : row.status?.code === 'waiting_start'
-                    ? "bg-red-100 text-[#B76E00]"
-                    : "bg-gray-100 text-gray-600"
+          className={`text-nowrap px-3 py-1 rounded-full text-[10px] font-bold border
+            ${row.status?.code === 'completed' || row.status?.code === 'ended'
+              ? "border-green-200 bg-green-50 text-green-700"
+              : row.status?.code === 'processing' || row.status?.code === 'waiting_start'
+                ? "border-blue-200 bg-blue-50 text-blue-700"
+                : row.status?.code === 'rejected' || row.status?.code === 'expired' || row.status?.code === 'cancelled'
+                  ? "border-red-200 bg-red-50 text-red-700"
+                  : row.status?.code === 'waiting_approval' || row.status?.code === 'on-hold'
+                    ? "border-orange-200 bg-orange-50 text-orange-700"
+                    : "border-gray-200 bg-gray-50 text-gray-600"
             }`}
         >
           {lang === "ar" ? row?.status?.name_ar : row?.status?.name_en}
@@ -232,32 +228,32 @@ const ProjectsTable = ({ stats, requesterId }) => {
                   ? `/projects/${row.id}`
                   : `/provider/projects/${row.id}`
             }
-            className="bg-[#1A71F6] text-white px-1 py-1 rounded-lg hover:bg-blue-700 transition text-xs font-medium"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
             title={t("projects.view") || "عرض"}
           >
-            <EyeIcon />
+            <EyeIcon size={16} />
           </Link>
           {role === "Admin" && (
             <>
               <Link
                 href={`/admin/projects/${row.id}`}
-                className="bg-primary text-white px-1 py-1 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                 title={t("projects.edit") || "تعديل"}
               >
-                <Edit width={15} />
+                <Edit size={14} />
               </Link>
               <button
                 onClick={() => askToDelete(row.id)}
-                className="bg-red-500 text-white px-1 py-1 rounded-lg hover:bg-red-600 transition text-xs font-medium"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm"
                 title={t("projects.delete") || "حذف"}
               >
-                <Trash width={15} />
+                <Trash size={14} />
               </button>
             </>
           )}
         </div>
       ),
-      ignoreRowClick: true,
+      width: "120px",
     },
   ];
 
@@ -270,18 +266,23 @@ const ProjectsTable = ({ stats, requesterId }) => {
   return (
     <>
       <div className="py-5">
-        <div className="mx-2">
-          <div className="rounded-3xl bg-white p-5">
+        <div className="rounded-3xl bg-white shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <h3 className="font-bold text-2xl text-gray-800">
+              {(role === "Requester" ? t("navProvider.myProjects") : t("projects.title")) || t("projects.all")}
+            </h3>
+          </div>
+
+          <div className="overflow-hidden">
             <CustomDataTable
               tabs={tabs}
               columns={columns}
               data={sortedData}
-              searchableFields={["orderNumber", "startDate", "endDate"]}
+              searchableFields={["id", "started_at"]}
               searchPlaceholder={t("searchPlaceholder")}
               isLoading={isLoading}
-              totalRows={totalRows} // 👈 الباجينيشن هيشتغل بناءً عليه
+              totalRows={totalRows}
             />
-            {/* <AddReviewModal open={open} setOpen={setOpen} orderId={orderId} /> */}
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import RequestDetailsContent from './RequestDetailsContent';
 import { createClient } from '@/utils/supabase/server';
 import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export default async function RequestDetailsPage({ params }) {
   const { id } = params || {};
@@ -50,13 +51,69 @@ export default async function RequestDetailsPage({ params }) {
     requester = data;
   }
 
+  // SSR: fetch initial request details using service-role to avoid RLS issues
+  let initialData = null;
+  if (supabaseAdmin && id) {
+    const { data: reqRow } = await supabaseAdmin
+      .from('requests')
+      .select(`
+        *,
+        requester:requesters!requests_requester_id_fkey(id,name,full_name),
+        service:services(id,name_ar,name_en,description,base_price),
+        status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code),
+        city:cities(id,name_ar,name_en)
+      `)
+      .eq('id', id)
+      .maybeSingle();
+    if (reqRow) {
+      let attachments = [];
+      if (reqRow.attachments_group_key) {
+        const { data: group } = await supabaseAdmin
+          .from('attachment_groups')
+          .select('id,group_key')
+          .eq('group_key', reqRow.attachments_group_key)
+          .maybeSingle();
+        if (group?.id) {
+          const { data: files } = await supabaseAdmin
+            .from('attachments')
+            .select('id,file_path,file_name,content_type,size_bytes,request_phase_lookup_id,created_at')
+            .eq('group_id', group.id);
+          attachments = (files || []).map(f => ({
+            id: f.id,
+            fileUrl: f.file_path,
+            fileName: f.file_name,
+            contentType: f.content_type,
+            sizeBytes: f.size_bytes,
+            requestPhaseLookupId: f.request_phase_lookup_id,
+            created_at: f.created_at,
+          }));
+        }
+      }
+      initialData = {
+        ...reqRow,
+        service: {
+          id: reqRow.service?.id,
+          name_ar: reqRow.service?.name_ar,
+          name_en: reqRow.service?.name_en,
+          description: reqRow.service?.description,
+          base_price: reqRow.service?.base_price,
+          price: typeof reqRow.service?.base_price === 'number' ? Number(reqRow.service.base_price) : null,
+        },
+        requestStatus: reqRow.status
+          ? { id: reqRow.status.id, nameAr: reqRow.status.name_ar, nameEn: reqRow.status.name_en, code: reqRow.status.code }
+          : null,
+        attachments,
+      };
+    }
+  }
+
   if (requester) {
     return (
       <SeekerLayout requester={requester}>
-        <RequestDetailsContent id={id} />
+        <RequestDetailsContent id={id} initialData={initialData} />
       </SeekerLayout>
     );
   }
 
-  return <RequestDetailsContent id={id} />;
+  return <RequestDetailsContent id={id} initialData={initialData} />;
 }

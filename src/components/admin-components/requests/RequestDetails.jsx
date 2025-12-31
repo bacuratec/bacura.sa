@@ -18,7 +18,7 @@ const RequestDetails = ({ data }) => {
   const requestNumber = data?.requestNumber || data?.id;
   const requestStatus = data?.requestStatus || data?.status || null;
   const pricingNotes = data?.pricingNotes || "";
-  const price = data?.servicePrice ?? data?.service?.price ?? null;
+  const price = data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price ?? null;
 
   const joiningDateFormatted = dayjs(creationTime).format("DD/MM/YYYY hh:mm A");
 

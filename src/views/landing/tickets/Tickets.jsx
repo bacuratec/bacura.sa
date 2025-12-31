@@ -45,60 +45,77 @@ const Tickets = () => {
       </div>
 
       {/* Tickets Section */}
-      <div className="container max-w-3xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-semibold mb-6 text-center">
-          {t("ticket.listTitle")}
-        </h2>
-
-        <div className="space-y-6">
+      <div className="container max-w-4xl mx-auto px-4 py-12">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {t("ticket.listTitle")}
+          </h2>
           <button
             onClick={() => setOpen(true)}
-            className="bg-primary/10 rounded-xl text-sm font-bold py-2 px-4 w-fit block mr-auto"
+            className="bg-primary text-white font-semibold py-2.5 px-6 rounded-xl shadow-md hover:bg-primary/90 transition-all flex items-center gap-2"
           >
+            <span className="text-xl">+</span>
             {t("ticket.sendTicket")}
           </button>
-          <TicketModal open={open} setOpen={setOpen} refetch={refetch} />
+        </div>
 
+        <TicketModal open={open} setOpen={setOpen} refetch={refetch} />
+
+        <div className="space-y-4">
           {tickets?.length > 0 ? (
             tickets.map((item) => (
               <div
                 key={item?.id}
-                className="flex items-start gap-4 p-4 bg-white rounded-xl shadow hover:shadow-md transition duration-300 cursor-pointer"
+                className="group flex flex-col sm:flex-row sm:items-center gap-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/20 transition-all duration-300"
               >
-                <div className="image rounded-full w-16 h-16 overflow-hidden border-2 border-primary relative">
-                  <OptimizedImage
-                    src={logo}
-                    alt="User"
-                    fill
-                    className="object-cover"
-                  />
+                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary shrink-0 transition-transform group-hover:scale-105">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" x2="4" y1="22" y2="15" /></svg>
                 </div>
-                <div className="Info flex-1">
-                  <h5 className="font-semibold text-lg text-primary">
-                    {item?.title}
-                  </h5>
-                  <p className="text-sm text-gray-600 mt-1">
+
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <h5 className="font-bold text-lg text-gray-800">
+                      {item?.title}
+                    </h5>
+                    <span
+                      className={`px-3 py-0.5 rounded-full text-[10px] font-bold border
+                        ${item.status?.code === 'open'
+                          ? "border-blue-200 bg-blue-50 text-blue-700"
+                          : item.status?.code === 'closed'
+                            ? "border-green-200 bg-green-50 text-green-700"
+                            : "border-orange-200 bg-orange-50 text-orange-700"
+                        }`}
+                    >
+                      {lang === "ar" ? item.status?.name_ar : item.status?.name_en}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
                     {item?.description}
                   </p>
+                  <div className="mt-2 text-[10px] text-gray-400 font-medium">
+                    {item.created_at ? dayjs(item.created_at).format("DD/MM/YYYY hh:mm A") : "-"}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end">
+                  <div className="text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-xs font-bold">
+                    {t("viewDetails") || "عرض التفاصيل"}
+                    <span className="rtl:rotate-180">→</span>
+                  </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-center py-10">
-              <div className="relative w-20 h-20 mx-auto mb-4">
-                <OptimizedImage
-                  src={logo}
-                  alt="No Tickets"
-                  fill
-                  className="opacity-70 object-contain"
-                />
+            <div className="text-center py-16 bg-white rounded-3xl border-2 border-dashed border-gray-100">
+              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
               </div>
-              <p className="text-gray-600 text-lg font-medium">
+              <p className="text-gray-500 text-lg font-bold mb-1">
                 {t("ticket.noTicketsTitle")}
               </p>
-              {/* <p className="text-sm text-gray-400 mt-1">
-                {t("ticket.noTicketsDescription")}
-              </p> */}
+              <p className="text-sm text-gray-400">
+                {t("ticket.noTicketsDescription") || "لا توجد أي تذاكر مفتوحة حالياً"}
+              </p>
             </div>
           )}
         </div>
