@@ -12,6 +12,17 @@ export default function MoyasarInlineForm({ amount, orderId }) {
     let mounted = true;
     const load = async () => {
       if (!publishable || !amount) return;
+
+      // Load Moyasar CSS if not already present
+      const cssId = "moyasar-css";
+      if (!document.getElementById(cssId)) {
+        const link = document.createElement("link");
+        link.id = cssId;
+        link.rel = "stylesheet";
+        link.href = "https://cdn.moyasar.com/mpf/1.7.1/moyasar.css";
+        document.head.appendChild(link);
+      }
+
       if (typeof window !== "undefined" && window.Moyasar) {
         if (containerRef.current && window.Moyasar.init) {
           window.Moyasar.init();

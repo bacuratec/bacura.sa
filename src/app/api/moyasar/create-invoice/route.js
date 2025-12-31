@@ -30,11 +30,8 @@ export async function POST(request) {
       orderId,
       userId,
       supportedSources = ["creditcard", "mada", "applepay"],
-      callbackUrl =
-        process.env.NEXT_PUBLIC_MOYASAR_CALLBACK_URL ||
-        process.env.VITE_MOYASAR_CALLBACK_URL ||
-        (typeof window !== "undefined" ? window.location.origin : ""),
     } = body || {};
+    const callbackUrl = (process.env.NEXT_PUBLIC_MOYASAR_CALLBACK_URL || "").trim() || `${(process.env.NEXT_PUBLIC_APP_BASE_URL || "").replace(/\/$/, "")}/moyasar/callback`;
 
     if (!amount || isNaN(Number(amount))) {
       return NextResponse.json(

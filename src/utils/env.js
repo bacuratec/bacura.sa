@@ -100,10 +100,11 @@ export const getMoyasarAccountId = () => {
  * Get Callback URL for payment redirects
  */
 export const getMoyasarCallbackUrl = () => {
-  return (
-    getEnv("NEXT_PUBLIC_MOYASAR_CALLBACK_URL") ||
-    getAppBaseUrl() ||
-    ""
-  );
+  const raw = getEnv("NEXT_PUBLIC_MOYASAR_CALLBACK_URL") || getAppBaseUrl() || "";
+  if (!raw) return "";
+  const hasCallback = /\/moyasar\/callback\/?$/.test(raw);
+  if (hasCallback) return raw;
+  const trimmed = raw.replace(/\/+$/, "");
+  return `${trimmed}/moyasar/callback`;
 };
 

@@ -226,14 +226,13 @@ const RequestForm = ({ services }) => {
       // 8. التسجيل
       else {
         await createOrder(payload).unwrap();
-        toast.success(t("formRequest.messages.successUpload"));
+        toast.success(t("formRequest.messages.successUpload") || "تم تقديم طلبك بنجاح");
+        router.push("/requests");
       }
-      router.push("/");
     } catch (error) {
       toast.error(
-        error?.data?.message || t("formRequest.messages.registrationError") || "حدث خطأ أثناء إنشاء الطلب"
+        error?.data?.message || t("formRequest.messages.registrationError") || t("formRequest.messages.errorUpload") || "حدث خطأ أثناء إنشاء الطلب"
       );
-      toast.error(t("formRequest.messages.errorUpload"));
     }
   };
 
@@ -541,7 +540,7 @@ const RequestForm = ({ services }) => {
                       {loadingCreateOrder || loadingCreateOrderPriced ? (
                         <>
                           <span className="loader w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                          <span>{t("formRequest.submitting")}...</span>
+                          <span>{hasPricedService ? (t("formRequest.redirectingToPayment") || "جاري التحويل للدفع...") : (t("formRequest.submitting") || "جاري التقديم...")}</span>
                         </>
                       ) : (
                         t("formRequest.submitButton")

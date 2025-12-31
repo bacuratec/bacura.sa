@@ -36,8 +36,8 @@ const RequestDetails = ({ initialData, id }) => {
     const code = data?.requestStatus?.code || "";
     if (code === "priced" || code === "accepted") {
       setShowPayment({
-        amount: data?.servicePrice, // Stripe uses cents
-        consultationId: data?.id, // we'll use it to link payment to the order
+        amount: data?.servicePrice ?? data?.service?.price, // Unified price retrieval
+        consultationId: data?.id,
       });
     }
   }, [data]);
