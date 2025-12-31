@@ -557,6 +557,9 @@
     "safeRedirect": "سيتم توجيهك الآن للدفع الآمن، وبعد إتمام العملية ستعود تلقائياً للتطبيق."
   },
   "payWithMoyasar": "الدفع عبر Moyasar",
+  "files": "ملفات",
+  "noFiles": "لا توجد مرفقات",
+  "currency": { "sar": "ريال" },
   "signupForm": {
     "welcome": "اهلا بيك في",
     "appName": "باكورة أعمال",

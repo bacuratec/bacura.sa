@@ -6,13 +6,18 @@ import { supabaseAdmin } from "@/lib/supabase";
  */
 export async function POST(request) {
   try {
-    const secretKey =
-      process.env.MOYASAR_SECRET_KEY ||
-      process.env.NEXT_PUBLIC_MOYASAR_SECRET_KEY;
+    const secretRaw = process.env.MOYASAR_SECRET_KEY || "";
+    const secretKey = (secretRaw || "").trim();
 
     if (!secretKey) {
       return NextResponse.json(
         { error: "Moyasar secret key is missing in environment" },
+        { status: 500 }
+      );
+    }
+    if (secretKey.startsWith("pk_")) {
+      return NextResponse.json(
+        { error: "Invalid Moyasar secret key: publishable key provided. Use a key starting with sk_." },
         { status: 500 }
       );
     }

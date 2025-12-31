@@ -16,7 +16,7 @@ import { createAttachmentGroupKey, uploadAttachmentsToStorage } from "@/utils/at
 import { supabase } from "@/lib/supabaseClient";
 import StepWizard from "./StepWizard";
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import MoyasarInvoiceButton from "./MoyasarInvoiceButton";
+import MoyasarInlineForm from "./MoyasarInlineForm";
 
 const RequestForm = ({ services }) => {
   const router = useRouter();
@@ -24,14 +24,18 @@ const RequestForm = ({ services }) => {
 
   const { lang } = useContext(LanguageContext);
   const { t } = useTranslation();
+  const tr = (key, fallback) => {
+    const v = t(key);
+    return v === key ? fallback : v;
+  };
 
   const [currentStep, setCurrentStep] = useState(1);
 
   const steps = [
-    { id: 1, label: t("formRequest.steps.services") || "الخدمات" },
-    { id: 2, label: t("formRequest.steps.details") || "التفاصيل" },
-    { id: 3, label: t("formRequest.steps.attachments") || "المرفقات" },
-    { id: 4, label: t("formRequest.steps.review") || "المراجعة" },
+    { id: 1, label: tr("formRequest.steps.services", "الخدمات") },
+    { id: 2, label: tr("formRequest.steps.details", "التفاصيل") },
+    { id: 3, label: tr("formRequest.steps.attachments", "المرفقات") },
+    { id: 4, label: tr("formRequest.steps.review", "المراجعة") },
   ];
 
   const validationSchema = [
@@ -470,9 +474,11 @@ const RequestForm = ({ services }) => {
                       <div className="flex flex-wrap gap-2">
                         {values.selectedServices.map(id => {
                           const s = services.find(srv => String(srv.id) === id);
+                          const nameAr = s?.name_ar || s?.titleAr;
+                          const nameEn = s?.name_en || s?.titleEn;
                           return (
                             <span key={id} className="bg-white border px-3 py-1 rounded-full text-sm font-medium text-primary">
-                              {lang === "ar" ? s?.titleAr : s?.titleEn}
+                              {lang === "ar" ? (nameAr || "-") : (nameEn || "-")}
                             </span>
                           )
                         })}
@@ -489,9 +495,21 @@ const RequestForm = ({ services }) => {
                     <div>
                       <span className="text-sm text-gray-500 block mb-1">{t("formRequest.attachmentsLabel")}</span>
                       <p className="text-gray-800 text-sm">
-                        {selectedFiles?.length > 0 ? `${selectedFiles.length} ${t("files") || "ملفات"}` : t("noFiles") || "لا توجد مرفقات"}
+                        {selectedFiles?.length > 0 ? `${selectedFiles.length} ${tr("files", "ملفات")}` : tr("noFiles", "لا توجد مرفقات")}
                       </p>
                     </div>
+                    {isAnyPricedSelected(values.selectedServices) && (
+                      <div>
+                        <span className="text-sm text-gray-500 block mb-1">{tr("projects.servicePrice", "سعر الخدمة")}</span>
+                        <p className="text-gray-800 text-sm">
+                          {(() => {
+                            const sid = values.selectedServices?.[0];
+                            const s = services.find(srv => String(srv.id) === String(sid));
+                            return typeof s?.base_price === "number" ? `${s.base_price} ${tr("currency.sar", "ريال")}` : "-";
+                          })()}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
@@ -575,11 +593,9 @@ const RequestForm = ({ services }) => {
             consultationId={showPayment.consultationId}
           />
           <div className="mt-4">
-            {/* بديل للدفع عبر Moyasar */}
-            <MoyasarInvoiceButton
+            <MoyasarInlineForm
               amount={showPayment.amount}
               orderId={showPayment.consultationId}
-              userId={userId}
             />
           </div>
         </div>
