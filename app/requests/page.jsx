@@ -61,7 +61,9 @@ export default async function RequestsPage() {
   return <ExploreContent stats={stats} />;
 }
 
-export const metadata = {
-  title: 'تصفح الطلبات | باكورة أعمال',
-  description: 'تصفح طلبات الخدمة ومتابعة حالتها',
-};
+export function generateMetadata() {
+  return {
+    title: 'تصفح الطلبات | باكورة أعمال',
+    description: 'تصفح طلبات الخدمة ومتابعة حالتها',
+  };
+}
