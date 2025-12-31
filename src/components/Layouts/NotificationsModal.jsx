@@ -2,7 +2,7 @@ import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import {
   useGetNotificationsQuery,
   useSeenNotificationsMutation,
-} from "../../redux/api/notificationsApi";
+} from "@/redux/api/notificationsApi";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -21,18 +21,19 @@ export default function NotificationsModal({ open, setOpen }) {
   const { t } = useTranslation();
   const role = useSelector((state) => state.auth.role);
   const token = useSelector((state) => state.auth.token);
+  const userId = useSelector((state) => state.auth.userId);
 
   const {
     data = [],
     isLoading,
     isFetching,
     refetch,
-  } = useGetNotificationsQuery(undefined, {
+  } = useGetNotificationsQuery(userId, {
     pollingInterval: 60000,
-    skip: !token,
+    skip: !token || !userId,
   });
 
-  const [markAsSeen] = useSeenNotificationsMutation();
+  const [seenNotifications] = useSeenNotificationsMutation();
 
   useEffect(() => {
     if (open && data.length > 0) {
@@ -41,10 +42,10 @@ export default function NotificationsModal({ open, setOpen }) {
         .map((n) => n.id);
 
       if (unseenIds.length > 0) {
-        markAsSeen(unseenIds);
+        seenNotifications({ notificationIds: unseenIds });
       }
     }
-  }, [open, data, markAsSeen, refetch]);
+  }, [open, data, seenNotifications]);
 
   const prevOpen = usePrevious(open);
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function NotificationsModal({ open, setOpen }) {
       refetch();
     }
   }, [role, refetch]);
+
   useEffect(() => {
     if (prevOpen && !open) {
       refetch();
@@ -84,11 +86,10 @@ export default function NotificationsModal({ open, setOpen }) {
                     {[...data].reverse().map((notification, idx) => (
                       <div
                         key={idx}
-                        className={`p-3 rounded-md border ${
-                          !notification.is_seen
+                        className={`p-3 rounded-md border ${!notification.is_seen
                             ? "bg-primary/10 border-primary/30"
                             : "bg-gray-100 border-gray-200"
-                        }`}
+                          }`}
                       >
                         <h3 className="text-sm font-bold text-gray-800 mb-1">
                           {notification.title}
@@ -100,8 +101,8 @@ export default function NotificationsModal({ open, setOpen }) {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState 
-                    title={t("notifications.empty") || "لا توجد إشعارات"} 
+                  <EmptyState
+                    title={t("notifications.empty") || "لا توجد إشعارات"}
                     description={t("notifications.emptyDesc") || "سنخبرك عند وجود أي تحديثات جديدة."}
                     icon={Bell}
                     className="py-6"

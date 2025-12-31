@@ -87,14 +87,8 @@ const nextConfig = {
 
   // Rewrites for API proxy
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://51.112.209.149:5141/api/:path*',
-      },
-    ];
+    return [];
   },
 };
 
 module.exports = nextConfig;
-

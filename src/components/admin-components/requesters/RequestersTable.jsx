@@ -7,7 +7,7 @@ import Avatar from "../../shared/Avatar";
 import {
   useGetRequestersAccountsQuery,
   useDeleteRequesterMutation,
-} from "../../../redux/api/requestersApi";
+} from "@/redux/api/requestersApi";
 import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Eye, Edit, Trash } from "lucide-react";
@@ -76,8 +76,8 @@ const RequestersTable = ({ stats }) => {
     } catch (err) {
       toast.error(
         err?.data?.message ||
-          t("requesters.deleteError") ||
-          "فشل حذف طالب الخدمة"
+        t("requesters.deleteError") ||
+        "فشل حذف طالب الخدمة"
       );
     }
   };
@@ -194,11 +194,10 @@ const RequestersTable = ({ stats }) => {
       cell: (row) => (
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-              ${
-                !row.user?.is_blocked
-                  ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                  : "bg-red-100 text-red-700"
-              }`}
+              ${!row.user?.is_blocked
+              ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
+              : "bg-red-100 text-red-700"
+            }`}
         >
           {row.user?.is_blocked
             ? t("status.blocked") || "محظور"

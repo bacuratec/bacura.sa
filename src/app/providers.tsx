@@ -8,7 +8,7 @@ import "@/lib/i18n";
 
 
 import { LanguageProvider } from "@/context/LanguageContext";
-import StoreProvider from "@/lib/redux/StoreProvider";
+import StoreProvider from "@/redux/StoreProvider";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import BackToTopButton from "@/components/BackTop";

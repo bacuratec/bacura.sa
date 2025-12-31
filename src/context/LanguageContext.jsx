@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, createContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ export const LanguageProvider = ({ children }) => {
     return "ar";
   });
   const { i18n } = useTranslation();
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const langLocal = localStorage.getItem("lang");
@@ -25,6 +26,7 @@ export const LanguageProvider = ({ children }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem("lang", lang);
@@ -47,3 +49,4 @@ export const LanguageProvider = ({ children }) => {
     </LanguageContext.Provider>
   );
 };
+
