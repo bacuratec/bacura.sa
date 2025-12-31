@@ -14,6 +14,8 @@ export default function OptimizedImage({
   quality = 75,
   className = "",
   fallbackSrc = "",
+  placeholder = "blur",
+  blurDataURL = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxmaWx0ZXIgaWQ9J2EnPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249JzAuOCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxJyBoZWlnaHQ9JzEnIGZpbHRlcj0ndXJsKCNhKScgZmlsbD0nI2VhZWFlYScvPjwvc3ZnPg==",
 }) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const defaultBucket = process.env.NEXT_PUBLIC_SUPABASE_IMAGES_BUCKET || "attachments";
@@ -54,6 +56,8 @@ export default function OptimizedImage({
         priority={priority}
         quality={quality}
         className={className}
+        placeholder={placeholder}
+        blurDataURL={blurDataURL}
         onError={() => setFailed(true)}
       />
     );
@@ -68,6 +72,8 @@ export default function OptimizedImage({
       priority={priority}
       quality={quality}
       className={className}
+      placeholder={placeholder}
+      blurDataURL={blurDataURL}
       onError={() => setFailed(true)}
     />
   );

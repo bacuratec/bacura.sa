@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import LoadingPage from "@/views/LoadingPage";
 
 // Initialize i18n before anything else
 import "@/lib/i18n";
@@ -17,7 +18,7 @@ import DirManager from "@/components/shared/DirManager";
 export default function Providers({ children }: { children: React.ReactNode }) {
     return (
         <ErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<LoadingPage />}>
                 <StoreProvider>
                     <LanguageProvider>
                         <AuthInitializer>
