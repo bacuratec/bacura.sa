@@ -2,6 +2,8 @@
 
 import React, { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import OptimizedImage from "@/components/shared/OptimizedImage";
+import logo from "@/assets/images/logo.png";
 
 interface LoadingPageProps {
     message?: string;
@@ -11,7 +13,11 @@ interface LoadingPageProps {
 
 const LoadingPage = ({ message, useSkeleton = false, skeletonComponent }: LoadingPageProps) => {
     const { t } = useTranslation();
-    const loadingMessage = message || t("loading") || "Loading...";
+    const translated = t("loading.default");
+    const loadingMessage =
+        typeof message === "string" && message
+            ? message
+            : (typeof translated === "string" ? translated : "Loading...");
 
     // If skeleton component is provided, use it
     if (useSkeleton && skeletonComponent) {
@@ -21,17 +27,17 @@ const LoadingPage = ({ message, useSkeleton = false, skeletonComponent }: Loadin
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="text-center">
-                <div className="relative">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-700 border-t-blue-600 dark:border-t-blue-500 mx-auto"></div>
+                <div className="relative w-20 h-20 mx-auto">
+                    <div className="absolute inset-0 rounded-full border-4 border-primary/20 dark:border-primary/30 border-t-primary animate-spin"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="h-8 w-8 bg-blue-600 dark:bg-blue-500 rounded-full animate-pulse"></div>
+                        <OptimizedImage src={logo} alt="logo" width={56} height={56} className="w-14 h-14 object-contain" />
                     </div>
                 </div>
                 <p className="mt-6 text-lg font-medium text-gray-700 dark:text-gray-300">
                     {loadingMessage}
                 </p>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    {t("loading.subtitle") || "Please wait..."}
+                    {typeof t("loading.subtitle") === "string" ? t("loading.subtitle") : "Please wait..."}
                 </p>
             </div>
         </div>
