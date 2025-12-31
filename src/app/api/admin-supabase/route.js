@@ -46,7 +46,7 @@ export async function GET(req) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ data }, { status: 200 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
@@ -67,7 +67,7 @@ export async function POST(req) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ data }, { status: 200 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
@@ -96,7 +96,7 @@ export async function PUT(req) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ data }, { status: 200 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
@@ -125,7 +125,7 @@ export async function DELETE(req) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ data }, { status: 200 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }

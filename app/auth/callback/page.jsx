@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { detectUserRole } from "@/utils/roleDetection";
 
@@ -17,7 +17,6 @@ function parseHash(hashStr) {
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [state, setState] = useState({ loading: true, message: "جاري تفعيل الجلسة...", ok: false });
 
   useEffect(() => {

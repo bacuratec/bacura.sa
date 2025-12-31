@@ -30,13 +30,6 @@ export default async function ProjectsPage() {
   };
 
   try {
-    // If it's a requester, count only their orders
-    let query = supabase.from("orders").select("*", { count: "exact", head: true });
-
-    if (requester) {
-      query = query.eq('requests.requester_id', requester.id);
-    }
-
     const getCount = async (statusId) => {
       let q = supabase.from("orders").select("*", { count: "exact", head: true });
       if (requester) q = q.eq('requests.requester_id', requester.id);

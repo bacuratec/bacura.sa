@@ -4,9 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Home, PlusCircle, Search, Ticket } from "lucide-react";
-import { useSelector } from "react-redux";
 import { getAppBaseUrl } from "@/utils/env";
+import { Home, PlusCircle, Search, Ticket, ChevronLeft, ChevronRight } from "lucide-react";
 
 const logo = "/vite.png";
 
@@ -65,8 +64,8 @@ const SeekerSideBar = ({ data }) => {
                                     href={item.href}
                                     aria-current={isActive ? "page" : undefined}
                                     className={`group flex items-center gap-4 py-3 px-6 text-gray-700 ${isActive
-                                            ? "text-primary font-medium bg-gray-100 border-r-4 border-r-primary"
-                                            : "hover:text-primary"
+                                        ? "text-primary font-medium bg-gray-100 border-r-4 border-r-primary"
+                                        : "hover:text-primary"
                                         }`}
                                 >
                                     <item.icon className="w-6 h-6" />

@@ -2,10 +2,8 @@
 
 import React, { useEffect } from "react";
 import ExploreRequests from "@/components/landing-components/ExploreRequests/ExploreRequests";
-import { useTranslation } from "react-i18next";
 
 const ExploreContent = ({ stats }) => {
-  const { t } = useTranslation();
 
   useEffect(() => {
     window.scrollTo(0, 0);

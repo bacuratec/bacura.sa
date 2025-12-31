@@ -47,7 +47,7 @@ export async function POST(req) {
 
     const { data: pub } = supabaseAdmin.storage.from(bucket).getPublicUrl(objectPath);
     return NextResponse.json({ url: pub?.publicUrl || null, path: objectPath, bucket }, { status: 200 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }

@@ -770,7 +770,6 @@
     "error": "حدث خطأ أثناء تنفيذ العملية",
     "pricingNotesRequired": "ملاحظات التسعير مطلوبة"
   },
-  "loading": "جاري تحميل البيانات...",
   "searchPlaceholder": "ابحث...",
   "uploadAdminAttachments": {
     "attachmentsLabel": "مرفقات الطلب",
@@ -958,7 +957,8 @@
       "goHome": "العودة للصفحة الرئيسية",
       "reload": "إعادة تحميل الصفحة",
       "tryAgain": "المحاولة مرة أخرى"
-    }
+    },
+    "default": "حدث خطأ"
   },
   "loading": {
     "default": "جاري التحميل...",
@@ -972,6 +972,5 @@
   "city": "المدينة",
   "all": "الكل",
   "clearFilters": "مسح الفلاتر",
-  "back": "عودة",
-  "error": "حدث خطأ"
+  "back": "عودة"
 }

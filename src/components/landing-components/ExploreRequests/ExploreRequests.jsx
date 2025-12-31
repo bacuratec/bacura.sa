@@ -191,17 +191,16 @@ const ExploreRequests = ({ stats }) => {
       cell: (row) => (
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-              ${
-                row.requestStatus?.id === 504
-                  ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                  : row.requestStatus?.id === 501
-                  ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                  : row.requestStatus?.id === 503
+              ${row.requestStatus?.id === 504
+              ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
+              : row.requestStatus?.id === 501
+                ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
+                : row.requestStatus?.id === 503
                   ? "bg-red-100 text-red-700"
                   : row.requestStatus?.id === 502
-                  ? "bg-red-100 text-[#B76E00]"
-                  : "bg-gray-100 text-gray-600"
-              }`}
+                    ? "bg-red-100 text-[#B76E00]"
+                    : "bg-gray-100 text-gray-600"
+            }`}
         >
           {lang === "ar"
             ? row.requestStatus?.nameAr
@@ -229,10 +228,10 @@ const ExploreRequests = ({ stats }) => {
   ];
   const sortedData = orders
     ? [...orders]?.sort((a, b) => {
-        // لو رقم الطلب عبارة عن أرقام
-        return Number(b?.requestNumber) - Number(a?.requestNumber); // تنازلي
-        // return Number(a.requestNumber) - Number(b.requestNumber); // تصاعدي
-      })
+      // لو رقم الطلب عبارة عن أرقام
+      return Number(b?.requestNumber) - Number(a?.requestNumber); // تنازلي
+      // return Number(a.requestNumber) - Number(b.requestNumber); // تصاعدي
+    })
     : [];
   return (
     <FadeIn className="py-5">
@@ -243,7 +242,7 @@ const ExploreRequests = ({ stats }) => {
           </h3>
           {isError && (
             <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-red-700 mb-4">
-              {(error?.data?.message) || (error?.error) || t("error") || "An error occurred"}
+              {(error?.data?.message) || (error?.error) || t("error.default") || "An error occurred"}
             </div>
           )}
           <CustomDataTable
@@ -272,10 +271,10 @@ const ExploreRequests = ({ stats }) => {
                   <option value="">{t("loading.default")}</option>
                 ) : (
                   (cities || []).map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {lang === "ar" ? c.name_ar : c.name_en}
-                  </option>
-                ))
+                    <option key={c.id} value={c.id}>
+                      {lang === "ar" ? c.name_ar : c.name_en}
+                    </option>
+                  ))
                 )}
               </select>
             </div>
@@ -293,10 +292,10 @@ const ExploreRequests = ({ stats }) => {
                   <option value="">{t("loading.default")}</option>
                 ) : (
                   (services || []).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {lang === "ar" ? s.name_ar : s.name_en}
-                  </option>
-                ))
+                    <option key={s.id} value={s.id}>
+                      {lang === "ar" ? s.name_ar : s.name_en}
+                    </option>
+                  ))
                 )}
               </select>
             </div>

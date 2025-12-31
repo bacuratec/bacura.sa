@@ -727,7 +727,6 @@
     "error": "An error occurred during the operation",
     "pricingNotesRequired": "Pricing notes are required"
   },
-  "loading": "Loading data...",
   "searchPlaceholder": "Search...",
   "uploadAdminAttachments": {
     "attachmentsLabel": "Order Attachments",
@@ -915,7 +914,8 @@
       "goHome": "Go to Home Page",
       "reload": "Reload Page",
       "tryAgain": "Try Again"
-    }
+    },
+    "default": "An error occurred"
   },
   "loading": {
     "default": "Loading...",
@@ -929,6 +929,5 @@
   "city": "City",
   "all": "All",
   "clearFilters": "Clear Filters",
-  "back": "Back",
-  "error": "An error occurred"
+  "back": "Back"
 }

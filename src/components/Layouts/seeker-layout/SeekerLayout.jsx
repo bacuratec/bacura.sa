@@ -3,7 +3,6 @@
 import SeekerMobileNavigation from "./sidebar/SeekerMobileNavigation";
 import SeekerHeader from "./header/SeekerHeader";
 import SeekerSideBar from "./sidebar/SeekerSideBar";
-import { useSelector } from "react-redux";
 // We might need a separate API hook for Seeker details or pass it down.
 // app/profile/page.jsx fetches it server side. 
 // But here we might want it for the header/sidebar if they are client components.
