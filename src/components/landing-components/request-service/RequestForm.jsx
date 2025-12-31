@@ -13,6 +13,7 @@ import PaymentForm from "./PaymentForm";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import { createAttachmentGroupKey, uploadAttachmentsToStorage } from "@/utils/attachmentUtils";
+import { supabase } from "@/lib/supabaseClient";
 import StepWizard from "./StepWizard";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import MoyasarInvoiceButton from "./MoyasarInvoiceButton";
@@ -89,7 +90,7 @@ const RequestForm = ({ services }) => {
     if (!selectedServices) return false;
     return selectedServices.some((id) => {
       const service = services.find((s) => String(s.id) === id);
-      return service?.isPriced === true;
+      return !!service && typeof service.base_price === "number" && service.base_price > 0;
     });
   };
   const isAnyServicesSelect = (selectedServices) => {
@@ -132,16 +133,67 @@ const RequestForm = ({ services }) => {
         return;
       }
 
-      // 2. جهز بيانات الريجيستر كـ FormData
+      // 2. جلب requester_id من جدول requesters باستخدام userId
+      const { data: requesterRow, error: requesterErr } = await supabase
+        .from("requesters")
+        .select("id")
+        .eq("user_id", userId)
+        .single();
+      if (requesterErr || !requesterRow?.id) {
+        toast.error("تعذر تحديد هوية طالب الخدمة");
+        return;
+      }
+      const requesterId = requesterRow.id;
+
+      // 3. تحديد الخدمة المختارة (قاعدة: طلب واحد مرتبط بخدمة واحدة)
+      const selectedServiceId = values.selectedServices?.[0];
+      const selectedService = services.find((s) => String(s.id) === String(selectedServiceId));
+      if (!selectedServiceId || !selectedService) {
+        toast.error("يجب اختيار خدمة واحدة على الأقل");
+        return;
+      }
+
+      // 4. جلب status_id حسب نوع الخدمة
+      const { data: statusTypeRow } = await supabase
+        .from("lookup_types")
+        .select("id")
+        .eq("code", "requester-entity-types") // placeholder to ensure table exists
+        .maybeSingle();
+      const { data: reqStatusType } = await supabase
+        .from("lookup_types")
+        .select("id")
+        .eq("code", "request-status")
+        .single();
+      const statusCode = hasPricedService ? "priced" : "pending";
+      const { data: statusRow } = await supabase
+        .from("lookup_values")
+        .select("id")
+        .eq("lookup_type_id", reqStatusType.id)
+        .eq("code", statusCode)
+        .single();
+      const statusId = statusRow?.id;
+      if (!statusId) {
+        toast.error("تعذر تحديد حالة الطلب");
+        return;
+      }
+
+      // 5. تجهيز العنوان
+      const title =
+        (lang === "ar" ? selectedService?.name_ar : selectedService?.name_en) ||
+        (selectedService?.titleAr || selectedService?.titleEn) ||
+        "طلب خدمة";
+
+      // 6. جهز بيانات الطلب
       const payload = {
-        services: values.selectedServices,
-        attachmenstGroupKey: groupKey,
+        requesterId,
+        serviceId: selectedServiceId,
+        title,
         description: values.description,
-        requesterId: userId,
-        isTermsAccepted: values.agreeToTerms,
+        statusId,
+        attachmentsGroupKey: groupKey,
       };
 
-      // 3. ارفع الملفات فقط لو فيه ملفات
+      // 7. ارفع الملفات فقط لو فيه ملفات
       if (selectedFiles && selectedFiles.length > 0) {
         const uploadSuccess = await uploadAttachmentsToStorage(
           selectedFiles,
@@ -158,18 +210,16 @@ const RequestForm = ({ services }) => {
       if (hasPricedService) {
         const orderRes = await createOrderPriced(payload).unwrap();
         const orderId = orderRes.id;
-        const pricedService = services.find(
-          (s) => values.selectedServices.includes(String(s.id)) && s.isPriced
-        );
-        setShowPayment({
-          amount: pricedService.price, // Stripe uses cents
+          const pricedService = selectedService;
+          setShowPayment({
+          amount: pricedService.base_price, // Stripe uses cents
           consultationId: orderId, // we'll use it to link payment to the order
-        });
+          });
 
         return; // ما نكملش التسجيل دلوقتي
       }
       // ******************** stripe  *********************
-      // 4. التسجيل
+      // 8. التسجيل
       else {
         await createOrder(payload).unwrap();
         toast.success(t("formRequest.messages.successUpload"));
@@ -343,13 +393,13 @@ const RequestForm = ({ services }) => {
                             const pricedServiceId = values.selectedServices.find(
                                 (id) => {
                                 const svc = services.find((s) => String(s.id) === id);
-                                return svc?.isPriced;
+                                return typeof svc?.base_price === "number" && svc.base_price > 0;
                                 }
                             );
                             const pricedService = services.find(
                                 (s) => String(s.id) === pricedServiceId
                             );
-                            return pricedService ? pricedService.price : "";
+                            return pricedService ? pricedService.base_price : "";
                             })()}
                         />
                         <p className="text-xs text-gray-500">{t("formRequest.fixedPriceNote") || "هذه الخدمة لها سعر ثابت"}</p>
