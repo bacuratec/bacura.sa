@@ -30,7 +30,7 @@ const LoadingPage = ({ message, useSkeleton = false, skeletonComponent }: Loadin
                 <div className="relative w-20 h-20 mx-auto">
                     <div className="absolute inset-0 rounded-full border-4 border-primary/20 dark:border-primary/30 border-t-primary animate-spin"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <OptimizedImage src={logo} alt="logo" width={56} height={56} className="w-14 h-14 object-contain" />
+                        <OptimizedImage src={logo} alt="logo" width={56} height={56} sizes="56px" className="w-14 h-14 object-contain" />
                     </div>
                 </div>
                 <p className="mt-6 text-lg font-medium text-gray-700 dark:text-gray-300">
