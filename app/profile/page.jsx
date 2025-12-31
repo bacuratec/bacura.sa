@@ -66,14 +66,37 @@ export default async function ProfilePage() {
 
     if (orders) {
       stats.totalOrdersCount = orders.length;
-      // Calculate other stats based on order_status_id
-      // This requires knowing the IDs for statuses.
+      // Calculate other stats based on order_status_id if needed
+    }
+  }
+
+  // Fetch recent orders (Activity)
+  let recentOrders = [];
+  if (requester) {
+    const { data } = await supabase
+      .from('orders')
+      .select(`
+        id,
+        created_at,
+        status:lookup_values!order_status_id(name_ar, name_en),
+        request:requests!inner(
+          id,
+          title,
+          service:services(name_ar, name_en)
+        )
+      `)
+      .eq('request.requester_id', requester.id)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (data) {
+      recentOrders = data;
     }
   }
 
   return (
     <SeekerLayout requester={requester}>
-      <ProfileContent requester={requester} tickets={tickets} stats={stats} />
+      <ProfileContent requester={requester} tickets={tickets} stats={stats} recentOrders={recentOrders} />
     </SeekerLayout>
   );
 }

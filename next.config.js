@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  
+
   // Support for Netlify
   ...(process.env.NETLIFY && {
     output: 'standalone',
@@ -13,6 +13,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '**.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tqskjoufozgyactjnrix.supabase.co',
       },
       {
         protocol: 'http',
@@ -47,13 +51,13 @@ const nextConfig = {
         tls: false,
       };
     }
-    
+
     // Ensure path aliases work correctly
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname, './src'),
     };
-    
+
     return config;
   },
 

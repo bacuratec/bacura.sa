@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import WelcomeTitle from "@/components/landing-components/profile-components/welcomeTitle";
 import DashboardInfo from "@/components/landing-components/profile-components/DashboardInfo";
 import Services from "@/components/landing-components/profile-components/Services";
+import RecentRequests from "@/components/landing-components/profile-components/RecentRequests";
 import Messages from "@/components/landing-components/profile-components/Messages";
 import Support from "@/components/landing-components/profile-components/Support";
 import LoadingPage from "@/views/LoadingPage";
@@ -21,7 +22,7 @@ import {
   Wallet,
 } from "lucide-react";
 
-const ProfileContent = ({ requester, tickets, stats }) => {
+const ProfileContent = ({ requester, tickets, stats, recentOrders }) => {
   const { t } = useTranslation();
   const [openSuspend, setOpenSuspend] = useState(false);
 
@@ -96,7 +97,7 @@ const ProfileContent = ({ requester, tickets, stats }) => {
                   name={requester?.name ?? requester?.fullName}
                   joinAt={requester?.created_at}
                   data={requester}
-                  // refetch={refetch} // Handle refetch if needed
+                // refetch={refetch} // Handle refetch if needed
                 />
               </m.div>
               <m.div
@@ -119,7 +120,17 @@ const ProfileContent = ({ requester, tickets, stats }) => {
                   title={t("profile.dashboard")}
                 />
               </m.div>
-              <Services />
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2">
+                  <RecentRequests orders={recentOrders} />
+                </div>
+                <div className="lg:col-span-1">
+                  <Services />
+                </div>
+              </div>
+
+              {/* <Services /> Moved to grid above */}
               <Messages tickets={tickets} />
               <Support />
               <button

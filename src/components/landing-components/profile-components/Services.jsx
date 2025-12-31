@@ -9,6 +9,12 @@ import prevRequests from "../../../assets/icons/prevRequests.svg";
 import projectsRunning from "../../../assets/icons/projectsRunning.svg";
 import ratesService from "../../../assets/icons/ratesService.svg";
 
+// Helper to get src from imported asset
+const getIconSrc = (importedIcon) => {
+  if (typeof importedIcon === 'string') return importedIcon;
+  return importedIcon?.src || "";
+};
+
 const services = [
   {
     icon: newService,
@@ -43,11 +49,11 @@ const Services = () => {
           <AppLink
             href={item.href}
             key={i}
-            className="p-2 md:p-3 lg:p-4 xl:p-5 bg-primary/15 rounded-lg flex flex-col gap-2 md:gap-3 lg:gap-4 xl:gap-5"
+            className="p-4 bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all rounded-xl flex flex-col items-center text-center gap-3 hover:bg-gray-50"
           >
             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
               <img
-                src={item.icon}
+                src={getIconSrc(item.icon)}
                 alt={t(`servicesLanding.items.${i}.title`)}
               />
             </div>

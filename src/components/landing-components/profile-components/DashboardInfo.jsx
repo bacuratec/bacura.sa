@@ -8,10 +8,10 @@ const DashboardInfo = ({ stats, title }) => {
         {stats?.map((item, i) => (
           <div
             key={i}
-            className="p-2 md:p-3 lg:p-4 xl:p-6 flex items-center justify-between shadow-md cursor-pointer  border border-[#DEE0E3] rounded-xl"
+            className={`p-4 md:p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 rounded-xl bg-white group`}
           >
             <div className="flex flex-col gap-2">
-              <h4 className="font-medium text-sm md:text-base">
+              <h4 className="font-medium text-gray-500 text-sm">
                 {item?.title}
               </h4>
               <span className="font-bold text-lg md:text-xl lg:text-2xl">
