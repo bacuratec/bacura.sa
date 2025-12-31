@@ -74,6 +74,26 @@ export const uploadAttachmentsToStorage = async (
 
     const groupId = groupData.id;
 
+    const { data: phaseType } = await supabase
+      .from("lookup_types")
+      .select("id")
+      .eq("code", "request-phase")
+      .single();
+    let requestPhaseId = null;
+    if (phaseType?.id) {
+      const { data: phaseRow } = await supabase
+        .from("lookup_values")
+        .select("id")
+        .eq("lookup_type_id", phaseType.id)
+        .eq("code", String(requestPhaseLookupId))
+        .single();
+      requestPhaseId = phaseRow?.id || null;
+    }
+    if (!requestPhaseId) {
+      toast.error("تعذر تحديد مرحلة الطلب للمرفقات");
+      return false;
+    }
+
     // رفع كل ملف إلى Supabase Storage وإنشاء سجل في attachments
     const uploadPromises = Array.from(files).map(async (file) => {
       try {
@@ -105,7 +125,7 @@ export const uploadAttachmentsToStorage = async (
             file_name: file.name,
             content_type: file.type,
             size_bytes: file.size,
-            request_phase_lookup_id: requestPhaseLookupId,
+            request_phase_lookup_id: requestPhaseId,
           });
 
         if (insertError) {
