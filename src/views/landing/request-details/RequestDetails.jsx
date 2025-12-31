@@ -7,6 +7,7 @@ import NotFound from "../../not-found/NotFound";
 import { useGetRequestDetailsQuery } from "../../../redux/api/ordersApi";
 import RequesterAttachmentForm from "../../../components/request-service-forms/RequesterAttachmentForm";
 import RequestAttachment from "../../../components/request-service-forms/RequestAttachment";
+import RequestStatusStepper from "../../../components/landing-components/request-service/RequestStatusStepper";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import PaymentForm from "../../../components/landing-components/request-service/PaymentForm";
@@ -32,7 +33,8 @@ const RequestDetails = ({ initialData, id }) => {
   const attachments = data?.attachments;
 
   useEffect(() => {
-    if (data?.requestStatus?.id === 502 || data?.requestStatus?.id === 506) {
+    const code = data?.requestStatus?.code || "";
+    if (code === "priced" || code === "accepted") {
       setShowPayment({
         amount: data?.servicePrice, // Stripe uses cents
         consultationId: data?.id, // we'll use it to link payment to the order
@@ -73,6 +75,7 @@ const RequestDetails = ({ initialData, id }) => {
           }
           status={data?.requestStatus?.id}
         />
+        <RequestStatusStepper status={data?.requestStatus} />
         <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
         <RequestAttachment attachments={attachments} />
         {data?.requestStatus?.id === 501 && (

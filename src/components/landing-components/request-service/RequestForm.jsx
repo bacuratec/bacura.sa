@@ -566,7 +566,10 @@ const RequestForm = ({ services }) => {
 
       {showPayment && (
         <div className="mt-8 border-t pt-8 animate-fadeIn">
-          <h3 className="text-xl font-bold mb-4 text-center">{t("payment.title") || "الدفع"}</h3>
+          <h3 className="text-xl font-bold mb-2 text-center">{t("payment.title") || "الدفع"}</h3>
+          <p className="text-center text-sm text-gray-600 mb-4">
+            {t("payment.safeRedirect") || "سيتم توجيهك الآن للدفع الآمن، وبعد إتمام العملية ستعود تلقائياً للتطبيق."}
+          </p>
           <PaymentForm
             amount={showPayment.amount}
             consultationId={showPayment.consultationId}

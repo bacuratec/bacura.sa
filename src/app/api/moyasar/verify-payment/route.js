@@ -50,17 +50,19 @@ export async function POST(request) {
       data?.invoice_id || data?.invoice?.id || data?.source?.invoice_id || null;
 
     let updated = null;
+    let linkedRequestId = null;
     if (supabaseAdmin && invoiceId) {
       // Find payment by stored invoiceId (saved in stripe_payment_intent_id)
       const found = await supabaseAdmin
         .from("payments")
-        .select("id,status")
+        .select("id,status,order_id")
         .eq("stripe_payment_intent_id", invoiceId)
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
 
       if (!found.error && found.data?.id) {
+        linkedRequestId = found.data?.order_id || null;
         const upRes = await supabaseAdmin
           .from("payments")
           .update({
@@ -74,6 +76,27 @@ export async function POST(request) {
         if (!upRes.error) {
           updated = upRes.data;
         }
+
+        // Update request status to 'accepted' after successful payment
+        if (status === "paid" && linkedRequestId) {
+          const { data: typeRow } = await supabaseAdmin
+            .from("lookup_types")
+            .select("id")
+            .eq("code", "request-status")
+            .single();
+          const { data: statusRow } = await supabaseAdmin
+            .from("lookup_values")
+            .select("id")
+            .eq("lookup_type_id", typeRow?.id)
+            .eq("code", "accepted")
+            .single();
+          if (statusRow?.id) {
+            await supabaseAdmin
+              .from("requests")
+              .update({ status_id: statusRow.id, updated_at: new Date().toISOString() })
+              .eq("id", linkedRequestId);
+          }
+        }
       }
     }
 
@@ -81,6 +104,7 @@ export async function POST(request) {
       status,
       invoiceId,
       updatedPayment: updated,
+      requestId: linkedRequestId,
     });
   } catch (error) {
     return NextResponse.json(

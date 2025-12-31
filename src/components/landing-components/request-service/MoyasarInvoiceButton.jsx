@@ -35,10 +35,6 @@ export default function MoyasarInvoiceButton({ amount, orderId, userId }) {
     }
   };
 
-  if (!publishable) {
-    return null;
-  }
-
   return (
     <button
       type="button"

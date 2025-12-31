@@ -19,6 +19,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "@reduxjs/toolkit": "^2.8.2",
+    "@sahabaplus/moyasar": "^0.2.5",
     "@stripe/react-stripe-js": "^3.8.1",
     "@stripe/stripe-js": "^7.7.0",
     "@supabase/ssr": "^0.8.0",
