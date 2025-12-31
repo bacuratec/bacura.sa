@@ -1,7 +1,6 @@
 import { ServiceIcon } from "@/constants/servicesData";
-import { formatCurrency } from "@/utils/currency";
 
-const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive, lang, color }) => {
+const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang, color }) => {
   return (
     <div
       title={description}

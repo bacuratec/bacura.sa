@@ -1,11 +1,10 @@
 import React from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
 import { getServiceIcon } from "@/utils/serviceIcon";
-import { formatCurrency } from "@/utils/currency";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive, lang }) => {
+const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang }) => {
   return (
     <motion.div
       title={description}
@@ -14,11 +13,7 @@ const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActiv
     >
       <div className="flex items-start justify-between">
         <span className="text-sm sm:text-base text-gray-400">{index}</span>
-        {price !== null && price !== undefined ? (
-          <span className="inline-flex items-center rounded-lg bg-primary/10 text-primary px-2 py-1 text-xs sm:text-sm">
-            {formatCurrency(price, lang)}
-          </span>
-        ) : null}
+        
       </div>
 
       <div className="flex items-center gap-3">
