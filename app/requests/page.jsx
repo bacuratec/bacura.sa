@@ -1,9 +1,10 @@
 import { createClient } from '@/utils/supabase/server';
 import ExploreContent from './ExploreContent';
+import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 
 export default async function RequestsPage() {
   const supabase = await createClient();
-  
+
   let stats = {
     totalRequestsCount: 0,
     underProcessingRequestsCount: 0,
@@ -36,5 +37,27 @@ export default async function RequestsPage() {
     console.error("Error fetching requests stats:", err);
   }
 
+  // Check for user to optionally show layout
+  const { data: { user } } = await supabase.auth.getUser();
+  let requester = null;
+
+  if (user) {
+    const { data } = await supabase
+      .from('requesters')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+    requester = data;
+  }
+
+  if (requester) {
+    return (
+      <SeekerLayout requester={requester}>
+        <ExploreContent stats={stats} />
+      </SeekerLayout>
+    );
+  }
+
   return <ExploreContent stats={stats} />;
 }
+

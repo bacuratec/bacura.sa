@@ -1,4 +1,6 @@
 import RequestDetailsContent from './RequestDetailsContent';
+import { createClient } from '@/utils/supabase/server';
+import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 
 export default async function RequestDetailsPage({ params }) {
   const { id } = await params;
@@ -28,7 +30,7 @@ export default async function RequestDetailsPage({ params }) {
   //         // Since we can't easily replicate the whole API response with attachments and all relations without complex queries,
   //         // we will pass the ID and let the client fetch the full details for now, 
   //         // BUT we can pass basic details for SEO/Skeleton if we wanted.
-          
+
   //         // However, RequestDetails uses `initialData` to SKIP client fetch.
   //         // If we provide incomplete data, the page might break.
   //         // So let's NOT pass initialData for now, but keep the server component structure ready.
@@ -39,5 +41,23 @@ export default async function RequestDetailsPage({ params }) {
   // But we want to use the server component.
   // We can pass `id` prop to `RequestDetailsContent`.
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let requester = null;
+  if (user) {
+    const { data } = await supabase.from('requesters').select('*').eq('user_id', user.id).single();
+    requester = data;
+  }
+
+  if (requester) {
+    return (
+      <SeekerLayout requester={requester}>
+        <RequestDetailsContent id={id} />
+      </SeekerLayout>
+    );
+  }
+
   return <RequestDetailsContent id={id} />;
 }
+

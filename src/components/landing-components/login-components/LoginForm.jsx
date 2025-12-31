@@ -135,7 +135,7 @@ const LoginForm = () => {
       // Detect role
       const userRolePromise = detectUserRole(user, session);
       const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
-      
+
       const userRole = await Promise.race([userRolePromise, timeoutPromise]);
 
       if (!userRole) {
@@ -146,7 +146,7 @@ const LoginForm = () => {
 
       // Sync session cookies on server
       try {
-        await fetch("/api/auth/set-session", {
+        const sessionRes = await fetch("/api/auth/set-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -154,7 +154,12 @@ const LoginForm = () => {
             refresh_token: session.refresh_token,
           }),
         });
-      } catch {}
+        if (!sessionRes.ok) {
+          console.error("Failed to set session on server:", await sessionRes.text());
+        }
+      } catch (e) {
+        console.error("Error calling set-session:", e);
+      }
 
       dispatch(
         setCredentials({
@@ -182,13 +187,18 @@ const LoginForm = () => {
 
       // Redirect based on role
       const normalizedRole = userRole.toLowerCase();
-      
+
       if (normalizedRole === "admin") {
         router.replace("/admin");
       } else if (normalizedRole === "provider") {
         router.replace("/provider");
       } else if (normalizedRole === "requester") {
-        router.replace("/profile");
+        // Allow deep linking logic if 'from' is present and valid
+        if (from && from !== "/" && from !== "/login" && !from.includes("/admin") && !from.includes("/provider")) {
+          router.replace(from);
+        } else {
+          router.replace("/profile");
+        }
       } else {
         toast.warning(t("loginForm.errors.unknownRole"));
         router.replace("/profile");
@@ -243,11 +253,10 @@ const LoginForm = () => {
                 name="email"
                 type="email"
                 placeholder={t("loginForm.email")}
-                className={`w-full rounded-lg border py-3 px-5 placeholder:text-sm placeholder:text-[#808080] placeholder:font-light outline-none ${
-                  touched.email && errors.email
+                className={`w-full rounded-lg border py-3 px-5 placeholder:text-sm placeholder:text-[#808080] placeholder:font-light outline-none ${touched.email && errors.email
                     ? "border-red-500"
                     : "border-[#ADADAD] focus:border-[#4285F4]"
-                }`}
+                  }`}
               />
               <ErrorMessage
                 name="email"
@@ -267,11 +276,10 @@ const LoginForm = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder={t("loginForm.password")}
-                  className={`w-full rounded-lg border py-3 px-5 placeholder:text-sm placeholder:text-[#808080] placeholder:font-light outline-none pr-12 ${
-                    touched.password && errors.password
+                  className={`w-full rounded-lg border py-3 px-5 placeholder:text-sm placeholder:text-[#808080] placeholder:font-light outline-none pr-12 ${touched.password && errors.password
                       ? "border-red-500"
                       : "border-[#ADADAD] focus:border-[#4285F4]"
-                  }`}
+                    }`}
                 />
                 <button
                   type="button"
