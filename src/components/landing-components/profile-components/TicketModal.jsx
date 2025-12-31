@@ -5,16 +5,18 @@ import * as Yup from "yup";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { useCreateTicketsMutation } from "../../../redux/api/ticketApi";
+import { useSelector } from "react-redux";
 
 export default function TicketModal({ open, setOpen, refetch }) {
   const { t } = useTranslation();
   const handleClose = () => setOpen(false);
   const [createTickets, { isLoading: loadingCreateTickets }] =
     useCreateTicketsMutation();
+  const userId = useSelector((state) => state.auth.userId);
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      await createTickets(values).unwrap();
+      await createTickets({ ...values, userId }).unwrap();
       toast.success(t("ticket.success"));
       resetForm();
       handleClose();

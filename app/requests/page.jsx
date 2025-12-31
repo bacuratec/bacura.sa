@@ -2,6 +2,11 @@ import { createClient } from '@/utils/supabase/server';
 import ExploreContent from './ExploreContent';
 import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 
+export const metadata = {
+  title: 'تصفح الطلبات | باكورة أعمال',
+  description: 'تصفح طلبات الخدمة ومتابعة حالتها',
+};
+
 export default async function RequestsPage() {
   const supabase = await createClient();
 

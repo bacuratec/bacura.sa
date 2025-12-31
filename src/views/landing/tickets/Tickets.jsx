@@ -15,13 +15,15 @@ const Tickets = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const userId = useSelector((state) => state.auth.userId);
+
   const [open, setOpen] = useState(false);
 
   const {
     data: tickets,
     refetch,
     isLoading: isLoadingTickets,
-  } = useGetTicketsQuery();
+  } = useGetTicketsQuery(userId);
 
   useEffect(() => {
     refetch();

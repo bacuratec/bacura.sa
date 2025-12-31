@@ -74,6 +74,43 @@ export const projectsApi = createApi({
       },
       providesTags: ["Orders"],
     }),
+    // Get Requester Projects/Orders
+    getProjectsRequesters: builder.query({
+      query: ({
+        PageNumber = 1,
+        PageSize = 10,
+        OrderTitle = "",
+        OrderStatusLookupId,
+        requesterId,
+      }) => {
+        const filters = {};
+        if (requesterId) {
+          // Join path to filter by requester_id via request table
+          filters["request.requester_id"] = requesterId;
+        }
+        if (OrderStatusLookupId) {
+          filters.order_status_id = OrderStatusLookupId;
+        }
+        if (OrderTitle) {
+          filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };
+        }
+        return {
+          table: "orders",
+          method: "GET",
+          filters,
+          pagination: {
+            page: Number(PageNumber),
+            pageSize: Number(PageSize),
+          },
+          joins: [
+            "request:requests!inner(id,title,description,requester_id, requester:requesters(id,name), service:services(base_price))",
+            "provider:providers(id,name,specialization)",
+            "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
+          ],
+        };
+      },
+      providesTags: ["Orders"],
+    }),
     // Get Project Details
     getProjectDetails: builder.query({
       query: ({ id }) => ({
@@ -160,5 +197,6 @@ export const {
   useAddOrderAttachmentsMutation,
   useCompleteOrderMutation,
   useGetProjectsProvidersQuery,
+  useGetProjectsRequestersQuery,
   useDeleteProjectMutation,
 } = projectsApi;

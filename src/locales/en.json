@@ -15,7 +15,6 @@
       "questionRequired": "Question is required",
       "answerRequired": "Answer is required"
     },
-
     "faqManagement": "FAQ Management",
     "addQuestion": "Add Question",
     "question": "Question",
@@ -25,12 +24,10 @@
     "delete": "Delete",
     "deleteSuccess": "Question deleted successfully",
     "deleteError": "An error occurred while deleting",
-
     "deleteConfirmationTitle": "Are you sure you want to delete the question?",
     "confirmDelete": "Delete",
     "cancel": "Cancel",
     "deleting": "Deleting...",
-
     "editQuestion": "Edit Question",
     "save": "Save",
     "saving": "Saving...",
@@ -41,7 +38,6 @@
   "partners": {
     "titlePage": "Our Partners",
     "description": "Here you can manage and view all platform partners",
-
     "titleHero": "Partners",
     "addPartner": "Add Partner",
     "partnerName": "Partner Name",
@@ -61,13 +57,11 @@
       "deleting": "Deleting...",
       "cancel": "Cancel"
     },
-
     "title": "Partners Management",
     "name": "Name",
     "actions": "Actions",
     "deleteSuccess": "Partner deleted successfully",
     "deleteError": "An error occurred while deleting",
-
     "upsertPartner": {
       "titleAdd": "Add Partner",
       "titleEdit": "Edit Partner",
@@ -87,18 +81,15 @@
   "projects": {
     "pageTitle": "Project Management",
     "pageDescription": "Here you can find all projects related to service requesters",
-
     "projectDetailsTitle": "Project Details No.",
     "projectManagement": "Project Management",
     "projectDetails": "Project Details",
     "projectAttachments": "Project Attachments",
     "requesterAttachments": "Requester Attachments",
-
     "attachments": "Attachments",
     "action": "Action",
     "preview": "Preview",
     "orderDescription": "Order Description",
-
     "orderNumber": "Order Number",
     "startDate": "Start Date",
     "endDate": "End Date",
@@ -108,7 +99,6 @@
     "requester": "Requester",
     "provider": "Provider",
     "orderStatus": "Order Status",
-
     "all": "All",
     "waitingApproval": "Waiting for Approval",
     "waitingStart": "Waiting to Start",
@@ -118,7 +108,6 @@
     "rejected": "Rejected",
     "expired": "Expired",
     "viewOrder": "View Order",
-
     "confirmRequest": "Confirm Request",
     "providerLabel": "Service Provider",
     "providerPlaceholder": "Select a service provider",
@@ -128,7 +117,6 @@
     "errorMessage": "An error occurred during the operation",
     "providerRequired": "Service provider is required"
   },
-
   "providersTable": {
     "tabs": {
       "all": "All",
@@ -148,7 +136,6 @@
       "view": "View"
     }
   },
-
   "requestersTable": {
     "tabs": {
       "all": "All",
@@ -168,14 +155,12 @@
       "view": "View"
     }
   },
-
   "request": {
     "name": "Name",
     "registrationDate": "Registration Date",
     "price": "Price",
     "requestDescription": "Request Description",
     "notes": "notes:",
-
     "all": "All",
     "newRequest": "New Request",
     "underProcessing": "Under Processing",
@@ -183,7 +168,6 @@
     "awaitingPayment": "Awaiting Payment",
     "rejected": "Rejected",
     "completed": "Completed",
-
     "requestNumber": "Request Number",
     "requesterName": "Requester Name",
     "requestDate": "Request Date",
@@ -199,7 +183,6 @@
     "status": "Status",
     "actions": "Actions",
     "edit": "Edit",
-
     "update_price": "Update Price",
     "enter_new_price": "Enter new price",
     "update": "Update",
@@ -208,7 +191,6 @@
     "toast_success_update": "Price updated successfully",
     "toast_error_update": "An error occurred while updating the price"
   },
-
   "tickets": {
     "title": "Manage Complaints",
     "description": "Here you can find the requests you have been nominated to handle based on your specialization",
@@ -222,14 +204,12 @@
     "ticket_title": "Ticket Title",
     "ticket_description": "Ticket Description",
     "no_description": "No description available",
-
     "username": "User Name",
     "complaint_title": "Complaint Title",
     "complaint_status": "Complaint Status",
     "view": "View",
     "action": "Action"
   },
-
   "user": {
     "name": "Name",
     "email": "Email",
@@ -244,7 +224,6 @@
     "user_blocked_success": "User blocked successfully!",
     "user_activated_success": "User activated successfully!"
   },
-
   "about": {
     "metaTitle": "About Us - Learn About Our Vision and Goals",
     "metaDescription": "Discover more about our mission, values, and services at our platform dedicated to delivering excellence.",
@@ -313,7 +292,6 @@
     ],
     "more": "More About Bacura A'mal"
   },
-
   "review": {
     "add_review": "Add Review",
     "write_review_placeholder": "Write your review here...",
@@ -322,7 +300,6 @@
     "review_success": "Thank you for your product review",
     "review_error": "An error occurred while submitting your review"
   },
-
   "requestsUser": {
     "my_requests": "My Requests",
     "request_number": "Request Number",
@@ -339,16 +316,13 @@
     "status_completed": "Completed",
     "action": "Action"
   },
-
   "faq": "FAQ",
-
   "hero": {
     "title": "Bacura Amal - Our Launch",
     "registerNow": "Register Now",
     "requestService": "Request a Service",
     "seeMore": "See More"
   },
-
   "howItWorks": {
     "metaDescription": "Learn how to use the platform to request services easily and quickly through clear and simple steps.",
     "title": "How does the platform work?",
@@ -358,7 +332,6 @@
     "requestService": "Request Service",
     "subscribeNow": "Subscribe Now"
   },
-
   "join": {
     "title": "Join us as a service requester",
     "description": "For governmental and commercial entities; we are honored to fulfill your requests with high professionalism. We serve all low current systems including supply, installation, programming, maintenance, consultation, and training.",
@@ -454,7 +427,6 @@
     "sendTicket": "Submit Complaint",
     "noTicketsTitle": "No messages yet",
     "noTicketsDescription": "You can send a new complaint using the button above",
-
     "title": "Submit a Complaint",
     "form": {
       "title": "Complaint Title",
@@ -483,7 +455,6 @@
       "completed": "Completed Orders",
       "servicesCompleted": "Services Completed"
     },
-
     "providerDetails": "Service Provider Details",
     "requesterDetails": "Service Requester Details",
     "adminDetails": "Admin Details",
@@ -494,7 +465,6 @@
     "editData": "Edit Profile",
     "subtitle": "Browse service requests or track your ongoing projects below.",
     "joinedSince": "Joined since: {{date}}",
-
     "fullName": "Full Name",
     "email": "Email",
     "phone": "Phone Number",
@@ -596,6 +566,13 @@
     "role": "Admin",
     "logout": "Logout",
     "serviceProvider": "Service Provider"
+  },
+  "navSeeker": {
+    "home": "Home",
+    "postRequest": "New Request",
+    "explore": "My Requests",
+    "support": "Support Tickets",
+    "serviceSeeker": "Service Seeker"
   },
   "nav": {
     "home": "Home",
@@ -879,10 +856,8 @@
   "providerHome": {
     "activeOrders.title": "Available Orders",
     "activeOrders.description": "Here you will find the orders you have been nominated for based on your specialization.",
-
     "providerHome.title": "Home Page",
     "providerHome.description": "Welcome to Bacura – Service Provider",
-
     "providerHome.statisticsTitle": "Statistics",
     "providerHome.totalOrders": "Total Orders",
     "providerHome.waitingApproval": "Waiting for Approval",

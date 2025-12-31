@@ -15,7 +15,6 @@
       "questionRequired": "السؤال مطلوب",
       "answerRequired": "الإجابة مطلوبة"
     },
-
     "faqManagement": "إدارة الأسئلة",
     "addQuestion": "إضافة سؤال",
     "question": "السؤال",
@@ -25,12 +24,10 @@
     "delete": "حذف",
     "deleteSuccess": "تم حذف السؤال بنجاح",
     "deleteError": "حدث خطأ أثناء الحذف",
-
     "deleteConfirmationTitle": "هل أنت متأكد أنك تريد حذف السؤال؟",
     "confirmDelete": "حذف",
     "cancel": "إلغاء",
     "deleting": "جارٍ الحذف...",
-
     "editQuestion": "تعديل السؤال",
     "save": "حفظ",
     "saving": "جارٍ الحفظ...",
@@ -41,7 +38,6 @@
   "partners": {
     "titlePage": "شركاؤنا",
     "description": "هنا يمكنك إدارة وعرض جميع شركاء المنصة",
-
     "titleHero": "شركاؤنا",
     "addPartner": "إضافة شريك",
     "partnerName": "اسم الشريك",
@@ -61,13 +57,11 @@
       "deleting": "جارٍ الحذف...",
       "cancel": "إلغاء"
     },
-
     "title": "إدارة الشركاء",
     "name": "الاسم",
     "actions": "إجراء",
     "deleteSuccess": "تم حذف الشريك بنجاح",
     "deleteError": "حدث خطأ أثناء الحذف",
-
     "upsertPartner": {
       "titleAdd": "إضافة شريك",
       "titleEdit": "تعديل الشريك",
@@ -87,7 +81,6 @@
   "customers": {
     "titlePage": "عملاؤنا",
     "description": "هنا يمكنك إدارة وعرض جميع عملاء المنصة",
-
     "titleHero": "عملاؤنا",
     "addCustomer": "إضافة عميل",
     "customerName": "اسم العميل",
@@ -97,25 +90,21 @@
     "submitting": "جارٍ الإرسال...",
     "addSuccess": "تم إضافة العميل بنجاح",
     "addError": "حدث خطأ أثناء الإضافة",
-
     "validation": {
       "nameRequired": "اسم العميل مطلوب",
       "imageRequired": "الصورة مطلوبة"
     },
-
     "modalDelete": {
       "title": "هل أنت متأكد أنك تريد حذف العميل؟",
       "delete": "حذف",
       "deleting": "جارٍ الحذف...",
       "cancel": "إلغاء"
     },
-
     "title": "إدارة العملاء",
     "name": "الاسم",
     "actions": "إجراء",
     "deleteSuccess": "تم حذف العميل بنجاح",
     "deleteError": "حدث خطأ أثناء الحذف",
-
     "upsertCustomer": {
       "titleAdd": "إضافة عميل",
       "titleEdit": "تعديل العميل",
@@ -135,18 +124,15 @@
   "projects": {
     "pageTitle": "إدارة المشاريع",
     "pageDescription": "هنا تجد المشاريع الخاصه بطالبين الخدمات",
-
     "projectDetailsTitle": "تفاصيل المشروع رقم",
     "projectManagement": "إدارة المشاريع",
     "projectDetails": "تفاصيل المشروع",
     "projectAttachments": "المرفقات الخاصة بالمشروع",
     "requesterAttachments": "المرفقات الخاصة بطالب الخدمة",
-
     "attachments": "المرفقات",
     "action": "إجراء",
     "preview": "معاينه",
     "orderDescription": "وصف الطلب",
-
     "startDate": "تاريخ البداية",
     "endDate": "تاريخ النهاية",
     "userNotes": "ملاحظات طالب الخدمة",
@@ -154,7 +140,6 @@
     "serviceType": "نوع الخدمة",
     "provider": "مزود الخدمة",
     "orderStatus": "حالة الطلب",
-
     "all": "الكل",
     "waitingApproval": "في انتظار الموافقة",
     "waitingStart": "في انتظار البدء",
@@ -166,7 +151,6 @@
     "orderNumber": "رقم الطلب",
     "requester": "مقدم الطلب",
     "viewOrder": "عرض الطلب",
-
     "confirmRequest": "تأكيد الطلب",
     "providerLabel": "مقدم الخدمة",
     "providerPlaceholder": "اختر مقدم الخدمة",
@@ -176,7 +160,6 @@
     "errorMessage": "حدث خطأ أثناء تنفيذ العملية",
     "providerRequired": "يجب اختيار مقدم خدمة"
   },
-
   "providersTable": {
     "tabs": {
       "all": "الكل",
@@ -196,7 +179,6 @@
       "view": "عرض"
     }
   },
-
   "requestersTable": {
     "tabs": {
       "all": "الكل",
@@ -216,14 +198,12 @@
       "view": "عرض"
     }
   },
-
   "request": {
     "name": "الاسم",
     "registrationDate": "تاريخ التسجيل",
     "price": "السعر",
     "requestDescription": "وصف الطلب",
     "notes": "ملاحظات:",
-
     "all": "الكل",
     "newRequest": "طلب جديد",
     "underProcessing": "تحت المعالجة",
@@ -231,13 +211,11 @@
     "awaitingPayment": "بإنتظار الدفع",
     "rejected": "مرفوض",
     "completed": "مكتمل",
-
     "requestNumber": "رقم الطلب",
     "requesterName": "مقدم الطلب",
     "requestDate": "تاريخ الطلب",
     "requestStatus": "حالة الطلب",
     "viewRequest": "عرض الطلب",
-
     "actions": "إجراء"
   },
   "services": {
@@ -248,7 +226,6 @@
     "status": "الحالة",
     "actions": "إجراء",
     "edit": "تعديل",
-
     "update_price": "تحديث السعر",
     "enter_new_price": "أدخل السعر الجديد",
     "update": "تحديث",
@@ -257,7 +234,6 @@
     "toast_success_update": "تم تحديث السعر بنجاح",
     "toast_error_update": "حدث خطأ أثناء تحديث السعر"
   },
-
   "tickets": {
     "title": "الدعم الفني",
     "description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك",
@@ -271,14 +247,12 @@
     "ticket_title": "عنوان الشكوى",
     "ticket_description": "وصف الشكوى",
     "no_description": "لا يوجد وصف",
-
     "username": "اسم المستخدم",
     "complaint_title": "عنوان الشكوى",
     "complaint_status": "حالة الشكوى",
     "view": "عرض",
     "actions": "إجراء"
   },
-
   "user": {
     "name": "الاسم",
     "email": "البريد الالكتروني",
@@ -293,7 +267,6 @@
     "user_blocked_success": "تم حظر المستخدم بنجاح!",
     "user_activated_success": "تم تفعيل المستخدم بنجاح!"
   },
-
   "about": {
     "metaTitle": "من نحن - تعرف على أهدافنا ورؤيتنا",
     "metaDescription": "اكتشف المزيد عن رسالتنا وقيمنا وخدماتنا في منصةنا التي تهدف إلى تقديم الأفضل.",
@@ -362,7 +335,6 @@
     ],
     "more": "المزيد عن باكوره الاعمال"
   },
-
   "review": {
     "add_review": "إضافة تقييم",
     "write_review_placeholder": "اكتب تقييمك هنا...",
@@ -371,7 +343,6 @@
     "review_success": "شكراً لتقييمك المنتج",
     "review_error": "حدث خطأ في إرسال التقييم"
   },
-
   "requestsUser": {
     "my_requests": "طلباتي",
     "request_number": "رقم الطلب",
@@ -388,16 +359,13 @@
     "status_completed": "مكتمل",
     "action": "إجراء"
   },
-
   "faq": "الأسئلة الشائعة",
-
   "hero": {
     "title": "باكورة أعمال - Bacura Business",
     "registerNow": "سجل الآن",
     "requestService": "طلب خدمة",
     "seeMore": "عرض المزيد"
   },
-
   "howItWorks": {
     "metaDescription": "تعرف على خطوات استخدام المنصة لطلب الخدمة بسهولة وسرعة في خطوات بسيطة وواضحة.",
     "title": "كيف تعمل المنصة؟",
@@ -407,7 +375,6 @@
     "requestService": "طلب خدمة",
     "subscribeNow": "اشترك الان"
   },
-
   "join": {
     "title": "انضم إلينا كطالب خدمة",
     "description": "للمنشآت الحكومية والتجارية؛ نتشرف بتلبية طلباتكم باحترافية ومهنية عالية. نخدمكم في جميع أنظمة التيار الخفيف من توريد وتأسيس وتركيب وبرمجة وصيانة واستشارات وتدريب.",
@@ -503,7 +470,6 @@
     "sendTicket": "إرسال طلب",
     "noTicketsTitle": "لا يوجد رسائل حتى الآن",
     "noTicketsDescription": "يمكنك إرسال طلب جديدة من الزر بالأعلى",
-
     "title": "إرسال طلب",
     "form": {
       "title": "عنوان الشكوى",
@@ -532,7 +498,6 @@
       "completed": "طلبات مكتملة",
       "servicesCompleted": "خدمات مكتملة"
     },
-
     "editData": "تعديل البيانات",
     "providerDetails": "تفاصيل مزود الخدمة",
     "requesterDetails": "تفاصيل طالب الخدمة",
@@ -540,11 +505,9 @@
     "providerNav": "إدارة مزودي الخدمة",
     "requesterNav": "إدارة طالبي الخدمة",
     "adminNav": "لوحة التحكم",
-
     "welcome": "مرحباً بك {{name}}",
     "subtitle": "تصفح طلبات الخدمة أو تتبع مشاريعك الجارية أدناه.",
     "joinedSince": "مشترك منذ: {{date}}",
-
     "fullName": "الاسم بالكامل",
     "email": "البريد الإلكتروني",
     "phone": "رقم الجوال",
@@ -669,13 +632,19 @@
     "reports": "الدعم الفني",
     "serviceProvider": "مزود خدمة"
   },
+  "navSeeker": {
+    "home": "الرئيسية",
+    "postRequest": "طلب خدمة جديدة",
+    "explore": "تصفح طلباتي",
+    "support": "الدعم الفني",
+    "serviceSeeker": "طالب خدمة"
+  },
   "profileInfo": {
     "submit": "تأكيد",
     "uploading": "جاري رفع الملف..."
   },
   "footer": {
     "profile": "الملف التعريفي",
-
     "importantLinks": "روابط مهمة",
     "home": "الرئيسية",
     "about": "من نحن",
@@ -930,10 +899,8 @@
   "providerHome": {
     "activeOrders.title": "الطلبات المتاحه",
     "activeOrders.description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك",
-
     "title": "الصفحه الرئيسية",
     "description": "مرحبًا بك في باكورة – مزود خدمة",
-
     "statisticsTitle": "احصائيات",
     "totalOrders": "إجمالي الطلبات",
     "waitingApproval": "في انتظار الموافقة",

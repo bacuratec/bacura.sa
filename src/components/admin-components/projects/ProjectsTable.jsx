@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import {
   useGetProjectsQuery,
+  useGetProjectsRequestersQuery,
   useDeleteProjectMutation,
 } from "../../../redux/api/projectsApi";
 import { useSelector } from "react-redux";
@@ -15,7 +16,7 @@ import { LanguageContext } from "@/context/LanguageContext";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
 
-const ProjectsTable = ({ stats }) => {
+const ProjectsTable = ({ stats, requesterId }) => {
   const { lang } = useContext(LanguageContext);
   const { t } = useTranslation();
   const role = useSelector((state) => state.auth.role);
@@ -24,7 +25,7 @@ const ProjectsTable = ({ stats }) => {
   const PageNumber = searchParams.get("PageNumber") || 1;
   const PageSize = searchParams.get("PageSize") || 30;
   const OrderStatusLookupId = searchParams.get("OrderStatusLookupId") || "";
-  
+
   // Map string codes to IDs for API query
   const getStatusId = (code) => {
     switch (code) {
@@ -56,15 +57,24 @@ const ProjectsTable = ({ stats }) => {
       return stats?.expiredOrdersCount || 0;
     return stats?.totalOrdersCount || 0;
   })();
+  // Choose the appropriate query hook based on role
+  const useProjectsQuery = role === "Requester" ? useGetProjectsRequestersQuery : useGetProjectsQuery;
+  const queryParams = {
+    PageNumber,
+    PageSize,
+    OrderStatusLookupId: getStatusId(OrderStatusLookupId),
+  };
+
+  // If Requester, add requesterId to params
+  if (role === "Requester" && requesterId) {
+    queryParams.requesterId = requesterId;
+  }
+
   const {
     data: projects,
     isLoading,
     refetch,
-  } = useGetProjectsQuery({
-    PageNumber,
-    PageSize,
-    OrderStatusLookupId: getStatusId(OrderStatusLookupId),
-  });
+  } = useProjectsQuery(queryParams);
 
   const [deleteProject, { isLoading: isDeleting }] =
     useDeleteProjectMutation();
@@ -172,12 +182,12 @@ const ProjectsTable = ({ stats }) => {
     },
     ...(role !== "Requester"
       ? [
-          {
-            name: t("projects.provider"),
-            selector: (row) => row?.provider?.name || "-",
-            wrap: true,
-          },
-        ]
+        {
+          name: t("projects.provider"),
+          selector: (row) => row?.provider?.name || "-",
+          wrap: true,
+        },
+      ]
       : []),
     {
       name: t("projects.startDate"),
@@ -194,16 +204,15 @@ const ProjectsTable = ({ stats }) => {
       cell: (row) => (
         <span
           className={`px-0 py-1 rounded-lg text-[11px] font-normal
-            ${
-              row.status?.code === 'completed'
-                ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                : row.status?.code === 'processing'
+            ${row.status?.code === 'completed'
+              ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
+              : row.status?.code === 'processing'
                 ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
                 : row.status?.code === 'rejected' || row.status?.code === 'expired'
-                ? "bg-red-100 text-red-700"
-                : row.status?.code === 'waiting_start'
-                ? "bg-red-100 text-[#B76E00]"
-                : "bg-gray-100 text-gray-600"
+                  ? "bg-red-100 text-red-700"
+                  : row.status?.code === 'waiting_start'
+                    ? "bg-red-100 text-[#B76E00]"
+                    : "bg-gray-100 text-gray-600"
             }`}
         >
           {lang === "ar" ? row?.status?.name_ar : row?.status?.name_en}
@@ -220,8 +229,8 @@ const ProjectsTable = ({ stats }) => {
               role === "Admin"
                 ? `/admin/projects/${row.id}`
                 : role === "Requester"
-                ? `/projects/${row.id}`
-                : `/provider/projects/${row.id}`
+                  ? `/projects/${row.id}`
+                  : `/provider/projects/${row.id}`
             }
             className="bg-[#1A71F6] text-white px-1 py-1 rounded-lg hover:bg-blue-700 transition text-xs font-medium"
             title={t("projects.view") || "عرض"}
@@ -254,8 +263,8 @@ const ProjectsTable = ({ stats }) => {
 
   const sortedData = projects
     ? [...projects]?.sort(
-        (a, b) => new Date(b?.created_at) - new Date(a?.created_at)
-      )
+      (a, b) => new Date(b?.created_at) - new Date(a?.created_at)
+    )
     : [];
 
   return (

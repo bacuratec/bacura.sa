@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import ProjectsTable from "@/components/admin-components/projects/ProjectsTable";
 import { useTranslation } from "react-i18next";
 
-const ProjectsContent = ({ stats }) => {
+const ProjectsContent = ({ stats, requesterId }) => {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const ProjectsContent = ({ stats }) => {
       <div className="container">
         <div className="">
           <div className="">
-            <ProjectsTable stats={stats} />
+            <ProjectsTable stats={stats} requesterId={requesterId} />
           </div>
         </div>
       </div>
