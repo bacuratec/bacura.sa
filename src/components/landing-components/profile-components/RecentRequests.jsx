@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
-import { arSA, enUS } from "date-fns/locale";
+import dayjs from "dayjs";
+import "dayjs/locale/ar";
+import "dayjs/locale/en";
 
 const RecentRequests = ({ orders }) => {
     const { t, i18n } = useTranslation();
@@ -46,7 +47,7 @@ const RecentRequests = ({ orders }) => {
                                     {order.request?.service?.[isRtl ? "name_ar" : "name_en"] || order.request?.title}
                                 </td>
                                 <td className="px-4 py-4 text-gray-500">
-                                    {format(new Date(order.created_at), "dd MMM yyyy", { locale: isRtl ? arSA : enUS })}
+                                    {dayjs(order.created_at).locale(isRtl ? "ar" : "en").format("DD MMM YYYY")}
                                 </td>
                                 <td className="px-4 py-4">
                                     <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

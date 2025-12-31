@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HomeIcon, PlusCircle, UserCircle2Icon } from "lucide-react";
@@ -7,6 +8,7 @@ import { useSelector } from "react-redux";
 import requestOrders from "../../../../assets/icons/requestOrders.svg";
 import requestOrdersActive from "../../../../assets/icons/requestOrdersActive.svg";
 import { getAppBaseUrl } from "../../../../utils/env";
+import OptimizedImage from "@/components/shared/OptimizedImage";
 
 const MobileNavigation = ({ data }) => {
   const { token, role } = useSelector((state) => state.auth);
@@ -22,7 +24,6 @@ const MobileNavigation = ({ data }) => {
       href: "/requests",
       icon: requestOrders,
       iconActive: requestOrdersActive,
-      ic: false,
     },
     {
       name: "طلب خدمة",
@@ -31,9 +32,14 @@ const MobileNavigation = ({ data }) => {
     },
   ];
   const pathname = usePathname();
-  const imageUrl = data?.profilePictureUrl
-    ? `${getAppBaseUrl()}/${data.profilePictureUrl}`
-    : null;
+  const imageUrl = (() => {
+    const raw = data?.profilePictureUrl || null;
+    if (!raw) return null;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    const base = (getAppBaseUrl() || "").replace(/\/$/, "");
+    const path = String(raw).replace(/^\//, "");
+    return `${base}/${path}`;
+  })();
   // <UserCircle2Icon />
   return (
     <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-lg z-50">
@@ -50,26 +56,35 @@ const MobileNavigation = ({ data }) => {
                   : ""
               }`}
             >
-              {link?.ic === false ? (
-                <img
-                  src={link.iconActive}
-                  alt={link.name}
-                  className="w-6 h-6"
-                />
+              {typeof link.icon === "object" && !React.isValidElement(link.icon) ? (
+                (() => {
+                  const isActive = pathname === link.href;
+                  const srcObj = isActive ? link.iconActive : link.icon;
+                  const src =
+                    typeof srcObj === "string" ? srcObj : (srcObj?.src || "");
+                  return (
+                    <OptimizedImage
+                      src={src}
+                      alt={link.name}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6 object-contain"
+                    />
+                  );
+                })()
               ) : (
-                link?.icon
+                link.icon
               )}
             </Link>
           ))}
 
           {token && imageUrl ? (
-            <Link
-              href="/profile"
-              className="flex items-center gap-1 border-2 border-primary/50 rounded-full w-10 h-10 overflow-hidden p-1"
-            >
-              <img
+            <Link href="/profile" className="flex items-center gap-1 rounded-full w-10 h-10 overflow-hidden p-1 border-2 border-primary/50">
+              <OptimizedImage
                 src={imageUrl}
                 alt="user"
+                width={40}
+                height={40}
                 className="w-full h-full object-cover rounded-full"
               />
             </Link>
