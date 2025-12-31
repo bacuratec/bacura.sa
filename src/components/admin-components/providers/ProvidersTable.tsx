@@ -182,21 +182,27 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
         },
         {
             name: t("providersTable.columns.email"),
-            cell: (row: any) => (
-                <a href={`mailto:${row?.email || ""}`} className="text-blue-600 hover:underline">
-                    {row?.email || ""}
-                </a>
-            ),
+            cell: (row: any) => {
+                const email = row?.user?.email || row?.email || "";
+                return (
+                    <a href={`mailto:${email}`} className="text-blue-600 hover:underline">
+                        {email}
+                    </a>
+                );
+            },
             sortable: true,
             wrap: true,
         },
         {
             name: t("providersTable.columns.phone"),
-            cell: (row: any) => (
-                <a href={`tel:${row?.phoneNumber || ""}`} className="text-gray-700 hover:text-black">
-                    {row?.phoneNumber || ""}
-                </a>
-            ),
+            cell: (row: any) => {
+                const phone = row?.user?.phone || row?.phoneNumber || "";
+                return (
+                    <a href={`tel:${phone}`} className="text-gray-700 hover:text-black">
+                        {phone}
+                    </a>
+                );
+            },
             wrap: true,
         },
         {

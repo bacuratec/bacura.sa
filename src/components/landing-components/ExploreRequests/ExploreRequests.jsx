@@ -228,9 +228,13 @@ const ExploreRequests = ({ stats }) => {
   ];
   const sortedData = orders
     ? [...orders]?.sort((a, b) => {
-      // لو رقم الطلب عبارة عن أرقام
-      return Number(b?.requestNumber) - Number(a?.requestNumber); // تنازلي
-      // return Number(a.requestNumber) - Number(b.requestNumber); // تصاعدي
+      const aNum = Number(a?.requestNumber);
+      const bNum = Number(b?.requestNumber);
+      const aTime = a?.created_at ? new Date(a.created_at).getTime() : 0;
+      const bTime = b?.created_at ? new Date(b.created_at).getTime() : 0;
+      const aKey = Number.isFinite(aNum) ? aNum : aTime;
+      const bKey = Number.isFinite(bNum) ? bNum : bTime;
+      return bKey - aKey;
     })
     : [];
   return (

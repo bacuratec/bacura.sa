@@ -189,10 +189,6 @@ const CustomDataTable = ({
             <SkeletonTable rows={5} columns={columns?.length || 5} />
           </div>
         }
-        {...(() => {
-          const { button: _btn, allowOverflow: _ao, ...clean } = rest || {};
-          return clean;
-        })()}
       />
     </div>
   );

@@ -34,6 +34,11 @@ const Providers = () => {
                 title={t("providers.pageTitle")}
             // description={t("providers.pageDescription")}
             />
+            {!isLoading && (!providerStats || (providerStats?.totalAccountsCount ?? 0) === 0) && (
+                <div className="w-full py-4 text-center text-sm text-gray-600">
+                    {t("providers.empty") || "لا توجد بيانات للعرض"}
+                </div>
+            )}
             <ProviderTable stats={providerStats} />
         </div>
     );

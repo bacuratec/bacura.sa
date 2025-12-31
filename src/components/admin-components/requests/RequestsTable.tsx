@@ -146,8 +146,8 @@ const RequestsTable = ({ stats }: { stats: any }) => {
         {
             name: t("projects.serviceType"),
             selector: (row: any) => {
-                const ar = row?.services?.[0]?.titleAr || row?.service?.name_ar;
-                const en = row?.services?.[0]?.titleEn || row?.service?.name_en;
+                const ar = row?.service?.name_ar || row?.services?.[0]?.titleAr;
+                const en = row?.service?.name_en || row?.services?.[0]?.titleEn;
                 return lang === "ar" ? (ar || "-") : (en || "-");
             },
             wrap: true,
@@ -227,9 +227,13 @@ const RequestsTable = ({ stats }: { stats: any }) => {
 
     const sortedData = orders
         ? [...orders]?.sort((a, b) => {
-            // لو رقم الطلب عبارة عن أرقام
-            return Number(b?.requestNumber) - Number(a?.requestNumber); // تنازلي
-            // return Number(a.requestNumber) - Number(b.requestNumber); // تصاعدي
+            const aNum = Number(a?.requestNumber);
+            const bNum = Number(b?.requestNumber);
+            const aTime = a?.created_at ? new Date(a.created_at).getTime() : 0;
+            const bTime = b?.created_at ? new Date(b.created_at).getTime() : 0;
+            const aKey = Number.isFinite(aNum) ? aNum : aTime;
+            const bKey = Number.isFinite(bNum) ? bNum : bTime;
+            return bKey - aKey;
         })
         : [];
 
@@ -238,6 +242,11 @@ const RequestsTable = ({ stats }: { stats: any }) => {
             <div className="py-5">
                 <div className="mx-2">
                     <div className="rounded-3xl bg-white p-5">
+                        {!isLoading && (!sortedData || sortedData.length === 0) && (
+                            <div className="mb-3 text-center text-sm text-gray-600">
+                                {t("requests.empty") || "لا توجد بيانات للعرض"}
+                            </div>
+                        )}
                         <CustomDataTable
                             tabs={tabs}
                             columns={columns}

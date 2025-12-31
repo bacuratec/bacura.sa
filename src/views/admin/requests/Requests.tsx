@@ -34,6 +34,11 @@ const Requestes = () => {
                 title={t("requests.title")}
             // description={t("requests.description")}
             />
+            {!isLoading && (!requestsStats || (requestsStats?.totalRequestsCount ?? 0) === 0) && (
+                <div className="w-full py-4 text-center text-sm text-gray-600">
+                    {t("requests.empty") || "لا توجد بيانات للعرض"}
+                </div>
+            )}
             <RequestsTable stats={requestsStats} />
         </div>
     );
