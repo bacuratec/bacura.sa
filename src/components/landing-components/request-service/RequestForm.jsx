@@ -17,6 +17,7 @@ import { supabase } from "@/lib/supabaseClient";
 import StepWizard from "./StepWizard";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import MoyasarInlineForm from "./MoyasarInlineForm";
+import { PLATFORM_SERVICES, ServiceIcon } from "@/constants/servicesData";
 
 const RequestForm = ({ services }) => {
   const router = useRouter();
@@ -265,39 +266,7 @@ const RequestForm = ({ services }) => {
 
           const handleCheckboxChange = (e) => {
             const { value, checked } = e.target;
-            let selected = [...values.selectedServices];
-
-            const clickedService = services.find((s) => String(s.id) === value);
-            const isClickedSelectable = clickedService?.isSelectable;
-
-            const isClickedPriced = clickedService?.isPriced;
-
-            // عند الاختيار
-            if (checked) {
-              // لو الخدمة isPriced
-              if (isClickedPriced) {
-                selected = [value];
-              }
-              // لو الخدمة isSelectable فقط
-              else if (isClickedSelectable) {
-                // شيل أي خدمة مش isSelectable
-                selected = selected.filter((id) => {
-                  const service = services.find((s) => String(s.id) === id);
-                  return service?.isSelectable;
-                });
-                selected.push(value);
-              }
-              // لو مش isSelectable
-              else {
-                // ممنوع تضيف لو فيه خدمات isSelectable مختارة
-                if (isAnyServicesSelectable(selected)) return;
-                selected.push(value);
-              }
-            } else {
-              // عند الإزالة
-              selected = selected.filter((id) => id !== value);
-            }
-
+            let selected = checked ? [String(value)] : [];
             setFieldValue("selectedServices", selected);
             if (selected.length === 0) setFieldValue("budget", "");
           };
@@ -312,44 +281,60 @@ const RequestForm = ({ services }) => {
                     {t("formRequest.requiredServices")}{" "}
                     <span className="text-red-500">*</span>
                   </p>
-                  <div className="flex flex-col gap-3 ltr:items-end max-h-[400px] overflow-y-auto pr-2">
-                    {services?.map((item) => {
-                      const disabled = anyPriced
-                        ? !values.selectedServices.includes(String(item.id))
-                        : anySelectable
-                          ? !item.isSelectable &&
-                          !values.selectedServices.includes(String(item.id))
-                          : anySelect
-                            ? !values.selectedServices.includes(String(item.id))
-                            : false;
+                  <div className="flex flex-col gap-4 ltr:items-end max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
+                    {PLATFORM_SERVICES.map((item) => {
+                      // Find matching service in DB to get real ID and Price
+                      const dbMatch = services?.find(s => {
+                        const nameAr = s.name_ar || s.titleAr || "";
+                        const nameEn = s.name_en || s.titleEn || "";
+                        return nameAr.includes(item.name_ar) ||
+                          item.name_ar.includes(nameAr) ||
+                          nameEn.toLowerCase().includes(item.name_en.toLowerCase());
+                      });
+
+                      const serviceId = dbMatch?.id || String(item.id);
+                      const isSelected = values.selectedServices.includes(String(serviceId));
+
                       return (
-                        <div key={item?.id} className={`p-3 border rounded-xl transition-all hover:bg-gray-50 ${values.selectedServices.includes(String(item?.id)) ? 'border-primary bg-primary/5 ring-1 ring-primary/20' : 'border-gray-200'}`}>
-                          <label className="text-sm font-normal text-[#333] flex items-center ltr:flex-row-reverse gap-3 cursor-pointer w-full">
-                            <input
-                              type="checkbox"
-                              name="selectedServices"
-                              value={String(item?.id)}
-                              checked={values.selectedServices.includes(String(item?.id))}
-                              onChange={handleCheckboxChange}
-                              className="w-5 h-5 accent-primary"
-                              disabled={disabled}
-                            />
-                            {(item?.imageUrl || item?.image_url) && (
-                              <img
-                                src={item.imageUrl || item.image_url}
-                                alt="service"
-                                className="w-10 h-10 rounded object-cover border"
+                        <div
+                          key={item.id}
+                          className={`group relative overflow-hidden transition-all duration-300 rounded-3xl border-2 ${isSelected ? 'border-primary bg-primary/[0.03] shadow-lg' : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-md'}`}
+                        >
+                          <label className="p-5 flex items-center justify-between cursor-pointer w-full">
+                            <div className="flex items-center gap-4">
+                              <ServiceIcon icon={item.icon} color={item.color} size={28} />
+                              <div className="flex flex-col">
+                                <span className={`font-bold transition-colors ${isSelected ? 'text-primary' : 'text-gray-800'}`}>
+                                  {lang === "ar" ? item.name_ar : item.name_en}
+                                </span>
+                                <span className="text-[10px] text-gray-400 font-medium tracking-tight">
+                                  {lang === "ar" ? "خدمة متخصصة" : "Specialized Service"}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              {(dbMatch?.price || dbMatch?.base_price) && (
+                                <span className="bg-primary/5 text-primary px-3 py-1 rounded-full text-xs font-black">
+                                  {dbMatch.price || dbMatch.base_price} ر.س
+                                </span>
+                              )}
+                              <input
+                                type="checkbox"
+                                name="selectedServices"
+                                value={String(serviceId)}
+                                checked={isSelected}
+                                onChange={handleCheckboxChange}
+                                className="w-6 h-6 rounded-lg accent-primary cursor-pointer border-gray-300"
                               />
-                            )}
-                            <span className="flex-1 font-medium text-base">
-                              {(lang === "ar" ? item?.titleAr : item?.titleEn) || (lang === "ar" ? item?.name_ar : item?.name_en) || item?.title || "خدمة"}
-                            </span>
-                            {item.price && (
-                              <span className="text-primary font-bold text-sm">
-                                {item.price} ر.س
-                              </span>
-                            )}
+                            </div>
                           </label>
+
+                          {/* Subtle background decoration */}
+                          <div
+                            className={`absolute -right-4 -bottom-4 w-12 h-12 opacity-[0.03] rounded-full transition-opacity group-hover:opacity-[0.08]`}
+                            style={{ backgroundColor: item.color }}
+                          />
                         </div>
                       );
                     })}

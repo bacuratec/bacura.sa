@@ -22,7 +22,7 @@ export const ordersApi = createApi({
         },
       }),
       invalidatesTags: ["Requests"],
-      }),
+    }),
     // Create Priced Request (Consultation)
     createOrderPriced: builder.mutation({
       query: (body) => ({
@@ -124,6 +124,8 @@ export const ordersApi = createApi({
         id: body.requestId,
         body: {
           status_id: body.statusId,
+          amount: body.amount,
+          pricing_notes: body.pricing_notes,
           updated_at: new Date().toISOString(),
         },
       }),
@@ -144,15 +146,16 @@ export const ordersApi = createApi({
     }),
     // Reassign Request to Provider (Create Order)
     ReassignRequestFn: builder.mutation({
-      query: ({ orderId, providerId, requestId }) => {
+      query: ({ orderId, providerId, requestId, payout }) => {
         // If orderId exists, update; otherwise create new order
         if (orderId) {
           return {
             table: "orders",
-        method: "PUT",
+            method: "PUT",
             id: orderId,
             body: {
               provider_id: providerId,
+              payout: payout,
               updated_at: new Date().toISOString(),
             },
           };
@@ -164,7 +167,8 @@ export const ordersApi = createApi({
             body: {
               request_id: requestId,
               provider_id: providerId,
-              order_title: "مشروع جديد", // Should be set properly
+              payout: payout,
+              order_title: "مشروع جديد",
               order_status_id: 17, // Waiting Approval
             },
           };

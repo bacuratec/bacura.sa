@@ -9,40 +9,45 @@ import s3 from "../../../../assets/icons/s3.svg";
 import { LanguageContext } from "@/context/LanguageContext";
 import { AppLink } from "../../../../utils/routing";
 
+import { PLATFORM_SERVICES } from "@/constants/servicesData";
+
 const ServiceList = ({ data }) => {
-  const icons = [s1, s2, s3];
   const { lang } = useContext(LanguageContext);
   const [query, setQuery] = useState("");
   const [availableOnly, setAvailableOnly] = useState(false);
   const [sortBy, setSortBy] = useState("none");
 
   const normalized = useMemo(() => {
-    if (!Array.isArray(data)) return [];
-    return data.map((item) => {
-      const title =
-        (lang === "ar" ? item.titleAr : item.titleEn) ||
-        (lang === "ar" ? item.name_ar : item.name_en) ||
-        "خدمة";
-      const description =
-        (lang === "ar" ? item.descriptionAr : item.descriptionEn) ||
-        (lang === "ar" ? item.description_ar : item.description_en) ||
-        item.description ||
-        "";
-      const price = item.price ?? item.base_price ?? null;
+    // We strictly use the 8 services requested by the user
+    return PLATFORM_SERVICES.map((standardService) => {
+      // Try to find best match in the database: prefer active + priced
+      const matches = Array.isArray(data) ? data.filter(item => {
+        const nameAr = item.name_ar || item.titleAr || "";
+        const nameEn = item.name_en || item.titleEn || "";
+        return nameAr.includes(standardService.name_ar) ||
+          standardService.name_ar.includes(nameAr) ||
+          nameEn.toLowerCase().includes(standardService.name_en.toLowerCase());
+      }) : [];
+      const dbMatch =
+        matches.find(m => (m.is_active !== false) && typeof m.base_price === 'number') ||
+        matches.find(m => m.is_active !== false) ||
+        matches[0] || null;
+
       return {
-        id: item.id,
-        title,
-        description,
-        price,
-        imageUrl: item.image_url || item.imageUrl || null,
-        isActive: item.is_active,
-        raw: item,
+        id: dbMatch?.id || standardService.id,
+        title: lang === 'ar' ? standardService.name_ar : standardService.name_en,
+        description: lang === 'ar' ? standardService.description_ar : standardService.description_en,
+        price: dbMatch?.price ?? dbMatch?.base_price ?? null,
+        isActive: dbMatch ? dbMatch?.is_active !== false : true,
+        icon: standardService.icon,
+        color: standardService.color,
+        raw: dbMatch || standardService,
       };
     });
   }, [data, lang]);
 
   const filteredSorted = useMemo(() => {
-    let list = normalized;
+    let list = normalized.filter((s) => s.isActive !== false);
     if (query.trim()) {
       const q = query.trim().toLowerCase();
       list = list.filter(
@@ -112,7 +117,8 @@ const ServiceList = ({ data }) => {
               >
                 <ServiceCard
                   index={index + 1}
-                  icon={icons[index % icons.length] || s1}
+                  icon={item.icon}
+                  color={item.color}
                   imageUrl={item.imageUrl}
                   title={item.title}
                   description={item.description}

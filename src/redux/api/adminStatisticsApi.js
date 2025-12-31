@@ -40,7 +40,7 @@ const statisticsBaseQuery = async (args) => {
           supabase.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 202),
           supabase.from("providers").select("id", { count: "exact", head: true }).eq("profile_status_id", 203),
         ]);
-        
+
         result = {
           totalAccountsCount: total.count || 0,
           pendingAccountsCount: pending.count || 0,
@@ -53,7 +53,7 @@ const statisticsBaseQuery = async (args) => {
 
       case "requests": {
         // Count requests by status
-        // Mapped to DB IDs: 7=pending, 8=priced, 9=accepted, 10=rejected, 11=completed
+        // IDs: 7=pending, 8=priced, 9=accepted, 10=rejected, 11=completed, 21=waiting_payment
         const [
           total,
           processing,
@@ -64,12 +64,12 @@ const statisticsBaseQuery = async (args) => {
           newRequests
         ] = await Promise.all([
           supabase.from("requests").select("id", { count: "exact", head: true }),
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 8), // Priced
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 9), // Accepted
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 21), // Waiting Payment (Was 0, now 21)
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 10), // Rejected
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 11), // Completed
-          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 7), // Pending
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 8),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 9),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 21),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 10),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 11),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 7),
         ]);
 
         result = {
@@ -95,24 +95,36 @@ const statisticsBaseQuery = async (args) => {
           paymentsCount,
           projectsCount,
           ticketsCount,
+          // Service breakdown
+          consultationsCount,
+          diagnosisCount,
+          maintenanceCount,
+          trainingCount,
+          supervisionCount,
+          executionCount,
+          managementCount,
+          wholesaleCount,
         ] = await Promise.all([
           supabase.from("users").select("id", { count: "exact", head: true }),
           supabase.from("requesters").select("id", { count: "exact", head: true }),
           supabase.from("providers").select("id", { count: "exact", head: true }),
           supabase.from("requests").select("id", { count: "exact", head: true }),
           supabase.from("orders").select("id", { count: "exact", head: true }),
-          supabase
-            .from("payments")
-            .select("amount", { count: "exact", head: false }),
-          supabase.from("orders").select("id", { count: "exact", head: true }), // Fixed: projects -> orders
+          supabase.from("payments").select("amount"),
+          supabase.from("orders").select("id", { count: "exact", head: true }),
           supabase.from("tickets").select("id", { count: "exact", head: true }),
+          // Specific service counts (approximate mapping to service_id if available, otherwise 0)
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 1),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 2),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 3),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 4),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 5),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 6),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 7),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 8),
         ]);
 
-        const totalAmount =
-          paymentsCount.data?.reduce(
-            (sum, row) => sum + Number(row.amount || 0),
-            0
-          ) || 0;
+        const totalAmount = paymentsCount.data?.reduce((sum, row) => sum + Number(row.amount || 0), 0) || 0;
 
         result = {
           totalUsers: usersCount.count || 0,
@@ -123,7 +135,16 @@ const statisticsBaseQuery = async (args) => {
           totalProjects: projectsCount.count || 0,
           totalTickets: ticketsCount.count || 0,
           totalFinancialAmounts: totalAmount,
-          consultationsFinancialAmounts: 0,
+          serviceBreakdown: {
+            consultations: consultationsCount.count || 0,
+            diagnosis: diagnosisCount.count || 0,
+            maintenance: maintenanceCount.count || 0,
+            training: trainingCount.count || 0,
+            supervision: supervisionCount.count || 0,
+            execution: executionCount.count || 0,
+            management: managementCount.count || 0,
+            wholesale: wholesaleCount.count || 0,
+          }
         };
         break;
       }

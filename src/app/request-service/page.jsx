@@ -13,7 +13,11 @@ export default async function RequestServicePage() {
     redirect('/login?redirect=/request-service');
   }
 
-  const { data: services } = await supabase.from('services').select('*').order('created_at', { ascending: true });
+  const { data: services } = await supabase
+    .from('services')
+    .select('id,name_ar,name_en,base_price,is_active')
+    .eq('is_active', true)
+    .order('created_at', { ascending: true });
 
   // Need to fetch requester details for the layout
   // We have the user object.

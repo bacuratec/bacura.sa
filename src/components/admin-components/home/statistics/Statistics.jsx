@@ -11,36 +11,58 @@ const Statistics = ({ title, stats }) => {
           {title ?? ""}
         </h2>
         <div
-          className={`grid ${
-            pathname === "/admin" || pathname === "/provider"
-              ? "grid-cols-1"
-              : "grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-          } gap-2 md:gap-3 lg:gap-5 xl:gap-9`}
+          className={`grid ${pathname === "/admin" || pathname === "/provider"
+              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-1"
+              : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+            } gap-4 md:gap-6`}
         >
           {stats?.length > 0 &&
             stats?.map((item, i) => {
               return (
                 <div
                   key={i}
-                  className="card shadow-md cursor-pointer flex flex-col justify-between bg-white p-4 rounded-xl min-h-[100px]"
+                  className="group relative overflow-hidden bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex flex-col">
-                      <h3 className="font-bold text-lg">{item?.number}</h3>
-                      <span className="text-[#737373] text-sm font-normal">
+                  <div className="flex items-start justify-between">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                         {item?.title}
-                      </span>
+                      </p>
+                      <h3 className="text-2xl font-black text-gray-800">
+                        {Number(item?.number || 0).toLocaleString()}
+                      </h3>
                     </div>
-                    {item?.ic ? item?.icon : (
-                      <img
-                        src={typeof item?.icon === "string" ? item.icon : (item?.icon?.src || "")}
-                        alt={item?.title || "icon"}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-6 h-6"
-                      />
-                    )}
+
+                    <div
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-inner"
+                      style={{
+                        backgroundColor: `${item?.color || '#F3F4F6'}20`,
+                        color: item?.color || '#374151'
+                      }}
+                    >
+                      {item?.ic ? (
+                        React.cloneElement(item?.icon, { size: 22, strokeWidth: 2.5 })
+                      ) : (
+                        <img
+                          src={typeof item?.icon === "string" ? item.icon : (item?.icon?.src || "")}
+                          alt={item?.title || "icon"}
+                          className="w-6 h-6 object-contain filter group-hover:drop-shadow-sm"
+                        />
+                      )}
+                    </div>
                   </div>
+
+                  {/* Subtle accent bar */}
+                  <div
+                    className="absolute bottom-0 left-0 h-1 transition-all duration-500 rounded-full bg-primary"
+                    style={{ width: '0%', backgroundColor: item?.color || '#3b82f6' }}
+                  />
+
+                  {/* Decorative background shape */}
+                  <div
+                    className="absolute -right-4 -bottom-4 w-16 h-16 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 rounded-full"
+                    style={{ backgroundColor: item?.color || '#3b82f6' }}
+                  />
                 </div>
               );
             })}

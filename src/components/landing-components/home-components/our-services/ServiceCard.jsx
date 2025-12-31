@@ -1,37 +1,37 @@
-import React from "react";
-import OptimizedImage from "@/components/shared/OptimizedImage";
-import { getServiceIcon } from "@/utils/serviceIcon";
+import { ServiceIcon } from "@/constants/servicesData";
 import { formatCurrency } from "@/utils/currency";
 
-const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive, lang }) => {
+const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActive, lang, color }) => {
   return (
     <div
       title={description}
-      className="relative rounded-2xl bg-[#F8F8F8] transition-all duration-300 hover:shadow-custom group p-4 sm:p-6 flex flex-col gap-4"
+      className="relative rounded-[32px] bg-white border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group p-6 sm:p-8 flex flex-col gap-6"
     >
       <div className="flex items-start justify-between">
-        <span className="text-sm sm:text-base text-gray-400">{index}</span>
+        <span className="text-sm font-black text-gray-200 group-hover:text-primary/20 transition-colors uppercase tracking-widest">{String(index).padStart(2, '0')}</span>
         {price !== null && price !== undefined ? (
-          <span className="inline-flex items-center rounded-lg bg-primary/10 text-primary px-2 py-1 text-xs sm:text-sm">
+          <span className="inline-flex items-center rounded-full bg-primary/5 text-primary border border-primary/10 px-3 py-1 text-xs font-bold">
             {formatCurrency(price, lang)}
           </span>
-        ) : null}
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="rounded-xl bg-[#F1F1F1] p-3 w-fit flex items-center justify-center text-primary">
-          <OptimizedImage src={imageUrl || icon} alt={title || ""} width={40} height={40} className="object-cover" fallbackSrc={getServiceIcon(title, description)} />
-        </div>
-        {isActive === false ? (
-          <span className="text-xs text-red-600">غير متاحة حالياً</span>
         ) : (
-          <span className="text-xs text-green-600">متاحة</span>
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color || '#0071FF' }}></div>
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <h3 className="font-semibold text-base sm:text-lg md:text-xl">{title}</h3>
-        <p className="text-sm sm:text-base text-[#525252] leading-relaxed line-clamp-3">
+      <div className="flex items-center gap-4">
+        <ServiceIcon icon={icon} color={color} size={32} />
+        <div className="flex flex-col">
+          {isActive === false ? (
+            <span className="text-[10px] font-bold text-red-500 uppercase tracking-tighter">غير متاح حالياً</span>
+          ) : (
+            <span className="text-[10px] font-bold text-green-500 uppercase tracking-tighter">متاح الآن</span>
+          )}
+          <h3 className="font-black text-xl text-gray-800 leading-tight">{title}</h3>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 font-medium">
           {description}
         </p>
       </div>

@@ -10,6 +10,9 @@ export const servicesApi = createApi({
       query: () => ({
         table: "services",
         method: "GET",
+        filters: { is_active: true },
+        orderBy: { column: "created_at", ascending: true },
+        select: "id,name_ar,name_en,base_price,is_active,image_url,created_at",
       }),
       providesTags: ["Services"],
     }),

@@ -17,8 +17,8 @@ const RequestDetails = ({ data }) => {
   const description = data?.description || "";
   const requestNumber = data?.requestNumber || data?.id;
   const requestStatus = data?.requestStatus || data?.status || null;
-  const pricingNotes = data?.pricingNotes || "";
-  const price = data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price ?? null;
+  const pricingNotes = data?.pricingNotes || data?.pricing_notes || "";
+  const price = data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price ?? data?.amount ?? null;
 
   const joiningDateFormatted = dayjs(creationTime).format("DD/MM/YYYY hh:mm A");
 

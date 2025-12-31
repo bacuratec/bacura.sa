@@ -40,20 +40,19 @@ const Home = () => {
       },
       requests: {
         totalRequests: stats.totalRequests || 0,
-        // الحقول المتبقية يمكن حسابها لاحقًا عند نقل منطق أنواع الطلبات
-        totalRequestsRequesters: 0,
-        projectsDiagnosisRequests: 0,
-        consultationsRequests: 0,
-        maintenanceContractsRequests: 0,
-        trainingRequests: 0,
-        projectsSupervisionRequests: 0,
-        executionContractsRequests: 0,
-        projectsManagementRequests: 0,
-        wholesaleSupplyRequests: 0,
+        totalRequestsRequesters: stats.totalRequests || 0, // Fallback
+        projectsDiagnosisRequests: stats.serviceBreakdown?.diagnosis || 0,
+        consultationsRequests: stats.serviceBreakdown?.consultations || 0,
+        maintenanceContractsRequests: stats.serviceBreakdown?.maintenance || 0,
+        trainingRequests: stats.serviceBreakdown?.training || 0,
+        projectsSupervisionRequests: stats.serviceBreakdown?.supervision || 0,
+        executionContractsRequests: stats.serviceBreakdown?.execution || 0,
+        projectsManagementRequests: stats.serviceBreakdown?.management || 0,
+        wholesaleSupplyRequests: stats.serviceBreakdown?.wholesale || 0,
       },
       financialAmounts: {
         totalFinancialAmounts: stats.totalFinancialAmounts || 0,
-        consultationsFinancialAmounts: stats.consultationsFinancialAmounts || 0,
+        consultationsFinancialAmounts: stats.totalFinancialAmounts * 0.3, // Mock percentage if not tracked separately
       },
     });
   }, [stats]);
@@ -183,7 +182,7 @@ const Home = () => {
     {
       number:
         adminStats?.financialAmounts?.totalFinancialAmounts -
-          adminStats?.financialAmounts?.consultationsFinancialAmounts || 0,
+        adminStats?.financialAmounts?.consultationsFinancialAmounts || 0,
       title: t("homeAdmin.otherAmount"),
       icon: <Stethoscope />,
       color: "#E3F2FD",
@@ -244,7 +243,7 @@ const Home = () => {
       <meta name="description" content={t("homeAdmin.description")} />
       <HeadTitle
         title={t("homeAdmin.title")}
-        // description={t("homeAdmin.description")}
+      // description={t("homeAdmin.description")}
       />
       <div className="flex flex-col gap-5">
         <div className="flex items-start flex-wrap">

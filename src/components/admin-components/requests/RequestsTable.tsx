@@ -97,40 +97,40 @@ const RequestsTable = ({ stats }: { stats: any }) => {
             color: "#637381",
         },
         {
-            name: t("request.newRequest"),
+            name: t("request.newRequest") || "طلبات جديدة",
             href: "?RequestStatus=7",
             numbers: stats?.newRequestsCount,
-            color: "#B76E00",
+            color: "#0071FF",
         },
         {
-            name: t("request.underProcessing"),
+            name: t("request.underProcessing") || "تحت المعالجة",
             href: "?RequestStatus=8",
             numbers: stats?.underProcessingRequestsCount,
             color: "#B76E00",
         },
         {
-            name: t("request.initialApproval"),
+            name: t("request.initialApproval") || "موافقة مبدئية",
             href: "?RequestStatus=9",
             numbers: stats?.initiallyApprovedRequestsCount,
             color: "#007867",
         },
         {
-            name: t("request.awaitingPayment"),
+            name: t("request.awaitingPayment") || "بانتظار الدفع",
             href: "?RequestStatus=21",
             numbers: stats?.waitingForPaymentRequestsCount,
-            color: "#b76f21",
+            color: "#FF5630",
         },
         {
-            name: t("request.rejected"),
+            name: t("request.rejected") || "مرفوض",
             href: "?RequestStatus=10",
             numbers: stats?.rejectedRequestsCount,
             color: "#B71D18",
         },
         {
-            name: t("request.completed"),
+            name: t("request.completed") || "مكتمل",
             href: "?RequestStatus=11",
             numbers: stats?.approvedRequestsCount,
-            color: "#007867",
+            color: "#22C55E",
         },
     ];
 
@@ -171,25 +171,27 @@ const RequestsTable = ({ stats }: { stats: any }) => {
         },
         {
             name: t("request.requestStatus"),
-            cell: (row: any) => (
-                <span
-                    className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-              ${(row.requestStatus?.id || row.status?.id) === 11
-                            ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                            : (row.requestStatus?.id || row.status?.id) === 9
-                                ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                                : (row.requestStatus?.id || row.status?.id) === 10
-                                    ? "bg-red-100 text-red-700"
-                                    : (row.requestStatus?.id || row.status?.id) === 21
-                                        ? "bg-red-100 text-[#B76E00]"
-                                        : "bg-gray-100 text-gray-600"
-                        }`}
-                >
-                    {lang === "ar"
-                        ? row?.requestStatus?.nameAr || row?.status?.name_ar || "-"
-                        : row?.requestStatus?.nameEn || row?.status?.name_en || "-"}
-                </span>
-            ),
+            cell: (row: any) => {
+                const statusId = row.requestStatus?.id || row.status_id || row.status?.id;
+                let bgClass = "bg-gray-100 text-gray-600";
+
+                if (statusId === 11) bgClass = "bg-green-50 text-green-700 border-green-200";
+                else if (statusId === 9) bgClass = "bg-blue-50 text-blue-700 border-blue-200";
+                else if (statusId === 10) bgClass = "bg-red-50 text-red-700 border-red-200";
+                else if (statusId === 21) bgClass = "bg-orange-50 text-orange-700 border-orange-200";
+                else if (statusId === 7) bgClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                else if (statusId === 8) bgClass = "bg-yellow-50 text-yellow-700 border-yellow-200";
+
+                return (
+                    <span
+                        className={`text-nowrap px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all ${bgClass}`}
+                    >
+                        {lang === "ar"
+                            ? row?.requestStatus?.nameAr || row?.status?.name_ar || row?.status?.nameAr || "-"
+                            : row?.requestStatus?.nameEn || row?.status?.name_en || row?.status?.nameEn || "-"}
+                    </span>
+                );
+            },
             wrap: true,
         },
         {

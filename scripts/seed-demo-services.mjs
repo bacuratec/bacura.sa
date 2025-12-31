@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { PLATFORM_SERVICES } from "../src/constants/servicesData.js";
 
 const url =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -21,84 +22,43 @@ const supabase = createClient(url, serviceRoleKey, {
   db: { schema: "public" },
 });
 
-const demoServices = [
-  {
-    name_ar: "خدمة التصميم الهندسي",
-    name_en: "Engineering Design",
-    price: 2500,
-    image_url:
-      "https://via.placeholder.com/300x200.png?text=Engineering+Design",
-    is_active: true,
-  },
-  {
-    name_ar: "إدارة المشاريع",
-    name_en: "Project Management",
-    price: 0,
-    image_url:
-      "https://via.placeholder.com/300x200.png?text=Project+Management",
-    is_active: true,
-  },
-  {
-    name_ar: "استشارات تقنية",
-    name_en: "Technical Consulting",
-    price: 1200,
-    image_url:
-      "https://via.placeholder.com/300x200.png?text=Technical+Consulting",
-    is_active: true,
-  },
-  {
-    name_ar: "تحليل الأعمال",
-    name_en: "Business Analysis",
-    price: 1500,
-    image_url:
-      "https://via.placeholder.com/300x200.png?text=Business+Analysis",
-    is_active: true,
-  },
-  {
-    name_ar: "اختبار وضمان الجودة",
-    name_en: "QA & Testing",
-    price: 800,
-    image_url: "https://via.placeholder.com/300x200.png?text=QA+%26+Testing",
-    is_active: true,
-  },
-];
+const demoServices = PLATFORM_SERVICES.map(s => ({
+  name_ar: s.name_ar,
+  name_en: s.name_en,
+  base_price: 0,
+  image_url: null,
+  is_active: true,
+}));
 
 async function main() {
-  const { count, error: countError } = await supabase
-    .from("services")
-    .select("*", { count: "exact", head: true });
-  if (countError) {
-    console.error("Count error:", countError.message);
-    process.exit(1);
-  }
-  if (count && count > 0) {
-    console.log("Services already exist, skipping seed.");
-    process.exit(0);
-  }
+  // Reset services: delete all then insert the 8 platform services
+  await supabase.from("services").delete().neq("id", null);
 
   // Try inserting; accommodate schema differences (price vs base_price)
   // Insert with name_ar, name_en, image_url, is_active, price if column exists
-  const { data, error } = await supabase.from("services").insert(
-    demoServices.map((s) => ({
-      name_ar: s.name_ar,
-      name_en: s.name_en,
-      image_url: s.image_url,
-      is_active: s.is_active,
-      price: s.price ?? null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }))
-  );
+  const { data, error } = await supabase
+    .from("services")
+    .insert(
+      demoServices.map((s) => ({
+        name_ar: s.name_ar,
+        name_en: s.name_en,
+        image_url: s.image_url,
+        is_active: s.is_active,
+        base_price: s.base_price ?? 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }))
+    )
+    .select("id,name_ar,name_en");
 
   if (error) {
     console.error("Seed insert error:", error.message);
     process.exit(1);
   }
-  console.log(`Seeded ${data?.length || demoServices.length} services successfully.`);
+  console.log(`Reset and seeded ${data?.length || demoServices.length} platform services successfully.`);
 }
 
 main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-

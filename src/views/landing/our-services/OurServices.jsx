@@ -3,6 +3,7 @@ import { useGetServicesQuery } from "../../../redux/api/servicesApi";
 import LoadingPage from "../../LoadingPage";
 import Services from "../../../components/landing-components/home-components/our-services/OurServices";
 import { useTranslation } from "react-i18next";
+import { PLATFORM_SERVICES } from "@/constants/servicesData";
 
 const OurServices = () => {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ const OurServices = () => {
     <div>
       <title>{t("services.title")}</title>
       <meta name="description" content={t("services.description")} />
-      <Services data={services} />
+      <Services data={Array.isArray(services) && services.length > 0 ? services : PLATFORM_SERVICES} />
     </div>
   );
 };
