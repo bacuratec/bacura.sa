@@ -490,6 +490,10 @@
   "profile": {
     "dashboard": "الداشبورد",
     "suspendAccount": "تعليق حسابي",
+    "recentActivity": "النشاط الحديث",
+    "noRecentActivity": "لا يوجد نشاط حديث",
+    "startNewRequest": "ابدأ طلب خدمة جديدة",
+    "quickActions": "إجراءات سريعة",
     "stats": {
       "totalOrders": "إجمالي الطلبات",
       "waitingApproval": "طلبات في انتظار الموافقة",
@@ -560,6 +564,12 @@
   "files": "ملفات",
   "noFiles": "لا توجد مرفقات",
   "currency": { "sar": "ريال" },
+  "common": {
+    "viewAll": "عرض الكل",
+    "service": "الخدمة",
+    "date": "التاريخ",
+    "status": "الحالة"
+  },
   "signupForm": {
     "welcome": "اهلا بيك في",
     "appName": "باكورة أعمال",

@@ -33,14 +33,15 @@ const RequestDetails = ({ initialData, id }) => {
   const attachments = data?.attachments;
 
   useEffect(() => {
-    const code = data?.requestStatus?.code || "";
+    const status = requestData?.status || data?.status;
+    const code = status?.code || "";
     if (code === "priced" || code === "accepted") {
       setShowPayment({
         amount: data?.servicePrice ?? data?.service?.price, // Unified price retrieval
         consultationId: data?.id,
       });
     }
-  }, [data]);
+  }, [data, requestData]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -70,12 +71,12 @@ const RequestDetails = ({ initialData, id }) => {
           title={t("requestDetails.title")}
           type={
             lang === "ar"
-              ? data?.requestStatus?.nameAr
-              : data?.requestStatus?.nameEn
+              ? (data?.status?.name_ar || data?.requestStatus?.nameAr)
+              : (data?.status?.name_en || data?.requestStatus?.nameEn)
           }
-          status={data?.requestStatus?.id}
+          status={data?.status?.id || data?.requestStatus?.id}
         />
-        <RequestStatusStepper status={data?.requestStatus} />
+        <RequestStatusStepper status={data?.status || data?.requestStatus} />
         <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
         <RequestAttachment attachments={attachments} />
         {data?.requestStatus?.id === 501 && (

@@ -41,21 +41,35 @@ const RecentRequests = ({ orders }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order) => (
-                            <tr key={order.id} className="bg-white border-b hover:bg-gray-50">
+                        {orders.map((item) => {
+                            const service =
+                              item.request?.service ||
+                              item.service ||
+                              null;
+                            const serviceName =
+                              service?.[isRtl ? "name_ar" : "name_en"] ||
+                              item.request?.title ||
+                              item.title ||
+                              "-";
+                            const statusObj = item.status || item.request?.status || null;
+                            const statusName =
+                              statusObj?.[isRtl ? "name_ar" : "name_en"] || t("common.status");
+                            const createdAt = item.created_at || item.request?.created_at;
+                            return (
+                            <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                                 <td className="px-4 py-4 font-medium text-gray-900">
-                                    {order.request?.service?.[isRtl ? "name_ar" : "name_en"] || order.request?.title}
+                                    {serviceName}
                                 </td>
                                 <td className="px-4 py-4 text-gray-500">
-                                    {dayjs(order.created_at).locale(isRtl ? "ar" : "en").format("DD MMM YYYY")}
+                                    {createdAt ? dayjs(createdAt).locale(isRtl ? "ar" : "en").format("DD MMM YYYY") : "-"}
                                 </td>
                                 <td className="px-4 py-4">
                                     <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {order.status?.[isRtl ? "name_ar" : "name_en"] || "Unknown"}
+                                        {statusName}
                                     </span>
                                 </td>
                             </tr>
-                        ))}
+                        )})}
                     </tbody>
                 </table>
             </div>

@@ -165,46 +165,47 @@ const ExploreRequests = ({ stats }) => {
     {
       name: t("requestsUser.request_number"),
       cell: (row) => (
-        <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
-          {row?.requestNumber}
+        <span className="text-xs font-medium text-gray-400">
+          #{row?.id?.slice(0, 8)}
         </span>
       ),
+      width: "100px",
     },
     {
       name: t("projects.serviceType"),
       selector: (row) =>
-        lang === "ar" ? row.services[0].titleAr : row.services[0].titleEn,
+        lang === "ar" ? row.service?.name_ar : row.service?.name_en,
       wrap: true,
     },
     {
       name: t("requestsUser.requester_name"),
-      selector: (row) => row.fullName,
+      selector: (row) => row.requester?.name || row.fullName || "-",
       wrap: true,
     },
     {
       name: t("requestsUser.request_date"),
-      selector: (row) => dayjs(row.creationTime).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) => row.created_at ? dayjs(row.created_at).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
       name: t("requestsUser.request_status"),
       cell: (row) => (
         <span
-          className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-              ${row.requestStatus?.id === 504
-              ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-              : row.requestStatus?.id === 501
-                ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                : row.requestStatus?.id === 503
-                  ? "bg-red-100 text-red-700"
-                  : row.requestStatus?.id === 502
-                    ? "bg-red-100 text-[#B76E00]"
-                    : "bg-gray-100 text-gray-600"
+          className={`text-nowrap px-3 py-1 rounded-full text-[10px] font-bold border
+              ${row.status?.code === "accepted" || row.status?.code === "completed"
+              ? "border-green-200 bg-green-50 text-green-700"
+              : row.status?.code === "priced"
+                ? "border-blue-200 bg-blue-50 text-blue-700"
+                : row.status?.code === "rejected"
+                  ? "border-red-200 bg-red-50 text-red-700"
+                  : row.status?.code === "waiting-payment" || row.status?.code === "priced"
+                    ? "border-orange-200 bg-orange-50 text-orange-700"
+                    : "border-gray-200 bg-gray-50 text-gray-600"
             }`}
         >
           {lang === "ar"
-            ? row.requestStatus?.nameAr
-            : row.requestStatus?.nameEn}
+            ? row.status?.name_ar
+            : row.status?.name_en}
         </span>
       ),
       wrap: true,
@@ -212,65 +213,46 @@ const ExploreRequests = ({ stats }) => {
     {
       name: t("requestsUser.action"),
       cell: (row) => (
-        <div className="flex items-center gap-2 mt-4 justify-end">
+        <div className="flex items-center gap-2">
           <Link
             href={`/requests/${row.id}`}
-            className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium ml-5 text-nowrap"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+            title={t("viewDetails")}
           >
-            <Eye />
+            <Eye size={16} />
           </Link>
         </div>
       ),
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
+      width: "80px",
     },
   ];
+
   const sortedData = orders
     ? [...orders]?.sort((a, b) => {
-      const aNum = Number(a?.requestNumber);
-      const bNum = Number(b?.requestNumber);
       const aTime = a?.created_at ? new Date(a.created_at).getTime() : 0;
       const bTime = b?.created_at ? new Date(b.created_at).getTime() : 0;
-      const aKey = Number.isFinite(aNum) ? aNum : aTime;
-      const bKey = Number.isFinite(bNum) ? bNum : bTime;
-      return bKey - aKey;
+      return bTime - aTime;
     })
     : [];
+
   return (
     <FadeIn className="py-5">
       <div className="container">
-        <div className="rounded-3xl bg-white xl:p-6">
-          <h3 className="font-bold text-xl mb-3">
-            {t("requestsUser.my_requests")}
-          </h3>
-          {isError && (
-            <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-red-700 mb-4">
-              {(error?.data?.message) || (error?.error) || t("error.default") || "An error occurred"}
-            </div>
-          )}
-          <CustomDataTable
-            tabs={tabs}
-            columns={columns}
-            data={sortedData}
-            searchableFields={["fullName", "email", "requestNumber"]}
-            searchPlaceholder={t("searchPlaceholder")}
-            defaultPage={PageNumber}
-            defaultPageSize={PageSize}
-            totalRows={dynamicTotal ?? totalRows}
-            isLoading={isLoading}
-          />
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="filter-city" className="block text-sm mb-1">{t("city") || "City"}</label>
+        <div className="rounded-3xl bg-white shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <h3 className="font-bold text-2xl text-gray-800">
+              {t("requestsUser.my_requests")}
+            </h3>
+
+            <div className="flex flex-wrap gap-2">
               <select
                 id="filter-city"
                 value={CityId}
                 onChange={(e) => onFilterChange("CityId", e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 disabled={citiesLoading}
               >
-                <option value="">{t("all") || "All"}</option>
+                <option value="">{t("city") || "المدينة"}</option>
                 {citiesLoading ? (
                   <option value="">{t("loading.default")}</option>
                 ) : (
@@ -281,17 +263,15 @@ const ExploreRequests = ({ stats }) => {
                   ))
                 )}
               </select>
-            </div>
-            <div>
-              <label htmlFor="filter-service" className="block text-sm mb-1">{t("projects.serviceType")}</label>
+
               <select
                 id="filter-service"
                 value={ServiceId}
                 onChange={(e) => onFilterChange("ServiceId", e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 disabled={servicesLoading}
               >
-                <option value="">{t("all") || "All"}</option>
+                <option value="">{t("projects.serviceType")}</option>
                 {servicesLoading ? (
                   <option value="">{t("loading.default")}</option>
                 ) : (
@@ -304,36 +284,41 @@ const ExploreRequests = ({ stats }) => {
               </select>
             </div>
           </div>
+
+          {isError && (
+            <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-red-700 mb-6 flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+              {(error?.data?.message) || (error?.error) || t("error.default") || "An error occurred"}
+            </div>
+          )}
+
           {(CityId || ServiceId) && (
-            <div className="mt-3">
-              <div className="flex gap-2 mb-2">
-                {CityId && activeCity && (
-                  <span className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 rounded-lg px-3 py-1 text-sm">
-                    {t("city")}: {lang === "ar" ? activeCity.name_ar : activeCity.name_en}
-                    <button
-                      type="button"
-                      aria-label="remove city filter"
-                      onClick={() => onFilterChange("CityId", "")}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                {ServiceId && activeService && (
-                  <span className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 rounded-lg px-3 py-1 text-sm">
-                    {t("projects.serviceType")}: {lang === "ar" ? activeService.name_ar : activeService.name_en}
-                    <button
-                      type="button"
-                      aria-label="remove service filter"
-                      onClick={() => onFilterChange("ServiceId", "")}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-              </div>
+            <div className="mb-6 flex flex-wrap items-center gap-2">
+              <span className="text-sm text-gray-500 mr-2 ltr:ml-2">{t("activeFilters") || "الفلاتر النشطة"}:</span>
+              {CityId && activeCity && (
+                <span className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 rounded-full px-4 py-1.5 text-xs font-medium">
+                  {lang === "ar" ? activeCity.name_ar : activeCity.name_en}
+                  <button
+                    type="button"
+                    onClick={() => onFilterChange("CityId", "")}
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {ServiceId && activeService && (
+                <span className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 rounded-full px-4 py-1.5 text-xs font-medium">
+                  {lang === "ar" ? activeService.name_ar : activeService.name_en}
+                  <button
+                    type="button"
+                    onClick={() => onFilterChange("ServiceId", "")}
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -343,12 +328,26 @@ const ExploreRequests = ({ stats }) => {
                   params.set("PageNumber", 1);
                   navigate(`${window.location.pathname}?${params.toString()}`);
                 }}
-                className="text-sm bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-2"
+                className="text-xs text-red-500 hover:underline font-medium px-2"
               >
-                {t("clearFilters") || "Clear Filters"}
+                {t("clearAll") || "حذف الكل"}
               </button>
             </div>
           )}
+
+          <div className="overflow-hidden">
+            <CustomDataTable
+              tabs={tabs}
+              columns={columns}
+              data={sortedData}
+              searchableFields={["fullName", "requestNumber"]}
+              searchPlaceholder={t("searchPlaceholder")}
+              defaultPage={PageNumber}
+              defaultPageSize={PageSize}
+              totalRows={dynamicTotal ?? totalRows}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
       </div>
     </FadeIn>

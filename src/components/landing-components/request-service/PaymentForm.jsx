@@ -48,7 +48,8 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
         }
 
         const { clientSecret: secret } = paymentData;
-        const intentId = secret?.split('_secret_')[0] || null;
+        const parts = typeof secret === "string" ? secret.split("_secret_") : [];
+        const intentId = parts.length > 0 ? parts[0] : null;
 
         // 2. Create pending payment record in Supabase
         const dbPayment = await createPayment({

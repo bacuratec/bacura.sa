@@ -41,7 +41,9 @@ const RequestDetails = ({ data }) => {
           <DetailRow
             label={t("request.requestStatus")}
             value={
-              lang === "ar" ? requestStatus?.nameAr : requestStatus?.nameEn
+              lang === "ar"
+                ? (requestStatus?.name_ar || requestStatus?.nameAr)
+                : (requestStatus?.name_en || requestStatus?.nameEn)
             }
           />
           <DetailRow label={t("request.price")} value={formatCurrency(price, lang)} />

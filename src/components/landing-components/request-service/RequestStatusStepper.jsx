@@ -25,14 +25,13 @@ export default function RequestStatusStepper({ status }) {
         return (
           <div key={step.code} className="flex flex-col items-center gap-2 bg-white px-2">
             <div
-              className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                active ? "bg-primary border-primary text-white" : "bg-white border-primary text-primary"
-              }`}
+              className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${active ? "bg-primary border-primary text-white" : "bg-white border-primary text-primary"
+                }`}
             >
               {active ? <span>✓</span> : <span>{idx + 1}</span>}
             </div>
             <span className="text-[10px] md:text-sm font-medium text-center">
-              {status?.nameAr || step.labelAr}
+              {status?.name_ar || status?.nameAr || step.labelAr}
             </span>
           </div>
         );
