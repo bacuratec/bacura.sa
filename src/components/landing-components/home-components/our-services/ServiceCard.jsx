@@ -9,13 +9,7 @@ const ServiceCard = ({ icon, imageUrl, title, description, price, index, isActiv
     >
       <div className="flex items-start justify-between">
         <span className="text-sm font-black text-gray-200 group-hover:text-primary/20 transition-colors uppercase tracking-widest">{String(index).padStart(2, '0')}</span>
-        {price !== null && price !== undefined ? (
-          <span className="inline-flex items-center rounded-full bg-primary/5 text-primary border border-primary/10 px-3 py-1 text-xs font-bold">
-            {formatCurrency(price, lang)}
-          </span>
-        ) : (
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color || '#0071FF' }}></div>
-        )}
+        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color || '#0071FF' }}></div>
       </div>
 
       <div className="flex items-center gap-4">
