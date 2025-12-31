@@ -8,7 +8,11 @@ export default function Page() {
   const [state, setState] = useState({ loading: true, message: "", ok: false });
 
   useEffect(() => {
-    const paymentId = searchParams.get("id");
+    const paymentId =
+      searchParams.get("id") ||
+      searchParams.get("payment_id") ||
+      searchParams.get("paymentId") ||
+      "";
     if (!paymentId) {
       setState({ loading: false, message: "لا يوجد معرف دفع", ok: false });
       return;
@@ -30,6 +34,11 @@ export default function Page() {
           message: ok ? "تم الدفع بنجاح" : `حالة الدفع: ${data?.status || "غير معروف"}`,
           ok,
         });
+        // Redirect to request details when linked request id is available
+        const rid = data?.requestId;
+        if (ok && rid) {
+          setTimeout(() => router.push(`/requests/${rid}`), 1200);
+        }
       } catch (e) {
         setState({ loading: false, message: e?.message || "فشل التحقق", ok: false });
       }

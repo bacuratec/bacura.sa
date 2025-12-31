@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 
 export default async function RequestDetailsPage({ params }) {
-  const { id } = await params;
+  const { id } = params || {};
   // const supabase = await createClient();
 
   // Fetch request details
@@ -60,4 +60,3 @@ export default async function RequestDetailsPage({ params }) {
 
   return <RequestDetailsContent id={id} />;
 }
-

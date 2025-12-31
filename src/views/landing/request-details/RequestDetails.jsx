@@ -27,31 +27,50 @@ const RequestDetails = ({ initialData, id }) => {
     refetch: refetchRequesterDetails,
     isLoading: loadingRequester,
   } = useGetRequestDetailsQuery(requestId, { skip: !!initialData || !requestId });
+  const [adminData, setAdminData] = useState(null);
 
-  const data = initialData || requestData;
+  const data = initialData || requestData || adminData;
 
-  const attachments = data?.attachments;
+  const attachments = Array.isArray(data?.attachments) ? data.attachments : [];
 
   useEffect(() => {
     const status = requestData?.status || data?.status;
     const code = status?.code || "";
     if (code === "priced" || code === "accepted") {
-      setShowPayment({
-        amount: data?.servicePrice ?? data?.service?.price, // Unified price retrieval
-        consultationId: data?.id,
-      });
+      const amt = data?.servicePrice ?? data?.service?.price;
+      if (typeof amt === "number" && Number.isFinite(amt) && amt > 0) {
+        setShowPayment({
+          amount: amt,
+          consultationId: data?.id,
+        });
+      }
     }
   }, [data, requestData]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  if (loadingRequester) {
+  if (loadingRequester && !adminData) {
     return <DetailPageSkeleton />;
   }
 
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      if (data || !requestId) return;
+      try {
+        const res = await fetch("/api/requests/admin-get", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: requestId }),
+        });
+        const json = await res.json();
+        if (json?.data) setAdminData(json.data);
+      } catch {}
+    };
+    fetchAdmin();
+  }, [data, requestId]);
   if (!data) {
-    return <NotFound />;
+    return <UnavailableDetails id={requestId} />;
   }
   return (
     <div className="py-10">
@@ -100,3 +119,39 @@ const RequestDetails = ({ initialData, id }) => {
 };
 
 export default RequestDetails;
+
+const UnavailableDetails = ({ id }) => {
+  const { t } = useTranslation();
+  const [state, setState] = useState({ loading: true, exists: false });
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch("/api/requests/check-exists", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const data = await res.json();
+        setState({ loading: false, exists: !!data?.exists });
+      } catch {
+        setState({ loading: false, exists: false });
+      }
+    };
+    if (id) check();
+  }, [id]);
+  if (state.loading) return <DetailPageSkeleton />;
+  if (!state.exists) return <NotFound />;
+  return (
+    <div className="container mx-auto p-8">
+      <div className="rounded-2xl bg-yellow-50 border border-yellow-200 p-6 text-yellow-800">
+        <h3 className="text-lg font-bold mb-2">{t("error.boundary.title") || "حدث خطأ غير متوقع"}</h3>
+        <p className="text-sm">{t("requestsUser.notAuthorized") || "لا تملك صلاحية عرض هذا الطلب"}</p>
+        <div className="mt-4">
+          <a href="/requests" className="px-4 py-2 bg-black text-white rounded-lg">
+            {t("common.viewAll") || "عرض الطلبات"}
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -7,12 +7,13 @@ const RequestAttachment = ({ attachments }) => {
   const role = useSelector((state) => state.auth.role);
   const { t } = useTranslation();
 
+  const list = Array.isArray(attachments) ? attachments : [];
   const RequestAttachment =
-    attachments.filter((item) => item.requestPhaseLookupId === 800) || [];
+    list.filter((item) => item.requestPhaseLookupId === 800) || [];
   const RequestAdminAttachment =
-    attachments.filter((item) => item.requestPhaseLookupId === 801) || [];
+    list.filter((item) => item.requestPhaseLookupId === 801) || [];
   const RequestRequesterAttachment =
-    attachments.filter((item) => item.requestPhaseLookupId === 802) || [];
+    list.filter((item) => item.requestPhaseLookupId === 802) || [];
 
   return (
     <section className="rounded-2xl bg-white shadow-sm p-2 md:p-4 lg:p-5 xl:p-6">
@@ -27,7 +28,7 @@ const RequestAttachment = ({ attachments }) => {
             </h4>
             <div className="attachments grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-3 gap-2 md:gap-3 lg:gap-4 xl:gap-5">
               {RequestAttachment?.map((item) => (
-                <AttachmentCard item={item} />
+                <AttachmentCard key={item.id || item.fileUrl} item={item} />
               ))}
             </div>
           </div>
@@ -43,7 +44,7 @@ const RequestAttachment = ({ attachments }) => {
             </h4>
             <div className="attachments grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-3 gap-2 md:gap-3 lg:gap-4 xl:gap-5">
               {RequestAdminAttachment?.map((item) => (
-                <AttachmentCard item={item} />
+                <AttachmentCard key={item.id || item.fileUrl} item={item} />
               ))}
             </div>
           </div>
@@ -59,7 +60,7 @@ const RequestAttachment = ({ attachments }) => {
             </h4>
             <div className="attachments grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-3 gap-2 md:gap-3 lg:gap-4 xl:gap-5">
               {RequestRequesterAttachment?.map((item) => (
-                <AttachmentCard item={item} />
+                <AttachmentCard key={item.id || item.fileUrl} item={item} />
               ))}
             </div>
           </div>
