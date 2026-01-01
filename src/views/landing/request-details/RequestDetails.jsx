@@ -107,6 +107,29 @@ const RequestDetails = ({ initialData, id }) => {
         <RequestStatusStepper status={data?.status || data?.requestStatus} />
         <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
         <RequestAttachment attachments={attachments} />
+        {(data?.admin_price || data?.admin_notes || data?.admin_proposal_file_url) && (
+          <div className="mt-4 rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm text-gray-800 font-bold">{t("requestDetails.adminOffer") || "عرض الإدارة"}</div>
+              {typeof data?.admin_price === "number" && (
+                <div className="text-sm text-primary font-semibold">{t("requestDetails.adminPrice") || "السعر"}: {data.admin_price}</div>
+              )}
+            </div>
+            {data?.admin_notes && (
+              <p className="text-sm text-gray-700 mb-2">{data.admin_notes}</p>
+            )}
+            {data?.admin_proposal_file_url && (
+              <a
+                href={data.admin_proposal_file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-primary underline text-sm"
+              >
+                {t("requestDetails.downloadProposal") || "تحميل ملف العرض"}
+              </a>
+            )}
+          </div>
+        )}
         {data?.requestStatus?.id === 501 && (
           <RequesterAttachmentForm
             data={data}
@@ -114,28 +137,32 @@ const RequestDetails = ({ initialData, id }) => {
           />
         )}
         {/* قبول/رفض السعر من طالب الخدمة */}
-        {data?.admin_price && !data?.requester_accepted_price && !data?.requester_rejection_reason && (data?.status?.code === "priced" || data?.requestStatus?.id === 501) && (
-          <div className="mt-4 rounded-xl border border-gray-200 p-4 bg-white">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                {t("requestDetails.adminPrice") || "السعر المقترح من الإدارة"}: {data.admin_price}
+        {data?.admin_price && !data?.requester_accepted_price && !data?.requester_rejection_reason && (data?.status?.code === "priced" || data?.requestStatus?.id === 8 || data?.requestStatus?.id === 501) && (
+          <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-6 animate-fade-in">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{t("requestDetails.priceProposal") || "عرض السعر المقدم"}</h3>
+                <p className="text-sm text-gray-600 mb-3">{t("requestDetails.priceProposalDesc") || "يرجى مراجعة السعر المقترح من الإدارة للمتابعة"}</p>
+                <div className="text-2xl font-bold text-primary">
+                  {data.admin_price} <span className="text-sm font-normal text-gray-500">{t("currency.sar") || "ر.س"}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 w-full md:w-auto">
                 <button
-                  className="btn btn-primary"
+                  className="flex-1 md:flex-none btn btn-primary px-8 py-3 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all text-white font-bold"
                   onClick={async () => {
-                    await respondPrice({ requestId, accepted: true, statusId: 502 }).unwrap();
+                    await respondPrice({ requestId, accepted: true, statusId: 21 }).unwrap(); // 21 = waiting_payment
                     refetchRequesterDetails();
                   }}
                 >
-                  {t("common.accept") || "قبول"}
+                  {t("common.accept") || "قبول العرض"}
                 </button>
                 <button
-                  className="btn btn-secondary"
+                  className="flex-1 md:flex-none btn bg-white text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300 px-6 py-3 rounded-xl transition-all font-medium"
                   onClick={async () => {
                     const reason = window.prompt(t("requestDetails.rejectReason") || "سبب الرفض؟") || "";
                     if (reason) {
-                      await respondPrice({ requestId, accepted: false, rejectionReason: reason, statusId: 503 }).unwrap();
+                      await respondPrice({ requestId, accepted: false, rejectionReason: reason, statusId: 10 }).unwrap(); // 10 = rejected
                       refetchRequesterDetails();
                     }
                   }}

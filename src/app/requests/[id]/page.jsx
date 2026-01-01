@@ -4,7 +4,7 @@ import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export default async function RequestDetailsPage({ params }) {
-  const { id } = params || {};
+  const { id } = await params;
   // const supabase = await createClient();
 
   // Fetch request details
@@ -61,7 +61,8 @@ export default async function RequestDetailsPage({ params }) {
         requester:requesters!requests_requester_id_fkey(id,name),
         service:services(id,name_ar,name_en,description,base_price),
         status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code),
-        city:cities(id,name_ar,name_en)
+        city:cities(id,name_ar,name_en),
+        provider:providers!requests_provider_id_fkey(id,name)
       `)
       .eq('id', id)
       .maybeSingle();
@@ -91,6 +92,9 @@ export default async function RequestDetailsPage({ params }) {
       }
       initialData = {
         ...reqRow,
+        fullName: reqRow?.requester?.name || null,
+        requestNumber: reqRow?.id,
+        creationTime: reqRow?.created_at,
         service: {
           id: reqRow.service?.id,
           name_ar: reqRow.service?.name_ar,
@@ -99,10 +103,17 @@ export default async function RequestDetailsPage({ params }) {
           base_price: reqRow.service?.base_price,
           price: typeof reqRow.service?.base_price === 'number' ? Number(reqRow.service.base_price) : null,
         },
+        servicePrice: typeof reqRow.service?.base_price === 'number' ? Number(reqRow.service.base_price) : null,
         requestStatus: reqRow.status
           ? { id: reqRow.status.id, nameAr: reqRow.status.name_ar, nameEn: reqRow.status.name_en, code: reqRow.status.code }
           : null,
         attachments,
+        provider: reqRow.provider, // Pass provider object
+        provider_id: reqRow.provider_id,
+        provider_assigned_at: reqRow.provider_assigned_at,
+        admin_price: reqRow.admin_price,
+        admin_notes: reqRow.admin_notes,
+        admin_proposal_file_url: reqRow.admin_proposal_file_url,
       };
 
       // Fetch Order ID if exists

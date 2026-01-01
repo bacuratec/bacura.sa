@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { mcpLog } from "@/utils/logger";
 
 /**
  * Custom base query for RTK Query using Supabase
@@ -18,6 +19,7 @@ export const supabaseBaseQuery = async (args) => {
   } = args;
 
   try {
+    mcpLog("start", { table, method, id, filters: Object.keys(filters || {}), joins: (joins || []).length });
     // Supabase يتعامل مع الجلسة تلقائياً
     // لا نضيف قيود إضافية هنا لأن RLS policies في Supabase تتعامل مع الأمان
     let result;
@@ -183,18 +185,14 @@ export const supabaseBaseQuery = async (args) => {
     }
 
     if (result.error) {
+      mcpLog("end", { ok: false, table, method, code: result.error.code, status: result.error.status });
       // معالجة أخطاء Supabase بشكل أفضل
       const errorMessage =
         result.error.message || "حدث خطأ أثناء تنفيذ العملية";
       
       // إذا كان الخطأ 406، قد يكون بسبب مشكلة في الـ headers أو الـ session أو الـ select query
       if (result.error.code === "PGRST116" || result.error.status === 406 || result.error.code === "PGRST301") {
-        console.error("Supabase 406 error:", {
-          table,
-          selectString,
-          joins,
-          error: result.error
-        });
+        mcpLog("error", { table, selectString, joins, code: result.error.code, status: result.error.status });
         
         // محاولة إعادة المحاولة بدون joins إذا فشلت
         if (safeJoins.length > 0 && method === "GET") {
@@ -225,7 +223,7 @@ export const supabaseBaseQuery = async (args) => {
             if (id) {
               const simpleResult = await simpleQuery.eq("id", id).maybeSingle();
               if (!simpleResult.error) {
-                console.warn(`Supabase query with joins failed (406), returned data without joins for table: ${table}`);
+                mcpLog("retry-no-joins", { table, method, ok: true });
                 return { data: simpleResult.data };
               }
             } else {
@@ -245,12 +243,12 @@ export const supabaseBaseQuery = async (args) => {
               
               const simpleResult = await simpleQuery;
               if (!simpleResult.error) {
-                console.warn(`Supabase query with joins failed (406), returned data without joins for table: ${table}`);
+                mcpLog("retry-no-joins", { table, method, ok: true });
                 return { data: simpleResult.data };
               }
             }
           } catch (retryError) {
-            console.error("Error retrying query without joins:", retryError);
+            mcpLog("retry-error", { table, method, error: String(retryError?.message || retryError) });
           }
         }
         
@@ -272,6 +270,7 @@ export const supabaseBaseQuery = async (args) => {
       };
     }
 
+    mcpLog("end", { ok: true, table, method });
     return { data: result.data };
   } catch (error) {
     // معالجة الأخطاء العامة
@@ -280,7 +279,7 @@ export const supabaseBaseQuery = async (args) => {
     
     // إذا كان الخطأ يتعلق بـ undefined.match، فهذا يعني مشكلة في Supabase client
     if (errorMessage.includes("match") || errorMessage.includes("undefined") || error?.message?.includes("match")) {
-      console.error("Supabase client error:", error);
+      mcpLog("client-error", { error: String(errorMessage) });
       return {
         error: {
           status: "CLIENT_ERROR",
@@ -290,6 +289,7 @@ export const supabaseBaseQuery = async (args) => {
       };
     }
 
+    mcpLog("end", { ok: false, table, method, error: String(errorMessage) });
     return {
       error: {
         status: "CUSTOM_ERROR",

@@ -107,11 +107,12 @@ export const ordersApi = createApi({
         table: "requests",
         method: "GET",
         id,
-          joins: [
+        joins: [
           "requester:requesters!requests_requester_id_fkey(id,name)",
           "service:services(id,name_ar,name_en,base_price)",
           "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
+          "provider:providers!requests_provider_id_fkey(id,name)",
         ],
       }),
       providesTags: ["Requests"],
@@ -142,6 +143,7 @@ export const ordersApi = createApi({
           admin_price: body.adminPrice,
           admin_notes: body.adminNotes || null,
           admin_proposal_file_url: body.adminProposalFileUrl || null,
+          status_id: 8, // Automatically set to 'Priced'
           updated_at: new Date().toISOString(),
         },
       }),
@@ -259,7 +261,7 @@ export const ordersApi = createApi({
         filters: { order_id: orderId },
         pagination: { page: Number(PageNumber), pageSize: Number(PageSize) },
         orderBy: { column: "created_at", ascending: false },
-        joins: ["sender:users(id,full_name,name)"],
+        joins: ["sender:users(id,name)"],
       }),
       providesTags: ["Orders"],
     }),
