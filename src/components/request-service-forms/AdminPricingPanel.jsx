@@ -1,7 +1,7 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
-import { useAdminSetRequestPriceMutation } from "@/redux/api/ordersApi";
+import { useAdminSetRequestPriceMutation, useAdminMarkRequestPaidMutation, useGetRequestDetailsQuery } from "@/redux/api/ordersApi";
 import { useTranslation } from "react-i18next";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
@@ -70,7 +70,49 @@ const AdminPricingPanel = ({ refetch }) => {
           </Form>
         )}
       </Formik>
-    </section>
+
+      {/* Cash Payment / Mark as Paid Action */}
+      <AdminMarkPaidAction requestId={id} refetch={refetch} />
+    </section >
+  );
+};
+
+// Sub-component for Marking as Paid
+const AdminMarkPaidAction = ({ requestId, refetch }) => {
+  const { t } = useTranslation();
+  const [markPaid, { isLoading }] = useAdminMarkRequestPaidMutation();
+  const { data: requestData } = useGetRequestDetailsQuery(requestId);
+
+  // Show only if status is waiting_payment (21) or priced (8)
+  // 8 = Priced, 21 = Waiting Payment
+  const canMarkPaid = requestData?.status?.id === 21 || requestData?.status?.id === 8;
+
+  if (!canMarkPaid) return null;
+
+  return (
+    <div className="mt-6 pt-6 border-t border-gray-100">
+      <div className="flex items-center justify-between bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+        <div>
+          <h4 className="font-bold text-yellow-800">{t("AdminPricingPanel.cashPayment") || "الدفع الكاش / تحويل بنكي"}</h4>
+          <p className="text-sm text-yellow-700 mt-1">
+            {t("AdminPricingPanel.markPaidDesc") || "يمكنك تحديث حالة الطلب إلى 'مدفوع' يدوياً في حال استلام المبلغ نقداً أو عبر تحويل."}
+          </p>
+        </div>
+        <button
+          onClick={async () => {
+            if (window.confirm(t("AdminPricingPanel.confirmMarkPaid") || "هل أنت متأكد من تغيير الحالة إلى مدفوع؟")) {
+              await markPaid(requestId).unwrap();
+              toast.success(t("AdminPricingPanel.markedPaid") || "تم تحديث الحالة إلى مدفوع");
+              refetch && refetch();
+            }
+          }}
+          disabled={isLoading}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-sm transition-colors"
+        >
+          {isLoading ? "..." : (t("AdminPricingPanel.markAsPaid") || "تحديد كـ مدفوع")}
+        </button>
+      </div>
+    </div>
   );
 };
 

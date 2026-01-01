@@ -13,6 +13,70 @@ import AttachmentsTable from "../../../components/admin-components/projects/Atta
 import Statistics from "@/components/admin-components/home/statistics/Statistics";
 import { Wallet, Clock3, Check, Star, Ban } from "lucide-react"; // أيقونات افتراضية
 import { useTranslation } from "react-i18next";
+import { useGetProviderRequestsQuery } from "@/redux/api/ordersApi";
+
+const ProviderRequestsSection = ({ providerId }) => {
+  const { t, i18n } = useTranslation();
+  const { data: providerRequests, isLoading } = useGetProviderRequestsQuery({
+    providerId,
+    PageNumber: 1,
+    PageSize: 10,
+  });
+  if (isLoading) {
+    return (
+      <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="text-gray-400 text-sm">{t("common.loading") || "جاري التحميل..."}</div>
+      </div>
+    );
+  }
+  const isArabic = i18n?.language === "ar";
+  return (
+    <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <h4 className="font-bold text-gray-800 text-sm mb-4">
+        {t("userDetails.providerRequests") || "طلبات المزود"}
+      </h4>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="text-gray-500">
+              <th className="text-right p-2">{t("requests.title") || "العنوان"}</th>
+              <th className="text-right p-2">{t("requests.service") || "الخدمة"}</th>
+              <th className="text-right p-2">{t("requests.city") || "المدينة"}</th>
+              <th className="text-right p-2">{t("requests.status") || "الحالة"}</th>
+              <th className="text-right p-2">{t("requests.createdAt") || "تاريخ الإنشاء"}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(providerRequests || []).map((req) => (
+              <tr key={req.id} className="border-t border-gray-100">
+                <td className="p-2">{req.title}</td>
+                <td className="p-2">
+                  {req.service ? (isArabic ? req.service.name_ar : req.service.name_en) : "-"}
+                </td>
+                <td className="p-2">
+                  {req.city ? (isArabic ? req.city.name_ar : req.city.name_en) : "-"}
+                </td>
+                <td className="p-2">
+                  {req.status ? (isArabic ? req.status.name_ar : req.status.name_en) : "-"}
+                </td>
+                <td className="p-2">
+                  {req.created_at ? new Date(req.created_at).toLocaleDateString(isArabic ? "ar-EG" : "en-US") : "-"}
+                </td>
+              </tr>
+            ))}
+            {(!providerRequests || providerRequests.length === 0) && (
+              <tr>
+                <td className="p-3 text-center text-gray-400" colSpan={5}>
+                  {t("requests.empty") || "لا توجد طلبات"}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 const UsersDetails = () => {
   const { t } = useTranslation();
@@ -152,6 +216,9 @@ const UsersDetails = () => {
           }
         />
         <AttachmentsTable attachments={displayData?.attachments} />
+        {isProvider && (
+          <ProviderRequestsSection providerId={id} />
+        )}
       </div>
     </div>
   );

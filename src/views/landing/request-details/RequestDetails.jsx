@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import PaymentForm from "../../../components/landing-components/request-service/PaymentForm";
 import ProjectDeliverables from "../../../components/landing-components/request-service/ProjectDeliverables";
+import { formatCurrency } from "@/utils/currency";
 
 import { DetailPageSkeleton } from "../../../components/shared/skeletons/PageSkeleton";
 
@@ -117,11 +118,9 @@ const RequestDetails = ({ initialData, id }) => {
               {/* Price moved inside Proposal Card for better flow, or kept here if accepted */}
             </div>
 
-            {/* Show Price Prominently */}
             {typeof data?.admin_price === "number" && (
               <div className="mb-6 flex items-end gap-2 text-3xl font-bold text-primary">
-                {data.admin_price}
-                <span className="text-sm font-medium text-gray-500 mb-1.5">{t("currency.sar") || "ر.س"}</span>
+                {formatCurrency(Number(data.admin_price), lang)}
               </div>
             )}
 

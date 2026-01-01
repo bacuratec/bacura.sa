@@ -1,14 +1,13 @@
 // components/shared/DataTable.jsx
 import { useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
-import searchIcon from "../../../assets/icons/searchIcon.svg";
+import { Search, FileQuestion } from "lucide-react";
 import Link from "next/link";
 import { useLocation } from "@/utils/useLocation";
 import { useNavigate } from "@/utils/useNavigate";
 import { useSearchParams } from "@/utils/useSearchParams";
 import { useTranslation } from "react-i18next";
 import EmptyState from "../../shared/EmptyState";
-import { FileQuestion } from "lucide-react";
 import { SkeletonTable } from "../../shared/skeletons/Skeleton";
 
 const CustomDataTable = ({
@@ -19,12 +18,10 @@ const CustomDataTable = ({
   searchPlaceholder,
   searchableFields = [],
   tabs = [],
-  totalRows = 0, // 👈 عدد العناصر الكلي من السيرفر
-  defaultPage = 1, // 👈 قيمة الصفحة الحالية
-  defaultPageSize = 10, // 👈 قيمة عدد العناصر في كل صفحة
+  totalRows = 0,
+  defaultPage = 1,
+  defaultPageSize = 10,
   isLoading,
-  allowOverflow,
-  ...rest
 }) => {
   const { t } = useTranslation();
   const path = useLocation();
@@ -36,15 +33,15 @@ const CustomDataTable = ({
   const customStyles = {
     tableWrapper: {
       style: {
-        borderRadius: tabs?.length > 0 ? "0 0 12px 12px" : "12px", // أو أي قيمة تحبها
-        overflow: allowOverflow ? "visible" : "hidden", // التحكم في التدفق حسب الخاصية
-        border: "1px solid #e5e7eb", // لون البوردر اختياري
+        borderRadius: tabs?.length > 0 ? "0 0 12px 12px" : "12px",
+        overflow: "visible",
+        border: "1px solid #e5e7eb",
       },
     },
     headCells: {
       style: {
-        backgroundColor: "#E7E7E7", // لون خلفية الهيدر
-        color: "#1f2937", // لون الخط
+        backgroundColor: "#F8F9FA",
+        color: "#1f2937",
         fontWeight: "bold",
         fontSize: "14px",
         paddingLeft: "16px",
@@ -57,21 +54,23 @@ const CustomDataTable = ({
       },
     },
   };
+
   const searchParams = useSearchParams();
   const initialQ = (searchParams?.get && searchParams.get("q")) || "";
   const [search, setSearch] = useState(initialQ);
   const navigate = useNavigate();
   const location = useLocation();
+
   const isProjectDetail =
     /^\/projects\/[^/]+$/.test(path?.pathname || "") ||
     /^\/admin\/projects\/[^/]+$/.test(path?.pathname || "") ||
     /^\/provider\/projects\/[^/]+$/.test(path?.pathname || "");
-  // تصفية البيانات حسب كلمات البحث في الحقول المحددة
+
   const filteredData = useMemo(() => {
     if (!search) return data;
     return data.filter((row) =>
       searchableFields.some((field) =>
-        String(row[field]).toLowerCase().includes(search.toLowerCase())
+        String(row[field] || "").toLowerCase().includes(search.toLowerCase())
       )
     );
   }, [data, search, searchableFields]);
@@ -94,6 +93,7 @@ const CustomDataTable = ({
     params.set("PageNumber", page);
     navigate(`${location?.pathname || ""}?${params.toString()}`);
   };
+
   const handlePerRowsChange = (newPageSize, _) => {
     const params = new URLSearchParams(location?.search || "");
     params.set("PageSize", newPageSize);
@@ -101,95 +101,93 @@ const CustomDataTable = ({
     navigate(`${location?.pathname || ""}?${params.toString()}`);
   };
 
-  const AccountStatus =
+  const queryStatus =
     searchParams?.get("AccountStatus") ||
     searchParams?.get("RequestStatus") ||
     searchParams?.get("OrderStatusLookupId") ||
     "";
-  const PageSize = searchParams?.get("PageSize") || 30;
 
   return (
-    <div className="custom-table">
-      {title && <h2 className="mb-4 font-medium text-sm">{title}</h2>}
-      {searchableFields && (
-        <div className="relative mb-4 flex justify-center">
-          <input
-            type="text"
-            placeholder={searchPlaceholder || tr("searchPlaceholder", "ابحث...")}
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="input input-search rounded-xl pl-10 w-full max-w-md"
-          />
-          <div className="relative rtl:left-10 ltr:right-10 top-2">
-            <img src={typeof searchIcon === "string" ? searchIcon : (searchIcon?.src || "")} alt={tr("search", "search")} loading="lazy" decoding="async" />
+    <div className="custom-table space-y-4">
+      {title && <h2 className="text-lg font-bold text-gray-800">{title}</h2>}
+
+      {searchableFields?.length > 0 && (
+        <div className="flex justify-center mb-6">
+          <div className="relative w-full max-w-xl group">
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+              <Search className="w-5 h-5" />
+            </div>
+            <input
+              type="text"
+              placeholder={searchPlaceholder || tr("searchPlaceholder", "ابحث...")}
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full h-12 pr-12 pl-6 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none transition-all duration-300 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 hover:border-gray-300"
+            />
           </div>
         </div>
       )}
-      {tabs?.length > 0 ? (
-        <div className="min-h-4 bg-[#E7E7E7]/80 w-full rounded-t-2xl py-4 px-5 overflow-auto">
-          <ul className="flex items-center xl:gap-10 lg:gap-8 md:gap-6 gap-3 text-sm font-bold">
-            {tabs?.map((item, i) => (
-              <li key={i} className="text-xs shrink-0">
-                <Link
-                  href={item?.href}
-                  className={`flex items-center gap-2 ${
-                    (item?.href.includes(AccountStatus) && AccountStatus) ||
-                    ((item?.name === "الكل" || item?.name.toLowerCase() === "all") && !AccountStatus)
-                      ? "text-black"
-                      : "text-[#898A8D]"
-                  }`}
-                >
-                  <span
-                    className={`py-0.5 px-1.5 rounded-lg`}
-                    style={{
-                      backgroundColor: `${item?.color}33`, // شفافية 20%
-                      color: item?.color,
-                    }}
+
+      {tabs?.length > 0 && (
+        <div className="bg-gray-100/50 w-full rounded-t-2xl py-3 px-4 border-x border-t border-gray-200 overflow-auto">
+          <ul className="flex items-center gap-6 text-sm">
+            {tabs?.map((item, i) => {
+              const isActive = (item?.href.includes(queryStatus) && queryStatus) ||
+                ((item?.name === "الكل" || item?.name.toLowerCase() === "all" || item?.href === "/admin/providers") && !queryStatus);
+              return (
+                <li key={i} className="shrink-0">
+                  <Link
+                    href={item?.href}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all ${isActive ? "bg-white shadow-sm text-primary font-bold" : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                      }`}
                   >
-                    {item?.numbers}
-                  </span>
-                  {item?.name}
-                </Link>
-              </li>
-            ))}
+                    <span
+                      className="text-[10px] font-black px-1.5 py-0.5 rounded-lg"
+                      style={{
+                        backgroundColor: `${item?.color}20`,
+                        color: item?.color,
+                      }}
+                    >
+                      {item?.numbers}
+                    </span>
+                    {item?.name}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
-      ) : (
-        ""
       )}
-      {/*
-        تنظيف الخصائص غير المدعومة لمنع تمريرها لعناصر DOM الداخلية
-      */}
-      <DataTable
-        data={filteredData}
-        columns={columns}
-        pagination={pagination === false ? false : true}
-        highlightOnHover
-        striped
-        responsive
-        selectableRows
-        customStyles={customStyles}
-        noDataComponent={
-          <EmptyState 
-            title={tr("noData", "لا توجد بيانات")}
-            description={tr("noDataDesc", "لم يتم العثور على سجلات مطابقة")}
-            icon={FileQuestion}
-            className="w-full py-8"
-          />
-        }
-        paginationServer // 👈 مهم جدًا: عشان البيانات server-side
-        paginationTotalRows={totalRows} // 👈 اجمالي عدد العناصر
-        paginationDefaultPage={parseInt(defaultPage)} // 👈 رقم الصفحة من props
-        paginationPerPage={parseInt(defaultPageSize)} // 👈 حجم الصفحة من props
-        onChangePage={isProjectDetail ? () => {} : handlePageChange} // 👈 تغيير الصفحة
-        onChangeRowsPerPage={isProjectDetail ? () => {} : handlePerRowsChange} // 👈 تغيير حجم الصفحة
-        progressPending={isLoading}
-        progressComponent={
-          <div className="w-full py-4">
-            <SkeletonTable rows={5} columns={columns?.length || 5} />
-          </div>
-        }
-      />
+
+      <div className="bg-white rounded-b-2xl overflow-hidden">
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          pagination={pagination === false ? false : true}
+          highlightOnHover
+          responsive
+          customStyles={customStyles}
+          noDataComponent={
+            <div className="py-20 flex flex-col items-center justify-center text-gray-400">
+              <FileQuestion className="w-16 h-16 mb-4 opacity-20" />
+              <p className="text-lg font-medium">{tr("noData", "لا توجد بيانات")}</p>
+              <p className="text-sm">{tr("noDataDesc", "لم يتم العثور على سجلات مطابقة")}</p>
+            </div>
+          }
+          paginationServer
+          paginationTotalRows={totalRows}
+          paginationDefaultPage={parseInt(defaultPage)}
+          paginationPerPage={parseInt(defaultPageSize)}
+          onChangePage={isProjectDetail ? () => { } : handlePageChange}
+          onChangeRowsPerPage={isProjectDetail ? () => { } : handlePerRowsChange}
+          progressPending={isLoading}
+          progressComponent={
+            <div className="w-full py-4">
+              <SkeletonTable rows={5} columns={columns?.length || 5} />
+            </div>
+          }
+        />
+      </div>
     </div>
   );
 };

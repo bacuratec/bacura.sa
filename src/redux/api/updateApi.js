@@ -20,10 +20,6 @@ export const updateApi = createApi({
             updated_at: new Date().toISOString(),
           },
         };
-        // Also update user if needed
-        if (body.email || body.phone) {
-          // This would need to be handled separately or via RPC
-        }
         return providerUpdate;
       },
       invalidatesTags: ["Provider"],
@@ -53,6 +49,19 @@ export const updateApi = createApi({
         },
       }),
       invalidatesTags: ["Admin"],
+    }),
+    updateUserContact: builder.mutation({
+      query: (body) => ({
+        table: "users",
+        method: "PUT",
+        id: body.userId,
+        body: {
+          email: body.email || undefined,
+          phone: body.phone || undefined,
+          updated_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Requester", "Provider", "Admin"],
     }),
     suspendRequester: builder.mutation({
       query: (userId) => ({
@@ -85,6 +94,7 @@ export const {
   useUpdateProviderMutation,
   useUpdateRequesterMutation,
   useUpdateAdminMutation,
+  useUpdateUserContactMutation,
   useSuspendProviderMutation,
   useSuspendRequesterMutation,
 } = updateApi;

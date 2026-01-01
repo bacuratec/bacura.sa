@@ -149,6 +149,37 @@ const statisticsBaseQuery = async (args) => {
         break;
       }
 
+      case "projects": {
+        const [
+          total,
+          waitingApproval,
+          waitingStart,
+          processing,
+          completed,
+          rejected,
+          expired
+        ] = await Promise.all([
+          supabase.from("orders").select("id", { count: "exact", head: true }),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 17),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 18),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 13),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 15),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 19),
+          supabase.from("orders").select("id", { count: "exact", head: true }).eq("order_status_id", 20),
+        ]);
+
+        result = {
+          totalOrdersCount: total.count || 0,
+          waitingForApprovalOrdersCount: waitingApproval.count || 0,
+          waitingToStartOrdersCount: waitingStart.count || 0,
+          ongoingOrdersCount: processing.count || 0,
+          completedOrdersCount: completed.count || 0,
+          rejectedOrdersCount: rejected.count || 0,
+          expiredOrdersCount: expired.count || 0,
+        };
+        break;
+      }
+
       case "providerOrders": {
         // Provider-specific order statistics
         const providerOrders = await supabase
@@ -206,6 +237,12 @@ export const adminStatisticsApi = createApi({
       }),
       providesTags: ["Statistics"],
     }),
+    getProjectsStatistics: builder.query({
+      query: () => ({
+        type: "projects",
+      }),
+      providesTags: ["Statistics"],
+    }),
     getProviderOrderStatistics: builder.query({
       query: ({ providerId }) => ({
         type: "providerOrders",
@@ -221,5 +258,6 @@ export const {
   useGetServiceProvidersStatisticsQuery,
   useGetRequestsStatisticsQuery,
   useGetAdminStatisticsQuery,
+  useGetProjectsStatisticsQuery,
   useGetProviderOrderStatisticsQuery,
 } = adminStatisticsApi;

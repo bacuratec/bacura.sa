@@ -227,8 +227,9 @@ const ExploreRequests = ({ stats }) => {
     },
   ];
 
-  const sortedData = orders
-    ? [...orders]?.sort((a, b) => {
+  const baseData = Array.isArray(orders) ? orders : (orders?.data || []);
+  const sortedData = baseData && baseData.length > 0
+    ? [...baseData]?.sort((a, b) => {
       const aTime = a?.created_at ? new Date(a.created_at).getTime() : 0;
       const bTime = b?.created_at ? new Date(b.created_at).getTime() : 0;
       return bTime - aTime;

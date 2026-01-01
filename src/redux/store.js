@@ -21,6 +21,7 @@ import { customersApi } from "./api/customersApi";
 import { profileInfoApi } from "./api/profileInfoApi";
 import { providerStatisticsApi } from "./api/providerStatisticsApi";
 import { adminProfilesApi } from "./api/adminProfilesApi";
+import { requestsApi } from "./api/requestsApi";
 
 export const makeStore = () => {
   return configureStore({
@@ -47,6 +48,7 @@ export const makeStore = () => {
       [paymentApi.reducerPath]: paymentApi.reducer,
       [providerStatisticsApi.reducerPath]: providerStatisticsApi.reducer,
       [adminProfilesApi.reducerPath]: adminProfilesApi.reducer,
+      [requestsApi.reducerPath]: requestsApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -70,7 +72,8 @@ export const makeStore = () => {
         .concat(profileInfoApi.middleware)
         .concat(paymentApi.middleware)
         .concat(providerStatisticsApi.middleware)
-        .concat(adminProfilesApi.middleware),
+        .concat(adminProfilesApi.middleware)
+        .concat(requestsApi.middleware),
   });
 };
 

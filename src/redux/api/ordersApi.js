@@ -23,6 +23,23 @@ export const ordersApi = createApi({
       }),
       invalidatesTags: ["Requests"],
     }),
+    // Get Requests by Provider (Admin view)
+    getProviderRequests: builder.query({
+      query: ({ providerId, PageNumber = 1, PageSize = 10 }) => ({
+        table: "requests",
+        method: "GET",
+        filters: { provider_id: providerId },
+        pagination: { page: Number(PageNumber), pageSize: Number(PageSize) },
+        orderBy: { column: "created_at", ascending: false },
+        joins: [
+          "requester:requesters!requests_requester_id_fkey(id,name)",
+          "service:services(id,name_ar,name_en)",
+          "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
+          "city:cities(id,name_ar,name_en)",
+        ],
+      }),
+      providesTags: ["Requests"],
+    }),
     // Create Priced Request (Consultation)
     createOrderPriced: builder.mutation({
       query: (body) => ({
@@ -253,6 +270,21 @@ export const ordersApi = createApi({
       }),
       invalidatesTags: ["Requests"],
     }),
+    // Status History for a Request
+    getRequestStatusHistory: builder.query({
+      query: (requestId) => ({
+        table: "status_history",
+        method: "GET",
+        filters: { request_id: requestId },
+        orderBy: { column: "created_at", ascending: false },
+        joins: [
+          "request:requests!status_history_request_id_fkey(id,title)",
+          "status:lookup_values!status_history_status_id_fkey(id,name_ar,name_en,code)",
+          "old_status:lookup_values!status_history_old_status_id_fkey(id,name_ar,name_en,code)",
+        ],
+      }),
+      providesTags: ["Requests"],
+    }),
     // Project messages
     getProjectMessages: builder.query({
       query: ({ orderId, PageNumber = 1, PageSize = 20 }) => ({
@@ -335,6 +367,21 @@ export const ordersApi = createApi({
       }),
       invalidatesTags: ["Requests"],
     }),
+    // Admin Mark as Paid
+    adminMarkRequestPaid: builder.mutation({
+      query: (requestId) => ({
+        table: "requests",
+        method: "PUT",
+        id: requestId,
+        body: {
+          payment_status: "paid",
+          requester_accepted_price: true, // Ensure accepted if paid
+          status_id: 15, // Paid status
+          updated_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Requests"],
+    }),
   }),
 });
 
@@ -359,4 +406,7 @@ export const {
   useAddDeliverableMutation,
   useUpdateDeliverableStatusMutation,
   useDeleteRequestMutation,
+  useAdminMarkRequestPaidMutation,
+  useGetRequestStatusHistoryQuery,
+  useGetProviderRequestsQuery,
 } = ordersApi;

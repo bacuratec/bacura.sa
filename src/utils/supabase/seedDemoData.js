@@ -382,7 +382,11 @@ export async function seedDemoData() {
     toast.success("تم إدخال بيانات تجريبية بنجاح");
     return { ok: true };
   } catch (error) {
-    console.error("Seed error:", error);
+    const normalized =
+      (error && (error.message || error.code || error.hint)) ?
+      { message: error.message, code: error.code, hint: error.hint, details: error.details } :
+      JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error))) || String(error);
+    console.error("Seed error:", normalized);
     toast.error("فشل إدخال البيانات التجريبية");
     return { ok: false, message: error?.message || "seed failed" };
   }

@@ -22,55 +22,67 @@ import {
   Wallet,
 } from "lucide-react";
 
+import ProfileModal from "@/components/shared/profile-modal/ProfileModal";
+import { useRouter } from "next/navigation";
+
 const ProfileContent = ({ requester, tickets, stats, recentOrders }) => {
   const { t } = useTranslation();
+  const router = useRouter();
   const [openSuspend, setOpenSuspend] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const projectStatistics = [
+    // ... stats logic remains same
     {
       number: stats?.totalOrdersCount ?? 0,
       title: t("profile.stats.totalOrders"),
-      icon: <Wallet />,
-      color: "#F9FDF1",
+      icon: <Wallet className="w-5 h-5" />,
+      color: "bg-emerald-50",
+      textColor: "text-emerald-700",
       ic: true,
     },
     {
       number: stats?.waitingForApprovalOrdersCount ?? 0,
       title: t("profile.stats.waitingApproval"),
-      icon: <Clock />,
-      color: "#FFF4E5",
+      icon: <Clock className="w-5 h-5" />,
+      color: "bg-amber-50",
+      textColor: "text-amber-700",
       ic: true,
     },
     {
       number: stats?.waitingToStartOrdersCount ?? 0,
       title: t("profile.stats.waitingStart"),
-      icon: <Play />,
-      color: "#F0F7FF",
+      icon: <Play className="w-5 h-5" />,
+      color: "bg-blue-50",
+      textColor: "text-blue-700",
       ic: true,
     },
     {
       number: stats?.ongoingOrdersCount ?? 0,
       title: t("profile.stats.ongoing"),
-      icon: <ListChecks />,
-      color: "#EAF9F0",
+      icon: <ListChecks className="w-5 h-5" />,
+      color: "bg-indigo-50",
+      textColor: "text-indigo-700",
       ic: true,
     },
     {
       number: stats?.completedOrdersCount ?? 0,
       title: t("profile.stats.completed"),
-      icon: <Check />,
-      color: "#F1F1FD",
+      icon: <Check className="w-5 h-5" />,
+      color: "bg-green-50",
+      textColor: "text-green-700",
       ic: true,
     },
     {
       number: stats?.serviceCompletedOrdersCount ?? 0,
       title: t("profile.stats.servicesCompleted"),
-      icon: <ShieldCheck />,
-      color: "#FDF6F1",
+      icon: <ShieldCheck className="w-5 h-5" />,
+      color: "bg-rose-50",
+      textColor: "text-rose-700",
       ic: true,
     },
   ];
@@ -79,72 +91,91 @@ const ProfileContent = ({ requester, tickets, stats, recentOrders }) => {
     return <LoadingPage />;
   }
 
+  const handleRefresh = () => {
+    router.refresh(); // Refresh server data
+  };
+
   return (
-    <div className="pt-6">
+    <div className="pt-6 pb-20 bg-gray-50/30 min-h-screen">
       <title>{t("mobileMenu.myProfile")}</title>
       <meta name="description" content={t("profile.subtitle")} />
-      <div className="container">
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-3 md:col-span-3">
-            <div className="flex flex-col xl:gap-8 lg:gap-6 md:gap-4 gap-3">
-              <m.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
-                <WelcomeTitle
-                  name={requester?.name ?? requester?.fullName}
-                  joinAt={requester?.created_at}
-                  data={requester}
-                // refetch={refetch} // Handle refetch if needed
-                />
-              </m.div>
-              <m.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
-                <UserData data={requester} />
-              </m.div>
-              <AttachmentsTable attachments={requester?.attachments} />
-              <m.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <DashboardInfo
-                  stats={projectStatistics}
-                  title={t("profile.dashboard")}
-                />
-              </m.div>
+      <div className="container px-4 md:px-6">
+        <div className="flex flex-col gap-10">
+          {/* Top Section: Welcome & Actions */}
+          <m.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <WelcomeTitle
+              name={requester?.name ?? requester?.fullName}
+              joinAt={requester?.created_at}
+              data={requester}
+              onEdit={() => setOpenEdit(true)}
+            />
+          </m.div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2">
-                  <RecentRequests orders={recentOrders} />
-                </div>
-                <div className="lg:col-span-1">
-                  <Services />
-                </div>
-              </div>
+          {/* User Data Card */}
+          <m.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <UserData data={requester} onEdit={() => setOpenEdit(true)} />
+          </m.div>
+          <m.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+          >
+            <AttachmentsTable attachments={requester?.attachments} />
+          </m.div>
+          {/* Stats Dashboard */}
+          <m.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <DashboardInfo
+              stats={projectStatistics}
+              title={t("profile.dashboard") || "لوحة التحكم والإحصائيات"}
+            />
+          </m.div>
 
-              {/* <Services /> Moved to grid above */}
+          {/* Activity Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+              <RecentRequests orders={recentOrders} />
               <Messages tickets={tickets} />
-              <Support />
-              <button
-                onClick={() => setOpenSuspend(true)}
-                className="w-fit bg-red-600 py-2 px-4 rounded-lg text-white font-medium flex items-center gap-2 mr-auto"
-              >
-                {t("profile.suspendAccount")}
-              </button>
             </div>
+            <div className="lg:col-span-1 space-y-8">
+              <Services />
+              <Support />
 
-            <SuspendModal open={openSuspend} setOpen={setOpenSuspend} />
+              {/* Account Controls */}
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                <h4 className="font-bold text-gray-900 mb-4">{t("profile.accountControls") || "إعدادات الحساب"}</h4>
+                <button
+                  onClick={() => setOpenSuspend(true)}
+                  className="w-full bg-rose-50 hover:bg-rose-100 py-3 px-4 rounded-2xl text-rose-600 font-bold flex items-center justify-center gap-2 transition-colors border border-rose-100"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  {t("profile.suspendAccount")}
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="col-span-1"></div>
         </div>
+
+        {/* Modals */}
+        <ProfileModal
+          open={openEdit}
+          setOpen={setOpenEdit}
+          data={requester}
+          refetch={handleRefresh}
+        />
+        <SuspendModal open={openSuspend} setOpen={setOpenSuspend} />
       </div>
     </div>
   );

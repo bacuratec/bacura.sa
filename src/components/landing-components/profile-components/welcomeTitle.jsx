@@ -4,55 +4,47 @@ import edit from "@/assets/icons/edit.svg";
 import ProfileModal from "../../shared/profile-modal/ProfileModal";
 import { useTranslation } from "react-i18next";
 
-const WelcomeTitle = ({ name, joinAt, data, refetch }) => {
-  const [open, setOpen] = useState(false);
+const WelcomeTitle = ({ name, joinAt, onEdit }) => {
   const { t } = useTranslation();
-
   const formattedDate = dayjs(joinAt).format("DD/MM/YYYY");
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* العنوان وزر التعديل */}
-      <div className="flex flex-col lg:gap-3">
-        <div className="flex items-center justify-between lg:w-1/2">
-          <h1 className="text-sm md:text-lg lg:text-xl xl:text-2xl font-bold text-[#121417]">
-            {t("profile.welcome", { name })}
-          </h1>
-          <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 bg-primary text-white py-2 px-1 md:px-3 lg:px-4 rounded-lg font-medium"
-          >
-            <img
-              src={edit}
-              alt={t("profile.editData")}
-              className="lg:w-6 md:w-5 w-4"
-            />
-            <span className="text-xs md:text-sm lg:text-base">
-              {t("profile.editData")}
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gradient-to-br from-primary/5 to-transparent p-6 md:p-10 rounded-[40px] border border-primary/10 relative overflow-hidden">
+      {/* Abstract Background Element */}
+      <div className="absolute -top-10 -left-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl"></div>
+
+      <div className="relative z-10">
+        <h1 className="text-3xl md:text-4xl xl:text-5xl font-black text-gray-900 leading-tight mb-2">
+          {t("profile.welcome", { name })} 👋
+        </h1>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm">
+            <Calendar className="w-4 h-4 text-primary" />
+            <span className="text-sm font-bold text-gray-600">
+              {t("profile.joinedSince", { date: formattedDate })}
             </span>
-          </button>
-        </div>
-        <p className="text-[#6B7582] text-xs md:text-sm">
-          {t("profile.subtitle")}
-        </p>
-      </div>
-
-      {/* تاريخ الاشتراك */}
-      <div className="w-fit">
-        <div className="border border-[#DEE0E3] rounded-lg p-1 md:p-2 lg:p-3 text-base md:text-xl lg:text-2xl font-medium lg:font-bold text-[#121417]">
-          {t("profile.joinedSince", { date: formattedDate })}
+          </div>
+          <p className="text-gray-400 text-sm hidden sm:block">
+            {t("profile.subtitle") || "مرحباً بك في لوحة تحكم باقورة أمل"}
+          </p>
         </div>
       </div>
 
-      {/* مودال التعديل */}
-      <ProfileModal
-        open={open}
-        setOpen={setOpen}
-        data={data}
-        refetch={refetch}
-      />
+      <button
+        onClick={onEdit}
+        className="relative z-10 flex items-center justify-center gap-3 bg-primary hover:bg-primary/90 text-white py-4 px-8 rounded-2xl font-black shadow-xl shadow-primary/20 transition-all transform hover:-translate-y-1 active:scale-95 group"
+      >
+        <div className="p-1.5 bg-white/20 rounded-lg group-hover:rotate-12 transition-transform">
+          <Edit className="w-5 h-5 text-white" />
+        </div>
+        <span className="text-base">
+          {t("profile.editData") || "تعديل الملف الشخصي"}
+        </span>
+      </button>
     </div>
   );
 };
+
+import { Calendar, Edit } from "lucide-react";
 
 export default WelcomeTitle;

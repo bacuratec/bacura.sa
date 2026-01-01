@@ -405,7 +405,9 @@
       "roleNotFound": "فشل في تحديد صلاحيات المستخدم. حاول مرة أخرى.",
       "unknownRole": "نوع المستخدم غير معروف. سيتم توجيهك للصفحة الرئيسية.",
       "emailNotConfirmed": "البريد غير مؤكد. رجاءً تحقق من بريدك واضغط رابط التفعيل.",
-      "unauthorized": "غير مصرح. يرجى التحقق من بيانات الدخول أو المحاولة لاحقاً."
+      "unauthorized": "غير مصرح. يرجى التحقق من بيانات الدخول أو المحاولة لاحقاً.",
+      "providerPending": "حسابك قيد المراجعة من قبل الإدارة. سيتم إرسال بريد إلكتروني عند القبول.",
+      "accountBlocked": "تم إيقاف حسابك من قبل الإدارة. يرجى التواصل مع الدعم الفني."
     },
     "validation": {
       "invalidEmail": "البريد الالكتروني غير صحيح",
@@ -546,8 +548,11 @@
   },
   "signup": {
     "title": "إنشاء حساب جديد في باكورة أعمال",
+    "titleProvider": "انضم كشريك نجاح (مزود خدمة)",
     "description1": "قم بإنشاء حساب جديد للوصول إلى خدماتنا، متابعة طلباتك، تنفيذ مشاريعك.",
-    "description2": "نوفر لك تجربة آمنة وسلسة لإدارة خدماتك وتنفيذ مشاريعك بثقة."
+    "descriptionProvider": "ساهم معنا في تنفيذ مشاريع نوعية ووسع آفاق أعمالك بنظام المقاولات التقنية.",
+    "description2": "نوفر لك تجربة آمنة وسلسة لإدارة خدماتك وتنفيذ مشاريعك بثقة.",
+    "descriptionSecondaryProvider": "نوفر لك منصة متكاملة لإدارة عروضك ومشاريعك بكل سلاسة واحترافية."
   },
   "payment": {
     "title": "الدفع",
@@ -563,7 +568,9 @@
   "payWithMoyasar": "الدفع عبر Moyasar",
   "files": "ملفات",
   "noFiles": "لا توجد مرفقات",
-  "currency": { "sar": "ريال" },
+  "currency": {
+    "sar": "ريال"
+  },
   "common": {
     "viewAll": "عرض الكل",
     "service": "الخدمة",
@@ -596,6 +603,10 @@
     "uploadProfilePicture": "قم برفع صورة الملف الشخصي",
     "agreeToTerms": "أوافق على",
     "terms": "الشروط والأحكام",
+    "specialization": "التخصص / مجال العمل",
+    "specializationPlaceholder": "مثال: أنظمة كاميرات، شبكات، طاقة شمسية...",
+    "bio": "نبذة عن الخدمات المقدمة",
+    "bioPlaceholder": "اشرح باختصار الخدمات التي تقدمها منشأتك...",
     "submitProvider": "تسجيل كمزود خدمة",
     "submitRequester": "تسجيل كطالب خدمة",
     "submitting": "جاري التسجيل...",
@@ -615,7 +626,9 @@
       "passwordShort": "كلمة المرور قصيرة",
       "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
       "confirmPasswordMismatch": "كلمة المرور غير متطابقة",
-      "agreeRequired": "يجب الموافقة على الشروط والأحكام"
+      "agreeRequired": "يجب الموافقة على الشروط والأحكام",
+      "specializationRequired": "التخصص مطلوب",
+      "bioRequired": "النبذة مطلوبة"
     }
   },
   "signupForm.companyName": "اسم المنشأة",
@@ -849,8 +862,26 @@
     "description": "هنا تجد التقييمات التي تركها العملاء لك"
   },
   "providers": {
+    "stats": {
+      "total": "إجمالي المزودين",
+      "pending": "بانتظار المراجعة",
+      "active": "الحسابات النشطة",
+      "blocked": "الحسابات المحظورة",
+      "suspended": "الحسابات الموقوفة"
+    },
+    "view": "عرض",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "approve": "قبول",
+    "reject": "رفض",
+    "deleteSuccess": "تم حذف مزود الخدمة بنجاح",
+    "deleteError": "فشل حذف مزود الخدمة",
+    "approveSuccess": "تم قبول الحساب بنجاح",
+    "approveError": "فشل قبول الحساب",
+    "rejectSuccess": "تم تحديث حالة الحساب",
     "pageTitle": "إدارة مزودي الخدمة",
-    "pageDescription": "هنا تجد مزودين الخدمة القادرين على تنفيذ الطلب بناءً على التخصص"
+    "pageDescription": "متابعة وإدارة حسابات مزودي الخدمة المسجلين في المنصة",
+    "empty": "لا توجد بيانات للعرض"
   },
   "requestDetails": {
     "title": "تفاصيل طلب الخدمة",
@@ -867,12 +898,69 @@
     "waitingPayment": "بانتظار الدفع"
   },
   "requesters": {
+    "stats": {
+      "total": "إجمالي طالبي الخدمة",
+      "active": "الحسابات النشطة",
+      "blocked": "الحسابات المحظورة"
+    },
     "title": "إدارة طالبي الخدمة",
-    "description": "هنا تجد مقدمين طلب الخدمة"
+    "description": "متابعة وإدارة حسابات طالبي الخدمة المسجلين في المنصة",
+    "deleteSuccess": "تم حذف الحساب بنجاح",
+    "deleteError": "فشل حذف الحساب",
+    "blockSuccess": "تم حظر الحساب بنجاح",
+    "unblockSuccess": "تم إلغاء حظر الحساب بنجاح",
+    "statusUpdateError": "فشل تحديث حالة الحساب"
   },
   "requests": {
+    "stats": {
+      "total": "إجمالي الطلبات",
+      "new": "طلبات جديدة",
+      "processing": "تحت المعالجة",
+      "priced": "طلبات مسعرة",
+      "accepted": "طلبات مقبولة",
+      "rejected": "طلبات مرفوضة",
+      "completed": "طلبات مكتملة",
+      "waitingPayment": "بانتظار الدفع"
+    },
     "title": "إدارة الطلبات",
-    "description": "هنا تجد الطلبات التي تم ترشيحك لتنفيذها بناءً على تخصصك"
+    "description": "متابعة وإدارة طلبات الخدمات المقدمة من طالبي الخدمة",
+    "deleteSuccess": "تم حذف الطلب بنجاح",
+    "deleteError": "فشل حذف الطلب"
+  },
+  "requests.actions": {
+    "view": "عرض",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "empty": "لا توجد بيانات للعرض"
+  },
+  "AdminPricingPanel": {
+    "title": "تسعير الطلب",
+    "price": "السعر",
+    "enterPrice": "أدخل السعر",
+    "notes": "ملاحظات",
+    "enterNotes": "أدخل الملاحظات",
+    "proposalUrl": "رابط ملف العرض",
+    "enterUrl": "أدخل الرابط",
+    "save": "حفظ",
+    "cashPayment": "دفع نقدي",
+    "markPaidDesc": "ضع الطلب كمدفوع عند استلام الدفع نقداً",
+    "markAsPaid": "تحديد كمدفوع",
+    "priceType": "السعر غير صحيح",
+    "priceRequired": "أدخل السعر",
+    "urlInvalid": "رابط غير صحيح"
+  },
+  "AdminAssignProvider": {
+    "title": "تعيين مزود الخدمة",
+    "providerLabel": "المزوّد",
+    "providerPlaceholder": "اختر مزوداً",
+    "priceLabel": "سعر المزود",
+    "pricePlaceholder": "أدخل السعر (اختياري)",
+    "submit": "تعيين",
+    "providerRequired": "اختر مزوداً",
+    "priceType": "سعر غير صحيح",
+    "submitting": "جاري الحفظ...",
+    "success": "تم تعيين المزود بنجاح",
+    "error": "حدث خطأ أثناء تعيين المزود"
   },
   "servicesAdmin": {
     "title": "إدارة الخدمات",

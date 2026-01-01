@@ -1,68 +1,53 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import { requestService } from "@/services/api";
-import { useContext, useEffect, useState, useCallback } from "react";
+import { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { EyeIcon, Edit, Trash } from "lucide-react";
+import { Eye, Edit, Trash, Calendar, Tag, User, MapPin } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
+import {
+    useGetAllRequestsQuery,
+    useDeleteRequestMutation
+} from "@/redux/api/requestsApi";
 
-const RequestsTable = ({ stats }: { stats: any }) => {
+interface RequestsTableProps {
+    stats: any;
+}
+
+const RequestsTable = ({ stats }: RequestsTableProps) => {
     const { t } = useTranslation();
     const { lang } = useContext(LanguageContext);
-
     const searchParams = useSearchParams();
 
     // Extract values from URL
-    const PageNumber = searchParams.get("PageNumber") || 1;
-    const PageSize = searchParams.get("PageSize") || 30;
+    const PageNumber = searchParams.get("PageNumber") || "1";
+    const PageSize = searchParams.get("PageSize") || "30";
     const RequestStatus = searchParams.get("RequestStatus") || "";
 
-    const totalRows = (() => {
-        if (RequestStatus === "8") // Priced (Under Processing)
-            return stats?.underProcessingRequestsCount || 0;
-        if (RequestStatus === "9") // Accepted (Initial Approval)
-            return stats?.initiallyApprovedRequestsCount || 0;
-        if (RequestStatus === "21") // Waiting Payment
-            return stats?.waitingForPaymentRequestsCount || 0;
-        if (RequestStatus === "10") return stats?.rejectedRequestsCount || 0; // Rejected
-        if (RequestStatus === "11") return stats?.approvedRequestsCount || 0; // Completed
-        if (RequestStatus === "7") return stats?.newRequestsCount || 0; // Pending (New)
-        return stats?.totalRequestsCount || 0;
-    })();
+    const {
+        data: response,
+        isLoading,
+        refetch
+    } = useGetAllRequestsQuery({
+        PageNumber: Number(PageNumber),
+        PageSize: Number(PageSize),
+        requestStatus: RequestStatus,
+    });
 
-    const [orders, setOrders] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [deleteRequest, { isLoading: isDeleting }] = useDeleteRequestMutation();
 
-    const fetchOrders = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const { data } = await requestService.getAllRequests({
-                pageNumber: Number(PageNumber),
-                pageSize: Number(PageSize),
-                requestStatus: RequestStatus
-            });
-            if (data) {
-                setOrders(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch requests", error);
-            toast.error("Failed to fetch requests");
-        } finally {
-            setIsLoading(false);
-        }
-    }, [PageNumber, PageSize, RequestStatus]);
+    const requests = response?.data || [];
+    const totalRows = response?.count || 0;
 
-    useEffect(() => {
-        fetchOrders();
-    }, [fetchOrders]);
-
-    const [isDeleting, setIsDeleting] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    useEffect(() => {
+        refetch();
+    }, [PageNumber, PageSize, RequestStatus, refetch]);
 
     const askToDelete = (id: string) => {
         setSelectedId(id);
@@ -71,200 +56,194 @@ const RequestsTable = ({ stats }: { stats: any }) => {
 
     const onDelete = async () => {
         if (!selectedId) return;
-        setIsDeleting(true);
         try {
-            const { error } = await requestService.delete(selectedId);
-            if (error) throw new Error(error);
-
-            toast.success(t("requests.deleteSuccess") || "تم حذف الطلب بنجاح");
+            await deleteRequest(selectedId).unwrap();
+            toast.success(t("requests.deleteSuccess"));
             setOpenDelete(false);
             setSelectedId(null);
-            fetchOrders();
         } catch (err: any) {
-            toast.error(
-                err?.message || t("requests.deleteError") || "فشل حذف الطلب"
-            );
-        } finally {
-            setIsDeleting(false);
+            toast.error(err?.data?.message || t("requests.deleteError"));
         }
     };
 
     const tabs = [
         {
-            name: t("request.all"),
-            href: "",
-            numbers: stats?.totalRequestsCount,
+            name: t("all"),
+            href: "/admin/requests",
+            numbers: stats?.totalRequestsCount || 0,
             color: "#637381",
         },
         {
-            name: t("request.newRequest") || "طلبات جديدة",
-            href: "?RequestStatus=7",
-            numbers: stats?.newRequestsCount,
+            name: t("requests.stats.new"),
+            href: "/admin/requests?RequestStatus=7",
+            numbers: stats?.newRequestsCount || 0,
             color: "#0071FF",
         },
         {
-            name: t("request.underProcessing") || "تحت المعالجة",
-            href: "?RequestStatus=8",
-            numbers: stats?.underProcessingRequestsCount,
+            name: t("requests.stats.priced"),
+            href: "/admin/requests?RequestStatus=8",
+            numbers: stats?.underProcessingRequestsCount || 0,
             color: "#B76E00",
         },
         {
-            name: t("request.initialApproval") || "موافقة مبدئية",
-            href: "?RequestStatus=9",
-            numbers: stats?.initiallyApprovedRequestsCount,
+            name: t("requests.stats.accepted"),
+            href: "/admin/requests?RequestStatus=9",
+            numbers: stats?.initiallyApprovedRequestsCount || 0,
             color: "#007867",
         },
         {
-            name: t("request.awaitingPayment") || "بانتظار الدفع",
-            href: "?RequestStatus=21",
-            numbers: stats?.waitingForPaymentRequestsCount,
+            name: t("requests.stats.waitingPayment"),
+            href: "/admin/requests?RequestStatus=21",
+            numbers: stats?.waitingForPaymentRequestsCount || 0,
             color: "#FF5630",
         },
         {
-            name: t("request.rejected") || "مرفوض",
-            href: "?RequestStatus=10",
-            numbers: stats?.rejectedRequestsCount,
-            color: "#B71D18",
+            name: t("requests.stats.completed"),
+            href: "/admin/requests?RequestStatus=11",
+            numbers: stats?.approvedRequestsCount || 0,
+            color: "#22C55E",
         },
         {
-            name: t("request.completed") || "مكتمل",
-            href: "?RequestStatus=11",
-            numbers: stats?.approvedRequestsCount,
-            color: "#22C55E",
+            name: t("requests.stats.rejected"),
+            href: "/admin/requests?RequestStatus=10",
+            numbers: stats?.rejectedRequestsCount || 0,
+            color: "#B71D18",
         },
     ];
 
     const columns = [
         {
-            name: t("request.requestNumber"),
+            name: t("orders.columns.orderNumber"),
+            width: "120px",
             cell: (row: any) => (
-                <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
-                    {row?.requestNumber || row?.id}
+                <span className="font-mono text-[11px] font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+                    #{row.request_number || row.id.slice(0, 8)}
                 </span>
             ),
         },
         {
-            name: t("projects.serviceType"),
-            selector: (row: any) => {
-                const ar = row?.service?.name_ar || row?.services?.[0]?.titleAr;
-                const en = row?.service?.name_en || row?.services?.[0]?.titleEn;
-                return lang === "ar" ? (ar || "-") : (en || "-");
-            },
-            wrap: true,
+            name: t("orders.columns.requester"),
+            grow: 1.5,
+            cell: (row: any) => (
+                <div className="flex items-center gap-3 py-2">
+                    <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                        <User className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-gray-900 text-xs truncate">
+                            {row.requester?.name || "-"}
+                        </span>
+                        <div className="flex items-center gap-1 text-[10px] text-gray-400">
+                            <MapPin className="w-3 h-3" />
+                            {lang === "ar" ? row.city?.name_ar : row.city?.name_en}
+                        </div>
+                    </div>
+                </div>
+            ),
         },
         {
-            name: t("request.requesterName"),
-            selector: (row: any) =>
-                row?.fullName ||
-                row?.requester?.full_name ||
-                row?.requester?.name ||
-                "-",
-            wrap: true,
+            name: t("nav.services"),
+            grow: 1.5,
+            cell: (row: any) => (
+                <div className="flex items-center gap-3 py-2">
+                    <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
+                        <Tag className="w-4 h-4" />
+                    </div>
+                    <span className="font-semibold text-gray-700 text-xs truncate">
+                        {lang === "ar" ? row.service?.name_ar : row.service?.name_en}
+                    </span>
+                </div>
+            ),
         },
         {
-            name: t("request.requestDate"),
-            selector: (row: any) =>
-                dayjs(row?.creationTime || row?.created_at).format(
-                    "DD/MM/YYYY hh:mm A"
-                ),
-            wrap: true,
+            name: t("orders.columns.startDate"),
+            cell: (row: any) => (
+                <div className="flex items-center gap-2 text-gray-500">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span className="text-[11px] font-medium">
+                        {dayjs(row.created_at).format("DD/MM/YYYY")}
+                    </span>
+                </div>
+            ),
         },
         {
-            name: t("request.requestStatus"),
+            name: t("orders.columns.status"),
+            center: true,
             cell: (row: any) => {
-                const statusId = row.requestStatus?.id || row.status_id || row.status?.id;
-                let bgClass = "bg-gray-100 text-gray-600";
+                const status = row.status;
+                const statusId = status?.id || row.status_id;
 
-                if (statusId === 11) bgClass = "bg-green-50 text-green-700 border-green-200";
-                else if (statusId === 9) bgClass = "bg-blue-50 text-blue-700 border-blue-200";
-                else if (statusId === 10) bgClass = "bg-red-50 text-red-700 border-red-200";
-                else if (statusId === 21) bgClass = "bg-orange-50 text-orange-700 border-orange-200";
-                else if (statusId === 7) bgClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
-                else if (statusId === 8) bgClass = "bg-yellow-50 text-yellow-700 border-yellow-200";
+                let colors = "";
+                if (statusId === 11) colors = "bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-500/10";
+                else if (statusId === 7) colors = "bg-blue-50 text-blue-700 border-blue-100 ring-blue-500/10";
+                else if (statusId === 10) colors = "bg-rose-50 text-rose-700 border-rose-100 ring-rose-500/10";
+                else if (statusId === 21) colors = "bg-amber-50 text-amber-700 border-amber-100 ring-amber-500/10";
+                else colors = "bg-gray-50 text-gray-700 border-gray-100 ring-gray-500/10";
 
                 return (
-                    <span
-                        className={`text-nowrap px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all ${bgClass}`}
-                    >
-                        {lang === "ar"
-                            ? row?.requestStatus?.nameAr || row?.status?.name_ar || row?.status?.nameAr || "-"
-                            : row?.requestStatus?.nameEn || row?.status?.name_en || row?.status?.nameEn || "-"}
-                    </span>
+                    <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
+                        <span className={`w-2 h-2 rounded-full ${statusId === 7 ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-current'}`} />
+                        {lang === "ar" ? status?.name_ar || "-" : status?.name_en || "-"}
+                    </div>
                 );
             },
-            wrap: true,
         },
         {
-            name: t("request.actions") || "الإجراءات",
+            name: t("orders.columns.action"),
+            center: true,
+            width: "150px",
             cell: (row: any) => (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-2">
                     <Link
                         href={`/admin/requests/${row.id}`}
-                        className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium text-nowrap"
-                        title={t("requests.view") || "عرض"}
+                        className="group relative p-2.5 bg-white text-blue-600 rounded-xl border border-blue-100 shadow-sm hover:bg-blue-600 hover:text-white transition-all duration-300"
+                        title={t("view")}
                     >
-                        <EyeIcon />
+                        <Eye className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                        <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                            {t("view")}
+                        </span>
                     </Link>
                     <Link
                         href={`/admin/requests/${row.id}`}
-                        className="bg-primary text-white px-1 py-1 rounded-lg hover:bg-primary/90 transition text-xs font-medium"
-                        title={t("requests.edit") || "تعديل"}
+                        className="group relative p-2.5 bg-white text-emerald-600 rounded-xl border border-emerald-100 shadow-sm hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                        title={t("edit")}
                     >
-                        <Edit width={15} />
+                        <Edit className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                        <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                            {t("edit")}
+                        </span>
                     </Link>
                     <button
                         onClick={() => askToDelete(row.id)}
-                        className="bg-red-500 text-white px-1 py-1 rounded-lg hover:bg-red-600 transition text-xs font-medium"
-                        title={t("requests.delete") || "حذف"}
+                        className="group relative p-2.5 bg-white text-gray-400 rounded-xl border border-gray-100 shadow-sm hover:bg-gray-900 hover:text-white transition-all duration-300"
+                        title={t("delete")}
                     >
-                        <Trash width={15} />
+                        <Trash className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                        <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                            {t("delete")}
+                        </span>
                     </button>
                 </div>
             ),
-            ignoreRowClick: true,
-            allowOverflow: true,
-            button: true,
         },
     ];
 
-    const sortedData = orders
-        ? [...orders]?.sort((a, b) => {
-            const aNum = Number(a?.requestNumber);
-            const bNum = Number(b?.requestNumber);
-            const aTime = a?.created_at ? new Date(a.created_at).getTime() : 0;
-            const bTime = b?.created_at ? new Date(b.created_at).getTime() : 0;
-            const aKey = Number.isFinite(aNum) ? aNum : aTime;
-            const bKey = Number.isFinite(bNum) ? bNum : bTime;
-            return bKey - aKey;
-        })
-        : [];
-
     return (
-        <>
-            <div className="py-5">
-                <div className="mx-2">
-                    <div className="rounded-3xl bg-white p-5">
-                        {!isLoading && (!sortedData || sortedData.length === 0) && (
-                            <div className="mb-3 text-center text-sm text-gray-600">
-                                {t("requests.empty") || "لا توجد بيانات للعرض"}
-                            </div>
-                        )}
-                        <CustomDataTable
-                            tabs={tabs}
-                            columns={columns}
-                            data={sortedData}
-                            searchableFields={["fullName", "email", "requestNumber", "title"]}
-                            searchPlaceholder={t("searchPlaceholder")}
-                            pagination={true}
-                            title={t("request.title") || ""}
-                            allowOverflow={true}
-                            defaultPage={Number(PageNumber)}
-                            defaultPageSize={Number(PageSize)}
-                            isLoading={isLoading}
-                            totalRows={totalRows}
-                        />
-                    </div>
-                </div>
+        <div className="space-y-6">
+            <div className="bg-transparent overflow-hidden">
+                <CustomDataTable
+                    tabs={tabs}
+                    columns={columns}
+                    data={requests}
+                    searchableFields={["request_number", "requester.name"]}
+                    searchPlaceholder={t("searchPlaceholder")}
+                    pagination={true}
+                    isLoading={isLoading}
+                    totalRows={totalRows}
+                    defaultPage={Number(PageNumber)}
+                    defaultPageSize={Number(PageSize)}
+                />
             </div>
 
             <ModalDelete
@@ -276,7 +255,7 @@ const RequestsTable = ({ stats }: { stats: any }) => {
                 onConfirm={onDelete}
                 loading={isDeleting}
             />
-        </>
+        </div>
     );
 };
 

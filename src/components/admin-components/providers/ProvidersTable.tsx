@@ -2,14 +2,18 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import Avatar from "../../shared/Avatar";
-import { useContext, useEffect, useState, useCallback } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Eye, Edit, Trash } from "lucide-react";
+import { Eye, Edit, Trash, CheckCircle, XCircle, MoreVertical, Phone, Mail, MapPin } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
-import { providerService, profileService } from "@/services/api";
 import TableActions from "../../shared/TableActions";
+import {
+    useGetProvidersAccountsQuery,
+    useDeleteProviderMutation,
+    useUpdateProviderAccountStatusMutation
+} from "@/redux/api/providersApi";
 
 interface ProvidersTableProps {
     stats: any;
@@ -18,51 +22,37 @@ interface ProvidersTableProps {
 const ProvidersTable = ({ stats }: ProvidersTableProps) => {
     const { t } = useTranslation();
     const { lang } = useContext(LanguageContext);
-
     const searchParams = useSearchParams();
 
     // Extract values from URL
-    const PageNumber = searchParams.get("PageNumber") || 1;
-    const PageSize = searchParams.get("PageSize") || 30;
-    const AccountStatus = searchParams.get("AccountStatus") || "";
+    const PageNumber = searchParams.get("PageNumber") || "1";
+    const PageSize = searchParams.get("PageSize") || "30";
+    const rawStatus = searchParams.get("AccountStatus") || "";
+    const allowedStatuses = ["200", "201", "202", "203"];
+    const AccountStatus = allowedStatuses.includes(rawStatus) ? rawStatus : "";
 
-    const totalRows = (() => {
-        if (AccountStatus === "200") return stats?.pendingAccountsCount || 0;
-        if (AccountStatus === "201") return stats?.activeAccountsCount || 0;
-        if (AccountStatus === "202") return stats?.blockedAccountsCount || 0;
-        if (AccountStatus === "203") return stats?.suspendedAccountsCount || 0;
-        return stats?.totalAccountsCount || 0;
-    })();
+    const {
+        data: response,
+        isLoading,
+        refetch
+    } = useGetProvidersAccountsQuery({
+        PageNumber: Number(PageNumber),
+        PageSize: Number(PageSize),
+        AccountStatus,
+    });
 
-    const [providers, setProviders] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [deleteProvider, { isLoading: isDeleting }] = useDeleteProviderMutation();
+    const [updateAccountStatus] = useUpdateProviderAccountStatusMutation();
 
-    const fetchProviders = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const { data } = await providerService.getAllProviders({
-                pageNumber: Number(PageNumber),
-                pageSize: Number(PageSize),
-                accountStatus: AccountStatus,
-            });
-            if (data) {
-                setProviders(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch providers", error);
-            toast.error("Failed to fetch providers");
-        } finally {
-            setIsLoading(false);
-        }
-    }, [PageNumber, PageSize, AccountStatus]);
+    const providers = response?.data || [];
+    const totalRows = response?.count || 0;
 
-    useEffect(() => {
-        fetchProviders();
-    }, [fetchProviders]);
-
-    const [isDeleting, setIsDeleting] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    useEffect(() => {
+        refetch();
+    }, [PageNumber, PageSize, AccountStatus, refetch]);
 
     const askToDelete = (id: string) => {
         setSelectedId(id);
@@ -71,230 +61,232 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
 
     const onDelete = async () => {
         if (!selectedId) return;
-        setIsDeleting(true);
         try {
-            const { error } = await providerService.delete(selectedId);
-            if (error) throw new Error(error);
-
+            await deleteProvider(selectedId).unwrap();
             toast.success(t("providers.deleteSuccess") || "تم حذف مزود الخدمة بنجاح");
             setOpenDelete(false);
             setSelectedId(null);
-            fetchProviders();
         } catch (err: any) {
-            toast.error(
-                err?.message || t("providers.deleteError") || "فشل حذف مزود الخدمة"
-            );
+            toast.error(err?.data?.message || t("providers.deleteError") || "فشل حذف مزود الخدمة");
+        }
+    };
+
+    const handleStatusUpdate = async (providerId: string, statusId: number) => {
+        const loadingToast = toast.loading(t("common.processing") || "جاري المعالجة...");
+        try {
+            await updateAccountStatus({ providerId, statusId }).unwrap();
+            toast.success(statusId === 201 ? (t("providers.approveSuccess") || "تم قبول الحساب بنجاح") : (t("providers.rejectSuccess") || "تم تحديث حالة الحساب"));
+        } catch (err: any) {
+            toast.error(err?.data?.message || t("common.error") || "حدث خطأ ما");
         } finally {
-            setIsDeleting(false);
-        }
-    };
-
-    const onApprove = async (id: string) => {
-        // Assuming approving means setting status to active (201 or similar logic) not strictly defined yet without authApi context
-        // Re-using toggleBlock/Suspend or we might need a specific 'approve' in profileService in future.
-        // For now, let's assume acceptance = unblocking or specific status update if needed.
-        // Checking adminProfilesApi for redundant implementation details... 
-        // It seems it updates 'profile_status_id'. Let's add that to ProviderService or strictly use update.
-        // Direct update for now:
-        try {
-            const { error } = await providerService.update(id, { profile_status_id: 201 }); // 201 = Active
-            if (error) throw new Error(error);
-            toast.success(t("providers.approveSuccess") || "تم قبول الحساب بنجاح");
-            fetchProviders();
-        } catch (err: any) {
-            toast.error(err?.message || t("providers.approveError") || "فشل قبول الحساب");
-        }
-    };
-
-    const onReject = async (id: string) => {
-        try {
-            const { error } = await providerService.update(id, { profile_status_id: 202 }); // 202 = Blocked
-            if (error) throw new Error(error);
-            toast.success(t("providers.rejectSuccess") || "تم رفض/حظر الحساب");
-            fetchProviders();
-        } catch (err: any) {
-            toast.error(err?.message || t("providers.rejectError") || "فشل رفض الحساب");
+            toast.dismiss(loadingToast);
         }
     };
 
     const tabs = [
         {
-            name: t("providersTable.tabs.all"),
-            href: "",
-            numbers: stats?.totalAccountsCount,
+            name: t("all"),
+            href: "/admin/providers",
+            numbers: stats?.totalAccountsCount || 0,
             color: "#637381",
         },
         {
-            name: t("providersTable.tabs.active"),
-            href: "?AccountStatus=201",
-            numbers: stats?.activeAccountsCount,
-
-            color: "#007867",
-        },
-        {
-            name: t("providersTable.tabs.pending"),
-            href: "?AccountStatus=200",
-            numbers: stats?.pendingAccountsCount,
+            name: t("providers.stats.pending"),
+            href: "/admin/providers?AccountStatus=200",
+            numbers: stats?.pendingAccountsCount || 0,
             color: "#B76E00",
         },
         {
-            name: t("providersTable.tabs.suspended"),
-            href: "?AccountStatus=203",
-            numbers: stats?.suspendedAccountsCount,
+            name: t("providers.stats.active"),
+            href: "/admin/providers?AccountStatus=201",
+            numbers: stats?.activeAccountsCount || 0,
+            color: "#007867",
+        },
+        {
+            name: t("providers.stats.suspended"),
+            href: "/admin/providers?AccountStatus=203",
+            numbers: stats?.suspendedAccountsCount || 0,
             color: "#b76f21",
         },
         {
-            name: t("providersTable.tabs.blocked"),
-            href: "?AccountStatus=202",
-            numbers: stats?.blockedAccountsCount,
+            name: t("providers.stats.blocked"),
+            href: "/admin/providers?AccountStatus=202",
+            numbers: stats?.blockedAccountsCount || 0,
             color: "#B71D18",
         },
     ];
 
     const columns = [
         {
-            name: t("providersTable.columns.avatar") || "",
-            width: "60px",
-            cell: (row: any) => (
-                <Avatar
-                    src={row?.logoUrl || null}
-                    name={row?.name || row?.email || ""}
-                    size={36}
-                    className="bg-white"
-                />
-            ),
-        },
-        {
-            name: t("providersTable.columns.name"),
-            cell: (row: any) => (
-                <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
-                    {row.name}
-                </span>
-            ),
-        },
-        {
-            name: t("providersTable.columns.entityType"),
-            selector: (row: any) =>
-                lang === "ar"
-                    ? row.entityType?.nameAr || row.entity_type?.name_ar
-                    : row.entityType?.nameEn || row.entity_type?.name_en,
-            wrap: true,
-        },
-        {
-            name: t("providersTable.columns.email"),
-            cell: (row: any) => {
-                const email = row?.user?.email || row?.email || "";
-                return (
-                    <a href={`mailto:${email}`} className="text-blue-600 hover:underline">
-                        {email}
-                    </a>
-                );
-            },
+            name: t("userData.fullName"),
+            selector: (row: any) => row.name,
             sortable: true,
-            wrap: true,
+            grow: 2,
+            cell: (row: any) => (
+                <div className="flex items-center gap-4 py-3">
+                    <div className="relative group">
+                        <Avatar
+                            src={row.logoUrl || row.profilePicturePath || null}
+                            name={row.name}
+                            size={48}
+                            className="rounded-2xl border-2 border-white shadow-md ring-1 ring-gray-100 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
+                        />
+                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${(row.profile_status?.id || row.profile_status_id) === 201 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                        <span className="font-extrabold text-gray-900 text-[14px] truncate group-hover:text-primary transition-colors">
+                            {row.name}
+                        </span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                                {lang === "ar" ? row.entity_type?.name_ar : row.entity_type?.name_en}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            ),
         },
         {
-            name: t("providersTable.columns.phone"),
+            name: t("userData.email"),
+            grow: 1.5,
+            cell: (row: any) => (
+                <div className="flex flex-col gap-2 py-3">
+                    <div className="flex items-center gap-2 group cursor-pointer">
+                        <div className="p-1.5 bg-blue-50 text-blue-500 rounded-lg group-hover:bg-blue-500 group-hover:text-white transition-all">
+                            <Mail className="w-3.5 h-3.5" />
+                        </div>
+                        <a href={`mailto:${row.user?.email || row.email}`} className="text-xs font-medium text-gray-600 group-hover:text-primary truncate max-w-[180px]">
+                            {row.user?.email || row.email}
+                        </a>
+                    </div>
+                    <div className="flex items-center gap-2 group cursor-pointer">
+                        <div className="p-1.5 bg-emerald-50 text-emerald-500 rounded-lg group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                            <Phone className="w-3.5 h-3.5" />
+                        </div>
+                        <a href={`tel:${row.user?.phone || row.phoneNumber}`} className="text-xs font-semibold text-gray-700 group-hover:text-primary">
+                            {row.user?.phone || row.phoneNumber}
+                        </a>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            name: t("userData.workRegion"),
+            selector: (row: any) => lang === "ar" ? row.city?.name_ar : row.city?.name_en,
+            cell: (row: any) => (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-xl border border-gray-100">
+                    <MapPin className="w-4 h-4 text-primary/70" />
+                    <span className="text-xs font-bold text-gray-700">
+                        {lang === "ar" ? row.city?.name_ar : row.city?.name_en}
+                    </span>
+                </div>
+            ),
+        },
+        {
+            name: t("orders.columns.status"),
+            center: true,
             cell: (row: any) => {
-                const phone = row?.user?.phone || row?.phoneNumber || "";
+                const status = row.profile_status;
+                const statusId = status?.id || row.profile_status_id;
+
+                let colors = "";
+                if (statusId === 201) colors = "bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-500/10";
+                else if (statusId === 200) colors = "bg-amber-50 text-amber-700 border-amber-100 ring-amber-500/10";
+                else if (statusId === 202) colors = "bg-red-50 text-red-700 border-red-100 ring-red-500/10";
+                else colors = "bg-gray-50 text-gray-700 border-gray-100 ring-gray-500/10";
+
                 return (
-                    <a href={`tel:${phone}`} className="text-gray-700 hover:text-black">
-                        {phone}
-                    </a>
+                    <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
+                        <span className={`w-2 h-2 rounded-full ${statusId === 201 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-current'}`} />
+                        {lang === "ar" ? status?.name_ar || "غير معروف" : status?.name_en || "Unknown"}
+                    </div>
                 );
             },
-            wrap: true,
         },
         {
-            name: t("providersTable.columns.region"),
-            selector: (row: any) =>
-                lang === "ar"
-                    ? row.city?.nameAr || row.city?.name_ar
-                    : row.city?.nameEn || row.city?.name_en,
-            wrap: true,
-        },
-        {
-            name: t("providersTable.columns.status"),
-            cell: (row: any) => (
-                <span
-                    className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-          ${row.profileStatus?.id === 201
-                            ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                            : row.profileStatus?.id === 202
-                                ? "bg-red-100 text-red-700"
-                                : "bg-gray-100 text-gray-600"
-                        }`}
-                >
-                    {lang === "ar"
-                        ? row.profileStatus?.nameAr
-                        : row.profileStatus?.nameEn}
-                </span>
-            ),
-            wrap: true,
-        },
-        {
-            name: t("providersTable.columns.action") || "الإجراءات",
-            cell: (row: any) => (
-                <TableActions
-                    actions={[
-                        {
-                            label: t("providers.view") || "عرض",
-                            icon: <Eye className="w-4 h-4" />,
-                            href: `/admin/providers/${row.id}`,
-                        },
-                        {
-                            label: t("providers.approve") || "قبول",
-                            icon: <div className="w-2 h-2 rounded-full bg-green-500 mx-1" />,
-                            onClick: () => onApprove(row.id),
-                            variant: "success",
-                        },
-                        {
-                            label: t("providers.reject") || "رفض",
-                            icon: <div className="w-2 h-2 rounded-full bg-orange-500 mx-1" />,
-                            onClick: () => onReject(row.id),
-                            variant: "destructive",
-                        },
-                        {
-                            label: t("providers.edit") || "تعديل",
-                            icon: <Edit className="w-4 h-4" />,
-                            href: `/admin/providers/${row.id}`,
-                        },
-                        {
-                            label: t("providers.delete") || "حذف",
-                            icon: <Trash className="w-4 h-4" />,
-                            onClick: () => askToDelete(row.id),
-                            variant: "destructive",
-                        },
-                    ]}
-                />
-            ),
-            ignoreRowClick: true,
-            allowOverflow: true,
-            button: true,
+            name: t("orders.columns.action"),
+            center: true,
+            width: "180px",
+            cell: (row: any) => {
+                const statusId = row.profile_status?.id || row.profile_status_id;
+
+                return (
+                    <div className="flex items-center justify-center gap-2">
+                        {statusId === 200 && (
+                            <button
+                                onClick={() => handleStatusUpdate(row.id, 201)}
+                                className="group relative p-2.5 bg-white text-emerald-600 rounded-xl border border-emerald-100 shadow-sm hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                                title={t("providers.approve")}
+                            >
+                                <CheckCircle className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                                    {t("providers.approve")}
+                                </span>
+                            </button>
+                        )}
+                        {statusId !== 202 && (
+                            <button
+                                onClick={() => handleStatusUpdate(row.id, 202)}
+                                className="group relative p-2.5 bg-white text-rose-600 rounded-xl border border-rose-100 shadow-sm hover:bg-rose-600 hover:text-white transition-all duration-300"
+                                title={t("providers.reject")}
+                            >
+                                <XCircle className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                                    {t("providers.reject")}
+                                </span>
+                            </button>
+                        )}
+                        <Link
+                            href={`/admin/providers/${row.id}`}
+                            className="group relative p-2.5 bg-white text-blue-600 rounded-xl border border-blue-100 shadow-sm hover:bg-blue-600 hover:text-white transition-all duration-300"
+                            title={t("providers.view")}
+                        >
+                            <Eye className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                                {t("providers.view")}
+                            </span>
+                        </Link>
+                        <button
+                            onClick={() => askToDelete(row.id)}
+                            className="group relative p-2.5 bg-white text-gray-400 rounded-xl border border-gray-100 shadow-sm hover:bg-gray-900 hover:text-white transition-all duration-300"
+                            title={t("providers.delete")}
+                        >
+                            <Trash className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                            <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                                {t("providers.delete")}
+                            </span>
+                        </button>
+                    </div>
+                );
+            },
         },
     ];
 
     return (
-        <>
-            <div className="py-5">
-                <div className="mx-2">
-                    <div className="rounded-3xl bg-white p-5">
-                        <CustomDataTable
-                            tabs={tabs}
-                            columns={columns}
-                            data={providers}
-                            searchableFields={["name", "email", "phoneNumber"]}
-                            searchPlaceholder={t("searchPlaceholder")}
-                            pagination={true}
-                            title={t("providersTable.title") || ""}
-                            allowOverflow={true}
-                            defaultPage={Number(PageNumber)}
-                            defaultPageSize={Number(PageSize)}
-                            isLoading={isLoading}
-                            totalRows={totalRows}
-                        />
+        <div className="space-y-6">
+            <div className="bg-transparent overflow-hidden">
+                {(!isLoading && providers.length === 0) && (
+                    <div className="mb-4 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 flex items-center justify-between">
+                        <div className="text-sm">
+                            {t("noDataDesc") || "لم يتم العثور على سجلات مطابقة"}
+                        </div>
+                        <Link href="/admin/providers" className="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-sm hover:bg-amber-700">
+                            {t("common.resetFilters") || "إعادة ضبط الفلاتر"}
+                        </Link>
                     </div>
-                </div>
+                )}
+                <CustomDataTable
+                    tabs={tabs}
+                    columns={columns}
+                    data={providers}
+                    searchableFields={["name"]}
+                    searchPlaceholder={t("searchPlaceholder")}
+                    pagination={true}
+                    isLoading={isLoading}
+                    totalRows={totalRows}
+                    defaultPage={Number(PageNumber)}
+                    defaultPageSize={Number(PageSize)}
+                />
             </div>
 
             <ModalDelete
@@ -306,7 +298,7 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                 onConfirm={onDelete}
                 loading={isDeleting}
             />
-        </>
+        </div>
     );
 };
 

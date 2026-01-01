@@ -8,10 +8,18 @@ export const requestersApi = createApi({
   endpoints: (builder) => ({
     // Get Requesters Accounts (Admin)
     getRequestersAccounts: builder.query({
-      query: ({ PageNumber = 1, PageSize = 10 }) => {
+      query: ({ PageNumber = 1, PageSize = 10, AccountStatus = "" }) => {
         const filters = {};
-        // AccountStatus would need to be mapped to user.is_blocked
-        // For now, we'll get all requesters with their user info
+        let userJoin = "user:users!requesters_user_id_fkey(id,email,phone,role,is_blocked)";
+
+        if (AccountStatus === "active") {
+          userJoin = "user:users!requesters_user_id_fkey!inner(id,email,phone,role,is_blocked)";
+          filters["user.is_blocked"] = false;
+        } else if (AccountStatus === "blocked") {
+          userJoin = "user:users!requesters_user_id_fkey!inner(id,email,phone,role,is_blocked)";
+          filters["user.is_blocked"] = true;
+        }
+
         return {
           table: "requesters",
           method: "GET",
@@ -21,7 +29,7 @@ export const requestersApi = createApi({
             pageSize: Number(PageSize),
           },
           joins: [
-            "user:users!requesters_user_id_fkey(id,email,phone,role,is_blocked)",
+            userJoin,
             "entity_type:lookup_values!requesters_entity_type_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
           ],
@@ -45,7 +53,7 @@ export const requestersApi = createApi({
         // Then update users table
         return {
           table: "users",
-        method: "PUT",
+          method: "PUT",
           id: body.userId, // Should be passed from component
           body: {
             is_blocked: body.isBlocked,
@@ -55,6 +63,23 @@ export const requestersApi = createApi({
       },
       invalidatesTags: ["Requesters"],
     }),
+    // Update Requester Profile
+    updateRequesterProfile: builder.mutation({
+      query: ({ id, body }) => ({
+        table: "requesters",
+        method: "PUT",
+        id,
+        body: {
+          name: body.name,
+          city_id: body.cityId,
+          entity_type_id: body.entityTypeId,
+          commercial_registration_number: body.commercialRegistrationNumber,
+          commercial_registration_date: body.commercialRegistrationDate,
+          updated_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Requesters"],
+    }),
   }),
 });
 
@@ -62,4 +87,5 @@ export const {
   useGetRequestersAccountsQuery,
   useDeleteRequesterMutation,
   useUpdateRequesterStatusMutation,
+  useUpdateRequesterProfileMutation,
 } = requestersApi;

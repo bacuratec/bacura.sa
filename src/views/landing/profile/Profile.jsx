@@ -29,6 +29,7 @@ import {
 
 const Profile = () => {
   const { t } = useTranslation();
+  const [formattedDate, setFormattedDate] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -36,6 +37,25 @@ const Profile = () => {
   const [openSuspend, setOpenSuspend] = useState(false);
   const userId = useSelector((state) => state.auth.userId);
   const { data, refetch, isLoading } = useGetRequesterDetailsQuery(userId);
+  useEffect(() => {
+    const createdAt = data?.creationTime || data?.creation_time || data?.created_at;
+    if (createdAt) {
+      try {
+        const date = new Date(createdAt);
+        setFormattedDate(
+          date.toLocaleDateString("ar-EG", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        );
+      } catch {
+        setFormattedDate("");
+      }
+    } else {
+      setFormattedDate("");
+    }
+  }, [data]);
   const { data: userOrders } = useGetUserOrdersQuery({ PageNumber: 1, PageSize: 5 });
   const {
     data: tickets,

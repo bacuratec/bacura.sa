@@ -105,9 +105,12 @@ const AdminCompleteRequest = ({ data, refetch }) => {
   ); // ⏳ 500ms تأخير بعد ما يوقف المستخدم عن الكتابة
 
   return (
-    <section className="rounded-2xl bg-white shadow-sm md:p-3 lg:p-4 xl:p-6 my-5">
-      <h3 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-primary mb-5">
-        {t("AdminCompleteRequest.confirmRequest")}
+    <section className="rounded-[32px] bg-white border border-gray-100 shadow-custom p-6 sm:p-8 my-8 overflow-hidden relative animate-fade-in-up">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+
+      <h3 className="text-xl sm:text-2xl font-black text-gray-800 mb-8 flex items-center gap-3">
+        <span className="w-2 h-8 bg-primary rounded-full"></span>
+        {t("AdminCompleteRequest.confirmRequest") || "إتمام الطلب وبدء التنفيذ"}
       </h3>
 
       <Formik
@@ -116,134 +119,132 @@ const AdminCompleteRequest = ({ data, refetch }) => {
           startDate: "",
           endDate: "",
           providerId: "",
-          orderPrice: "", // ➕ أضفت السعر هنا
+          orderPrice: "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting, setFieldValue }) => (
-          <Form className="grid gap-4">
-            {/* عنوان الطلب */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                {t("AdminCompleteRequest.requestTitle")} <span className="text-red-500">*</span>
-              </label>
-              <Field
-                name="requestTitle"
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl"
-                placeholder={t("AdminCompleteRequest.enterRequestTitle")}
-              />
-              <ErrorMessage
-                name="requestTitle"
-                component="div"
-                className="text-red-500 text-sm mt-1"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                {t("AdminCompleteRequest.price")} <span className="text-red-500">*</span>
-              </label>
-              <Field
-                name="orderPrice"
-                type="number"
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl"
-                placeholder={t("AdminCompleteRequest.enterOrderPrice")}
-              />
-              <ErrorMessage
-                name="orderPrice"
-                component="div"
-                className="text-red-500 text-sm mt-1"
-              />
-            </div>
-
-            {/* تاريخ البداية */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                {t("AdminCompleteRequest.startDate")} <span className="text-red-500">*</span>
-              </label>
-              <Field
-                name="startDate"
-                type="date"
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl"
-              />
-              <ErrorMessage
-                name="startDate"
-                component="div"
-                className="text-red-500 text-sm mt-1"
-              />
-            </div>
-
-            {/* تاريخ النهاية */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                {t("AdminCompleteRequest.endDate")} <span className="text-red-500">*</span>
-              </label>
-              <Field
-                name="endDate"
-                type="date"
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl"
-              />
-              <ErrorMessage
-                name="endDate"
-                component="div"
-                className="text-red-500 text-sm mt-1"
-              />
-            </div>
-
-            {/* اختيار مقدم الخدمة */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                {t("AdminCompleteRequest.provider")} <span className="text-red-500">*</span>
-              </label>
-              <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={debouncedLoadProvidersOptions}
-                onChange={(option) => setFieldValue("providerId", option.value)}
-                placeholder={t("AdminCompleteRequest.selectProvider")}
-                isClearable
-              />
-              <ErrorMessage
-                name="providerId"
-                component="div"
-                className="text-red-500 text-sm mt-1"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="file-upload"
-                className="mb-5 flex flex-col items-center justify-center border-2 border-dashed border-[#ADADAD] rounded-xl px-4 py-10 cursor-pointer text-center text-[#808080] hover:border-primary transition"
-              >
-                <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt="upload" loading="lazy" decoding="async" />
-                <span className="text-sm font-light">
-                  {t("AdminCompleteRequest.uploadAttachments")}{" "}
-                  <span className="text-red-500">*</span>
-                </span>
-                <input
-                  type="file"
-                  id="file-upload"
-                  className="hidden"
-                  multiple
-                  onChange={handleFileChange}
+        {({ values, isSubmitting, setFieldValue }) => (
+          <Form className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* عنوان الطلب */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-bold text-gray-700">
+                  {t("AdminCompleteRequest.requestTitle")} <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  name="requestTitle"
+                  className="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all font-bold"
+                  placeholder={t("AdminCompleteRequest.enterRequestTitle")}
                 />
-              </label>
+                <ErrorMessage name="requestTitle" component="div" className="text-red-500 text-xs font-bold mt-1" />
+              </div>
 
-              {selectedFiles.length > 0 && (
-                <ul className="mt-2 text-sm text-gray-700 list-disc pr-4 text-right">
-                  {selectedFiles.map((file, index) => (
-                    <li key={index}>{file.name}</li>
-                  ))}
-                </ul>
-              )}
+              {/* السعر */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700">
+                  {t("AdminCompleteRequest.price")} <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  name="orderPrice"
+                  type="number"
+                  className="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all font-bold"
+                  placeholder="0.00 SAR"
+                />
+                <ErrorMessage name="orderPrice" component="div" className="text-red-500 text-xs font-bold mt-1" />
+              </div>
+
+              {/* التاريخ */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700">{t("AdminCompleteRequest.startDate")}</label>
+                  <Field
+                    name="startDate"
+                    type="date"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none text-sm font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700">{t("AdminCompleteRequest.endDate")}</label>
+                  <Field
+                    name="endDate"
+                    type="date"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none text-sm font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* اختيار مقدم الخدمة */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-bold text-gray-700">
+                  {t("AdminCompleteRequest.provider")} <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <AsyncSelect
+                    cacheOptions
+                    defaultOptions
+                    loadOptions={debouncedLoadProvidersOptions}
+                    onChange={(option) => setFieldValue("providerId", option?.value)}
+                    placeholder={t("AdminCompleteRequest.selectProvider")}
+                    isClearable
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        borderRadius: '1rem',
+                        padding: '0.25rem',
+                        backgroundColor: '#f9fafb',
+                        borderColor: '#f3f4f6',
+                        boxShadow: 'none',
+                        '&:hover': { borderColor: '#3b82f6' }
+                      })
+                    }}
+                  />
+                </div>
+                <ErrorMessage name="providerId" component="div" className="text-red-500 text-xs font-bold mt-1" />
+              </div>
+
+              {/* رفع الملفات */}
+              <div className="md:col-span-2">
+                <label className="text-sm font-bold text-gray-700 mb-2 block">المرفقات النهائية</label>
+                <label
+                  htmlFor="file-upload"
+                  className="group flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-3xl px-4 py-8 cursor-pointer text-center hover:border-primary hover:bg-primary/5 transition-all"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
+                    <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt="upload" className="w-6 h-6 opacity-40 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="text-sm font-bold text-gray-500 group-hover:text-primary tracking-tight">
+                    {t("AdminCompleteRequest.uploadAttachments")}
+                  </span>
+                  <input type="file" id="file-upload" className="hidden" multiple onChange={handleFileChange} />
+                </label>
+
+                {selectedFiles.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-gray-600">
+                    {selectedFiles.map((file, index) => (
+                      <span key={index} className="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                        {file.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            {/* زر التأكيد */}
-            <div className="flex items-center justify-end mt-4">
+
+            {/* الأزرار */}
+            <div className="flex items-center justify-end pt-6 border-t border-gray-50">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-primary hover:bg-primary/80 py-2 px-6 rounded-xl text-white font-medium disabled:opacity-70 text-sm"
+                className="bg-primary hover:bg-primary/90 px-12 py-3.5 rounded-2xl text-white font-black shadow-xl shadow-primary/25 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 flex items-center gap-2"
               >
-                {isSubmitting ? t("AdminCompleteRequest.sending") : t("AdminCompleteRequest.confirm")}
+                {isSubmitting ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span>{t("AdminCompleteRequest.sending")}</span>
+                  </>
+                ) : t("AdminCompleteRequest.confirm")}
               </button>
             </div>
           </Form>

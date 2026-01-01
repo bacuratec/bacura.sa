@@ -11,11 +11,13 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useGetCitiesQuery } from "../../../redux/api/citiesApi";
 import fileUpload from "@/assets/icons/fileUpload.svg";
+import { Camera, Upload, User, Mail, Phone, Calendar as CalendarIcon, MapPin, Building, FileText } from "lucide-react";
 
 import {
   useUpdateAdminMutation,
   useUpdateProviderMutation,
   useUpdateRequesterMutation,
+  useUpdateUserContactMutation,
 } from "../../../redux/api/updateApi";
 import {
   useGetProviderEntityTypesQuery,
@@ -50,6 +52,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
   const [updateRequester, { isLoading: isRequesterLoading }] =
     useUpdateRequesterMutation();
   const [updateAdmin, { isLoading: isAdminLoading }] = useUpdateAdminMutation();
+  const [updateUserContact] = useUpdateUserContactMutation();
   const isLoading = isProviderLoading || isRequesterLoading || isAdminLoading;
 
   const [selectedFiles, setSelectedFiles] = useState(null);
@@ -155,9 +158,20 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
         className="fixed inset-0  bg-gray-500/75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
       />
 
-      <div className="fixed inset-0 z-10 w-screen overflow-y-auto rounded-lg">
-        <div className="flex md:h-full justify-center items-center p-4 text-center sm:items-center sm:p-0 rounded-lg">
-          <DialogPanel className="relative sm:min-w-[450px] max-h-[70vh]  transform overflow-auto rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95">
+      <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+          <DialogPanel className="relative w-full max-w-2xl transform overflow-hidden rounded-[32px] bg-white text-left shadow-2xl transition-all animate-fade-in-up">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+
+            <div className="px-6 py-6 border-b border-gray-50 flex items-center justify-between relative z-10">
+              <h2 className="text-xl font-black text-gray-800 flex items-center gap-2">
+                <div className="w-2 h-6 bg-primary rounded-full"></div>
+                {t("profile.editTitle") || "تعديل الملف الشخصي"}
+              </h2>
+              <button onClick={handleClose} className="p-2 hover:bg-gray-50 rounded-xl transition-colors">
+                <span className="text-2xl text-gray-400">&times;</span>
+              </button>
+            </div>
             <Formik
               initialValues={{
                 FullName: data?.fullName || data?.name || "",
@@ -202,8 +216,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                     }
 
                     const uploadRes = await axios.post(
-                      `${getAppBaseUrl()}api/attachments${
-                        groupKey ? `?groupKey=${groupKey}` : ""
+                      `${getAppBaseUrl()}api/attachments${groupKey ? `?groupKey=${groupKey}` : ""
                       }`,
                       uploadFormData
                     );
@@ -214,22 +227,43 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                     values.AttachmentsGroupKey = newGroupKey;
                   }
 
-                  // 🟢 تجهيز الفورم داتا للتحديث
-                  const formData = new FormData();
-                  for (const key in values) {
-                    if (values[key]) {
-                      formData.append(key, values[key]);
-                    }
+                  // 🟢 تجهيز الحمولة للتحديث وفق الدور
+                  let payload = {};
+                  if (role === "Requester") {
+                    payload = {
+                      requesterId: data?.id,
+                      name: values.FullName || values.name || "",
+                      commercialRegNo: values.CommercialRegistrationNumber || null,
+                      cityId: values.address || null,
+                    };
+                  } else if (role === "Provider") {
+                    payload = {
+                      providerId: data?.id,
+                      name: values.FullName || values.name || "",
+                      cityId: values.address || null,
+                    };
+                  } else if (role === "Admin") {
+                    payload = {
+                      adminId: data?.id,
+                      displayName: values.FullName || values.name || "",
+                    };
                   }
-                  formData.append("IsProfilePictureChanged", isChanges);
-                  // 🟢 استدعاء تحديث البيانات
-                  await updateFn(formData).unwrap();
+                  await updateFn(payload).unwrap();
+                  // تحديث بيانات التواصل للمستخدم (البريد/الهاتف)
+                  const userId = data?.user?.id || data?.userId || null;
+                  if (userId) {
+                    await updateUserContact({
+                      userId,
+                      email: values.email,
+                      phone: values.phoneNumber,
+                    }).unwrap();
+                  }
                   toast.success(t("profile.profileUpdateSuccess"));
                   setOpen(false);
                 } catch {
-      toast.error(
-        t("profile.profileUpdateFailed") || "حدث خطأ أثناء تحديث الملف الشخصي"
-      );
+                  toast.error(
+                    t("profile.profileUpdateFailed") || "حدث خطأ أثناء تحديث الملف الشخصي"
+                  );
                 } finally {
                   setSubmitting(false);
                   refetch();
@@ -238,34 +272,29 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
               enableReinitialize
             >
               {({ setFieldValue, values, errors, touched }) => (
-                <Form className="bg-white pb-4 pt-5 px-4">
-                  <div className="mt-3 text-center sm:mt-0 flex flex-col gap-3 justify-center items-center">
-                    <div className="w-full flex items-center justify-between gap-4">
-                      {/* عرض الصورة أو الكاميرا */}
+                <Form className="bg-white p-6 sm:p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Profile Picture Section */}
+                    <div className="md:col-span-2 flex items-center gap-6 bg-gray-50/50 p-6 rounded-[24px] border border-gray-100 mb-4">
                       {!cameraOpen ? (
-                        <div className="relative w-28 h-28 border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center bg-gray-100">
-                          {preview ? (
-                            <img
-                              src={preview}
-                              alt="Preview"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <span className="text-gray-400 text-sm">
-                              {t("profile.cameraPreview")}
-                            </span>
-                          )}
+                        <div className="relative group">
+                          <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg border-2 border-white bg-white">
+                            {preview ? (
+                              <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                <User className="w-10 h-10" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center gap-4">
-                          <video
-                            ref={videoRef}
-                            className="w-64 h-48 bg-black"
-                          />
+                        <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl">
+                          <video ref={videoRef} className="w-full h-full object-cover" />
                           <canvas ref={canvasRef} className="hidden" />
                           <button
                             type="button"
-                            className="inline-flex flex-1 justify-center rounded-lg bg-[#F5D446] py-2 px-3 text-sm font-semibold text-black shadow-sm hover:bg-[#F5D446bc] sm:ml-3 sm:w-auto"
+                            className="absolute bottom-4 left-4 bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg"
                             onClick={() => captureImage(setFieldValue)}
                           >
                             {t("profile.captureImage")}
@@ -274,144 +303,96 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                       )}
 
                       <div className="flex flex-col gap-3">
-                        <button
-                          type="button"
-                          className="flex items-center justify-center w-20 h-8 bg-gray-200 rounded-full hover:bg-gray-300"
-                          onClick={openCamera}
-                        >
-                          <img src={typeof camIcon === "string" ? camIcon : (camIcon?.src || "")} alt="camera" loading="lazy" decoding="async" />
-                        </button>
-                        <label className="flex items-center justify-center w-20 h-8 bg-gray-200 rounded-full hover:bg-gray-300 cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) =>
-                              handleImageChange(e, setFieldValue)
-                            }
-                            className="hidden"
-                          />
-                          <img src={typeof fileIcon === "string" ? fileIcon : (fileIcon?.src || "")} alt="upload" loading="lazy" decoding="async" />
-                        </label>
+                        <h4 className="font-bold text-gray-800 text-sm">{t("profile.profilePicture") || "الصورة الشخصية"}</h4>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-all text-gray-600 hover:text-primary"
+                            onClick={openCamera}
+                            title={t("profile.openCamera")}
+                          >
+                            <Camera className="w-5 h-5" />
+                          </button>
+                          <label className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-all text-gray-600 hover:text-primary cursor-pointer">
+                            <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, setFieldValue)} className="hidden" />
+                            <Upload className="w-5 h-5" />
+                          </label>
+                        </div>
                       </div>
                     </div>
-                    {/* {errors.image && touched.image && (
-                      <div className="text-red-500 text-xs">{errors.image}</div>
-                    )} */}
-
-                    {/* حقل الاسم */}
-                    <div className="w-full">
-                      <label
-                        htmlFor="name"
-                        className="text-[13px] font-normal text-gray-700 block mb-1 text-right"
-                      >
-                        {t("profile.fullName")}
-                      </label>
+                    {/* Full Name */}
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-bold text-gray-700">{t("profile.fullName")}</label>
                       <Field
-                        id="FullName"
                         name="FullName"
-                        type="text"
+                        className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all font-bold text-gray-800"
                         placeholder={t("profile.fullName")}
-                        className="block w-full px-3 py-3 border border-[#E8E8E8] rounded-lg shadow-sm focus:outline-none focus:ring-[#F5D446] focus:border-[#F5D446] text-xs"
                       />
-                      {errors.FullName && touched.FullName && (
-                        <div className="text-red-500 text-xs mt-1">
-                          {errors.FullName}
-                        </div>
-                      )}
+                      <ErrorMessage name="FullName" component="div" className="text-red-500 text-xs font-bold" />
                     </div>
 
-                    {/* حقل البريد الإلكتروني */}
-                    <div className="w-full">
-                      <label
-                        htmlFor="email"
-                        className="text-[13px] font-normal text-gray-700 block mb-1 text-right"
-                      >
-                        {t("profile.email")}
-                      </label>
+                    {/* Email */}
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-bold text-gray-700">{t("profile.email")}</label>
                       <Field
-                        id="email"
                         name="email"
                         type="email"
+                        className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all font-bold text-gray-800"
                         placeholder={t("profile.email")}
-                        className="block w-full px-3 py-3 border border-[#E8E8E8] rounded-lg shadow-sm focus:outline-none focus:ring-[#F5D446] focus:border-[#F5D446] text-xs"
                       />
-                      {errors.email && touched.email && (
-                        <div className="text-red-500 text-xs mt-1">
-                          {errors.email}
-                        </div>
-                      )}
+                      <ErrorMessage name="email" component="div" className="text-red-500 text-xs font-bold" />
                     </div>
 
-                    {/* حقل رقم الجوال */}
-                    <div className="w-full">
-                      <label
-                        htmlFor="phone"
-                        className="text-[13px] font-normal text-gray-700 block mb-1 text-right"
-                      >
-                        {t("profile.phone")}
-                      </label>
-                      <div className="relative" style={{ direction: "ltr" }}>
-                        <PhoneInput
-                          id="phone"
-                          name="phone"
-                          value={values.phoneNumber}
-                          country={"sa"} // الدولة الافتراضية (السعودية)
-                          onChange={(value) => setFieldValue("phone", value)}
-                          inputClass="!w-full !h-[42px] border border-[#E8E8E8] rounded-lg shadow-sm px-12 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5D446] focus:border-[#F5D446] bg-white"
-                          containerClass="relative w-full"
-                          dropdownClass="text-sm bg-white shadow-md border border-gray-200 rounded-lg"
-                        />
-                      </div>
-                      {errors.phone && touched.phone && (
-                        <div className="text-red-500 text-xs mt-1">
-                          {errors.phone}
-                        </div>
-                      )}
+                    {/* Phone */}
+                    <div className="space-y-1.5" style={{ direction: "ltr" }}>
+                      <label className="text-sm font-bold text-gray-700 block text-right">{t("profile.phone")}</label>
+                      <PhoneInput
+                        country={"sa"}
+                        value={values.phoneNumber}
+                        onChange={(val) => setFieldValue("phoneNumber", val)}
+                        inputStyle={{
+                          width: '100%',
+                          height: '52px',
+                          borderRadius: '1rem',
+                          backgroundColor: '#f9fafb',
+                          border: 'none',
+                          fontSize: '1rem',
+                          fontWeight: 'bold'
+                        }}
+                        containerStyle={{
+                          width: '100%',
+                        }}
+                      />
+                      <ErrorMessage name="phoneNumber" component="div" className="text-red-500 text-xs font-bold" />
                     </div>
 
-                    <div className="w-full">
-                      <label
-                        htmlFor="CommercialRegistrationNumber"
-                        className="text-[13px] font-normal text-gray-700 block mb-1 text-right"
-                      >
-                        {t("profile.crNumber")}
-                      </label>
+                    {/* CR Number */}
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-bold text-gray-700">{t("profile.crNumber")}</label>
                       <Field
-                        id="CommercialRegistrationNumber"
                         name="CommercialRegistrationNumber"
-                        type="text"
+                        className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl transition-all font-bold"
                         placeholder={t("profile.crNumber")}
-                        className="block w-full px-3 py-3 border border-[#E8E8E8] rounded-lg shadow-sm text-xs"
                       />
                     </div>
-                    <div className="w-full">
-                      <label
-                        htmlFor="CommercialRegistrationDate"
-                        className="text-[13px] font-normal text-gray-700 block mb-1 text-right"
-                      >
-                        {t("profile.crDate")}
-                      </label>
+
+                    {/* CR Date */}
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-bold text-gray-700">{t("profile.crDate")}</label>
                       <Field
-                        id="CommercialRegistrationDate"
                         name="CommercialRegistrationDate"
                         type="date"
-                        className="block w-full px-3 py-3 border border-[#E8E8E8] rounded-lg shadow-sm text-xs"
+                        className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl transition-all font-bold"
                       />
                     </div>
 
-                    {/* حقل العنوان */}
-                    <div className="w-full">
-                      <label
-                        htmlFor="address"
-                        className="text-[13px] font-normal text-gray-700 block mb-1 text-right"
-                      >
-                        {t("profile.address")}
-                      </label>
+                    {/* Address/City */}
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-bold text-gray-700">{t("profile.address")}</label>
                       <Field
                         as="select"
-                        id="address"
                         name="address"
-                        className="block w-full px-3 py-3 border border-[#E8E8E8] rounded-lg shadow-sm text-xs"
+                        className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl transition-all font-bold"
                       >
                         <option value="">{t("profile.selectCity")}</option>
                         {addresses?.map((city) => (
@@ -421,19 +402,15 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                         ))}
                       </Field>
                     </div>
+
+                    {/* Institution Type */}
                     {role !== "Admin" && (
-                      <div className="w-full">
-                        <label
-                          htmlFor="InstitutionTypeLookupId"
-                          className="text-[13px] font-normal text-gray-700 block mb-1 text-right"
-                        >
-                          {t("profile.institutionType")}
-                        </label>
+                      <div className="space-y-1.5 md:col-span-2">
+                        <label className="text-sm font-bold text-gray-700">{t("profile.institutionType")}</label>
                         <Field
                           as="select"
-                          id="InstitutionTypeLookupId"
                           name="InstitutionTypeLookupId"
-                          className="block w-full px-3 py-3 border border-[#E8E8E8] rounded-lg shadow-sm text-xs"
+                          className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl transition-all font-bold"
                         >
                           <option value="">{t("profile.selectType")}</option>
                           {types?.map((type) => (
@@ -442,72 +419,59 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                             </option>
                           ))}
                         </Field>
-                        {errors.InstitutionTypeLookupId &&
-                          touched.InstitutionTypeLookupId && (
-                            <div className="text-red-500 text-xs mt-1">
-                              {errors.InstitutionTypeLookupId}
-                            </div>
-                          )}
                       </div>
                     )}
 
                     <Field
                       type="hidden"
                       name="AttachmentsGroupKey"
-                      value={values.AttachmentsGroupKey}
                     />
                   </div>
-                  <div className="flex flex-col gap-4 mt-3">
+                  {/* Attachments Section */}
+                  <div className="md:col-span-2 mt-4">
+                    <label className="text-sm font-bold text-gray-700 mb-2 block">{t("profile.attachments")}</label>
                     <label
                       htmlFor="file-upload"
-                      className="flex flex-col items-center justify-center border-2 border-dashed border-[#ADADAD] rounded-xl px-4 py-10 cursor-pointer text-center text-[#808080] hover:border-primary transition"
+                      className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-[24px] px-6 py-10 cursor-pointer text-center hover:border-primary hover:bg-primary/5 transition-all group"
                     >
-                      <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt={t("profile.attachments")} loading="lazy" decoding="async" />
-                      <span className="text-sm font-normal">
+                      <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
+                        <Upload className="w-6 h-6 text-gray-400 group-hover:text-primary" />
+                      </div>
+                      <span className="text-sm font-bold text-gray-500 group-hover:text-primary">
                         {t("profile.attachments")}
                       </span>
-                      <input
-                        id="file-upload"
-                        name="attachment"
-                        type="file"
-                        onChange={handleFileChange}
-                        multiple
-                        className="hidden"
-                      />
+                      <input id="file-upload" type="file" onChange={handleFileChange} multiple className="hidden" />
                     </label>
-                    <ErrorMessage
-                      name="attachment"
-                      component="div"
-                      className="text-red-500 text-sm"
-                    />
+                    {selectedFiles && selectedFiles.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-gray-600">
+                        {Array.from(selectedFiles).map((file, index) => (
+                          <span key={index} className="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+                            {file.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  {selectedFiles && selectedFiles.length > 0 && (
-                    <ul className="mt-2 text-sm text-gray-700 list-disc pr-4 text-right">
-                      {Array.from(selectedFiles).map((file, index) => (
-                        <li key={index}>{file.name}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {/* أزرار التأكيد والعودة */}
-                  <div className="bg-gray-50 py-3 flex flex-row justify-center items-center gap-3">
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className={`inline-flex flex-1 justify-center rounded-lg bg-primary py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/80 sm:ml-3 sm:w-auto
-    ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
-                    >
-                      {isLoading ? (
-                        <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
-                      ) : (
-                        t("profile.confirm")
-                      )}
-                    </button>
+
+                  {/* Actions */}
+                  <div className="mt-10 flex flex-col-reverse sm:flex-row justify-end items-center gap-4 pt-6 border-t border-gray-50">
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="inline-flex flex-1 border-none outline-none justify-center rounded-lg bg-[#F3F6F5] py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                      className="w-full sm:w-auto px-8 py-3 rounded-2xl font-bold text-gray-500 hover:bg-gray-50 transition-colors"
                     >
                       {t("profile.cancel")}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-12 py-3.5 rounded-2xl font-black shadow-xl shadow-primary/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        t("profile.confirm")
+                      )}
                     </button>
                   </div>
                 </Form>

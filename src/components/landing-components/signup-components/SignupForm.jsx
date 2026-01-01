@@ -103,6 +103,8 @@ const SignupForm = () => {
     password: "",
     confirmPassword: "",
     agreeToTerms: false, // ✅ جديد
+    specialization: "", // ✅ جديد للمزود
+    bio: "", // ✅ جديد للمزود
   };
 
   const validationSchema = Yup.object({
@@ -157,6 +159,8 @@ const SignupForm = () => {
       [true],
       t("signupForm.validation.agreeRequired")
     ),
+    specialization: isProvider ? Yup.string().required(t("signupForm.validation.specializationRequired") || "التخصص مطلوب") : Yup.string().optional(),
+    bio: isProvider ? Yup.string().required(t("signupForm.validation.bioRequired") || "النبذة مطلوبة") : Yup.string().optional(),
   });
 
   const handleFileChange = (e) => {
@@ -178,6 +182,8 @@ const SignupForm = () => {
         regionId: values.region,
         commercialRecord: values.commercialRecord,
         commercialRegistrationDate: values.commercialRegistrationDate,
+        specialization: values.specialization || null,
+        bio: values.bio || null,
       };
 
       // 1) إنشاء المستخدم أولاً في Supabase Auth
@@ -476,28 +482,28 @@ const SignupForm = () => {
                 (isProvider && code === "company");
               if (!shouldShow) return null;
               return (
-            <div className="flex flex-col gap-4">
-              <label>
-                {t("signupForm.commercialRecord")}
-                <span className="text-red-500">*</span>
-              </label>
-              <Field
-                type="text"
-                name="commercialRecord"
-                placeholder={t("signupForm.commercialRecordPlaceholder")}
-                className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5"
-              />
-              <ErrorMessage
-                name="commercialRecord"
-                component="div"
-                className="text-red-500 text-sm"
-              />
-              {apiErrors?.CommercialRegistrationNumber && (
-                <div className="text-red-500 text-sm">
-                  {apiErrors.CommercialRegistrationNumber[0]}
+                <div className="flex flex-col gap-4">
+                  <label>
+                    {t("signupForm.commercialRecord")}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="commercialRecord"
+                    placeholder={t("signupForm.commercialRecordPlaceholder")}
+                    className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5"
+                  />
+                  <ErrorMessage
+                    name="commercialRecord"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                  {apiErrors?.CommercialRegistrationNumber && (
+                    <div className="text-red-500 text-sm">
+                      {apiErrors.CommercialRegistrationNumber[0]}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
               );
             })()}
             {(() => {
@@ -509,29 +515,68 @@ const SignupForm = () => {
                 (isProvider && code === "company");
               if (!shouldShow) return null;
               return (
-            <div className="flex flex-col gap-4">
-              <label>
-                {t("signupForm.commercialDate") || "تاريخ انتهاء السجل التجاري"}
-                <span className="text-red-500">*</span>
-              </label>
-              <Field
-                type="date"
-                name="commercialRegistrationDate"
-                className="w-full rounded-lg border border-[#ADADAD] py-3 px-5"
-              />
-              <ErrorMessage
-                name="commercialRegistrationDate"
-                component="div"
-                className="text-red-500 text-sm"
-              />
-              {apiErrors?.CommercialRegistrationDate && (
-                <div className="text-red-500 text-sm">
-                  {apiErrors.CommercialRegistrationDate[0]}
+                <div className="flex flex-col gap-4">
+                  <label>
+                    {t("signupForm.commercialDate") || "تاريخ انتهاء السجل التجاري"}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    type="date"
+                    name="commercialRegistrationDate"
+                    className="w-full rounded-lg border border-[#ADADAD] py-3 px-5"
+                  />
+                  <ErrorMessage
+                    name="commercialRegistrationDate"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                  {apiErrors?.CommercialRegistrationDate && (
+                    <div className="text-red-500 text-sm">
+                      {apiErrors.CommercialRegistrationDate[0]}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
               );
             })()}
+
+            {/* التخصص والنبذة لمزود الخدمة */}
+            {isProvider && (
+              <>
+                <div className="flex flex-col gap-4">
+                  <label>
+                    {t("signupForm.specialization")} <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="specialization"
+                    placeholder={t("signupForm.specializationPlaceholder")}
+                    className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5 placeholder:text-sm"
+                  />
+                  <ErrorMessage
+                    name="specialization"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <label>
+                    {t("signupForm.bio")} <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    as="textarea"
+                    name="bio"
+                    placeholder={t("signupForm.bioPlaceholder")}
+                    className="w-full rounded-lg border border-[#ADADAD] focus:border-[#4285F4] outline-none py-3 px-5 placeholder:text-sm min-h-[100px]"
+                  />
+                  <ErrorMessage
+                    name="bio"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+              </>
+            )}
 
             <div className="flex flex-col gap-4">
               <label>

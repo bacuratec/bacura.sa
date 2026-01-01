@@ -362,7 +362,9 @@
       "roleNotFound": "Failed to determine user role. Please try again.",
       "unknownRole": "Unknown user role. Redirecting to home.",
       "emailNotConfirmed": "Email not confirmed. Please check your inbox and verify your email.",
-      "unauthorized": "Unauthorized. Please check your credentials or try again later."
+      "unauthorized": "Unauthorized. Please check your credentials or try again later.",
+      "providerPending": "Your account is pending review by admin. You will receive an email once approved.",
+      "accountBlocked": "Your account has been suspended by admin. Please contact support."
     },
     "validation": {
       "invalidEmail": "Invalid email address",
@@ -508,8 +510,11 @@
   },
   "signup": {
     "title": "Create a new account at Bacura A'mal",
+    "titleProvider": "Join as a Success Partner (Service Provider)",
     "description1": "Create a new account to access our services, track your requests, and execute your projects.",
-    "description2": "We provide you with a secure and smooth experience to manage your services and execute your projects with confidence."
+    "descriptionProvider": "Contribute with us in executing high-quality projects and expand your business horizons.",
+    "description2": "We provide you with a secure and smooth experience to manage your services and execute your projects with confidence.",
+    "descriptionSecondaryProvider": "We provide you with an integrated platform to manage your offers and projects smoothly and professionally."
   },
   "signupForm": {
     "welcome": "Welcome to",
@@ -537,6 +542,10 @@
     "uploadProfilePicture": "Upload Profile Picture",
     "agreeToTerms": "I agree to the",
     "terms": "terms and conditions",
+    "specialization": "Specialization / Field of Work",
+    "specializationPlaceholder": "e.g., Camera Systems, Networking, Solar Energy...",
+    "bio": "Bio / Services Description",
+    "bioPlaceholder": "Briefly describe the services your entity provides...",
     "submitProvider": "Register as Provider",
     "submitRequester": "Register as Requester",
     "submitting": "Submitting...",
@@ -556,7 +565,9 @@
       "passwordShort": "Password is too short",
       "confirmPasswordRequired": "Confirm password is required",
       "confirmPasswordMismatch": "Passwords do not match",
-      "agreeRequired": "You must agree to the terms and conditions"
+      "agreeRequired": "You must agree to the terms and conditions",
+      "specializationRequired": "Specialization is required",
+      "bioRequired": "Bio is required"
     }
   },
   "signupForm.companyName": "Entity Name",
@@ -790,8 +801,26 @@
     "description": "Here you can find the ratings left by your clients"
   },
   "providers": {
+    "stats": {
+      "total": "Total Providers",
+      "pending": "Pending Review",
+      "active": "Active Accounts",
+      "blocked": "Blocked Accounts",
+      "suspended": "Suspended Accounts"
+    },
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "approve": "Approve",
+    "reject": "Reject",
+    "deleteSuccess": "Provider deleted successfully",
+    "deleteError": "Failed to delete provider",
+    "approveSuccess": "Account approved successfully",
+    "approveError": "Failed to approve account",
+    "rejectSuccess": "Account status updated",
     "pageTitle": "Service Providers Management",
-    "pageDescription": "Here you can find service providers capable of fulfilling requests based on their specialization"
+    "pageDescription": "Monitor and manage service provider accounts registered on the platform",
+    "empty": "No data to display"
   },
   "requestDetails": {
     "title": "Service Request Details",
@@ -808,12 +837,69 @@
     "waitingPayment": "Waiting for Payment"
   },
   "requesters": {
+    "stats": {
+      "total": "Total Requesters",
+      "active": "Active Accounts",
+      "blocked": "Blocked Accounts"
+    },
     "title": "Service Requesters Management",
-    "description": "Here you can find all service requesters"
+    "description": "Monitor and manage service requester accounts registered on the platform",
+    "deleteSuccess": "Account deleted successfully",
+    "deleteError": "Failed to delete account",
+    "blockSuccess": "Account blocked successfully",
+    "unblockSuccess": "Account unblocked successfully",
+    "statusUpdateError": "Failed to update account status"
   },
   "requests": {
+    "stats": {
+      "total": "Total Requests",
+      "new": "New Requests",
+      "processing": "Processing",
+      "priced": "Priced Requests",
+      "accepted": "Accepted Requests",
+      "rejected": "Rejected Requests",
+      "completed": "Completed Requests",
+      "waitingPayment": "Waiting for Payment"
+    },
     "title": "Manage Requests",
-    "description": "Here you can find the requests you have been nominated to handle based on your specialization"
+    "description": "Monitor and manage service requests submitted by seekers",
+    "deleteSuccess": "Request deleted successfully",
+    "deleteError": "Failed to delete request"
+  },
+  "requests.actions": {
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "empty": "No data to display"
+  },
+  "AdminPricingPanel": {
+    "title": "Request Pricing",
+    "price": "Price",
+    "enterPrice": "Enter price",
+    "notes": "Notes",
+    "enterNotes": "Enter notes",
+    "proposalUrl": "Proposal File URL",
+    "enterUrl": "Enter URL",
+    "save": "Save",
+    "cashPayment": "Cash Payment",
+    "markPaidDesc": "Mark request as paid when cash is received",
+    "markAsPaid": "Mark as Paid",
+    "priceType": "Invalid price",
+    "priceRequired": "Enter the price",
+    "urlInvalid": "Invalid URL"
+  },
+  "AdminAssignProvider": {
+    "title": "Assign Service Provider",
+    "providerLabel": "Provider",
+    "providerPlaceholder": "Select a provider",
+    "priceLabel": "Provider Price",
+    "pricePlaceholder": "Enter price (optional)",
+    "submit": "Assign",
+    "providerRequired": "Select a provider",
+    "priceType": "Invalid price",
+    "submitting": "Saving...",
+    "success": "Provider assigned successfully",
+    "error": "An error occurred while assigning the provider"
   },
   "servicesAdmin": {
     "title": "Manage Services",

@@ -16,7 +16,7 @@ export const projectsApi = createApi({
       }) => {
         const filters = {};
         if (OrderStatusLookupId) {
-          filters.order_status_id = OrderStatusLookupId;
+          filters.order_status_id = Number(OrderStatusLookupId);
         }
         if (OrderTitle) {
           filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };
@@ -52,7 +52,7 @@ export const projectsApi = createApi({
           filters.provider_id = providerId;
         }
         if (OrderStatusLookupId) {
-          filters.order_status_id = OrderStatusLookupId;
+          filters.order_status_id = Number(OrderStatusLookupId);
         }
         if (OrderTitle) {
           filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };
@@ -89,7 +89,7 @@ export const projectsApi = createApi({
           filters["request.requester_id"] = requesterId;
         }
         if (OrderStatusLookupId) {
-          filters.order_status_id = OrderStatusLookupId;
+          filters.order_status_id = Number(OrderStatusLookupId);
         }
         if (OrderTitle) {
           filters.order_title = { operator: "ilike", value: `%${OrderTitle}%` };

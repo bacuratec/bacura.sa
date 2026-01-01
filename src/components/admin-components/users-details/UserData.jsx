@@ -44,12 +44,10 @@ const UserData = ({ data, refetch }) => {
   const [toggleBlockUser, { isLoading }] = useToggleBlockUserMutation();
   const handleToggleBlock = async () => {
     try {
-      await toggleBlockUser(id).unwrap();
-      toast.success(
-        profileStatus?.id === 201
-          ? t("user.user_blocked_success")
-          : t("user.user_activated_success")
-      );
+      const userId = data?.user?.id;
+      const currentlyBlocked = !!data?.user?.is_blocked;
+      await toggleBlockUser({ userId, isBlocked: !currentlyBlocked }).unwrap();
+      toast.success(!currentlyBlocked ? (t("user.user_blocked_success")) : (t("user.user_activated_success")));
       refetch();
     } catch (error) {
       toast.error(
@@ -63,7 +61,7 @@ const UserData = ({ data, refetch }) => {
     <section className="py-5">
       <div className="rounded-2xl bg-white shadow-sm p-6 ">
         <div className="flex justify-between flex-col lg:flex-row gap-5">
-          <div className="shrink-0 w-[200px] profile h-[200px] bg-gray-500 rounded-xl col-span-1 overflow-hidden">
+          <div className="shrink-0 w-[200px] profile h-[200px] bg-gray-100 border border-gray-200 rounded-xl col-span-1 overflow-hidden">
             <img
               src={`${base}${data?.profilePictureUrl}`}
               alt=""
@@ -83,13 +81,13 @@ const UserData = ({ data, refetch }) => {
                 <span className="text-primary font-bold">
                   {t("user.email")}:
                 </span>
-                <span>{email}</span>
+                <span>{email || data?.user?.email || "-"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-primary font-bold">
                   {t("user.phone_number")}:
                 </span>
-                <span>{phoneNumber}</span>
+                <span>{phoneNumber || data?.user?.phone || "-"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-primary font-bold">
@@ -109,6 +107,14 @@ const UserData = ({ data, refetch }) => {
                 </span>
                 <span>{registrationDateFormatted}</span>
               </div>
+              {data?.user?.role && (
+                <div className="flex items-center gap-2">
+                  <span className="text-primary font-bold">
+                    {t("user.role") || "الدور"}:
+                  </span>
+                  <span>{data.user.role}</span>
+                </div>
+              )}
               {entityType?.nameAr ||
                 (entityType?.nameEn && (
                   <div className="flex items-center gap-2">
@@ -129,6 +135,16 @@ const UserData = ({ data, refetch }) => {
                     <span>{lang === "ar" ? city?.nameAr : city?.nameEn}</span>
                   </div>
                 ))}
+              {profileStatus?.nameAr || profileStatus?.nameEn ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-primary font-bold">
+                    {t("user.account_status") || "حالة الحساب"}:
+                  </span>
+                  <span>
+                    {lang === "ar" ? (profileStatus?.nameAr || "-") : (profileStatus?.nameEn || "-")}
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             {/* الأزرار */}
@@ -152,6 +168,12 @@ const UserData = ({ data, refetch }) => {
                   <img src={typeof active === "string" ? active : (active?.src || "")} alt="active" className="w-4 h-4" loading="lazy" decoding="async" />
                 </button>
               )}
+              <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-2xl px-4 py-2">
+                <span className="text-gray-700 text-sm">
+                  {t("user.user_id") || "معرّف المستخدم"}:
+                </span>
+                <span className="text-gray-500 text-xs">{data?.user?.id || "-"}</span>
+              </div>
             </div>
           </div>
         </div>

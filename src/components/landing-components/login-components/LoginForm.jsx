@@ -132,6 +132,24 @@ const LoginForm = () => {
       // Short delay to ensure session is ready
       await new Promise((resolve) => setTimeout(resolve, 50));
 
+      // 🔒 تحقق من الحظر العام للمستخدم
+      const { data: userData, error: userFetchError } = await supabase
+        .from("users")
+        .select("is_blocked")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (userFetchError) {
+        console.error("Error fetching user data:", userFetchError);
+      }
+
+      if (userData?.is_blocked) {
+        await supabase.auth.signOut();
+        toast.error(t("loginForm.errors.accountBlocked"), { duration: 6000 });
+        setLoading(false);
+        return;
+      }
+
       // Detect role
       const userRolePromise = detectUserRole(user, session);
       const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
@@ -191,6 +209,19 @@ const LoginForm = () => {
       if (normalizedRole === "admin") {
         router.replace("/admin");
       } else if (normalizedRole === "provider") {
+        // 🔒 تحقق من حالة مزود الخدمة (يجب أن يكون مقبولاً من الأدمن)
+        const { data: providerData, error: providerError } = await supabase
+          .from("providers")
+          .select("profile_status_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (providerError || !providerData || providerData.profile_status_id !== 201) {
+          await supabase.auth.signOut();
+          toast.error(t("loginForm.errors.providerPending"), { duration: 6000 });
+          setLoading(false);
+          return;
+        }
         router.replace("/provider");
       } else if (normalizedRole === "requester") {
         // Allow deep linking logic if 'from' is present and valid
@@ -224,12 +255,24 @@ const LoginForm = () => {
           </span>
         </h2>
         <div className="create text-center sm:text-end">
-          <h3 className="text-[#8D8D8D] text-xs">
+          <h3 className="text-[#8D8D8D] text-[10px] uppercase tracking-wider mb-1">
             {t("loginForm.noAccount")}
           </h3>
-          <Link className="text-xs text-primary" href={"/signup"}>
-            {t("loginForm.createAccount")}
-          </Link>
+          <div className="flex flex-col gap-1.5 items-center sm:items-end">
+            <Link
+              className="text-xs text-primary font-bold hover:underline py-1.5 px-3 rounded-lg hover:bg-primary/5 transition-all duration-200 border border-transparent hover:border-primary/20"
+              href={"/signup"}
+            >
+              {t("loginForm.createAccount")}
+            </Link>
+            <Link
+              className="text-[11px] text-gray-800 font-bold hover:underline py-1.5 px-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all duration-200 border border-gray-200 flex items-center gap-1.5 shadow-sm"
+              href={"/signup-provider"}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              {t("footer.joinAsProvider")}
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -254,8 +297,8 @@ const LoginForm = () => {
                 type="email"
                 placeholder={t("loginForm.email")}
                 className={`w-full rounded-lg border py-3 px-5 placeholder:text-sm placeholder:text-[#808080] placeholder:font-light outline-none ${touched.email && errors.email
-                    ? "border-red-500"
-                    : "border-[#ADADAD] focus:border-[#4285F4]"
+                  ? "border-red-500"
+                  : "border-[#ADADAD] focus:border-[#4285F4]"
                   }`}
               />
               <ErrorMessage
@@ -277,8 +320,8 @@ const LoginForm = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder={t("loginForm.password")}
                   className={`w-full rounded-lg border py-3 px-5 placeholder:text-sm placeholder:text-[#808080] placeholder:font-light outline-none pr-12 ${touched.password && errors.password
-                      ? "border-red-500"
-                      : "border-[#ADADAD] focus:border-[#4285F4]"
+                    ? "border-red-500"
+                    : "border-[#ADADAD] focus:border-[#4285F4]"
                     }`}
                 />
                 <button

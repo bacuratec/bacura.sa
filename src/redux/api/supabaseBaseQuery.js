@@ -20,20 +20,17 @@ export const supabaseBaseQuery = async (args) => {
 
   try {
     mcpLog("start", { table, method, id, filters: Object.keys(filters || {}), joins: (joins || []).length });
-    // Supabase يتعامل مع الجلسة تلقائياً
-    // لا نضيف قيود إضافية هنا لأن RLS policies في Supabase تتعامل مع الأمان
-    let result;
 
-    // التحقق من أن Supabase client موجود
     if (!supabase) {
       throw new Error("Supabase client is not initialized");
     }
 
-    // تحديد select string للاستخدام في الاستعلامات مع تنظيف المدخلات
+    let result;
     const baseSelect = typeof select === "string" && select.trim() ? select.trim() : "*";
     const safeJoins = Array.isArray(joins)
       ? joins.filter((j) => typeof j === "string" && j.trim().length > 0).map((j) => j.trim())
       : [];
+
     let selectString = baseSelect;
     if (safeJoins.length > 0) {
       selectString = `${baseSelect},${safeJoins.join(",")}`;
@@ -41,26 +38,12 @@ export const supabaseBaseQuery = async (args) => {
 
     switch (method) {
       case "GET": {
-        // نبني استعلام القراءة بشكل منفصل حتى لا نؤثر على عمليات الكتابة (insert / update)
         let query = supabase.from(table);
 
-        // Apply joins if needed (for related data)
         if (safeJoins.length > 0) {
-          // Supabase joins syntax: "foreign_table!inner(column1,column2)"
-          // بناء select string بشكل صحيح - Supabase يتطلب تنسيق محدد
-          let selectWithJoins;
-          if (baseSelect === "*") {
-            // إذا كان select = "*", نضيف joins بعدها مباشرة بدون فاصلة إضافية
-            selectWithJoins = `*,${safeJoins.join(",")}`;
-          } else {
-            // إذا كان select محدد، نضيف joins بعد الحقول المحددة
-            selectWithJoins = `${baseSelect},${safeJoins.join(",")}`;
-          }
-          
-          // استخدام select بدون options إضافية لتجنب مشاكل 406
-          query = query.select(selectWithJoins);
+          query = query.select(selectString, { count: "exact" });
         } else {
-          query = query.select(baseSelect);
+          query = query.select(baseSelect, { count: "exact" });
         }
 
         // Apply filters
@@ -69,28 +52,14 @@ export const supabaseBaseQuery = async (args) => {
             if (Array.isArray(value)) {
               query = query.in(key, value);
             } else if (typeof value === "object" && value.operator) {
-              // Support for operators like gt, lt, gte, lte, like, ilike
               switch (value.operator) {
-                case "gt":
-                  query = query.gt(key, value.value);
-                  break;
-                case "lt":
-                  query = query.lt(key, value.value);
-                  break;
-                case "gte":
-                  query = query.gte(key, value.value);
-                  break;
-                case "lte":
-                  query = query.lte(key, value.value);
-                  break;
-                case "like":
-                  query = query.like(key, value.value);
-                  break;
-                case "ilike":
-                  query = query.ilike(key, value.value);
-                  break;
-                default:
-                  query = query.eq(key, value.value);
+                case "gt": query = query.gt(key, value.value); break;
+                case "lt": query = query.lt(key, value.value); break;
+                case "gte": query = query.gte(key, value.value); break;
+                case "lte": query = query.lte(key, value.value); break;
+                case "like": query = query.like(key, value.value); break;
+                case "ilike": query = query.ilike(key, value.value); break;
+                default: query = query.eq(key, value.value);
               }
             } else {
               query = query.eq(key, value);
@@ -113,7 +82,6 @@ export const supabaseBaseQuery = async (args) => {
         }
 
         if (id) {
-          // استخدم maybeSingle لتفادي أخطاء no rows (PGRST116) وتحسين التوافق
           result = await query.eq("id", id).maybeSingle();
         } else {
           result = await query;
@@ -121,7 +89,6 @@ export const supabaseBaseQuery = async (args) => {
         break;
       }
       case "POST":
-        // في Supabase، نستخدم from(table).insert() مباشرة بدون select مسبق
         result = await supabase
           .from(table)
           .insert(body)
@@ -131,8 +98,6 @@ export const supabaseBaseQuery = async (args) => {
       case "PUT":
       case "PATCH": {
         let updateQuery = supabase.from(table).update(body);
-        
-        // Apply custom filters for update if provided
         if (filters && Object.keys(filters).length > 0) {
           Object.entries(filters).forEach(([key, value]) => {
             if (value !== undefined && value !== null) {
@@ -144,13 +109,11 @@ export const supabaseBaseQuery = async (args) => {
             }
           });
         } else if (id) {
-          // Default to ID if no filters
           updateQuery = updateQuery.eq("id", id);
         } else {
           throw new Error("Missing id or filters for update operation");
         }
 
-        // Only select single if we expect a single result (e.g. by ID)
         if (id || (filters && !Object.values(filters).some(Array.isArray))) {
           result = await updateQuery.select(selectString).single();
         } else {
@@ -160,9 +123,8 @@ export const supabaseBaseQuery = async (args) => {
       }
       case "DELETE": {
         let deleteQuery = supabase.from(table).delete();
-        
         if (filters && Object.keys(filters).length > 0) {
-           Object.entries(filters).forEach(([key, value]) => {
+          Object.entries(filters).forEach(([key, value]) => {
             if (value !== undefined && value !== null) {
               if (Array.isArray(value)) {
                 deleteQuery = deleteQuery.in(key, value);
@@ -174,9 +136,8 @@ export const supabaseBaseQuery = async (args) => {
         } else if (id) {
           deleteQuery = deleteQuery.eq("id", id);
         } else {
-           throw new Error("Missing id or filters for delete operation");
+          throw new Error("Missing id or filters for delete operation");
         }
-        
         result = await deleteQuery;
         break;
       }
@@ -186,77 +147,14 @@ export const supabaseBaseQuery = async (args) => {
 
     if (result.error) {
       mcpLog("end", { ok: false, table, method, code: result.error.code, status: result.error.status });
-      // معالجة أخطاء Supabase بشكل أفضل
-      const errorMessage =
-        result.error.message || "حدث خطأ أثناء تنفيذ العملية";
-      
-      // إذا كان الخطأ 406، قد يكون بسبب مشكلة في الـ headers أو الـ session أو الـ select query
+      const errorMessage = result.error.message || "حدث خطأ أثناء تنفيذ العملية";
+
       if (result.error.code === "PGRST116" || result.error.status === 406 || result.error.code === "PGRST301") {
-        mcpLog("error", { table, selectString, joins, code: result.error.code, status: result.error.status });
-        
-        // محاولة إعادة المحاولة بدون joins إذا فشلت
-        if (safeJoins.length > 0 && method === "GET") {
-          try {
-            const simpleQuery = supabase.from(table).select(baseSelect === "*" ? "*" : baseSelect);
-            
-            // تطبيق الفلاتر
-            Object.entries(filters).forEach(([key, value]) => {
-              if (value !== undefined && value !== null && value !== "") {
-                if (Array.isArray(value)) {
-                  simpleQuery.in(key, value);
-                } else if (typeof value === "object" && value.operator) {
-                  switch (value.operator) {
-                    case "gt": simpleQuery.gt(key, value.value); break;
-                    case "lt": simpleQuery.lt(key, value.value); break;
-                    case "gte": simpleQuery.gte(key, value.value); break;
-                    case "lte": simpleQuery.lte(key, value.value); break;
-                    case "like": simpleQuery.like(key, value.value); break;
-                    case "ilike": simpleQuery.ilike(key, value.value); break;
-                    default: simpleQuery.eq(key, value.value);
-                  }
-                } else {
-                  simpleQuery.eq(key, value);
-                }
-              }
-            });
-            
-            if (id) {
-              const simpleResult = await simpleQuery.eq("id", id).maybeSingle();
-              if (!simpleResult.error) {
-                mcpLog("retry-no-joins", { table, method, ok: true });
-                return { data: simpleResult.data };
-              }
-            } else {
-              // تطبيق pagination
-              if (pagination.page && pagination.pageSize) {
-                const from = (pagination.page - 1) * pagination.pageSize;
-                const to = from + pagination.pageSize - 1;
-                simpleQuery.range(from, to);
-              }
-              
-              // تطبيق ordering
-              if (orderBy.column) {
-                simpleQuery.order(orderBy.column, {
-                  ascending: orderBy.ascending !== false,
-                });
-              }
-              
-              const simpleResult = await simpleQuery;
-              if (!simpleResult.error) {
-                mcpLog("retry-no-joins", { table, method, ok: true });
-                return { data: simpleResult.data };
-              }
-            }
-          } catch (retryError) {
-            mcpLog("retry-error", { table, method, error: String(retryError?.message || retryError) });
-          }
-        }
-        
         return {
           error: {
             status: "NOT_ACCEPTABLE",
             data: result.error,
-            message: "خطأ في تنسيق الطلب (406). قد تكون هناك مشكلة في الصلاحيات (RLS) أو في تنسيق الاستعلام. تحقق من RLS policies في Supabase.",
+            message: "خطأ في تنسيق الطلب (406). قد تكون هناك مشكلة في الصلاحيات (RLS) أو في تنسيق الاستعلام.",
           },
         };
       }
@@ -271,24 +169,18 @@ export const supabaseBaseQuery = async (args) => {
     }
 
     mcpLog("end", { ok: true, table, method });
-    return { data: result.data };
-  } catch (error) {
-    // معالجة الأخطاء العامة
-    const errorMessage =
-      error?.message || error?.toString() || "حدث خطأ غير متوقع";
-    
-    // إذا كان الخطأ يتعلق بـ undefined.match، فهذا يعني مشكلة في Supabase client
-    if (errorMessage.includes("match") || errorMessage.includes("undefined") || error?.message?.includes("match")) {
-      mcpLog("client-error", { error: String(errorMessage) });
+    const hasPagination = !!(pagination && pagination.page && pagination.pageSize);
+    if (hasPagination) {
       return {
-        error: {
-          status: "CLIENT_ERROR",
-          data: error,
-          message: "خطأ في إعدادات الاتصال. يرجى التحقق من إعدادات Supabase وتحديث الصفحة",
+        data: {
+          data: result.data,
+          count: result.count ?? (Array.isArray(result.data) ? result.data.length : 0),
         },
       };
     }
-
+    return { data: result.data };
+  } catch (error) {
+    const errorMessage = error?.message || error?.toString() || "حدث خطأ غير متوقع";
     mcpLog("end", { ok: false, table, method, error: String(errorMessage) });
     return {
       error: {
@@ -299,4 +191,3 @@ export const supabaseBaseQuery = async (args) => {
     };
   }
 };
-

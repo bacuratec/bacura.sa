@@ -19,9 +19,9 @@ export const providersApi = createApi({
           filters.name = { operator: "ilike", value: `%${name}%` };
         }
         if (AccountStatus) {
-          filters.profile_status_id = AccountStatus;
+          filters.profile_status_id = Number(AccountStatus);
         }
-        
+
         return {
           table: "providers",
           method: "GET",
@@ -32,9 +32,9 @@ export const providersApi = createApi({
           },
           joins: [
             "user:users!providers_user_id_fkey(id,email,phone,role,is_blocked)",
-            "entityType:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
+            "entity_type:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
             "city:cities(id,name_ar,name_en)",
-            "profileStatus:lookup_values!providers_profile_status_id_fkey(id,name_ar,name_en,code)",
+            "profile_status:lookup_values!providers_profile_status_id_fkey(id,name_ar,name_en,code)",
           ],
         };
       },
@@ -49,13 +49,26 @@ export const providersApi = createApi({
       }),
       invalidatesTags: ["Providers"],
     }),
+    // Update Provider Account Status (profile_status_id)
+    updateProviderAccountStatus: builder.mutation({
+      query: ({ providerId, statusId }) => ({
+        table: "providers",
+        method: "PUT",
+        id: providerId,
+        body: {
+          profile_status_id: statusId,
+          updated_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Providers"],
+    }),
     // Update Provider Status (Block/Unblock User)
     updateProviderStatus: builder.mutation({
       query: ({ body }) => {
         // Update users table
         return {
           table: "users",
-        method: "PUT",
+          method: "PUT",
           id: body.userId, // Should be passed from component
           body: {
             is_blocked: body.isBlocked,
@@ -73,4 +86,5 @@ export const {
   useLazyGetProvidersAccountsQuery,
   useDeleteProviderMutation,
   useUpdateProviderStatusMutation,
+  useUpdateProviderAccountStatusMutation,
 } = providersApi;
