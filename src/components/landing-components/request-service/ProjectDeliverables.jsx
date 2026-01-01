@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGetDeliverablesQuery, useUpdateDeliverableStatusMutation } from "@/redux/api/ordersApi";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import toast from "react-hot-toast";
 
 const ProjectDeliverables = ({ orderId, isProvider = false }) => {
@@ -56,7 +56,7 @@ const ProjectDeliverables = ({ orderId, isProvider = false }) => {
                                 {item.description && <p className="text-sm text-gray-600 mb-2">{item.description}</p>}
 
                                 <div className="flex items-center gap-3 text-xs text-gray-500">
-                                    <span>{format(new Date(item.created_at), "yyyy-MM-dd HH:mm")}</span>
+                                    <span>{dayjs(item.created_at).format("YYYY-MM-DD HH:mm")}</span>
                                     {item.delivery_file_url && (
                                         <a
                                             href={item.delivery_file_url}

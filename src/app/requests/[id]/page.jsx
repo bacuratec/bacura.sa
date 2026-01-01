@@ -58,7 +58,7 @@ export default async function RequestDetailsPage({ params }) {
       .from('requests')
       .select(`
         *,
-        requester:requesters!requests_requester_id_fkey(id,name,full_name),
+        requester:requesters!requests_requester_id_fkey(id,name),
         service:services(id,name_ar,name_en,description,base_price),
         status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code),
         city:cities(id,name_ar,name_en)

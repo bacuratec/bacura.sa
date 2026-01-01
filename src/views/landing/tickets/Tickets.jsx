@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useGetTicketsQuery } from "../../../redux/api/ticketApi";
 import LoadingPage from "../../LoadingPage";
 const logo = "/vite.png";
@@ -6,9 +6,12 @@ import OptimizedImage from "@/components/shared/OptimizedImage";
 import TicketModal from "../../../components/landing-components/profile-components/TicketModal";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import dayjs from "dayjs";
+import { LanguageContext } from "@/context/LanguageContext";
 
 const Tickets = () => {
   const role = useSelector((state) => state.auth.role);
+  const { lang } = useContext(LanguageContext);
 
   const { t } = useTranslation();
   useEffect(() => {

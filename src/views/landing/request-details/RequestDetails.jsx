@@ -27,7 +27,7 @@ const RequestDetails = ({ initialData, id }) => {
     data: requestData,
     refetch: refetchRequesterDetails,
     isLoading: loadingRequester,
-  } = useGetRequestDetailsQuery(requestId); // Removed skip to allow updates/invalidation
+  } = useGetRequestDetailsQuery(requestId, { skip: !!initialData || !requestId });
 
   const { data: orderData } = useGetOrderByRequestQuery(requestId);
 
@@ -59,10 +59,6 @@ const RequestDetails = ({ initialData, id }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  if (loadingRequester && !adminData) {
-    return <DetailPageSkeleton />;
-  }
-
   useEffect(() => {
     const fetchAdmin = async () => {
       if (data || !requestId) return;
@@ -78,6 +74,10 @@ const RequestDetails = ({ initialData, id }) => {
     };
     fetchAdmin();
   }, [data, requestId]);
+  if (loadingRequester && !adminData) {
+    return <DetailPageSkeleton />;
+  }
+
   if (!data) {
     return <UnavailableDetails id={requestId} />;
   }

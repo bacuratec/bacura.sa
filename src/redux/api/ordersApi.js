@@ -107,15 +107,30 @@ export const ordersApi = createApi({
         table: "requests",
         method: "GET",
         id,
-        joins: [
+          joins: [
           "requester:requesters!requests_requester_id_fkey(id,name)",
           "service:services(id,name_ar,name_en,base_price)",
           "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
-          "provider:providers!requests_provider_id_fkey(id,name)",
         ],
       }),
       providesTags: ["Requests"],
+    }),
+    // Get Order by Request ID
+    getOrderByRequest: builder.query({
+      query: (requestId) => ({
+        table: "orders",
+        method: "GET",
+        filters: { request_id: requestId },
+        pagination: { page: 1, pageSize: 1 },
+        orderBy: { column: "created_at", ascending: false },
+        joins: [
+          "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
+          "provider:providers(id,name)",
+        ],
+      }),
+      transformResponse: (data) => Array.isArray(data) ? data[0] : data,
+      providesTags: ["Orders"],
     }),
     // Admin set price and notes for request (new fields)
     adminSetRequestPrice: builder.mutation({
@@ -236,16 +251,6 @@ export const ordersApi = createApi({
       }),
       invalidatesTags: ["Requests"],
     }),
-    // Get Order by Request ID
-    getOrderByRequest: builder.query({
-      query: (requestId) => ({
-        table: "orders",
-        method: "GET",
-        filters: { request_id: requestId },
-        single: true
-      }),
-      providesTags: ["Orders"],
-    }),
     // Project messages
     getProjectMessages: builder.query({
       query: ({ orderId, PageNumber = 1, PageSize = 20 }) => ({
@@ -337,6 +342,7 @@ export const {
   useGetOrdersQuery,
   useGetUserOrdersQuery,
   useGetRequestDetailsQuery,
+  useGetOrderByRequestQuery,
   useAdminSetRequestPriceMutation,
   useRequesterRespondPriceMutation,
   useAdminRequestPriceMutation,
@@ -351,5 +357,4 @@ export const {
   useAddDeliverableMutation,
   useUpdateDeliverableStatusMutation,
   useDeleteRequestMutation,
-  useGetOrderByRequestQuery,
 } = ordersApi;
