@@ -796,7 +796,16 @@
   "requestDetails": {
     "title": "Service Request Details",
     "nav1": "Requests Management",
-    "nav2": "Request Details"
+    "nav2": "Request Details",
+    "adminOffer": "Admin Offer",
+    "adminPrice": "Proposed Price",
+    "downloadProposal": "Download Proposal File",
+    "priceProposal": "Proposed Price Offer",
+    "priceProposalDesc": "Please review the proposed price from admin to proceed",
+    "youRejected": "You have rejected the proposed price",
+    "reason": "Reason",
+    "priceAccepted": "Price Accepted",
+    "waitingPayment": "Waiting for Payment"
   },
   "requesters": {
     "title": "Service Requesters Management",

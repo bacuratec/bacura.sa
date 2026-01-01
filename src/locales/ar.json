@@ -855,7 +855,16 @@
   "requestDetails": {
     "title": "تفاصيل طلب الخدمة",
     "nav1": "إدارة الطلبات",
-    "nav2": "تفاصيل الطلب"
+    "nav2": "تفاصيل الطلب",
+    "adminOffer": "عرض الإدارة",
+    "adminPrice": "السعر المقترح",
+    "downloadProposal": "تحميل ملف العرض",
+    "priceProposal": "عرض السعر المقدم",
+    "priceProposalDesc": "يرجى مراجعة السعر المقترح من الإدارة للمتابعة",
+    "youRejected": "لقد قمت برفض السعر المقترح",
+    "reason": "السبب",
+    "priceAccepted": "تم قبول السعر",
+    "waitingPayment": "بانتظار الدفع"
   },
   "requesters": {
     "title": "إدارة طالبي الخدمة",
