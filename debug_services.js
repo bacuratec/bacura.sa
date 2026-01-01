@@ -24,22 +24,22 @@ const PLATFORM_SERVICES = [
 ];
 
 async function debug() {
-    try {
-        const { data: services, error } = await supabase
-            .from('services')
-            .select('id, name_ar, name_en, base_price');
+  try {
+    const { data: services, error } = await supabase
+      .from('services')
+      .select('id, name_ar, name_en, base_price');
 
-        if (error) {
-            console.error('Error:', error);
-        } else {
-            const outPath = path.join(__dirname, 'services_dump.json');
-            fs.writeFileSync(outPath, JSON.stringify(services || [], null, 2), 'utf-8');
-            console.log(`Wrote ${Array.isArray(services) ? services.length : 0} rows to services_dump.json`);
-        }
-
-    } catch (e) {
-        console.error('CRITICAL ERROR:', e);
+    if (error) {
+      console.error('Error:', error);
+    } else {
+      const outPath = path.join(__dirname, 'services_dump.json');
+      fs.writeFileSync(outPath, JSON.stringify(services || [], null, 2), 'utf-8');
+      console.log(`Wrote ${Array.isArray(services) ? services.length : 0} rows to services_dump.json`);
     }
+
+  } catch (e) {
+    console.error('CRITICAL ERROR:', e);
+  }
 }
 
 async function reset() {
