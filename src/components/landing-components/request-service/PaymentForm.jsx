@@ -55,9 +55,11 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
         const dbPayment = await createPayment({
           amount,
           currency: "sar",
-          consultationId,
+          requestId: consultationId,
           stripePaymentIntentId: intentId,
           status: "pending",
+          paymentMethod: "stripe",
+          paymentStatus: "pending",
         }).unwrap();
         
         if (dbPayment?.data?.id) {
@@ -84,7 +86,7 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
   }, [amount, consultationId, createPayment, t]);
 
   if (fallback) {
-    return <MoyasarInlineForm amount={amount} orderId={consultationId} />;
+    return <MoyasarInlineForm amount={amount} requestId={consultationId} />;
   }
 
   const appearance = { theme: "stripe" };

@@ -112,9 +112,41 @@ export const ordersApi = createApi({
           "service:services(id,name_ar,name_en,base_price)",
           "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
+          "provider:providers!requests_provider_id_fkey(id,name)",
         ],
       }),
       providesTags: ["Requests"],
+    }),
+    // Admin set price and notes for request (new fields)
+    adminSetRequestPrice: builder.mutation({
+      query: (body) => ({
+        table: "requests",
+        method: "PUT",
+        id: body.requestId,
+        body: {
+          admin_price: body.adminPrice,
+          admin_notes: body.adminNotes || null,
+          admin_proposal_file_url: body.adminProposalFileUrl || null,
+          updated_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Requests"],
+    }),
+    // Requester respond to price (accept/reject)
+    requesterRespondPrice: builder.mutation({
+      query: (body) => ({
+        table: "requests",
+        method: "PUT",
+        id: body.requestId,
+        body: {
+          requester_accepted_price: !!body.accepted,
+          requester_response_date: new Date().toISOString(),
+          requester_rejection_reason: body.rejectionReason || null,
+          status_id: body.statusId,
+          updated_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Requests"],
     }),
     // Admin Request Pricing Action
     AdminRequestPrice: builder.mutation({
@@ -176,6 +208,21 @@ export const ordersApi = createApi({
       },
       invalidatesTags: ["Orders", "Requests"],
     }),
+    // Assign provider fields directly on request
+    assignProviderToRequest: builder.mutation({
+      query: ({ requestId, providerId, providerPrice }) => ({
+        table: "requests",
+        method: "PUT",
+        id: requestId,
+        body: {
+          provider_id: providerId,
+          provider_price: providerPrice ?? null,
+          provider_assigned_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Requests"],
+    }),
     // Admin Complete Request
     AdminCompleteRequest: builder.mutation({
       query: (body) => ({
@@ -188,6 +235,89 @@ export const ordersApi = createApi({
         },
       }),
       invalidatesTags: ["Requests"],
+    }),
+    // Get Order by Request ID
+    getOrderByRequest: builder.query({
+      query: (requestId) => ({
+        table: "orders",
+        method: "GET",
+        filters: { request_id: requestId },
+        single: true
+      }),
+      providesTags: ["Orders"],
+    }),
+    // Project messages
+    getProjectMessages: builder.query({
+      query: ({ orderId, PageNumber = 1, PageSize = 20 }) => ({
+        table: "project_messages",
+        method: "GET",
+        filters: { order_id: orderId },
+        pagination: { page: Number(PageNumber), pageSize: Number(PageSize) },
+        orderBy: { column: "created_at", ascending: false },
+        joins: ["sender:users(id,full_name,name)"],
+      }),
+      providesTags: ["Orders"],
+    }),
+    addProjectMessage: builder.mutation({
+      query: ({ orderId, senderId, message, attachmentUrl }) => ({
+        table: "project_messages",
+        method: "POST",
+        body: {
+          order_id: orderId,
+          sender_id: senderId,
+          message,
+          attachment_url: attachmentUrl || null,
+          is_read: false,
+        },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    markProjectMessagesRead: builder.mutation({
+      query: ({ orderId, senderId }) => ({
+        table: "project_messages",
+        method: "PUT",
+        filters: { order_id: orderId, sender_id: senderId },
+        body: { is_read: true },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    // Deliverables
+    getDeliverables: builder.query({
+      query: ({ orderId }) => ({
+        table: "project_deliverables",
+        method: "GET",
+        filters: { order_id: orderId },
+        orderBy: { column: "created_at", ascending: false },
+      }),
+      providesTags: ["Orders"],
+    }),
+    addDeliverable: builder.mutation({
+      query: ({ orderId, providerId, title, description, deliveryFileUrl }) => ({
+        table: "project_deliverables",
+        method: "POST",
+        body: {
+          order_id: orderId,
+          provider_id: providerId,
+          title,
+          description: description || null,
+          delivery_file_url: deliveryFileUrl || null,
+          status: "pending",
+        },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    updateDeliverableStatus: builder.mutation({
+      query: ({ deliverableId, status, requesterResponse }) => ({
+        table: "project_deliverables",
+        method: "PUT",
+        id: deliverableId,
+        body: {
+          status,
+          requester_response: requesterResponse || null,
+          responded_at: new Date().toISOString(),
+        },
+      }),
+      invalidatesTags: ["Orders"],
     }),
     // Delete Request
     deleteRequest: builder.mutation({
@@ -207,9 +337,19 @@ export const {
   useGetOrdersQuery,
   useGetUserOrdersQuery,
   useGetRequestDetailsQuery,
+  useAdminSetRequestPriceMutation,
+  useRequesterRespondPriceMutation,
   useAdminRequestPriceMutation,
   useRequesterActionMutation,
   useAdminCompleteRequestMutation,
   useReassignRequestFnMutation,
+  useAssignProviderToRequestMutation,
+  useGetProjectMessagesQuery,
+  useAddProjectMessageMutation,
+  useMarkProjectMessagesReadMutation,
+  useGetDeliverablesQuery,
+  useAddDeliverableMutation,
+  useUpdateDeliverableStatusMutation,
   useDeleteRequestMutation,
+  useGetOrderByRequestQuery,
 } = ordersApi;

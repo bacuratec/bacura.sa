@@ -7,6 +7,15 @@ import {
   useGetProjectDetailsQuery,
   useProviderProjectStateMutation,
 } from "../../../redux/api/projectsApi";
+import {
+  useGetProjectMessagesQuery,
+  useAddProjectMessageMutation,
+} from "../../../redux/api/ordersApi";
+import {
+  useGetDeliverablesQuery,
+  useAddDeliverableMutation,
+} from "../../../redux/api/ordersApi";
+import { useSelector } from "react-redux";
 import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";
 import ProjectDescription from "../../../components/admin-components/projects/ProjectDescription";
@@ -19,6 +28,7 @@ import { LanguageContext } from "@/context/LanguageContext";
 const ProviderProjectsDetails = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
+  const userId = useSelector((state) => state?.auth?.userId);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -32,6 +42,12 @@ const ProviderProjectsDetails = () => {
     isLoading: loadingProject,
     refetch,
   } = useGetProjectDetailsQuery({ id, params: { IsRejected, IsExpired } });
+  const { data: messagesData, refetch: refetchMessages } = useGetProjectMessagesQuery({ orderId: id, PageNumber: 1, PageSize: 50 });
+  const [addMessage] = useAddProjectMessageMutation();
+  const { data: deliverablesData, refetch: refetchDeliverables } = useGetDeliverablesQuery({ orderId: id });
+  const [addDeliverable] = useAddDeliverableMutation();
+  const [newMessage, setNewMessage] = useState("");
+  const [newDeliverable, setNewDeliverable] = useState({ title: "", description: "", url: "" });
 
   const startISO = projectData?.assignTime; // اختار اللي يناسبك
 
@@ -118,6 +134,94 @@ const ProviderProjectsDetails = () => {
             attachments={projectData?.orderAttachments}
           />
         )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h3 className="text-sm font-bold mb-3">{t("providerProjectsDetails.messages") || "الرسائل"}</h3>
+            <div className="space-y-2 max-h-64 overflow-auto">
+              {(messagesData || []).map((m) => (
+                <div key={m.id} className="text-xs border-b pb-2">
+                  <div className="font-semibold">{m.sender?.full_name || m.sender?.name || m.sender_id}</div>
+                  <div>{m.message}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                className="input flex-1"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder={t("providerProjectsDetails.writeMessage") || "اكتب رسالة"}
+              />
+              <button
+                className="btn btn-primary"
+                onClick={async () => {
+                  if (!newMessage.trim()) return;
+                  await addMessage({ orderId: id, senderId: userId, message: newMessage }).unwrap();
+                  setNewMessage("");
+                  refetchMessages();
+                }}
+              >
+                {t("common.send") || "إرسال"}
+              </button>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h3 className="text-sm font-bold mb-3">{t("providerProjectsDetails.deliverables") || "التسليمات"}</h3>
+            <div className="space-y-2 max-h-64 overflow-auto">
+              {(deliverablesData || []).map((d) => (
+                <div key={d.id} className="text-xs border-b pb-2">
+                  <div className="font-semibold">{d.title}</div>
+                  <div className="text-gray-600">{d.description}</div>
+                  {d.delivery_file_url && (
+                    <a className="text-primary underline" href={d.delivery_file_url} target="_blank" rel="noopener noreferrer">
+                      {t("providerProjectsDetails.download") || "تحميل"}
+                    </a>
+                  )}
+                  <div className="mt-1">{t("providerProjectsDetails.status") || "الحالة"}: {d.status}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 grid grid-cols-1 gap-2">
+              <input
+                className="input"
+                value={newDeliverable.title}
+                onChange={(e) => setNewDeliverable({ ...newDeliverable, title: e.target.value })}
+                placeholder={t("providerProjectsDetails.deliverableTitle") || "عنوان التسليم"}
+              />
+              <input
+                className="input"
+                value={newDeliverable.description}
+                onChange={(e) => setNewDeliverable({ ...newDeliverable, description: e.target.value })}
+                placeholder={t("providerProjectsDetails.deliverableDesc") || "وصف"}
+              />
+              <input
+                className="input"
+                value={newDeliverable.url}
+                onChange={(e) => setNewDeliverable({ ...newDeliverable, url: e.target.value })}
+                placeholder={t("providerProjectsDetails.deliverableUrl") || "رابط ملف"}
+              />
+              <div className="flex justify-end">
+                <button
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    if (!newDeliverable.title.trim()) return;
+                    await addDeliverable({
+                      orderId: id,
+                      providerId: projectData?.provider?.id,
+                      title: newDeliverable.title,
+                      description: newDeliverable.description,
+                      deliveryFileUrl: newDeliverable.url,
+                    }).unwrap();
+                    setNewDeliverable({ title: "", description: "", url: "" });
+                    refetchDeliverables();
+                  }}
+                >
+                  {t("providerProjectsDetails.addDeliverable") || "إضافة تسليم"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         {/* <AttachmentsTable
           title={"المرفقات الخاصة بطالب الخدمة"}
           attachments={projectData?.requestAttachments}

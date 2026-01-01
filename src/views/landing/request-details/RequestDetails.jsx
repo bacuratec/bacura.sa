@@ -4,13 +4,14 @@ import RequestDetailsInfo from "../../../components/admin-components/requests/Re
 import { useRouter } from "next/navigation";
 import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";
-import { useGetRequestDetailsQuery } from "../../../redux/api/ordersApi";
+import { useGetRequestDetailsQuery, useRequesterRespondPriceMutation, useGetOrderByRequestQuery } from "../../../redux/api/ordersApi";
 import RequesterAttachmentForm from "../../../components/request-service-forms/RequesterAttachmentForm";
 import RequestAttachment from "../../../components/request-service-forms/RequestAttachment";
 import RequestStatusStepper from "../../../components/landing-components/request-service/RequestStatusStepper";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import PaymentForm from "../../../components/landing-components/request-service/PaymentForm";
+import ProjectDeliverables from "../../../components/landing-components/request-service/ProjectDeliverables";
 
 import { DetailPageSkeleton } from "../../../components/shared/skeletons/PageSkeleton";
 
@@ -26,24 +27,32 @@ const RequestDetails = ({ initialData, id }) => {
     data: requestData,
     refetch: refetchRequesterDetails,
     isLoading: loadingRequester,
-  } = useGetRequestDetailsQuery(requestId, { skip: !!initialData || !requestId });
+  } = useGetRequestDetailsQuery(requestId); // Removed skip to allow updates/invalidation
+
+  const { data: orderData } = useGetOrderByRequestQuery(requestId);
+
+  const [respondPrice] = useRequesterRespondPriceMutation();
   const [adminData, setAdminData] = useState(null);
 
-  const data = initialData || requestData || adminData;
+  const data = requestData || initialData || adminData;
 
   const attachments = Array.isArray(data?.attachments) ? data.attachments : [];
 
   useEffect(() => {
     const status = requestData?.status || data?.status;
     const code = status?.code || "";
-    if (code === "priced" || code === "accepted") {
-      const amt = data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price;
+
+    // Payment Logic: Show only if accepted and NOT paid
+    if (data?.requester_accepted_price && data?.payment_status !== 'paid') {
+      const amt = data?.admin_price ?? data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price;
       if (typeof amt === "number" && Number.isFinite(amt) && amt > 0) {
         setShowPayment({
           amount: amt,
           consultationId: data?.id,
         });
       }
+    } else {
+      setShowPayment(null);
     }
   }, [data, requestData]);
 
@@ -65,7 +74,7 @@ const RequestDetails = ({ initialData, id }) => {
         });
         const json = await res.json();
         if (json?.data) setAdminData(json.data);
-      } catch {}
+      } catch { }
     };
     fetchAdmin();
   }, [data, requestId]);
@@ -104,7 +113,68 @@ const RequestDetails = ({ initialData, id }) => {
             refetch={refetchRequesterDetails}
           />
         )}
-        {showPayment && (
+        {/* قبول/رفض السعر من طالب الخدمة */}
+        {data?.admin_price && !data?.requester_accepted_price && !data?.requester_rejection_reason && (data?.status?.code === "priced" || data?.requestStatus?.id === 501) && (
+          <div className="mt-4 rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                {t("requestDetails.adminPrice") || "السعر المقترح من الإدارة"}: {data.admin_price}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    await respondPrice({ requestId, accepted: true, statusId: 502 }).unwrap();
+                    refetchRequesterDetails();
+                  }}
+                >
+                  {t("common.accept") || "قبول"}
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={async () => {
+                    const reason = window.prompt(t("requestDetails.rejectReason") || "سبب الرفض؟") || "";
+                    if (reason) {
+                      await respondPrice({ requestId, accepted: false, rejectionReason: reason, statusId: 503 }).unwrap();
+                      refetchRequesterDetails();
+                    }
+                  }}
+                >
+                  {t("common.reject") || "رفض"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* حالة الرفض */}
+        {data?.requester_rejection_reason && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+            <p className="text-red-700 font-medium">{t("requestDetails.youRejected") || "لقد قمت برفض السعر المقترح"}</p>
+            <p className="text-sm text-red-600 mt-1">{t("requestDetails.reason") || "السبب"}: {data.requester_rejection_reason}</p>
+          </div>
+        )}
+
+        {/* حالة القبول */}
+        {data?.requester_accepted_price && (
+          <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 mb-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-green-800 font-bold">{t("requestDetails.priceAccepted") || "تم قبول السعر"}</h3>
+                <p className="text-green-700">{t("requestDetails.waitingPayment") || "يرجى إتمام عملية الدفع لبدء العمل"}</p>
+              </div>
+              {/* Provider Card if assigned */}
+              {data?.provider && (
+                <div className="bg-white/50 p-3 rounded-lg text-sm text-green-900 border border-green-100">
+                  <span className="font-bold block mb-1">{t("requestDetails.provider") || "مزود الخدمة"}:</span>
+                  {data.provider.name}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {showPayment && !data?.payment_status?.includes('paid') && (
           <div className="mt-6">
             <PaymentForm
               amount={showPayment.amount}
@@ -112,6 +182,11 @@ const RequestDetails = ({ initialData, id }) => {
               refetch={refetchRequesterDetails}
             />
           </div>
+        )}
+
+        {/* عرض التسليمات إذا وجد طلب مرتبط */}
+        {(orderData?.id || data?.orderId) && (
+          <ProjectDeliverables orderId={orderData?.id || data?.orderId} />
         )}
       </div>
     </div>

@@ -12,11 +12,14 @@ export const paymentApi = createApi({
         method: "POST",
         body: {
           order_id: body.orderId,
+          request_id: body.requestId,
           user_id: body.userId,
           amount: body.amount,
           currency: body.currency || "SAR",
           stripe_payment_intent_id: body.stripePaymentIntentId || null,
           status: body.status || "pending",
+          payment_method: body.paymentMethod || "moyasar",
+          payment_status: body.paymentStatus || "pending",
         },
       }),
       invalidatesTags: ["Payments"],
@@ -25,6 +28,9 @@ export const paymentApi = createApi({
       query: ({ orderId, userId }) => {
         const filters = {};
         if (orderId) filters.order_id = orderId;
+        if (orderId === null) filters.order_id = null;
+        // allow request_id filter
+        // Note: use query with requestId when needed
         if (userId) filters.user_id = userId;
         return {
           table: "payments",
@@ -47,6 +53,8 @@ export const paymentApi = createApi({
         body: {
           status: body.status,
           stripe_payment_intent_id: body.stripePaymentIntentId || null,
+          payment_status: body.paymentStatus || "pending",
+          payment_method: body.paymentMethod || "moyasar",
           updated_at: new Date().toISOString(),
         },
       }),

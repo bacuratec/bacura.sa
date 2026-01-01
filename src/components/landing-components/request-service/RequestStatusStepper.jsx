@@ -5,7 +5,11 @@ export default function RequestStatusStepper({ status }) {
   const steps = [
     { code: "pending", labelAr: "قيد المراجعة" },
     { code: "priced", labelAr: "تم التسعير" },
-    { code: "accepted", labelAr: "مقبول" },
+    { code: "waiting_payment", labelAr: "بانتظار الدفع" },
+    { code: "paid", labelAr: "تم الدفع" },
+    { code: "provider_assigned", labelAr: "تم تعيين مزود" },
+    { code: "pending_delivery", labelAr: "بانتظار التسليم" },
+    { code: "under_review", labelAr: "تحت المراجعة" },
     { code: "completed", labelAr: "مكتمل" },
   ];
   const currentIndex = Math.max(

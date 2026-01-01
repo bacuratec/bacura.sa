@@ -104,6 +104,17 @@ export default async function RequestDetailsPage({ params }) {
           : null,
         attachments,
       };
+
+      // Fetch Order ID if exists
+      const { data: order } = await supabaseAdmin
+        .from('orders')
+        .select('id')
+        .eq('request_id', id)
+        .maybeSingle();
+
+      if (order) {
+        initialData.orderId = order.id;
+      }
     }
   }
 

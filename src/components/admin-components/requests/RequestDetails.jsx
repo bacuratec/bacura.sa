@@ -17,8 +17,11 @@ const RequestDetails = ({ data }) => {
   const description = data?.description || "";
   const requestNumber = data?.requestNumber || data?.id;
   const requestStatus = data?.requestStatus || data?.status || null;
-  const pricingNotes = data?.pricingNotes || data?.pricing_notes || "";
-  const price = data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price ?? data?.amount ?? null;
+  const pricingNotes = data?.admin_notes || data?.pricingNotes || data?.pricing_notes || "";
+  const price = data?.admin_price ?? data?.provider_price ?? data?.servicePrice ?? data?.service?.price ?? data?.service?.base_price ?? data?.amount ?? null;
+  const proposalUrl = data?.admin_proposal_file_url || null;
+  const providerAssignedAt = data?.provider_assigned_at || null;
+  const providerId = data?.provider_id || null;
 
   const joiningDateFormatted = dayjs(creationTime).format("DD/MM/YYYY hh:mm A");
 
@@ -49,6 +52,24 @@ const RequestDetails = ({ data }) => {
           <DetailRow label={t("request.price")} value={formatCurrency(price, lang)} />
           {pricingNotes && (
             <DetailRow label={t("request.notes")} value={pricingNotes} />
+          )}
+          {proposalUrl && (
+            <DetailRow
+              label={t("request.proposalFile") || "ملف العرض"}
+              value={<a href={proposalUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline">تحميل</a>}
+            />
+          )}
+          {providerId && (
+            <DetailRow
+              label={t("request.provider") || "مزوّد الخدمة"}
+              value={String(providerId)}
+            />
+          )}
+          {providerAssignedAt && (
+            <DetailRow
+              label={t("request.providerAssignedAt") || "تاريخ تعيين المزود"}
+              value={dayjs(providerAssignedAt).format("DD/MM/YYYY hh:mm A")}
+            />
           )}
         </div>
       </div>

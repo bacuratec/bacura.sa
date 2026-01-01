@@ -10,6 +10,8 @@ import { useGetRequestDetailsQuery } from "../../../redux/api/ordersApi";
 import AdminAttachmentForm from "../../../components/request-service-forms/AdminAttachmentForm";
 import RequestAttachment from "../../../components/request-service-forms/RequestAttachment";
 import AdminCompleteRequest from "../../../components/request-service-forms/AdminCompleteRequest";
+import AdminPricingPanel from "../../../components/request-service-forms/AdminPricingPanel";
+import AdminAssignProviderPanel from "../../../components/request-service-forms/AdminAssignProviderPanel";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 
@@ -65,6 +67,8 @@ const RequestDetails = () => {
         />
         <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
         <RequestAttachment attachments={attachments} />
+        <AdminPricingPanel refetch={refetchRequesterDetails} />
+        <AdminAssignProviderPanel refetch={refetchRequesterDetails} />
         {firstApprove ? (
           <AdminAttachmentForm data={data} refetch={refetchRequesterDetails} />
         ) : finalApprove ? (

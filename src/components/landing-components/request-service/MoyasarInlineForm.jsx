@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { getMoyasarPublishableKey, getMoyasarCallbackUrl } from "@/utils/env";
 
-export default function MoyasarInlineForm({ amount, orderId }) {
+export default function MoyasarInlineForm({ amount, requestId }) {
   const { t } = useTranslation();
   const publishable = (getMoyasarPublishableKey() || "").trim();
   const callbackUrl = getMoyasarCallbackUrl();
@@ -60,7 +60,7 @@ export default function MoyasarInlineForm({ amount, orderId }) {
 
   const minor = Math.round(Number(amount) * 100);
   const desc =
-    (t("payment.title") || "الدفع") + (orderId ? ` (#${orderId})` : "");
+    (t("payment.title") || "الدفع") + (requestId ? ` (#${requestId})` : "");
 
   return (
     <div
