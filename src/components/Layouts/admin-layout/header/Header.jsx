@@ -64,20 +64,9 @@ const Header = ({ data }) => {
           <div className="buttons flex items-center xl:gap-6 lg:gap-4 md:gap-3 sm:gap-2 gap-1">
             <LanguageDropdown />
             <RoleBadge />
-            {process.env.NODE_ENV !== "production" && (
-              <button
-                onClick={async () => {
-                  await seedDemoData();
-                }}
-                className="border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm bg-primary/10 hover:bg-primary/20 text-primary"
-                title="Seed demo data"
-              >
-                Seed
-              </button>
-            )}
             <button
               onClick={() => setIsModalOpen(true)}
-              className="notification border border-[#ccc] rounded-lg flex items-center gap-1 p-2 font-medium text-sm"
+              className="notification border border-[#ccc] rounded-lg flex items中心 gap-1 p-2 font-medium text-sm"
             >
               <img
                 src={typeof notifications === "string" ? notifications : (notifications?.src || "")}

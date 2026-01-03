@@ -13,6 +13,7 @@ import { ordersApi } from "./api/ordersApi";
 import { projectsApi } from "./api/projectsApi";
 import { ratingsApi } from "./api/ratingsApi";
 import { ticketApi } from "./api/ticketApi";
+import { ticketMessagesApi } from "./api/ticketMessagesApi";
 import { notificationsApi } from "./api/notificationsApi";
 import { faqsApi } from "./api/faqsApi";
 import { partnersApi } from "./api/partnersApi";
@@ -40,6 +41,7 @@ export const makeStore = () => {
       [projectsApi.reducerPath]: projectsApi.reducer,
       [ratingsApi.reducerPath]: ratingsApi.reducer,
       [ticketApi.reducerPath]: ticketApi.reducer,
+      [ticketMessagesApi.reducerPath]: ticketMessagesApi.reducer,
       [notificationsApi.reducerPath]: notificationsApi.reducer,
       [faqsApi.reducerPath]: faqsApi.reducer,
       [partnersApi.reducerPath]: partnersApi.reducer,
@@ -65,6 +67,7 @@ export const makeStore = () => {
         .concat(projectsApi.middleware)
         .concat(ratingsApi.middleware)
         .concat(ticketApi.middleware)
+        .concat(ticketMessagesApi.middleware)
         .concat(notificationsApi.middleware)
         .concat(faqsApi.middleware)
         .concat(partnersApi.middleware)

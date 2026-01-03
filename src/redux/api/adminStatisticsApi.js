@@ -61,7 +61,8 @@ const statisticsBaseQuery = async (args) => {
           waitingPayment,
           rejected,
           completed,
-          newRequests
+          newRequests,
+          paid
         ] = await Promise.all([
           supabase.from("requests").select("id", { count: "exact", head: true }),
           supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 8),
@@ -70,6 +71,7 @@ const statisticsBaseQuery = async (args) => {
           supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 10),
           supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 11),
           supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 7),
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 204),
         ]);
 
         result = {
@@ -80,6 +82,7 @@ const statisticsBaseQuery = async (args) => {
           rejectedRequestsCount: rejected.count || 0,
           approvedRequestsCount: completed.count || 0,
           newRequestsCount: newRequests.count || 0,
+          paidRequestsCount: paid.count || 0,
         };
         break;
       }
@@ -95,6 +98,8 @@ const statisticsBaseQuery = async (args) => {
           paymentsCount,
           projectsCount,
           ticketsCount,
+          newRequestsCount,
+          paidRequestsCount,
           // Service breakdown
           consultationsCount,
           diagnosisCount,
@@ -113,6 +118,9 @@ const statisticsBaseQuery = async (args) => {
           supabase.from("payments").select("amount"),
           supabase.from("orders").select("id", { count: "exact", head: true }),
           supabase.from("tickets").select("id", { count: "exact", head: true }),
+          // Specific requests statuses for main dashboard
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 7), // new
+          supabase.from("requests").select("id", { count: "exact", head: true }).eq("status_id", 204), // paid
           // Specific service counts (approximate mapping to service_id if available, otherwise 0)
           supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 1),
           supabase.from("requests").select("id", { count: "exact", head: true }).eq("service_id", 2),
@@ -135,6 +143,8 @@ const statisticsBaseQuery = async (args) => {
           totalProjects: projectsCount.count || 0,
           totalTickets: ticketsCount.count || 0,
           totalFinancialAmounts: totalAmount,
+          newRequestsCount: newRequestsCount.count || 0,
+          paidRequestsCount: paidRequestsCount.count || 0,
           serviceBreakdown: {
             consultations: consultationsCount.count || 0,
             diagnosis: diagnosisCount.count || 0,

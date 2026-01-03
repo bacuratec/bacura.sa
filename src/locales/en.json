@@ -826,15 +826,54 @@
     "title": "Service Request Details",
     "nav1": "Requests Management",
     "nav2": "Request Details",
-    "adminOffer": "Admin Offer",
+    "adminOffer": "Proposed Price Offer",
     "adminPrice": "Proposed Price",
     "downloadProposal": "Download Proposal File",
     "priceProposal": "Proposed Price Offer",
-    "priceProposalDesc": "Please review the proposed price from admin to proceed",
+    "priceProposalDesc": "Please review the price offer and approve it to move to the payment stage and start work",
     "youRejected": "You have rejected the proposed price",
     "reason": "Reason",
     "priceAccepted": "Price Accepted",
-    "waitingPayment": "Waiting for Payment"
+    "waitingPayment": "Waiting for Payment",
+    "sidebarTitle": "Request Data",
+    "sidebarDesc": "Summary of requested service details and information",
+    "actionRequired": "Awaiting Your Final Decision",
+    "isDone": "Has the work been received successfully?",
+    "completeConfirmPrompt": "If you are satisfied with the results, please close the project to move to the evaluation stage",
+    "finishNow": "Finish Project Now",
+    "successComplete": "Project completed successfully",
+    "confirmCompletion": "Are you sure the project is complete and all requirements have been received?",
+    "back": "Back to Requests List"
+  },
+  "rating": {
+    "title": "Rate Your Experience",
+    "subtitle": "Your opinion matters to us in improving the quality of services provided",
+    "selectStars": "Please select a star rating",
+    "success": "Thank you for your rating!",
+    "commentLabel": "Additional Notes",
+    "commentPlaceholder": "Write any notes you'd like to share here...",
+    "submit": "Submit Rating",
+    "thanks": "Thank you for your rating!",
+    "reviewedDesc": "You have already rated this service, your opinion always helps us improve"
+  },
+  "pricing": {
+    "total": "Total Price",
+    "proposal": "Proposal Summary"
+  },
+  "deliverables": {
+    "title": "Project Deliverables & Progress",
+    "subtitle": "Track work progress and download submitted files",
+    "accepted": "Deliverable accepted successfully",
+    "rejected": "Changes requested",
+    "empty": "No deliverables yet",
+    "emptySub": "The service provider will upload files here soon",
+    "rejectReason": "Please write the reason for requesting changes"
+  },
+  "status": {
+    "pending": "Pending",
+    "under_review": "Under Review",
+    "accepted": "Accepted",
+    "rejected": "Rejected"
   },
   "requesters": {
     "stats": {
@@ -859,7 +898,8 @@
       "accepted": "Accepted Requests",
       "rejected": "Rejected Requests",
       "completed": "Completed Requests",
-      "waitingPayment": "Waiting for Payment"
+      "waitingPayment": "Waiting for Payment",
+      "paid": "Paid Requests"
     },
     "title": "Manage Requests",
     "description": "Monitor and manage service requests submitted by seekers",

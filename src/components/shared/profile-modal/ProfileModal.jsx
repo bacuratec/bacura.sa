@@ -13,12 +13,13 @@ import { useGetCitiesQuery } from "../../../redux/api/citiesApi";
 import fileUpload from "@/assets/icons/fileUpload.svg";
 import { Camera, Upload, User, Mail, Phone, Calendar as CalendarIcon, MapPin, Building, FileText } from "lucide-react";
 
-import {
-  useUpdateAdminMutation,
-  useUpdateProviderMutation,
-  useUpdateRequesterMutation,
-  useUpdateUserContactMutation,
-} from "../../../redux/api/updateApi";
+  import {
+    useUpdateAdminMutation,
+    useUpdateProviderMutation,
+    useUpdateRequesterMutation,
+    useUpdateUserContactMutation,
+  } from "../../../redux/api/updateApi";
+  import { useCreateRequesterMutation } from "../../../redux/api/updateApi";
 import {
   useGetProviderEntityTypesQuery,
   useGetRequesterEntityTypesQuery,
@@ -27,10 +28,12 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import { getAppBaseUrl } from "../../../utils/env";
+import { tr as trHelper } from "@/utils/tr";
 
 export default function ProfileModal({ open, setOpen, data, refetch }) {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
+  const tr = (key, fallback) => trHelper(t, key, fallback);
 
   const [isChanges, setIsChanged] = useState(false);
   const role = useSelector((state) => state.auth.role);
@@ -51,9 +54,11 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
     useUpdateProviderMutation();
   const [updateRequester, { isLoading: isRequesterLoading }] =
     useUpdateRequesterMutation();
+  const [createRequester, { isLoading: isCreateRequesterLoading }] =
+    useCreateRequesterMutation();
   const [updateAdmin, { isLoading: isAdminLoading }] = useUpdateAdminMutation();
   const [updateUserContact] = useUpdateUserContactMutation();
-  const isLoading = isProviderLoading || isRequesterLoading || isAdminLoading;
+  const isLoading = isProviderLoading || isRequesterLoading || isAdminLoading || isCreateRequesterLoading;
 
   const [selectedFiles, setSelectedFiles] = useState(null);
   const handleFileChange = (e) => {
@@ -166,7 +171,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
             <div className="px-6 py-6 border-b border-gray-50 flex items-center justify-between relative z-10">
               <h2 className="text-xl font-black text-gray-800 flex items-center gap-2">
                 <div className="w-2 h-6 bg-primary rounded-full"></div>
-                {t("profile.editTitle") || "تعديل الملف الشخصي"}
+                {tr("profile.editTitle", "تعديل الملف الشخصي")}
               </h2>
               <button onClick={handleClose} className="p-2 hover:bg-gray-50 rounded-xl transition-colors">
                 <span className="text-2xl text-gray-400">&times;</span>
@@ -176,12 +181,12 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
               initialValues={{
                 FullName: data?.fullName || data?.name || "",
                 email: data?.email || "",
-                phoneNumber: data?.phoneNumber || "",
+                phoneNumber: data?.phone || data?.phoneNumber || "",
                 CommercialRegistrationNumber:
                   data?.commercialRegistrationNumber || "",
                 CommercialRegistrationDate:
                   data?.commercialRegistrationDate?.split("T")[0] || "",
-                address: data?.city?.id || data?.address || "",
+                address: data?.city?.id || data?.address?.id || data?.address || "",
                 InstitutionTypeLookupId: data?.entityType?.id || "",
                 ProfilePicture: null,
                 IsProfilePictureChanged: false,
@@ -193,7 +198,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                 try {
                   let updateFn;
                   if (role === "Provider") updateFn = updateProvider;
-                  else if (role === "Requester") updateFn = updateRequester;
+                  else if (role === "Requester") updateFn = data?.id ? updateRequester : createRequester;
                   else if (role === "Admin") updateFn = updateAdmin;
 
                   if (!updateFn) {
@@ -230,12 +235,21 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                   // 🟢 تجهيز الحمولة للتحديث وفق الدور
                   let payload = {};
                   if (role === "Requester") {
-                    payload = {
-                      requesterId: data?.id,
-                      name: values.FullName || values.name || "",
-                      commercialRegNo: values.CommercialRegistrationNumber || null,
-                      cityId: values.address || null,
-                    };
+                    payload = data?.id
+                      ? {
+                          requesterId: data?.id,
+                          name: values.FullName || values.name || "",
+                          commercialRegNo: values.CommercialRegistrationNumber || null,
+                          cityId: values.address || null,
+                          entityTypeLookupId: values.InstitutionTypeLookupId || null,
+                        }
+                      : {
+                          userId: data?.userId || data?.user?.id,
+                          name: values.FullName || values.name || "",
+                          commercialRegNo: values.CommercialRegistrationNumber || null,
+                          cityId: values.address || null,
+                          entityTypeLookupId: values.InstitutionTypeLookupId || null,
+                        };
                   } else if (role === "Provider") {
                     payload = {
                       providerId: data?.id,
@@ -309,7 +323,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                             type="button"
                             className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-all text-gray-600 hover:text-primary"
                             onClick={openCamera}
-                            title={t("profile.openCamera")}
+                            title={tr("profile.openCamera", "فتح الكاميرا")}
                           >
                             <Camera className="w-5 h-5" />
                           </button>
@@ -322,34 +336,35 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                     </div>
                     {/* Full Name */}
                     <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-gray-700">{t("profile.fullName")}</label>
+                      <label className="text-sm font-bold text-gray-700">{tr("profile.fullName", "الاسم بالكامل")}</label>
                       <Field
                         name="FullName"
                         className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all font-bold text-gray-800"
-                        placeholder={t("profile.fullName")}
+                        placeholder={tr("profile.fullName", "الاسم بالكامل")}
                       />
                       <ErrorMessage name="FullName" component="div" className="text-red-500 text-xs font-bold" />
                     </div>
 
                     {/* Email */}
                     <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-gray-700">{t("profile.email")}</label>
+                      <label className="text-sm font-bold text-gray-700">{tr("profile.email", "البريد الإلكتروني")}</label>
                       <Field
                         name="email"
                         type="email"
                         className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all font-bold text-gray-800"
-                        placeholder={t("profile.email")}
+                        placeholder={tr("profile.email", "البريد الإلكتروني")}
                       />
                       <ErrorMessage name="email" component="div" className="text-red-500 text-xs font-bold" />
                     </div>
 
                     {/* Phone */}
                     <div className="space-y-1.5" style={{ direction: "ltr" }}>
-                      <label className="text-sm font-bold text-gray-700 block text-right">{t("profile.phone")}</label>
+                      <label className="text-sm font-bold text-gray-700 block text-right">{tr("profile.phone", "رقم الجوال")}</label>
                       <PhoneInput
                         country={"sa"}
                         value={values.phoneNumber}
                         onChange={(val) => setFieldValue("phoneNumber", val)}
+                        specialLabel=""
                         inputStyle={{
                           width: '100%',
                           height: '52px',
@@ -368,17 +383,17 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
 
                     {/* CR Number */}
                     <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-gray-700">{t("profile.crNumber")}</label>
+                      <label className="text-sm font-bold text-gray-700">{tr("profile.crNumber", "رقم السجل التجاري")}</label>
                       <Field
                         name="CommercialRegistrationNumber"
                         className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl transition-all font-bold"
-                        placeholder={t("profile.crNumber")}
+                        placeholder={tr("profile.crNumber", "رقم السجل التجاري")}
                       />
                     </div>
 
                     {/* CR Date */}
                     <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-gray-700">{t("profile.crDate")}</label>
+                      <label className="text-sm font-bold text-gray-700">{tr("profile.crDate", "تاريخ تأكيد السجل التجاري")}</label>
                       <Field
                         name="CommercialRegistrationDate"
                         type="date"
@@ -388,16 +403,16 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
 
                     {/* Address/City */}
                     <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-gray-700">{t("profile.address")}</label>
+                      <label className="text-sm font-bold text-gray-700">{tr("profile.address", "المدينة / العنوان")}</label>
                       <Field
                         as="select"
                         name="address"
                         className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl transition-all font-bold"
                       >
-                        <option value="">{t("profile.selectCity")}</option>
+                        <option value="">{tr("profile.selectCity", "اختر المدينة")}</option>
                         {addresses?.map((city) => (
                           <option key={city.id} value={city.id}>
-                            {lang === "ar" ? city.nameAr : city.nameEn}
+                            {lang === "ar" ? (city.name_ar || city.nameAr) : (city.name_en || city.nameEn)}
                           </option>
                         ))}
                       </Field>
@@ -406,16 +421,16 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                     {/* Institution Type */}
                     {role !== "Admin" && (
                       <div className="space-y-1.5 md:col-span-2">
-                        <label className="text-sm font-bold text-gray-700">{t("profile.institutionType")}</label>
+                        <label className="text-sm font-bold text-gray-700">{tr("profile.institutionType", "نوع المؤسسة")}</label>
                         <Field
                           as="select"
                           name="InstitutionTypeLookupId"
                           className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl transition-all font-bold"
                         >
-                          <option value="">{t("profile.selectType")}</option>
+                          <option value="">{tr("profile.selectType", "اختر النوع")}</option>
                           {types?.map((type) => (
                             <option key={type.id} value={type.id}>
-                              {lang === "ar" ? type.nameAr : type.nameEn}
+                              {lang === "ar" ? (type.name_ar || type.nameAr) : (type.name_en || type.nameEn)}
                             </option>
                           ))}
                         </Field>
@@ -429,7 +444,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                   </div>
                   {/* Attachments Section */}
                   <div className="md:col-span-2 mt-4">
-                    <label className="text-sm font-bold text-gray-700 mb-2 block">{t("profile.attachments")}</label>
+                    <label className="text-sm font-bold text-gray-700 mb-2 block">{tr("profile.attachments", "قم برفع المرفقات")}</label>
                     <label
                       htmlFor="file-upload"
                       className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-[24px] px-6 py-10 cursor-pointer text-center hover:border-primary hover:bg-primary/5 transition-all group"
@@ -438,7 +453,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                         <Upload className="w-6 h-6 text-gray-400 group-hover:text-primary" />
                       </div>
                       <span className="text-sm font-bold text-gray-500 group-hover:text-primary">
-                        {t("profile.attachments")}
+                        {tr("profile.attachments", "قم برفع المرفقات")}
                       </span>
                       <input id="file-upload" type="file" onChange={handleFileChange} multiple className="hidden" />
                     </label>
@@ -460,7 +475,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                       onClick={handleClose}
                       className="w-full sm:w-auto px-8 py-3 rounded-2xl font-bold text-gray-500 hover:bg-gray-50 transition-colors"
                     >
-                      {t("profile.cancel")}
+                      {tr("profile.cancel", "عودة")}
                     </button>
                     <button
                       type="submit"
@@ -470,7 +485,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                       {isLoading ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       ) : (
-                        t("profile.confirm")
+                        tr("profile.confirm", "تأكيـد")
                       )}
                     </button>
                   </div>

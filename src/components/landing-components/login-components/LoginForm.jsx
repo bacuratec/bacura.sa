@@ -222,17 +222,12 @@ const LoginForm = () => {
           setLoading(false);
           return;
         }
-        router.replace("/provider");
+        router.replace("/home");
       } else if (normalizedRole === "requester") {
-        // Allow deep linking logic if 'from' is present and valid
-        if (from && from !== "/" && from !== "/login" && !from.includes("/admin") && !from.includes("/provider")) {
-          router.replace(from);
-        } else {
-          router.replace("/profile");
-        }
+        router.replace("/home");
       } else {
         toast.warning(t("loginForm.errors.unknownRole"));
-        router.replace("/profile");
+        router.replace("/home");
       }
     } catch (err) {
       console.error("Login error:", err);

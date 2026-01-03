@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation';
 import ProfileContent from './ProfileContent';
 import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 
-export default async function ProfilePage() {
+export const dynamic = 'force-dynamic';
+
+export default async function ProfilePage({ searchParams }) {
   const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -20,26 +22,38 @@ export default async function ProfilePage() {
     redirect('/provider');
   }
 
-  // Fetch requester details
+  // Fetch requester details with attachments
   const { data: requester } = await supabase
     .from('requesters')
-    .select('*')
+    .select('*, city:lookup_values!requesters_city_id_fkey(*), entityType:lookup_values!requesters_entity_type_id_fkey(*), attachments(*)')
     .eq('user_id', user.id)
     .single();
 
-  // If requester not found (maybe Provider or Admin), handle appropriately
-  // For now assuming Requester.
+  let requesterResolved = requester;
+  if (!requesterResolved) {
+    requesterResolved = {
+      id: null,
+      user_id: user.id,
+      name: user.user_metadata?.name || "",
+      fullName: user.user_metadata?.name || "",
+      email: user.email || "",
+      phone: user.user_metadata?.phone || "",
+      created_at: user.created_at || new Date().toISOString(),
+      attachments: [],
+      city: null,
+      entityType: null,
+      user: { id: user.id },
+    };
+  }
 
   // Fetch tickets
   const { data: tickets } = await supabase
     .from('tickets')
     .select('*')
-    .eq('user_id', user.id);
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
 
-  // Fetch project stats
-  // This requires complex aggregation which might be better in RPC or just fetching orders and counting in JS for now (if small scale)
-  // or simple count queries.
-
+  // Stats calculation
   const stats = {
     totalOrdersCount: 0,
     waitingForApprovalOrdersCount: 0,
@@ -47,56 +61,77 @@ export default async function ProfilePage() {
     ongoingOrdersCount: 0,
     completedOrdersCount: 0,
     serviceCompletedOrdersCount: 0,
+    rejectedOrdersCount: 0,
   };
 
-  // Example stats fetching (simplified)
-  if (requester) {
-    // Assuming requester_id in orders is the requester UUID, not user_id. 
-    // But requester table has user_id.
-    // Schema: orders has requester_id (UUID references requests(id)? No, references requesters(id) in older schema? 
-    // Let's check schema: orders references requests(id). requests references requesters(id).
-
-    // So to get orders for this user:
-    // Join orders -> requests -> requesters -> user_id = user.id
-
-    const { data: orders } = await supabase
+  if (requesterResolved) {
+    const { data: ordersData } = await supabase
       .from('orders')
       .select('order_status_id, requests!inner(requester_id)')
-      .eq('requests.requester_id', requester.id);
+      .eq('requests.requester_id', requesterResolved.id);
 
-    if (orders) {
-      stats.totalOrdersCount = orders.length;
-      // Calculate other stats based on order_status_id if needed
+    if (ordersData) {
+      stats.totalOrdersCount = ordersData.length;
+      stats.waitingForApprovalOrdersCount = ordersData.filter(o => o.order_status_id === 17).length;
+      stats.waitingToStartOrdersCount = ordersData.filter(o => o.order_status_id === 18).length;
+      stats.ongoingOrdersCount = ordersData.filter(o => o.order_status_id === 13).length;
+      stats.completedOrdersCount = ordersData.filter(o => o.order_status_id === 15).length;
+      stats.serviceCompletedOrdersCount = ordersData.filter(o => o.order_status_id === 15).length; // Map to completed if same
+      stats.rejectedOrdersCount = ordersData.filter(o => o.order_status_id === 19).length;
     }
   }
 
-  // Fetch recent orders (Activity)
+  // Pagination params
+  const sp = await searchParams;
+  const pageSizeParam = Number(sp?.PageSize || 5);
+  const pageNumberParam = Number(sp?.PageNumber || 1);
+  const pageSize = Number.isFinite(pageSizeParam) && pageSizeParam > 0 ? pageSizeParam : 5;
+  const pageNumber = Number.isFinite(pageNumberParam) && pageNumberParam > 0 ? pageNumberParam : 1;
+  const from = (pageNumber - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   let recentOrders = [];
-  if (requester) {
-    const { data } = await supabase
+  if (requesterResolved && requesterResolved.id) {
+    const { data: rec } = await supabase
       .from('orders')
       .select(`
         id,
         created_at,
-        status:lookup_values!order_status_id(name_ar, name_en),
-        request:requests!inner(
+        order_status_id,
+        status:lookup_values!orders_order_status_id_fkey(name_ar, name_en, code),
+        requests!inner(
           id,
+          requester_id,
           title,
           service:services(name_ar, name_en)
         )
       `)
-      .eq('request.requester_id', requester.id)
+      .eq('requests.requester_id', requesterResolved.id)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .range(from, to);
 
-    if (data) {
-      recentOrders = data;
+    if (rec) {
+      recentOrders = rec.map(o => ({
+        ...o,
+        request: {
+          id: o.requests?.id,
+          title: o.requests?.title,
+          service: o.requests?.service || null,
+        }
+      }));
     }
   }
 
   return (
-    <SeekerLayout requester={requester}>
-      <ProfileContent requester={requester} tickets={tickets} stats={stats} recentOrders={recentOrders} />
+    <SeekerLayout requester={requesterResolved}>
+      <ProfileContent
+        requester={requesterResolved}
+        tickets={tickets || []}
+        stats={stats}
+        recentOrders={recentOrders}
+        pageNumber={pageNumber}
+        pageSize={pageSize}
+      />
     </SeekerLayout>
   );
 }

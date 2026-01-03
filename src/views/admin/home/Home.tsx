@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGetAdminStatisticsQuery } from "@/redux/api/adminStatisticsApi";
+import { useGetPaymentsQuery } from "@/redux/api/paymentApi";
 import {
   Users,
   UserPlus,
@@ -15,11 +16,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { TablePageSkeleton } from "@/components/shared/skeletons/PageSkeleton";
+import { tr as trHelper } from "@/utils/tr";
+import { formatAmount } from "@/utils/format";
 
 const Home = () => {
   const { t } = useTranslation();
   const { data: stats, isLoading } = useGetAdminStatisticsQuery();
+  const { data: paymentsData } = useGetPaymentsQuery({}); 
   const [currentTime, setCurrentTime] = useState(new Date());
+  const tr = (key: string, fallback: string) => trHelper(t, key, fallback);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -28,6 +33,8 @@ const Home = () => {
 
   if (isLoading) return <TablePageSkeleton />;
 
+  const totalAmountNum = typeof stats?.totalFinancialAmounts === "number" ? stats.totalFinancialAmounts : Number(stats?.totalFinancialAmounts || 0);
+  const currencyLabel = tr("currency", "SAR");
   const mainStats = [
     {
       title: t("homeAdmin.users"),
@@ -51,7 +58,8 @@ const Home = () => {
       textColor: "text-emerald-600",
       link: "/admin/requests",
       subStats: [
-        { label: t("homeAdmin.newRequest"), value: stats?.totalRequests || 0 }, // Using total as new for now
+        { label: t("requests.stats.new") || "طلبات جديدة", value: stats?.newRequestsCount || 0 },
+        { label: t("requests.stats.paid") || "طلبات مدفوعة", value: stats?.paidRequestsCount || 0 },
       ]
     },
     {
@@ -68,14 +76,14 @@ const Home = () => {
     },
     {
       title: t("homeAdmin.financialTransactions"),
-      value: `${stats?.totalFinancialAmounts?.toLocaleString() || 0} ${t("currency") || "SAR"}`,
+      value: formatAmount(totalAmountNum, currencyLabel),
       icon: <Wallet className="w-6 h-6" />,
       color: "from-purple-600 to-pink-600",
       lightColor: "bg-purple-50",
       textColor: "text-purple-600",
-      link: "/admin/home",
+      link: "/admin/payments",
       subStats: [
-        { label: t("homeAdmin.totalAmount"), value: stats?.totalFinancialAmounts || 0 },
+        { label: t("homeAdmin.totalAmount"), value: totalAmountNum || 0 },
       ]
     }
   ];
@@ -191,21 +199,55 @@ const Home = () => {
                 <Briefcase className="w-8 h-8" />
               </div>
               <h2 className="text-3xl font-black leading-tight">
-                {t("homeAdmin.quickActions") || "إجراءات سريعة"}
+                {tr("homeAdmin.quickActions", "إجراءات سريعة")}
               </h2>
               <p className="text-white/70 font-medium">
-                {t("homeAdmin.quickActionsDesc") || "إدارة العمليات اليومية بكفاءة عالية من خلال لوحة التحكم"}
+                {tr("homeAdmin.quickActionsDesc", "إدارة العمليات اليومية بكفاءة عالية من خلال لوحة التحكم")}
               </p>
             </div>
 
             <div className="space-y-3">
               <button className="w-full bg-white text-primary font-black py-4 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95">
-                {t("homeAdmin.generateReport") || "إنشاء تقرير شهري"}
+                {tr("homeAdmin.generateReport", "إنشاء تقرير شهري")}
               </button>
               <button className="w-full bg-white/10 backdrop-blur-md text-white font-bold py-4 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
-                {t("homeAdmin.contactSupport") || "تواصل مع الدعم الفني"}
+                {tr("homeAdmin.contactSupport", "تواصل مع الدعم الفني")}
               </button>
             </div>
+          </div>
+        </section>
+        
+        <section className="lg:col-span-3 bg-white rounded-[40px] p-10 border border-gray-100 shadow-sm relative overflow-hidden">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-black text-gray-900">{tr("homeAdmin.wallet", "المحفظة")}</h2>
+            <span className="text-sm font-bold text-gray-700">
+              {tr("homeAdmin.totalAmount", "إجمالي المبالغ")}: {formatAmount(totalAmountNum, currencyLabel)}
+            </span>
+          </div>
+          <div className="space-y-3">
+            {(Array.isArray(paymentsData) ? paymentsData : (paymentsData?.data || [])).slice(0, 5).map((p: any) => (
+              <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50">
+                <div className="min-w-0">
+                  <div className="font-bold text-gray-900 truncate">
+                    {p.order?.order_title || p.request_id ? `${tr("homeAdmin.requestPayment", "دفعة طلب")} #${String(p.request_id).substring(0, 8)}` : tr("homeAdmin.payment", "دفعة")}
+                  </div>
+                  <div className="text-[11px] text-gray-500 mt-0.5">
+                    {new Date(p.created_at).toLocaleString("ar-EG")}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-black text-emerald-700">
+                    {formatAmount(Number(p.amount || 0), p.currency || currencyLabel)}
+                  </div>
+                  <div className={`text-[11px] font-bold ${String(p.payment_status).includes("paid") ? "text-emerald-600" : "text-gray-500"}`}>
+                    {p.payment_status || p.status || "pending"}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {(!paymentsData || (Array.isArray(paymentsData) ? paymentsData.length === 0 : (paymentsData?.data || []).length === 0)) && (
+              <div className="text-gray-500 text-sm">{tr("homeAdmin.noPayments", "لا توجد معاملات مالية")}</div>
+            )}
           </div>
         </section>
       </div>

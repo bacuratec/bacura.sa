@@ -1,8 +1,9 @@
-import dayjs from "dayjs";
 import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { LanguageContext } from "@/context/LanguageContext";
+import { formatDate } from "@/utils/format";
+import { mapOrderStatus } from "@/utils/statusMapper";
 
 const ProjectListInfo = ({ data }) => {
   const { t } = useTranslation();
@@ -12,11 +13,11 @@ const ProjectListInfo = ({ data }) => {
     { label: t("projects.orderNumber"), value: data.orderNumber },
     {
       label: t("projects.startDate"),
-      value: dayjs(data.startDate).format("DD/MM/YYYY"),
+      value: formatDate(data.startDate, "DD/MM/YYYY"),
     },
     {
       label: t("projects.endDate"),
-      value: dayjs(data.endDate).format("DD/MM/YYYY"),
+      value: formatDate(data.endDate, "DD/MM/YYYY"),
     },
     ...(role !== "Provider"
       ? [{ label: t("projects.userNotes"), value: data.userNotes }]
@@ -27,12 +28,14 @@ const ProjectListInfo = ({ data }) => {
       : ""),
     {
       label: t("projects.serviceType"),
-      value: data.services?.map((item, index) => (
-        <span key={index}>
-          {lang === "ar" ? item?.titleAr : item?.titleEn}
-          {index < data.services.length - 1 ? "، " : ""}
-        </span>
-      )),
+      value: Array.isArray(data.services) && data.services.length > 0
+        ? data.services.map((item, index) => (
+            <span key={index}>
+              {lang === "ar" ? item?.titleAr : item?.titleEn}
+              {index < data.services.length - 1 ? "، " : ""}
+            </span>
+          ))
+        : (lang === "ar" ? data.request?.service?.name_ar : data.request?.service?.name_en) || "-",
     },
     ...(role === "Admin"
       ? [
@@ -42,30 +45,12 @@ const ProjectListInfo = ({ data }) => {
       : [{ label: t("projects.requester"), value: data.requester?.fullName }]),
     {
       label: t("projects.orderStatus"),
-      value:
-        lang === "ar" ? data.orderStatus?.nameAr : data.orderStatus?.nameEn,
-      statusId: data.orderStatus?.id, // هنستخدمةا لتلوين الحالة
+      value: (lang === "ar" ? mapOrderStatus(data.orderStatus)?.nameAr : mapOrderStatus(data.orderStatus)?.nameEn),
+      statusId: mapOrderStatus(data.orderStatus)?.id,
     },
   ];
 
-  const getStatusColor = (id) => {
-    switch (id) {
-      case 600:
-        return "text-yellow-500";
-      case 601:
-        return "text-blue-500";
-      case 602:
-        return "text-cyan-600";
-      case 603:
-        return "text-green-600";
-      case 604:
-        return "text-red-500";
-      case 605:
-        return "text-gray-500";
-      default:
-        return "text-black";
-    }
-  };
+  const getStatusColor = (id) => mapOrderStatus({ id })?.color || "text-black";
 
   return (
     <div className="overflow-x-auto">

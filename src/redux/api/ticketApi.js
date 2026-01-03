@@ -13,6 +13,7 @@ export const ticketApi = createApi({
         body: {
           user_id: body.userId,
           related_order_id: body.relatedOrderId || null,
+          related_request_id: body.relatedRequestId || null,
           title: body.title,
           description: body.description || null,
           status_id: body.statusId, // Should be open status
@@ -25,6 +26,20 @@ export const ticketApi = createApi({
         table: "tickets",
         method: "GET",
         filters: userId ? { user_id: userId } : {},
+        orderBy: { column: "created_at", ascending: false },
+        joins: [
+          "user:users!tickets_user_id_fkey(id,email)",
+          "related_order:orders!tickets_related_order_id_fkey(id,order_title)",
+          "status:lookup_values!tickets_status_id_fkey(id,name_ar,name_en,code)",
+        ],
+      }),
+      providesTags: ["Tickets"],
+    }),
+    getTicketsByFilters: builder.query({
+      query: (filters) => ({
+        table: "tickets",
+        method: "GET",
+        filters: filters || {},
         orderBy: { column: "created_at", ascending: false },
         joins: [
           "user:users!tickets_user_id_fkey(id,email)",
@@ -66,6 +81,7 @@ export const ticketApi = createApi({
 export const {
   useCreateTicketsMutation,
   useGetTicketsQuery,
+  useGetTicketsByFiltersQuery,
   useGetTicketDetailsQuery,
   useUpdateTicketStatusMutation,
 } = ticketApi;

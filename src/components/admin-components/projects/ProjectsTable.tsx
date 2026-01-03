@@ -259,12 +259,12 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
         <CustomDataTable
           tabs={tabs}
           columns={columns}
-          data={projects}
+          data={projects?.data || projects || []}
           searchableFields={["id"]}
           searchPlaceholder={t("searchPlaceholder")}
           pagination={true}
           isLoading={isLoading}
-          totalRows={projects?.length || 0} // Fix this if pagination is implemented in API
+          totalRows={projects?.count || projects?.data?.length || projects?.length || 0}
           defaultPage={Number(PageNumber)}
           defaultPageSize={Number(PageSize)}
         />

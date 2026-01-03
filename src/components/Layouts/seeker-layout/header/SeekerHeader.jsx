@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import LanguageDropdown from "@/components/Layouts/LanguageDropdown";
 import { getAppBaseUrl } from "../../../../utils/env";
 import RoleBadge from "@/components/shared/RoleBadge";
+import UserAvatarMenu from "@/components/shared/UserAvatarMenu";
 
 const SeekerHeader = ({ data }) => {
     const { t } = useTranslation();
@@ -43,26 +44,26 @@ const SeekerHeader = ({ data }) => {
         <header className="lg:mr-[250px] sticky top-0 right-0 bg-white py-6 border-b-2 border-b-[#E7E7E7] z-[500]">
             <div className="container">
                 <div className="flex items-center justify-between gap-7">
-                    <Link
-                        href={"/profile"}
-                        className="profile flex items-center gap-1"
-                    >
-                        <div className="w-10 h-10 overflow-hidden rounded-md">
-                            <img
-                                src={imageUrl}
-                                alt="user"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <div className="flex flex-col">
+                    <div className="profile flex items-center gap-2">
+                        <UserAvatarMenu
+                            imageUrl={imageUrl}
+                            items={[
+                                { href: "/home", label: "الصفحة الرئيسية" },
+                                { href: "/profile", label: "الملف الشخصي" },
+                                { href: "/requests", label: "طلباتي" },
+                                { href: "/tickets", label: "الدعم الفني" },
+                                { href: "/logout", label: "تسجيل الخروج" },
+                            ]}
+                        />
+                        <Link href={"/profile"} className="flex flex-col">
                             <h1 className="text-xs font-medium">
                                 {t("header.goodMorning")} {data?.name || data?.fullName}
                             </h1>
                             <span className="text-xs font-normal text-[#CCCCCC]">
                                 {t("navSeeker.serviceSeeker") || "Service Seeker"}
                             </span>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
 
                     <div className="buttons flex items-center xl:gap-6 lg:gap-4 md:gap-3 sm:gap-2 gap-1">
                         <LanguageDropdown />

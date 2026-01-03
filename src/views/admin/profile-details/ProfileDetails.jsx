@@ -120,7 +120,9 @@ const ProfileDetails = () => {
         />
 
         <UserData data={data} refetch={refetch} />
-        <AttachmentsTable attachments={data?.attachments} />
+        {Array.isArray(data?.attachments) && data.attachments.length > 0 && (
+          <AttachmentsTable attachments={data.attachments} />
+        )}
         {role !== "Admin" && (
           <button
             onClick={() => setOpenSuspend(true)}

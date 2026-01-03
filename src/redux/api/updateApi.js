@@ -6,6 +6,23 @@ export const updateApi = createApi({
   baseQuery: supabaseBaseQuery,
   tagTypes: ["Provider", "Requester", "Admin"],
   endpoints: (builder) => ({
+    createRequester: builder.mutation({
+      query: (body) => ({
+        table: "requesters",
+        method: "POST",
+        body: {
+          user_id: body.userId,
+          name: body.name,
+          commercial_reg_no: body.commercialRegNo || null,
+          city_id: body.cityId || null,
+          entity_type_id: body.entityTypeLookupId || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        select: "*",
+      }),
+      invalidatesTags: ["Requester"],
+    }),
     updateProvider: builder.mutation({
       query: (body) => {
         // Update provider table
@@ -33,6 +50,7 @@ export const updateApi = createApi({
           name: body.name,
           commercial_reg_no: body.commercialRegNo || null,
           city_id: body.cityId || null,
+          entity_type_id: body.entityTypeLookupId || null,
           updated_at: new Date().toISOString(),
         },
       }),
@@ -97,4 +115,5 @@ export const {
   useUpdateUserContactMutation,
   useSuspendProviderMutation,
   useSuspendRequesterMutation,
+  useCreateRequesterMutation,
 } = updateApi;

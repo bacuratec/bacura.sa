@@ -8,7 +8,7 @@ const navLinks = [
     {
         name: "Home", // Translation keys can be added if needed, sticking to simple for now or adding hardcoded Arabic/English checks if I had access to translation hook here easily. 
         // Using hardcoded titles as placeholder or keys if I use useTranslation
-        href: "/profile",
+        href: "/home",
         icon: Home,
     },
     {
@@ -37,7 +37,7 @@ const SeekerMobileNavigation = () => {
                 {/* Navigation Links */}
                 <nav className="flex-1 flex justify-around items-center gap-1">
                     {navLinks.map((link) => {
-                        const isActive = pathname === link.href || (link.href !== "/profile" && pathname.startsWith(link.href));
+                        const isActive = pathname === link.href || (link.href !== "/home" && pathname.startsWith(link.href));
                         return (
                             <Link
                                 key={link.href}

@@ -281,7 +281,7 @@ const RequestForm = ({ services }) => {
                     {t("formRequest.requiredServices")}{" "}
                     <span className="text-red-500">*</span>
                   </p>
-                  <div className="flex flex-col gap-4 ltr:items-end max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ltr:items-end max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
                     {PLATFORM_SERVICES.map((item) => {
                       // Find matching service in DB to get real ID and Price
                       const dbMatch = services?.find(s => {

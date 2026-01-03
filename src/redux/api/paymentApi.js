@@ -40,6 +40,7 @@ export const paymentApi = createApi({
           joins: [
             "order:orders!payments_order_id_fkey(id,order_title)",
             "user:users!payments_user_id_fkey(id,email)",
+            "request:requests!payments_request_id_fkey(id,title)",
           ],
         };
       },

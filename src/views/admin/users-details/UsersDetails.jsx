@@ -30,6 +30,8 @@ const ProviderRequestsSection = ({ providerId }) => {
     );
   }
   const isArabic = i18n?.language === "ar";
+  const rows = Array.isArray(providerRequests) ? providerRequests : (providerRequests?.data || []);
+  if (!rows || rows.length === 0) return null;
   return (
     <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
       <h4 className="font-bold text-gray-800 text-sm mb-4">
@@ -47,7 +49,7 @@ const ProviderRequestsSection = ({ providerId }) => {
             </tr>
           </thead>
           <tbody>
-            {(providerRequests || []).map((req) => (
+            {rows.map((req) => (
               <tr key={req.id} className="border-t border-gray-100">
                 <td className="p-2">{req.title}</td>
                 <td className="p-2">
@@ -64,13 +66,6 @@ const ProviderRequestsSection = ({ providerId }) => {
                 </td>
               </tr>
             ))}
-            {(!providerRequests || providerRequests.length === 0) && (
-              <tr>
-                <td className="p-3 text-center text-gray-400" colSpan={5}>
-                  {t("requests.empty") || "لا توجد طلبات"}
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
@@ -215,10 +210,10 @@ const UsersDetails = () => {
               : t("userDetails.requesterStats")
           }
         />
-        <AttachmentsTable attachments={displayData?.attachments} />
-        {isProvider && (
-          <ProviderRequestsSection providerId={id} />
+        {Array.isArray(displayData?.attachments) && displayData.attachments.length > 0 && (
+          <AttachmentsTable attachments={displayData.attachments} />
         )}
+        {isProvider && <ProviderRequestsSection providerId={id} />}
       </div>
     </div>
   );

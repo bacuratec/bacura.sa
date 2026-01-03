@@ -47,12 +47,24 @@ export const requestsApi = createApi({
         }),
         // Update Request Status
         updateRequestStatus: builder.mutation({
-            query: ({ id, statusId }) => ({
+          query: ({ id, statusId }) => ({
+            table: "requests",
+            method: "PUT",
+            id,
+            body: {
+              status_id: statusId,
+              updated_at: new Date().toISOString(),
+            },
+          }),
+          invalidatesTags: ["Requests"],
+        }),
+        updateRequestPaymentStatus: builder.mutation({
+            query: ({ id, paymentStatus }) => ({
                 table: "requests",
                 method: "PUT",
                 id,
                 body: {
-                    status_id: statusId,
+                    payment_status: paymentStatus,
                     updated_at: new Date().toISOString(),
                 },
             }),
@@ -65,4 +77,5 @@ export const {
     useGetAllRequestsQuery,
     useDeleteRequestMutation,
     useUpdateRequestStatusMutation,
+    useUpdateRequestPaymentStatusMutation,
 } = requestsApi;

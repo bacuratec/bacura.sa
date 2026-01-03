@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getAppBaseUrl } from "@/utils/env";
 import { Home, PlusCircle, Search, Ticket, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -41,9 +41,69 @@ const SeekerSideBar = ({ data }) => {
 
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
+    const containerRef = useRef(null);
+    const scrollRef = useRef(null);
+    const dragState = useRef({ down: false, startY: 0, startTop: 0 });
+    useEffect(() => {
+        const containerEl = containerRef.current;
+        const el = scrollRef.current;
+        if (!containerEl || !el) return;
+        const onMouseDown = (e) => {
+            dragState.current.down = true;
+            dragState.current.startY = e.pageY;
+            dragState.current.startTop = el.scrollTop;
+            containerEl.style.cursor = "grabbing";
+            e.preventDefault();
+        };
+        const onMouseMove = (e) => {
+            if (!dragState.current.down) return;
+            const dy = e.pageY - dragState.current.startY;
+            el.scrollTop = dragState.current.startTop - dy;
+        };
+        const end = () => {
+            dragState.current.down = false;
+            if (containerEl) containerEl.style.cursor = "grab";
+        };
+        const onTouchStart = (e) => {
+            const t = e.touches[0];
+            dragState.current.down = true;
+            dragState.current.startY = t.pageY || t.clientY;
+            dragState.current.startTop = el.scrollTop;
+        };
+        const onTouchMove = (e) => {
+            if (!dragState.current.down) return;
+            const t = e.touches[0];
+            const dy = (t.pageY || t.clientY) - dragState.current.startY;
+            el.scrollTop = dragState.current.startTop - dy;
+        };
+        const onWheel = (e) => {
+            if (!el) return;
+            el.scrollTop += e.deltaY;
+            e.preventDefault();
+        };
+        containerEl.addEventListener("mousedown", onMouseDown);
+        window.addEventListener("mousemove", onMouseMove);
+        window.addEventListener("mouseup", end);
+        containerEl.addEventListener("mouseleave", end);
+        containerEl.addEventListener("touchstart", onTouchStart, { passive: true });
+        containerEl.addEventListener("touchmove", onTouchMove, { passive: true });
+        containerEl.addEventListener("touchend", end);
+        containerEl.addEventListener("wheel", onWheel, { passive: false });
+        containerEl.style.cursor = "grab";
+        return () => {
+            containerEl.removeEventListener("mousedown", onMouseDown);
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", end);
+            containerEl.removeEventListener("mouseleave", end);
+            containerEl.removeEventListener("touchstart", onTouchStart);
+            containerEl.removeEventListener("touchmove", onTouchMove);
+            containerEl.removeEventListener("touchend", end);
+            containerEl.removeEventListener("wheel", onWheel);
+        };
+    }, []);
 
     return (
-        <aside className={`min-h-screen fixed ${collapsed ? "w-[80px]" : "w-[250px]"} bg-white border-l lg:border-r border-gray-200 top-0 right-0 hidden lg:flex flex-col justify-between transition-all duration-300 z-50`}>
+        <aside ref={containerRef} className={`h-screen overflow-hidden fixed ${collapsed ? "w-[80px]" : "w-[250px]"} bg-white border-l lg:border-r border-gray-200 top-0 right-0 hidden lg:flex flex-col justify-between transition-all duration-300 z-50 select-none`}>
             <div className="logo px-6 py-3 border-b border-gray-200 flex items-center justify-between">
                 <img src={logo} alt="Bacura" className={collapsed ? "h-8 w-8 object-contain" : "h-10 w-auto object-contain"} />
                 <button
@@ -54,7 +114,7 @@ const SeekerSideBar = ({ data }) => {
                     {collapsed ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
                 </button>
             </div>
-            <nav className="flex-1 mt-4">
+            <nav ref={scrollRef} className="flex-1 mt-4 overflow-y-auto select-none">
                 <ul>
                     {Links.map((item, i) => {
                         const isActive = pathname === item.href || (item.href !== "/profile" && pathname.startsWith(item.href));

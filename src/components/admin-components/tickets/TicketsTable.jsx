@@ -7,10 +7,12 @@ import { useTranslation } from "react-i18next";
 import { useContext, useEffect, useState } from "react";
 import { LanguageContext } from "@/context/LanguageContext";
 import TicketModal from "../../landing-components/profile-components/TicketModal";
+import { tr as trHelper } from "@/utils/tr";
 
 const TicketsTable = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
+  const tr = (key, fallback) => trHelper(t, key, fallback);
   const [open, setOpen] = useState(false);
   const { data: tickets, isLoading, refetch } = useGetTicketsQuery();
   const role = useSelector((state) => state.auth.role);
@@ -55,7 +57,6 @@ const TicketsTable = () => {
         </Link>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];
@@ -68,14 +69,14 @@ const TicketsTable = () => {
             onClick={() => setOpen(true)}
             className="bg-primary/10 rounded-xl text-sm font-bold py-2 px-4 w-fit block mr-auto"
           >
-            {t("ticket.sendTicket")}
+            {tr("ticket.sendTicket", "إرسال تذكرة")}
           </button>
           <TicketModal open={open} setOpen={setOpen} refetch={refetch} />
           <CustomDataTable
             columns={columns}
             data={tickets}
             searchableFields={["user.name", "title", "status.nameAr"]}
-            searchPlaceholder={t("searchPlaceholder")}
+            searchPlaceholder={tr("searchPlaceholder", "ابحث...")}
             isLoading={isLoading}
           />
         </div>

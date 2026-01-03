@@ -83,9 +83,8 @@ const AdminMarkPaidAction = ({ requestId, refetch }) => {
   const [markPaid, { isLoading }] = useAdminMarkRequestPaidMutation();
   const { data: requestData } = useGetRequestDetailsQuery(requestId);
 
-  // Show only if status is waiting_payment (21) or priced (8)
-  // 8 = Priced, 21 = Waiting Payment
-  const canMarkPaid = requestData?.status?.id === 21 || requestData?.status?.id === 8;
+  // Show only if status is priced or waiting-payment (by code)
+  const canMarkPaid = ["priced", "waiting-payment", "waiting_payment"].includes(requestData?.status?.code);
 
   if (!canMarkPaid) return null;
 

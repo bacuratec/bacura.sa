@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { supabaseBaseQuery } from "./supabaseBaseQuery";
+import { supabase } from "@/lib/supabaseClient";
 
 export const ordersApi = createApi({
   reducerPath: "ordersApi",
@@ -376,7 +377,7 @@ export const ordersApi = createApi({
         body: {
           payment_status: "paid",
           requester_accepted_price: true, // Ensure accepted if paid
-          status_id: 15, // Paid status
+          status_id: 204, // Paid status (RequestStatus)
           updated_at: new Date().toISOString(),
         },
       }),

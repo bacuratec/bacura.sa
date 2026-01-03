@@ -98,6 +98,12 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
             color: "#FF5630",
         },
         {
+            name: t("requests.stats.paid") || "مدفوع",
+            href: "/admin/requests?RequestStatus=204",
+            numbers: stats?.paidRequestsCount || 0,
+            color: "#10B981",
+        },
+        {
             name: t("requests.stats.completed"),
             href: "/admin/requests?RequestStatus=11",
             numbers: stats?.approvedRequestsCount || 0,

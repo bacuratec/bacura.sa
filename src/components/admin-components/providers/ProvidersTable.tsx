@@ -275,18 +275,20 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                         </Link>
                     </div>
                 )}
-                <CustomDataTable
-                    tabs={tabs}
-                    columns={columns}
-                    data={providers}
-                    searchableFields={["name"]}
-                    searchPlaceholder={t("searchPlaceholder")}
-                    pagination={true}
-                    isLoading={isLoading}
-                    totalRows={totalRows}
-                    defaultPage={Number(PageNumber)}
-                    defaultPageSize={Number(PageSize)}
-                />
+                {providers.length > 0 && (
+                    <CustomDataTable
+                        tabs={tabs}
+                        columns={columns}
+                        data={providers}
+                        searchableFields={["name"]}
+                        searchPlaceholder={t("searchPlaceholder")}
+                        pagination={true}
+                        isLoading={isLoading}
+                        totalRows={totalRows}
+                        defaultPage={Number(PageNumber)}
+                        defaultPageSize={Number(PageSize)}
+                    />
+                )}
             </div>
 
             <ModalDelete

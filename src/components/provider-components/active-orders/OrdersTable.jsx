@@ -39,32 +39,34 @@ const OrdersTable = () => {
       name: t("orders.columns.orderNumber"),
       cell: (row) => (
         <span className="rounded-lg text-xs text-blue-600 font-normal">
-          {row?.orderNumber}
+          {row?.orderNumber || row?.id?.slice?.(0, 8) || "-"}
         </span>
       ),
     },
     {
       name: t("orders.columns.requester"),
-      selector: (row) => row?.requester?.fullName || t("unknown") || "-",
+      selector: (row) => row?.requester?.fullName || row?.request?.requester?.name || t("unknown") || "-",
       wrap: true,
     },
     {
       name: t("orders.columns.provider"),
-      selector: (row) => row?.providers?.fullName || t("unknown") || "-",
+      selector: (row) => row?.providers?.fullName || row?.provider?.name || t("unknown") || "-",
       wrap: true,
     },
     {
       name: t("projects.serviceType"),
       selector: (row) =>
         lang === "ar"
-          ? row?.services?.[0]?.titleAr || "-"
-          : row?.services?.[0]?.titleEn || "-",
+          ? row?.services?.[0]?.titleAr || row?.request?.service?.name_ar || "-"
+          : row?.services?.[0]?.titleEn || row?.request?.service?.name_en || "-",
       wrap: true,
     },
     {
       name: t("orders.columns.startDate"),
       selector: (row) =>
-        row?.startDate ? dayjs(row.startDate).format("DD/MM/YYYY hh:mm A") : "-",
+        row?.startDate
+          ? dayjs(row.startDate).format("DD/MM/YYYY hh:mm A")
+          : (row?.created_at ? dayjs(row.created_at).format("DD/MM/YYYY hh:mm A") : "-"),
       wrap: true,
     },
     {
@@ -80,20 +82,20 @@ const OrdersTable = () => {
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
             ${
-              row?.orderStatus?.id === 603
+              (row?.orderStatus?.id === 603 || row?.status?.code === 'completed')
                 ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                : row?.orderStatus?.id === 602
+                : (row?.orderStatus?.id === 602 || row?.status?.code === 'accepted')
                 ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                : row?.orderStatus?.id === 605 || row?.orderStatus?.id === 604
+                : (row?.orderStatus?.id === 605 || row?.orderStatus?.id === 604 || row?.status?.code === 'rejected')
                 ? "bg-red-100 text-red-700"
-                : row?.orderStatus?.id === 601
+                : (row?.orderStatus?.id === 601 || row?.status?.code === 'waiting-approval')
                 ? "bg-red-100 text-[#B76E00]"
                 : "bg-gray-100 text-gray-600"
             }`}
         >
           {lang === "ar"
-            ? row?.orderStatus?.nameAr || "-"
-            : row?.orderStatus?.nameEn || "-"}
+            ? (row?.orderStatus?.nameAr || row?.status?.name_ar || "-")
+            : (row?.orderStatus?.nameEn || row?.status?.name_en || "-")}
         </span>
       ),
       wrap: true,
@@ -115,19 +117,19 @@ const OrdersTable = () => {
         </Link>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];
 
+  const baseData = Array.isArray(projects) ? projects : (projects?.data || []);
   const filteredProjects =
     OrderStatusLookupId === ""
-      ? projects?.filter((item) => item.orderStatus?.id === 600)
-      : projects;
+      ? baseData?.filter((item) => (item.orderStatus?.id === 600) || (item.status?.id === 600) || (item.order_status_id === 600))
+      : baseData;
 
   const sortedData = filteredProjects
     ? [...filteredProjects]?.sort((a, b) => {
-        return Number(b?.orderNumber) - Number(a?.orderNumber);
+        return Number(b?.orderNumber || b?.id) - Number(a?.orderNumber || a?.id);
       })
     : [];
 

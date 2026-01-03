@@ -9,6 +9,8 @@ import pdfIcon from "@/assets/images/pdf.png";
 import fileUploadImg from "@/assets/icons/fileUpload.svg";
 import toast from "react-hot-toast";
 import { getAppBaseUrl } from "../../../utils/env";
+import { FileText, Download, Eye } from "lucide-react";
+import { motion as m } from "framer-motion";
 
 const base = getAppBaseUrl();
 
@@ -147,59 +149,104 @@ const ProfileInfo = () => {
       <meta name="description" content={t("footer.profile")} />
 
       <HeadTitle title={t("footer.profile")} />
-      <div className="container">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex flex-col gap-4">
-            <label className="font-medium text-sm">
-              {t("footer.profile")} <span className="text-red-500">*</span>
-            </label>
+      <div className="container px-4 py-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
 
-            <label
-              htmlFor="file-upload"
-              className="flex flex-col items-center justify-center border-2 border-dashed border-[#ADADAD] rounded-xl px-4 py-10 cursor-pointer text-center text-[#808080] hover:border-primary transition"
-            >
-              <img src={typeof fileUploadImg === "string" ? fileUploadImg : (fileUploadImg?.src || "")} alt="upload" className="mb-2 w-20" loading="lazy" decoding="async" />
-              <span className="text-sm font-normal">
-                {t("formRequest.attachmentsPlaceholder")}
-              </span>
-              <input
-                id="file-upload"
-                name="attachment"
-                type="file"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </label>
-          </div>
+          <form onSubmit={handleSubmit} className="relative z-10 space-y-10">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-primary/10 rounded-2xl">
+                  <FileText className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-gray-900">{t("profileInfo.uploadTitle") || "رفع المستندات"}</h3>
+                  <p className="text-gray-400 text-sm font-medium">{t("profileInfo.uploadDesc") || "يرجى إرفاق النسخ الرقمية من السجلات التجارية والتراخيص"}</p>
+                </div>
+              </div>
 
-          {/* preview selected files with X */}
-          {selectedFile && (
-            <SelectedAttachmentCard
-              file={selectedFile}
-              onRemove={() => {
-                if (preview?.url) URL.revokeObjectURL(preview.url);
-                setSelectedFile(null);
-                setPreview(null);
-              }}
-            />
-          )}
+              <label
+                htmlFor="file-upload"
+                className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-[32px] px-6 py-16 cursor-pointer text-center text-gray-400 hover:border-primary hover:bg-primary/5 transition-all group"
+              >
+                <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-6 shadow-inner group-hover:bg-primary/10 transition-colors">
+                  <img
+                    src={typeof fileUploadImg === "string" ? fileUploadImg : (fileUploadImg?.src || "")}
+                    alt="upload"
+                    className="w-10 h-10 group-hover:scale-110 transition-transform"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <span className="text-sm font-bold text-gray-500 group-hover:text-primary">
+                  {t("formRequest.attachmentsPlaceholder") || "اسحب الملفات هنا أو انقر للإختيار"}
+                </span>
+                <input
+                  id="file-upload"
+                  name="attachment"
+                  type="file"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
 
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={uploading}
-              className="px-4 py-2 bg-primary text-white rounded disabled:opacity-50"
-            >
-              {uploading
-                ? t("profileInfo.uploading") || "Uploading..."
-                : t("profileInfo.submit") || "Submit"}
-            </button>
-          </div>
-        </form>
+            {/* preview selected files with X */}
+            {selectedFile && (
+              <m.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex justify-center"
+              >
+                <SelectedAttachmentCard
+                  file={selectedFile}
+                  onRemove={() => {
+                    if (preview?.url) URL.revokeObjectURL(preview.url);
+                    setSelectedFile(null);
+                    setPreview(null);
+                  }}
+                />
+              </m.div>
+            )}
+
+            <div className="flex pt-6 border-t border-gray-50">
+              <button
+                type="submit"
+                disabled={uploading}
+                className="ml-auto bg-primary hover:bg-primary/90 text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center gap-2"
+              >
+                {uploading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    {t("profileInfo.uploading") || "جارٍ الرفع..."}
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5 opacity-50 rotate-180" />
+                    {t("profileInfo.submit") || "رفع المستند"}
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
 
         {/* show already-uploaded attachments from server */}
-        {data && (
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {data && Array.isArray(data) && data.length > 0 && (
+          <div className="mt-12 space-y-6">
+            <h3 className="text-xl font-black text-gray-800 flex items-center gap-3">
+              <div className="w-2 h-6 bg-primary rounded-full"></div>
+              {t("profile.uploadedAttachments") || "المرفقات المرفوعة سابقا"}
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {data.map((item) => (
+                <AttachmentCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+        {data && !Array.isArray(data) && (
+          <div className="mt-12">
             <AttachmentCard item={data} />
           </div>
         )}

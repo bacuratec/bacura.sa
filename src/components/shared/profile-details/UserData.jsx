@@ -8,16 +8,15 @@ const UserData = ({ data, onEdit }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const {
-    full_name: fullName,
-    email,
-    phone: phoneNumber,
-    creation_time: creationTime,
-    commercial_registration_number: commercialRegistrationNumber,
-    entity_type: entityType,
-    city,
-    commercial_registration_date: commercialRegistration,
-  } = (data?.user || data);
+  const srcData = data?.user ? { ...data, ...data.user } : data || {};
+  const fullName = srcData.full_name || srcData.fullName || srcData.name || "-";
+  const email = srcData.email || "-";
+  const phoneNumber = srcData.phone || srcData.phoneNumber || "-";
+  const creationTime = srcData.creation_time || srcData.created_at || srcData.user_created_at || Date.now();
+  const commercialRegistrationNumber = srcData.commercial_registration_number || srcData.commercialRegNo || srcData.commercial_registration_no || null;
+  const commercialRegistration = srcData.commercial_registration_date || srcData.CommercialRegistrationDate || null;
+  const entityType = srcData.entity_type || srcData.entityType || null;
+  const city = srcData.city || srcData.address || null;
 
   const joiningDateFormatted = new Date(creationTime).toLocaleDateString(
     lang === "ar" ? "ar-EG" : "en-US",
@@ -69,7 +68,13 @@ const UserData = ({ data, onEdit }) => {
               <div className="relative group">
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-[40px] overflow-hidden border-4 border-white shadow-xl bg-gray-50 flex items-center justify-center">
                   <img
-                    src={data?.profile_picture_url ? `${base}${data.profile_picture_url}` : "/vite.png"}
+                    src={
+                      srcData.profile_picture_url
+                        ? `${base}${srcData.profile_picture_url}`
+                        : srcData.profilePictureUrl
+                        ? `${base}/${String(srcData.profilePictureUrl).replace(/^\//, "")}`
+                        : "/vite.png"
+                    }
                     alt=""
                     className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
                   />
@@ -82,7 +87,7 @@ const UserData = ({ data, onEdit }) => {
                 </div>
               </div>
               <div className="mt-4 text-center">
-                <h4 className="font-black text-gray-900 text-lg">{fullName || data?.name || "-"}</h4>
+                <h4 className="font-black text-gray-900 text-lg">{fullName}</h4>
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("navSeeker.serviceSeeker") || "Service Seeker"}</span>
               </div>
             </div>
@@ -90,7 +95,7 @@ const UserData = ({ data, onEdit }) => {
             {/* Info Grid */}
             <div className="lg:col-span-9">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                <InfoItem label={t("userData.email")} value={email || data?.user?.email || "-"} icon={<Mail className="w-4 h-4" />} />
+                <InfoItem label={t("userData.email")} value={email} icon={<Mail className="w-4 h-4" />} />
                 <InfoItem label={t("userData.phone")} value={phoneNumber} icon={<Phone className="w-4 h-4" />} />
                 <InfoItem label={t("userData.registrationDate")} value={joiningDateFormatted} icon={<User className="w-4 h-4" />} />
                 {commercialRegistrationNumber && (

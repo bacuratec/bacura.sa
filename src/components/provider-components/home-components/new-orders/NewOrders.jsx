@@ -39,34 +39,36 @@ const OrdersTable = () => {
       name: t("orders.columns.orderNumber"),
       cell: (row) => (
         <span className="rounded-lg text-xs text-blue-600 font-normal">
-          {row?.orderNumber}
+          {row?.orderNumber || row?.id?.slice?.(0, 8) || "-"}
         </span>
       ),
     },
     {
       name: t("orders.columns.requester"),
-      selector: (row) => row.requester.fullName,
+      selector: (row) => row.requester?.fullName || row.request?.requester?.name || "-",
       wrap: true,
     },
     {
       name: t("orders.columns.provider"),
-      selector: (row) => row.providers.fullName,
+      selector: (row) => row.providers?.fullName || row.provider?.name || "-",
       wrap: true,
     },
     {
       name: t("projects.serviceType"),
       selector: (row) =>
-        lang === "ar" ? row.services[0].titleAr : row.services[0].titleEn,
+        lang === "ar"
+          ? row.services?.[0]?.titleAr || row.request?.service?.name_ar || "-"
+          : row.services?.[0]?.titleEn || row.request?.service?.name_en || "-",
       wrap: true,
     },
     {
       name: t("orders.columns.startDate"),
-      selector: (row) => dayjs(row.startDate).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) => row.startDate ? dayjs(row.startDate).format("DD/MM/YYYY hh:mm A") : (row.created_at ? dayjs(row.created_at).format("DD/MM/YYYY hh:mm A") : "-"),
       wrap: true,
     },
     {
       name: t("orders.columns.endDate"),
-      selector: (row) => dayjs(row.endDate).format("DD/MM/YYYY hh:mm A"),
+      selector: (row) => row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
@@ -108,19 +110,19 @@ const OrdersTable = () => {
         </Link>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];
 
+  const baseData = Array.isArray(projects) ? projects : (projects?.data || []);
   const filteredProjects =
     OrderStatusLookupId === ""
-      ? projects?.filter((item) => item.orderStatus?.id === 600)
-      : projects;
+      ? baseData?.filter((item) => (item.orderStatus?.id === 600) || (item.status?.id === 600) || (item.order_status_id === 600))
+      : baseData;
 
   const sortedData = filteredProjects
     ? [...filteredProjects]?.sort((a, b) => {
-        return Number(b?.orderNumber) - Number(a?.orderNumber);
+        return Number(b?.orderNumber || b?.id) - Number(a?.orderNumber || a?.id);
       })
     : [];
 

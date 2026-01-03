@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+import { useSelector } from "react-redux";
 
 const HeadTitle = ({
   title,
@@ -82,8 +84,30 @@ const HeadTitle = ({
     <div className="flex items-center justify-between lg:w-1/2">
       <div className="flex flex-col gap-1">
         <h1 className="font-bold text-2xl">{title}</h1>
-        <div>
-          <span className="text-[#898A8D] text-xs">{nav1}</span> &gt;{" "}
+        <div className="flex items-center gap-2">
+          <Link
+            href={
+              (() => {
+                const role = (useSelector((s) => s.auth.role) || "").toLowerCase();
+                if (role === "admin") return "/admin";
+                if (role === "provider") return "/provider";
+                if (role === "requester") return "/home";
+                return "/";
+              })()
+            }
+            className="group flex items-center gap-2 text-primary"
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full transition-all bg-primary/20 ring-2 ring-primary/30 shadow-sm group-hover:shadow-md group-active:scale-[0.98]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true">
+                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
+                <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              </svg>
+            </span>
+            <span className="text-xs font-bold">الصفحه الرئيسية</span>
+          </Link>
+          <span className="text-[#898A8D] text-xs">&gt;</span>
+          <span className="text-[#898A8D] text-xs">{nav1}</span>
+          <span className="text-[#898A8D] text-xs">&gt;</span>
           <span className="text-primary text-xs">{nav2}</span>
         </div>
       </div>

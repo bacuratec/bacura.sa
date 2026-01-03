@@ -118,7 +118,7 @@ export const projectsApi = createApi({
         method: "GET",
         id,
         joins: [
-          "request:requests(id,title,description,requester_id,service_id, requester:requesters(id,name))",
+          "request:requests(id,title,description,requester_id,service_id,attachments_group_key,created_at, requester:requesters(id,name), service:services(id,name_ar,name_en,base_price))",
           "provider:providers(id,name,specialization,avg_rate)",
           "status:lookup_values!orders_order_status_id_fkey(id,name_ar,name_en,code)",
         ],
