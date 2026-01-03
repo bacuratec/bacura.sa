@@ -14,10 +14,13 @@ import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import { supabase } from "@/lib/supabaseClient";
 import ProjectDeliverables from "../../../components/landing-components/request-service/ProjectDeliverables";
+import ProjectChat from "@/components/shared/ProjectChat";
+import { useSelector } from "react-redux";
 
 const ProjectsAdminDetails = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
+  const { userId } = useSelector((state) => state.auth);
   const [orderAttachments, setOrderAttachments] = useState([]);
   const [requestAttachments, setRequestAttachments] = useState([]);
   const [attachmentGroupKey, setAttachmentGroupKey] = useState("");
@@ -203,14 +206,18 @@ const ProjectsAdminDetails = () => {
             </div>
           </div>
         )}
+        <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-6 mt-6">
+          <ProjectChat orderId={projectData?.id} userId={userId} title={t("projects.chat", "محادثة المشروع")} />
+        </div>
+
         {projectData?.id && (
           <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-6 mt-6">
             <h3 className="text-lg font-black text-gray-900 mb-4">{t("projects.deliverables") || "مستندات التسليم"}</h3>
             <ProjectDeliverables orderId={projectData.id} />
           </div>
         )}
-        {(mappedData.orderStatus?.id === 605 ||
-          mappedData.orderStatus?.id === 604) && (
+        {(mappedData.orderStatus?.id === 19 ||
+          mappedData.orderStatus?.id === 20) && (
             <ReassignRequest refetch={refetch} />
           )}
       </div>

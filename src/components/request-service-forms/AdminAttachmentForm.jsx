@@ -77,14 +77,14 @@ const AdminAttachmentForm = ({ data, refetch }) => {
         if (selectedFiles.length > 0) {
           const uploadFormData = new FormData();
           uploadFormData.append("attachmentUploaderLookupId", 700);
-          uploadFormData.append("requestPhaseLookupId", 801);
+          uploadFormData.append("requestPhaseLookupId", 24);
 
           selectedFiles.forEach((file) => {
             uploadFormData.append("files", file);
           });
 
           await axios.post(
-            `${getAppBaseUrl()}api/attachments?groupKey=${data?.attachments_group_key || data?.attachmenstGroupKey
+            `${getAppBaseUrl()}api/attachments?groupKey=${data?.attachments_group_key || data?.attachmentsGroupKey
             }`,
             uploadFormData
           );

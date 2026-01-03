@@ -1,7 +1,5 @@
 // Script to run migration on Supabase
 const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
-const path = require('path');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://tqskjoufozgyactjnrix.supabase.co';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxc2tqb3Vmb3pneWFjdGpucml4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjQxMTM0NywiZXhwIjoyMDgxOTg3MzQ3fQ.xRU624hUrN8FTprG-LDYBiRhfLYb1oxDn2JowoX3QtU';
@@ -23,28 +21,6 @@ async function runMigration() {
             return;
         }
         console.log('✅ Connected to Supabase\n');
-
-        // Run each migration step separately using RPC or direct queries
-        const steps = [
-            {
-                name: '1. Add admin_price to requests',
-                query: async () => {
-                    const { error } = await supabase.rpc('exec_sql', {
-                        sql_query: "ALTER TABLE requests ADD COLUMN IF NOT EXISTS admin_price NUMERIC(12,2)"
-                    });
-                    return error;
-                }
-            },
-            {
-                name: '2. Add admin_notes to requests',
-                query: async () => {
-                    const { error } = await supabase.rpc('exec_sql', {
-                        sql_query: "ALTER TABLE requests ADD COLUMN IF NOT EXISTS admin_notes TEXT"
-                    });
-                    return error;
-                }
-            }
-        ];
 
         // Since we can't run DDL via the client, let's just verify the current schema
         console.log('📋 Checking current requests table structure...\n');

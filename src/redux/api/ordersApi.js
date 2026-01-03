@@ -1,6 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { supabaseBaseQuery } from "./supabaseBaseQuery";
-import { supabase } from "@/lib/supabaseClient";
 
 export const ordersApi = createApi({
   reducerPath: "ordersApi",
@@ -133,6 +132,20 @@ export const ordersApi = createApi({
           "provider:providers!requests_provider_id_fkey(id,name)",
         ],
       }),
+      providesTags: ["Requests"],
+    }),
+    // Get Attachments by Group Key
+    getAttachmentsByGroupKey: builder.query({
+      query: (groupKey) => ({
+        table: "attachment_groups",
+        method: "GET",
+        filters: { group_key: groupKey },
+        joins: ["attachments:attachments(id,file_path,file_name,content_type,size_bytes,request_phase_lookup_id,created_at)"],
+      }),
+      transformResponse: (response) => {
+        const group = Array.isArray(response) ? response[0] : response;
+        return group?.attachments || [];
+      },
       providesTags: ["Requests"],
     }),
     // Get Order by Request ID
@@ -402,6 +415,7 @@ export const {
   useAssignProviderToRequestMutation,
   useGetProjectMessagesQuery,
   useAddProjectMessageMutation,
+  useGetAttachmentsByGroupKeyQuery,
   useMarkProjectMessagesReadMutation,
   useGetDeliverablesQuery,
   useAddDeliverableMutation,

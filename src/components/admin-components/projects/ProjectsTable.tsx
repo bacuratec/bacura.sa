@@ -103,6 +103,12 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       color: "#B76E00",
     },
     {
+      name: t("projects.waitingStart") || "بانتظار البدء",
+      href: "/admin/projects?OrderStatusLookupId=waiting_start",
+      numbers: stats?.waitingToStartOrdersCount || 0,
+      color: "#F59E0B",
+    },
+    {
       name: t("projects.processing") || "تحت التنفيذ",
       href: "/admin/projects?OrderStatusLookupId=processing",
       numbers: stats?.ongoingOrdersCount || 0,
@@ -192,7 +198,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
     },
     {
       name: t("projects.orderStatus"),
-      center: true,
+      // center: true, // Removed to fix console error
       cell: (row: any) => {
         const status = row.status;
         const code = status?.code;
@@ -205,16 +211,17 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
         else colors = "bg-gray-50 text-gray-700 border-gray-100 ring-gray-500/10";
 
         return (
-          <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
-            <span className={`w-2 h-2 rounded-full ${code === 'processing' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-current'}`} />
-            {lang === "ar" ? status?.name_ar || "-" : status?.name_en || "-"}
+          <div className="w-full flex justify-center">
+            <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
+              <span className={`w-2 h-2 rounded-full ${code === 'processing' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-current'}`} />
+              {lang === "ar" ? status?.name_ar || "-" : status?.name_en || "-"}
+            </div>
           </div>
         );
       },
     },
     {
       name: t("projects.action"),
-      center: true,
       width: "150px",
       cell: (row: any) => (
         <div className="flex items-center justify-center gap-2">

@@ -40,9 +40,9 @@ const Payments = () => {
         const st = row.payment_status || row.status || "-";
         const cls =
           st === "submitted" ? "border-amber-200 bg-amber-50 text-amber-700" :
-          st === "approved" ? "border-green-200 bg-green-50 text-green-700" :
-          st === "rejected" ? "border-rose-200 bg-rose-50 text-rose-700" :
-          "border-gray-200 bg-gray-50 text-gray-700";
+            st === "approved" ? "border-green-200 bg-green-50 text-green-700" :
+              st === "rejected" ? "border-rose-200 bg-rose-50 text-rose-700" :
+                "border-gray-200 bg-gray-50 text-gray-700";
         return <span className={`px-3 py-1 rounded-full text-[10px] font-black border ${cls}`}>{st}</span>;
       },
       wrap: true,
@@ -61,10 +61,12 @@ const Payments = () => {
                 try {
                   await updatePaymentStatus({ id: row.id, body: { status: "approved", paymentStatus: "approved" } }).unwrap();
                   if (row.request_id) {
-                    await updateRequestStatus({ id: row.request_id, statusId: 500 }).unwrap();
+                    await updateRequestStatus({ id: row.request_id, statusId: 204 }).unwrap();
                     await updateRequestPaymentStatus({ id: row.request_id, paymentStatus: "paid" }).unwrap();
                   }
-                } catch {}
+                } catch (error) {
+                  console.error("Error approving payment", error);
+                }
               }}
             >
               {tr("approve", "اعتماد")}
@@ -77,7 +79,9 @@ const Payments = () => {
                   if (row.request_id) {
                     await updateRequestPaymentStatus({ id: row.request_id, paymentStatus: "under_review" }).unwrap();
                   }
-                } catch {}
+                } catch (error) {
+                  console.error("Error updating payment status", error);
+                }
               }}
             >
               {tr("underReview", "تحت المراجعة")}
@@ -87,7 +91,9 @@ const Payments = () => {
               onClick={async () => {
                 try {
                   await updatePaymentStatus({ id: row.id, body: { status: "rejected", paymentStatus: "rejected" } }).unwrap();
-                } catch {}
+                } catch (error) {
+                  console.error("Error rejecting payment", error);
+                }
               }}
             >
               {tr("reject", "رفض")}
@@ -142,7 +148,7 @@ const Payments = () => {
             onClose={() => setChatOpen(false)}
             userId={chatTarget?.user?.id}
             relatedOrderId={chatTarget?.request_id || chatTarget?.order?.id || null}
-            presetTitle={`دفع #${String(chatTarget?.id || "").slice(0,8)}`}
+            presetTitle={`دفع #${String(chatTarget?.id || "").slice(0, 8)}`}
           />
         </div>
       </div>

@@ -4,5 +4,7 @@ export const mcpLog = (label, payload) => {
     if (enable === "1" || enable === "true") {
       console.log(`[MCP] ${label}`, payload);
     }
-  } catch {}
+  } catch {
+    // Ignore logging errors
+  }
 };

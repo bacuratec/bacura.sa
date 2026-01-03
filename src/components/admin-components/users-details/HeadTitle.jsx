@@ -11,33 +11,40 @@ const HeadTitle = ({
   typeProject,
   statusProject,
 }) => {
+  const role = (useSelector((s) => s.auth.role) || "").toLowerCase();
+
   const requestStatusStyles = {
-    500: {
+    207: { // Under Processing
       bg: "#FFF2EE",
       border: "#FFCDBD",
       text: "#B82E00",
     },
-    501: {
+    8: { // Priced
       bg: "#EEFBF4",
       border: "#B2EECC",
       text: "#17663AB2",
     },
-    502: {
+    21: { // Waiting Payment
       bg: "#F7F7F8",
       border: "#D1D1DB",
       text: "#066F1D",
     },
-    503: {
+    10: { // Rejected
       bg: "#FEF0F4",
       border: "#FBB1C4",
       text: "#D50B3E",
     },
-    504: {
+    11: { // Completed
       bg: "#FFF9EB",
       border: "#FFDA85",
       text: "#C78F0B",
     },
-    505: {
+    204: { // Paid
+      bg: "#FFF9EB",
+      border: "#FFDA85",
+      text: "#C78F0B",
+    },
+    7: { // New
       bg: "#EEFBF4",
       border: "#B2EECC",
       text: "#17663AB2",
@@ -88,7 +95,6 @@ const HeadTitle = ({
           <Link
             href={
               (() => {
-                const role = (useSelector((s) => s.auth.role) || "").toLowerCase();
                 if (role === "admin") return "/admin";
                 if (role === "provider") return "/provider";
                 if (role === "requester") return "/home";

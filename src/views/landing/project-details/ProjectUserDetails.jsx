@@ -13,11 +13,13 @@ import AddReviewModal from "../../../components/landing-components/add-rate/AddR
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 
+import ProjectChat from "@/components/shared/ProjectChat";
+
 const ProjectUserDetails = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const role = useSelector((state) => state.auth.role);
+  const { role, userId } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
   const [orderId, setOrderId] = useState(null);
 
@@ -80,9 +82,13 @@ const ProjectUserDetails = () => {
         />
         <UploadAdminAttachments projectData={data} refetch={refetch} />
 
+        <div className="mt-8">
+          <ProjectChat orderId={data?.id} userId={userId} title={t("projectDetails.chat", "محادثة المشروع")} />
+        </div>
+
         {role === "Requester" &&
           !data?.isRated &&
-          data?.orderStatus?.id === 603 && (
+          data?.orderStatus?.id === 15 && (
             <button
               onClick={() => {
                 setOrderId(data.id);

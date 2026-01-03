@@ -41,8 +41,7 @@ const RequesterAttachmentForm = ({ data, refetch }) => {
           uploadFormData.append("files", file);
         });
         await axios.post(
-          `${getAppBaseUrl()}api/attachments?groupKey=${
-            data?.attachmenstGroupKey
+          `${getAppBaseUrl()}api/attachments?groupKey=${data?.attachments_group_key || data?.attachmentsGroupKey
           }`,
           uploadFormData
         );

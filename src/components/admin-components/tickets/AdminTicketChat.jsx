@@ -22,7 +22,9 @@ export default function AdminTicketChat({ ticketId }) {
     try {
       await sendMessage({ ticketId, senderId: adminId, message: msg }).unwrap();
       setText("");
-    } catch {}
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   return (
@@ -37,7 +39,7 @@ export default function AdminTicketChat({ ticketId }) {
           rows.map((m) => (
             <div key={m.id} className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-700">
-                {(m.sender?.email || "").slice(0,1).toUpperCase()}
+                {(m.sender?.email || "").slice(0, 1).toUpperCase()}
               </div>
               <div className="flex-1">
                 <div className="text-xs text-gray-500">{m.sender?.email || tr("tickets.user", "مستخدم")}</div>

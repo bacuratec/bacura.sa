@@ -671,6 +671,19 @@
       "expired": "Expired"
     }
   },
+  "requestLifecycle": {
+    "title": "Request Lifecycle"
+  },
+  "requestSteps": {
+    "new": "New Request",
+    "newDesc": "Request Received",
+    "priced": "Priced",
+    "payment": "Payment",
+    "paidPending": "Payment Confirmation Pending",
+    "execution": "In Progress",
+    "providerPending": "Waiting for Provider Acceptance",
+    "completed": "Completed"
+  },
   "rates": {
     "projectNumber": "Project Number",
     "projectName": "Project Name",

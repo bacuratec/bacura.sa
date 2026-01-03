@@ -8,8 +8,10 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { tr as trHelper } from "@/utils/tr";
 import { getAppBaseUrl } from "@/utils/env";
+import { useSelector } from "react-redux";
+import { supabase } from "@/lib/supabaseClient";
 
-export default function PaymentOptions({ amount, requestId, attachmenstGroupKey, refetch }) {
+export default function PaymentOptions({ amount, requestId, attachmentsGroupKey, refetch }) {
   const { t } = useTranslation();
   const tr = (k, f) => trHelper(t, k, f);
   const [method, setMethod] = useState("bank");
@@ -17,21 +19,51 @@ export default function PaymentOptions({ amount, requestId, attachmenstGroupKey,
   const [files, setFiles] = useState([]);
   const [notes, setNotes] = useState("");
 
+  // Try to get userId from Redux first
+  const { userId: reduxUserId } = useSelector((state) => state.auth || {});
+
   const onUploadChange = (e) => {
     setFiles(Array.from(e.target.files || []));
   };
 
   const submitManual = async (pm) => {
     try {
-      const userId = typeof window !== "undefined" ? (JSON.parse(localStorage.getItem("user"))?.id || null) : null;
-      // Upload receipt(s) as attachments to the same request group
-      if (files.length > 0 && attachmenstGroupKey) {
-        const fd = new FormData();
-        fd.append("attachmentUploaderLookupId", 702);
-        fd.append("requestPhaseLookupId", 802);
-        files.forEach((f) => fd.append("files", f));
-        await axios.post(`${getAppBaseUrl()}api/attachments?groupKey=${attachmenstGroupKey}`, fd);
+      let userId = reduxUserId;
+
+      // Fallback to session or localStorage if not in Redux
+      if (!userId) {
+        const { data: { session } } = await supabase.auth.getSession();
+        userId = session?.user?.id;
       }
+
+      if (!userId && typeof window !== "undefined") {
+        userId = JSON.parse(localStorage.getItem("user"))?.id || null;
+      }
+
+      if (!userId) {
+        toast.error(tr("payment.errorUser", "لم يتم العثور على بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى."));
+        return;
+      }
+
+      // Upload receipt(s) as attachments
+      if (files.length > 0) {
+        // Ensure we have a group key. If not, we might need to handle this (e.g. prompt user or fail).
+        // Usually requests have a key. If not, we use the one passed.
+        if (attachmentsGroupKey) {
+          const fd = new FormData();
+          // 702 might be specific to legacy. Let's try to omit uploader ID or keep it if it's required.
+          // But definitely update Phase to 24 (During Project) for visibility.
+          fd.append("attachmentUploaderLookupId", 702);
+          fd.append("requestPhaseLookupId", 25);
+          files.forEach((f) => fd.append("files", f));
+          await axios.post(`${getAppBaseUrl()}api/attachments?groupKey=${attachmentsGroupKey}`, fd);
+        } else {
+          console.warn("No attachment group key found, skipping receipt upload");
+          toast.error(tr("payment.errorNoGroupKey", "خطأ: لا يمكن رفع الإيصال (رمز المجموعة مفقود)"));
+          return;
+        }
+      }
+
       // Create payment submission
       await createPayment({
         amount,
@@ -47,6 +79,7 @@ export default function PaymentOptions({ amount, requestId, attachmenstGroupKey,
       setNotes("");
       if (typeof refetch === "function") refetch();
     } catch (err) {
+      console.error(err);
       toast.error(tr("payment.errorSubmit", "تعذر إرسال الدفع، حاول لاحقًا"));
     }
   };

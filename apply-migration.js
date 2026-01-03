@@ -8,62 +8,7 @@ const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-async function applyMigration() {
-    console.log('🚀 بدء تطبيق migration: auto_create_order_on_payment...\n');
 
-    try {
-        // Read migration file
-        const migrationPath = path.join(__dirname, 'supabase', 'migrations', '20260101_auto_create_order_on_payment.sql');
-        const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
-
-        // Split by semicolons to execute statements separately
-        const statements = migrationSQL
-            .split(';')
-            .map(s => s.trim())
-            .filter(s => s.length > 0 && !s.startsWith('--'));
-
-        console.log(`📝 عدد الأوامر SQL: ${statements.length}\n`);
-
-        // Execute migration using RPC
-        for (let i = 0; i < statements.length; i++) {
-            const stmt = statements[i];
-            if (!stmt || stmt.length < 10) continue;
-
-            console.log(`⏳ تنفيذ الأمر ${i + 1}/${statements.length}...`);
-
-            try {
-                // Use rpc to execute SQL
-                const { data, error } = await supabase.rpc('exec_sql', { sql_query: stmt + ';' });
-
-                if (error) {
-                    // Try direct query if rpc fails
-                    const result = await supabase.from('_migrations').insert({
-                        name: '20260101_auto_create_order_on_payment',
-                        executed_at: new Date().toISOString()
-                    });
-
-                    console.log(`⚠️  RPC غير متاح، سنستخدم طريقة بديلة`);
-                    break;
-                }
-
-                console.log(`✅ تم بنجاح`);
-            } catch (err) {
-                console.log(`⚠️  تحذير: ${err.message}`);
-            }
-        }
-
-        console.log('\n✅ تم تطبيق Migration بنجاح!');
-        console.log('\n📋 الخطوات التالية:');
-        console.log('1. التحقق من إنشاء الـ functions و triggers');
-        console.log('2. اختبار الإنشاء التلقائي للمشاريع');
-
-        return true;
-    } catch (error) {
-        console.error('\n❌ خطأ في تطبيق Migration:');
-        console.error(error.message);
-        return false;
-    }
-}
 
 // Alternative: Apply using direct SQL execution
 async function applyMigrationDirect() {

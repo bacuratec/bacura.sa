@@ -44,17 +44,19 @@ const AdminCompleteRequest = ({ data, refetch }) => {
 
       const payload = {
         requestId: data?.id,
+        statusCode: 11, // Completed
         isCompleted: true,
         orderTitle: values.requestTitle,
         startDate: values.startDate,
         endDate: values.endDate,
         providers: [values.providerId],
         orderPrice: values.orderPrice, // ➕ أضفت السعر هنا
+        statusId: 11, // Completed status for API
       };
       if (selectedFiles && selectedFiles.length > 0) {
         const uploadFormData = new FormData();
         uploadFormData.append("attachmentUploaderLookupId", 700);
-        uploadFormData.append("requestPhaseLookupId", 803);
+        uploadFormData.append("requestPhaseLookupId", 25);
         for (let i = 0; i < selectedFiles.length; i++) {
           uploadFormData.append("files", selectedFiles[i]);
         }

@@ -5,6 +5,7 @@ import { useAdminSetRequestPriceMutation, useAdminMarkRequestPaidMutation, useGe
 import { useTranslation } from "react-i18next";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
+import { DollarSign } from "lucide-react";
 
 const AdminPricingPanel = ({ refetch }) => {
   const { t } = useTranslation();
@@ -40,10 +41,15 @@ const AdminPricingPanel = ({ refetch }) => {
   };
 
   return (
-    <section className="rounded-2xl bg-white shadow-sm md:p-3 lg:p-4 xl:p-6 my-5">
-      <h3 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-primary mb-5">
-        {t("AdminPricingPanel.title") || "تسعير الطلب"}
-      </h3>
+    <section className="bg-white rounded-[2rem] shadow-custom border border-gray-100 p-6 animate-fade-in-up">
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+          <DollarSign className="w-5 h-5" />
+        </div>
+        <h3 className="text-lg font-bold text-gray-900">
+          {t("AdminPricingPanel.title") || "تسعير الطلب"}
+        </h3>
+      </div>
       <Formik initialValues={{ adminPrice: "", adminNotes: "", adminProposalFileUrl: "" }} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form className="grid gap-4">

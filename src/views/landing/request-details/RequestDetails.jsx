@@ -301,7 +301,7 @@ const RequestDetails = ({ initialData, id }) => {
                 <PaymentOptions
                   amount={showPayment.amount}
                   requestId={showPayment.consultationId}
-                  attachmenstGroupKey={data?.attachmenstGroupKey}
+                  attachmentsGroupKey={data?.attachments_group_key || data?.attachmentsGroupKey}
                   refetch={refetchRequesterDetails}
                 />
               </div>

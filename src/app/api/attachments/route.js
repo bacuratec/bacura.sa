@@ -43,37 +43,45 @@ export async function POST(request) {
 
     let requestPhaseLookupId = null;
     if (requestPhaseCodeRaw) {
-      const { data: type } = await supabaseAdmin
-        .from("lookup_types")
-        .select("id")
-        .eq("code", "request-phase")
-        .maybeSingle();
-      if (type?.id) {
-        const { data: phase } = await supabaseAdmin
-          .from("lookup_values")
+      if (!isNaN(requestPhaseCodeRaw)) {
+        requestPhaseLookupId = parseInt(requestPhaseCodeRaw);
+      } else {
+        const { data: type } = await supabaseAdmin
+          .from("lookup_types")
           .select("id")
-          .eq("lookup_type_id", type.id)
-          .eq("code", String(requestPhaseCodeRaw))
+          .eq("code", "request-phase")
           .maybeSingle();
-        requestPhaseLookupId = phase?.id || null;
+        if (type?.id) {
+          const { data: phase } = await supabaseAdmin
+            .from("lookup_values")
+            .select("id")
+            .eq("lookup_type_id", type.id)
+            .eq("code", String(requestPhaseCodeRaw))
+            .maybeSingle();
+          requestPhaseLookupId = phase?.id || null;
+        }
       }
     }
 
     let attachmentUploaderLookupId = null;
     if (attachmentUploaderLookupIdRaw) {
-      const { data: type } = await supabaseAdmin
-        .from("lookup_types")
-        .select("id")
-        .eq("code", "attachment-uploader")
-        .maybeSingle();
-      if (type?.id) {
-        const { data: uploader } = await supabaseAdmin
-          .from("lookup_values")
+      if (!isNaN(attachmentUploaderLookupIdRaw)) {
+        attachmentUploaderLookupId = parseInt(attachmentUploaderLookupIdRaw);
+      } else {
+        const { data: type } = await supabaseAdmin
+          .from("lookup_types")
           .select("id")
-          .eq("lookup_type_id", type.id)
-          .eq("code", String(attachmentUploaderLookupIdRaw))
+          .eq("code", "attachment-uploader")
           .maybeSingle();
-        attachmentUploaderLookupId = uploader?.id || null;
+        if (type?.id) {
+          const { data: uploader } = await supabaseAdmin
+            .from("lookup_values")
+            .select("id")
+            .eq("lookup_type_id", type.id)
+            .eq("code", String(attachmentUploaderLookupIdRaw))
+            .maybeSingle();
+          attachmentUploaderLookupId = uploader?.id || null;
+        }
       }
     }
 
@@ -115,6 +123,7 @@ export async function POST(request) {
 
     return NextResponse.json({ ok: true, uploaded }, { status: 200 });
   } catch (e) {
+    console.error("API Attachments Error:", e);
     return NextResponse.json({ message: "Unexpected error", details: String(e?.message || e) }, { status: 500 });
   }
 }

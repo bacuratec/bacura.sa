@@ -6,12 +6,13 @@ import RequestDetailsInfo from "../../../components/admin-components/requests/Re
 import { useParams } from "next/navigation";
 import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";
-import { useGetRequestDetailsQuery } from "../../../redux/api/ordersApi";
+import { useGetRequestDetailsQuery, useGetAttachmentsByGroupKeyQuery } from "../../../redux/api/ordersApi";
 import AdminAttachmentForm from "../../../components/request-service-forms/AdminAttachmentForm";
 import RequestAttachment from "../../../components/request-service-forms/RequestAttachment";
 import AdminCompleteRequest from "../../../components/request-service-forms/AdminCompleteRequest";
 import AdminPricingPanel from "../../../components/request-service-forms/AdminPricingPanel";
 import AdminAssignProviderPanel from "../../../components/request-service-forms/AdminAssignProviderPanel";
+import RequestLifecycle from "../../../components/admin-components/requests/RequestLifecycle";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 
@@ -30,10 +31,15 @@ const RequestDetails = () => {
     isLoading: loadingRequester,
   } = useGetRequestDetailsQuery(id);
 
+  const { data: attachmentsData } = useGetAttachmentsByGroupKeyQuery(
+    requestData?.attachments_group_key || requestData?.attachmentsGroupKey,
+    { skip: !requestData?.attachments_group_key && !requestData?.attachmentsGroupKey }
+  );
+
   const data = requestData;
-  const attachments = data?.attachments || [];
-  const firstApprove = requestData?.requestStatus?.id === 505 || null;
-  const finalApprove = requestData?.requestStatus?.id === 500 || null;
+  const attachments = attachmentsData || [];
+  const firstApprove = requestData?.requestStatus?.id === 7 || null;
+  const finalApprove = requestData?.requestStatus?.id === 207 || null;
 
   if (loadingRequester) {
     return <LoadingPage />;
@@ -73,6 +79,7 @@ const RequestDetails = () => {
 
           {/* Main Info Columns (2/3 width) */}
           <div className="xl:col-span-2 space-y-8">
+            <RequestLifecycle request={data} />
             <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
             <RequestAttachment attachments={attachments} />
             {firstApprove && (

@@ -8,10 +8,6 @@ import {
   useProviderProjectStateMutation,
 } from "../../../redux/api/projectsApi";
 import {
-  useGetProjectMessagesQuery,
-  useAddProjectMessageMutation,
-} from "../../../redux/api/ordersApi";
-import {
   useGetDeliverablesQuery,
   useAddDeliverableMutation,
 } from "../../../redux/api/ordersApi";
@@ -24,6 +20,7 @@ import UploadAdminAttachments from "../../../components/shared/forms-end-project
 import { FiveHoursTimer } from "./FiveHoursTimer";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
+import ProjectChat from "@/components/shared/ProjectChat";
 
 const ProviderProjectsDetails = () => {
   const { t } = useTranslation();
@@ -42,11 +39,9 @@ const ProviderProjectsDetails = () => {
     isLoading: loadingProject,
     refetch,
   } = useGetProjectDetailsQuery({ id, params: { IsRejected, IsExpired } });
-  const { data: messagesData, refetch: refetchMessages } = useGetProjectMessagesQuery({ orderId: id, PageNumber: 1, PageSize: 50 });
-  const [addMessage] = useAddProjectMessageMutation();
+
   const { data: deliverablesData, refetch: refetchDeliverables } = useGetDeliverablesQuery({ orderId: id });
   const [addDeliverable] = useAddDeliverableMutation();
-  const [newMessage, setNewMessage] = useState("");
   const [newDeliverable, setNewDeliverable] = useState({ title: "", description: "", url: "" });
 
   const startISO = projectData?.assignTime; // اختار اللي يناسبك
@@ -82,7 +77,7 @@ const ProviderProjectsDetails = () => {
         // reload projectData to get latest status from backend
         // eslint-disable-next-line no-unused-vars
         setStatusId((prev) =>
-          actionType === "approve" ? 601 : actionType === "start" ? 602 : 603
+          actionType === "approve" ? 18 : actionType === "start" ? 13 : 15
         );
       }
       refetch();
@@ -135,36 +130,7 @@ const ProviderProjectsDetails = () => {
           />
         )}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <h3 className="text-sm font-bold mb-3">{t("providerProjectsDetails.messages") || "الرسائل"}</h3>
-            <div className="space-y-2 max-h-64 overflow-auto">
-              {(messagesData || []).map((m) => (
-                <div key={m.id} className="text-xs border-b pb-2">
-                  <div className="font-semibold">{m.sender?.full_name || m.sender?.name || m.sender_id}</div>
-                  <div>{m.message}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 flex items-center gap-2">
-              <input
-                className="input flex-1"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder={t("providerProjectsDetails.writeMessage") || "اكتب رسالة"}
-              />
-              <button
-                className="btn btn-primary"
-                onClick={async () => {
-                  if (!newMessage.trim()) return;
-                  await addMessage({ orderId: id, senderId: userId, message: newMessage }).unwrap();
-                  setNewMessage("");
-                  refetchMessages();
-                }}
-              >
-                {t("common.send") || "إرسال"}
-              </button>
-            </div>
-          </div>
+          <ProjectChat orderId={id} userId={userId} title={t("providerProjectsDetails.messages") || "الرسائل"} />
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <h3 className="text-sm font-bold mb-3">{t("providerProjectsDetails.deliverables") || "التسليمات"}</h3>
             <div className="space-y-2 max-h-64 overflow-auto">
@@ -229,12 +195,12 @@ const ProviderProjectsDetails = () => {
         {/* اذرار اكشن البروفايدر */}
         {/* أزرار الحالة بناءً على statusId */}
         <div className="flex items-center justify-center md:justify-md:justify-start gap-2 md:gap-3 mb-10 mt-10">
-          {statusId === 600 && !rejected && (
+          {statusId === 17 && !rejected && (
             <>
               <FiveHoursTimer
                 startISO={startISO}
                 durationHours={5}
-                // timeZone="Africa/Cairo" // لو عايز تجبر العرض على القاهرة
+              // timeZone="Africa/Cairo" // لو عايز تجبر العرض على القاهرة
               />
               {/* زر الرفض */}
               <button
@@ -262,7 +228,7 @@ const ProviderProjectsDetails = () => {
             </span>
           )}
 
-          {statusId === 601 && (
+          {statusId === 18 && (
             <button
               onClick={() => handleAction("start")}
               disabled={loadingCreateState}
@@ -272,7 +238,7 @@ const ProviderProjectsDetails = () => {
             </button>
           )}
 
-          {statusId === 602 && (
+          {statusId === 13 && (
             <button
               onClick={() => handleAction("complete")}
               disabled={loadingCreateState}
@@ -282,7 +248,7 @@ const ProviderProjectsDetails = () => {
             </button>
           )}
 
-          {/* {(statusId === 606 || statusId === 603) && (
+          {/* {(statusId === 15 || statusId === 15) && (
             <span className="text-green-600 font-semibold border border-green-200 bg-green-50 py-2 px-4 rounded-xl text-sm">
               الطلب مكتمل ✅
             </span>

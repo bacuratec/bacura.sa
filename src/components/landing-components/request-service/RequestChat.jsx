@@ -6,17 +6,21 @@ import { tr as trHelper } from "@/utils/tr";
 import { useGetTicketsByFiltersQuery, useCreateTicketsMutation } from "@/redux/api/ticketApi";
 import { useGetTicketMessagesQuery, useSendTicketMessageMutation } from "@/redux/api/ticketMessagesApi";
 
-export default function RequestChat({ requestId, orderId, userId }) {
+export default function RequestChat({ requestId, orderId, userId, ticketOwnerId }) {
   const { t } = useTranslation();
   const tr = (k, f) => trHelper(t, k, f);
   const [createTicket, { isLoading: creating }] = useCreateTicketsMutation();
+
+  const ownerId = ticketOwnerId || userId;
+
   const filters = useMemo(() => {
-    const f = { user_id: userId };
+    const f = { user_id: ownerId };
     if (requestId) f.related_request_id = requestId;
     else if (orderId) f.related_order_id = orderId;
     return f;
-  }, [userId, requestId, orderId]);
-  const { data: tickets } = useGetTicketsByFiltersQuery(filters, { skip: !userId });
+  }, [ownerId, requestId, orderId]);
+
+  const { data: tickets } = useGetTicketsByFiltersQuery(filters, { skip: !ownerId });
   const firstTicket = Array.isArray(tickets) ? tickets[0] : (tickets?.data?.[0] || null);
   const [ticketId, setTicketId] = useState(firstTicket?.id || null);
   const { data: messages } = useGetTicketMessagesQuery(ticketId, { skip: !ticketId });
@@ -31,8 +35,8 @@ export default function RequestChat({ requestId, orderId, userId }) {
 
   const ensureTicket = async () => {
     if (ticketId) return ticketId;
-    const title = tr("tickets.chatTitle", "محادثة بخصوص الطلب") + ` #${String(requestId || orderId || "").slice(0,8)}`;
-    const payload = { userId, relatedRequestId: requestId || null, relatedOrderId: orderId || null, title, description: "", statusId: 1 };
+    const title = tr("tickets.chatTitle", "محادثة بخصوص الطلب") + ` #${String(requestId || orderId || "").slice(0, 8)}`;
+    const payload = { userId: ownerId, relatedRequestId: requestId || null, relatedOrderId: orderId || null, title, description: "", statusId: 1 };
     const res = await createTicket(payload).unwrap();
     const id = res?.data?.id || res?.id;
     if (id) setTicketId(id);
@@ -69,7 +73,7 @@ export default function RequestChat({ requestId, orderId, userId }) {
           rows.map((m) => (
             <div key={m.id} className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-700">
-                {(m.sender?.email || "").slice(0,1).toUpperCase()}
+                {(m.sender?.email || "").slice(0, 1).toUpperCase()}
               </div>
               <div className="flex-1">
                 <div className="text-xs text-gray-500">{m.sender?.email || tr("tickets.user", "مستخدم")}</div>

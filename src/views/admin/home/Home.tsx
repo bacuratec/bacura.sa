@@ -21,8 +21,8 @@ import { formatAmount } from "@/utils/format";
 
 const Home = () => {
   const { t } = useTranslation();
-  const { data: stats, isLoading } = useGetAdminStatisticsQuery();
-  const { data: paymentsData } = useGetPaymentsQuery({}); 
+  const { data: stats, isLoading } = useGetAdminStatisticsQuery({});
+  const { data: paymentsData } = useGetPaymentsQuery({});
   const [currentTime, setCurrentTime] = useState(new Date());
   const tr = (key: string, fallback: string) => trHelper(t, key, fallback);
 
@@ -216,7 +216,7 @@ const Home = () => {
             </div>
           </div>
         </section>
-        
+
         <section className="lg:col-span-3 bg-white rounded-[40px] p-10 border border-gray-100 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-black text-gray-900">{tr("homeAdmin.wallet", "المحفظة")}</h2>

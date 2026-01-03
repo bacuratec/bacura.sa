@@ -4,10 +4,12 @@ import CustomDataTable from "../../shared/datatable/DataTable";
 import { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { Eye, Edit, Trash, Calendar, Tag, User, MapPin } from "lucide-react";
+import { Eye, Edit, Trash, Calendar, Tag, User, MapPin, MessageCircle } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
+import RequestsChatModal from "./RequestsChatModal";
+import { useSelector } from "react-redux";
 import {
     useGetAllRequestsQuery,
     useDeleteRequestMutation
@@ -44,6 +46,18 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
 
     const [openDelete, setOpenDelete] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    // Chat Logic
+    const { userId } = useSelector((state: any) => state.auth);
+    const [openChat, setOpenChat] = useState(false);
+    const [chatRequestId, setChatRequestId] = useState<string | null>(null);
+    const [chatRequesterId, setChatRequesterId] = useState<string>("");
+
+    const handleChat = (requestId: string, requesterId: string) => {
+        setChatRequestId(requestId);
+        setChatRequesterId(requesterId);
+        setOpenChat(true);
+    };
 
     useEffect(() => {
         refetch();
@@ -174,7 +188,7 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
         },
         {
             name: t("orders.columns.status"),
-            center: true,
+            // center: true, // Removed to fix console error
             cell: (row: any) => {
                 const status = row.status;
                 const statusId = status?.id || row.status_id;
@@ -187,16 +201,17 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
                 else colors = "bg-gray-50 text-gray-700 border-gray-100 ring-gray-500/10";
 
                 return (
-                    <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
-                        <span className={`w-2 h-2 rounded-full ${statusId === 7 ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-current'}`} />
-                        {lang === "ar" ? status?.name_ar || "-" : status?.name_en || "-"}
+                    <div className="w-full flex justify-center">
+                        <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
+                            <span className={`w-2 h-2 rounded-full ${statusId === 7 ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-current'}`} />
+                            {lang === "ar" ? status?.name_ar || "-" : status?.name_en || "-"}
+                        </div>
                     </div>
                 );
             },
         },
         {
             name: t("orders.columns.action"),
-            center: true,
             width: "150px",
             cell: (row: any) => (
                 <div className="flex items-center justify-center gap-2">
@@ -220,6 +235,16 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
                             {t("edit")}
                         </span>
                     </Link>
+                    <button
+                        onClick={() => handleChat(row.id, row.requester?.id || "")}
+                        className="group relative p-2.5 bg-white text-purple-600 rounded-xl border border-purple-100 shadow-sm hover:bg-purple-600 hover:text-white transition-all duration-300"
+                        title={t("tickets.chatTitle") || "المحادثة"}
+                    >
+                        <MessageCircle className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+                        <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                            {t("tickets.chatTitle") || "المحادثة"}
+                        </span>
+                    </button>
                     <button
                         onClick={() => askToDelete(row.id)}
                         className="group relative p-2.5 bg-white text-gray-400 rounded-xl border border-gray-100 shadow-sm hover:bg-gray-900 hover:text-white transition-all duration-300"
@@ -260,6 +285,18 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
                 }}
                 onConfirm={onDelete}
                 loading={isDeleting}
+            />
+
+            <RequestsChatModal
+                open={openChat}
+                onClose={() => {
+                    setOpenChat(false);
+                    setChatRequestId(null);
+                    setChatRequesterId("");
+                }}
+                requestId={chatRequestId}
+                userId={userId}
+                ticketOwnerId={chatRequesterId}
             />
         </div>
     );

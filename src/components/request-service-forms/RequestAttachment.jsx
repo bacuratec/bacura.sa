@@ -2,67 +2,93 @@ import React from "react";
 import AttachmentCard from "./AttachmentCard";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { FolderOpen, FileText, Receipt, File as FileIcon } from "lucide-react";
 
 const RequestAttachment = ({ attachments }) => {
   const role = useSelector((state) => state.auth.role);
   const { t } = useTranslation();
 
   const list = Array.isArray(attachments) ? attachments : [];
-  const RequestAttachment =
-    list.filter((item) => item.requestPhaseLookupId === 800) || [];
-  const RequestAdminAttachment =
-    list.filter((item) => item.requestPhaseLookupId === 801) || [];
-  const RequestRequesterAttachment =
-    list.filter((item) => item.requestPhaseLookupId === 802) || [];
+
+  const requestFiles = list.filter((item) => item.requestPhaseLookupId === 22 || item.requestPhaseLookupId === 23 || item.requestPhaseLookupId === 800) || [];
+  const adminFiles = list.filter((item) => item.requestPhaseLookupId === 24 || item.requestPhaseLookupId === 801 || item.requestPhaseLookupId === 702) || [];
+  const requesterPaymentFiles = list.filter((item) => item.requestPhaseLookupId === 25 || item.requestPhaseLookupId === 802) || [];
 
   return (
-    <section className="rounded-2xl bg-white shadow-sm p-2 md:p-4 lg:p-5 xl:p-6">
-      <h3 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-primary mb-5">
-        {t("RequestAttachment.attachments")}
-      </h3>
-      <div className="flex flex-col gap-6">
-        {RequestAttachment?.length > 0 && (
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm md:text-base lg:text-lg xl:text-xl font-semibold">
-              {t("RequestAttachment.serviceRequestFiles")}
-            </h4>
-            <div className="attachments grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-3 gap-2 md:gap-3 lg:gap-4 xl:gap-5">
-              {RequestAttachment?.map((item) => (
+    <section className="bg-white rounded-[2rem] shadow-custom border border-gray-100 p-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+      <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100">
+        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-primary">
+          <FolderOpen className="w-6 h-6" />
+        </div>
+        <h3 className="text-xl font-bold text-gray-900">
+          {t("RequestAttachment.attachments")}
+        </h3>
+        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-bold">
+          {list.length}
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-10">
+        {requestFiles.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2 text-primary font-bold">
+              <FileIcon className="w-4 h-4" />
+              <h4 className="text-base">
+                {t("RequestAttachment.serviceRequestFiles")}
+              </h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {requestFiles.map((item) => (
                 <AttachmentCard key={item.id || item.fileUrl} item={item} />
               ))}
             </div>
           </div>
         )}
-        {RequestAdminAttachment?.length > 0 && (
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm md:text-base lg:text-lg xl:text-xl font-semibold">
-              {t(
-                role === "Admin"
-                  ? "RequestAttachment.adminPricingFilesForYou"
-                  : "RequestAttachment.adminPricingFilesForAdmin"
-              )}
-            </h4>
-            <div className="attachments grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-3 gap-2 md:gap-3 lg:gap-4 xl:gap-5">
-              {RequestAdminAttachment?.map((item) => (
+
+        {adminFiles.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2 text-secondary font-bold">
+              <FileText className="w-4 h-4" />
+              <h4 className="text-base">
+                {t(
+                  role === "Admin"
+                    ? "RequestAttachment.adminPricingFilesForYou"
+                    : "RequestAttachment.adminPricingFilesForAdmin"
+                )}
+              </h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {adminFiles.map((item) => (
                 <AttachmentCard key={item.id || item.fileUrl} item={item} />
               ))}
             </div>
           </div>
         )}
-        {RequestRequesterAttachment?.length > 0 && (
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm md:text-base lg:text-lg xl:text-xl font-semibold">
-              {t(
-                role === "Admin"
-                  ? "RequestAttachment.requesterReceiptForRequester"
-                  : "RequestAttachment.requesterReceiptForYou"
-              )}
-            </h4>
-            <div className="attachments grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-3 gap-2 md:gap-3 lg:gap-4 xl:gap-5">
-              {RequestRequesterAttachment?.map((item) => (
+
+        {requesterPaymentFiles.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2 text-green-600 font-bold">
+              <Receipt className="w-4 h-4" />
+              <h4 className="text-base">
+                {t(
+                  role === "Admin"
+                    ? "RequestAttachment.requesterReceiptForRequester"
+                    : "RequestAttachment.requesterReceiptForYou"
+                )}
+              </h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {requesterPaymentFiles.map((item) => (
                 <AttachmentCard key={item.id || item.fileUrl} item={item} />
               ))}
             </div>
+          </div>
+        )}
+
+        {list.length === 0 && (
+          <div className="py-12 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">
+            <FolderOpen className="w-12 h-12 mb-3 opacity-20" />
+            <p className="text-sm font-medium">{t("common.noAttachments") || "لا توجد مرفقات"}</p>
           </div>
         )}
       </div>

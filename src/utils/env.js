@@ -55,12 +55,12 @@ export const getSupabaseAnonKey = () => {
  * Get App Base URL
  */
 export const getAppBaseUrl = () => {
-  return (
+  const url =
     getEnv("NEXT_PUBLIC_APP_BASE_URL") ||
     getEnv("VITE_APP_BASE_URL") ||
     (typeof window !== "undefined" ? window.location.origin : "") ||
-    ""
-  );
+    "";
+  return url.endsWith("/") ? url : `${url}/`;
 };
 
 /**
@@ -107,4 +107,3 @@ export const getMoyasarCallbackUrl = () => {
   const trimmed = raw.replace(/\/+$/, "");
   return `${trimmed}/moyasar/callback`;
 };
-

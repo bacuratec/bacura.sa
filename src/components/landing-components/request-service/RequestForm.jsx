@@ -525,7 +525,7 @@ const RequestForm = ({ services }) => {
                       {loadingCreateOrder || loadingCreateOrderPriced ? (
                         <>
                           <span className="loader w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                          <span>{hasPricedService ? (t("formRequest.redirectingToPayment") || "جاري التحويل للدفع...") : (t("formRequest.submitting") || "جاري التقديم...")}</span>
+                          <span>{anyPriced ? (t("formRequest.redirectingToPayment") || "جاري التحويل للدفع...") : (t("formRequest.submitting") || "جاري التقديم...")}</span>
                         </>
                       ) : (
                         t("formRequest.submitButton")

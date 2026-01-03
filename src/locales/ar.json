@@ -575,7 +575,8 @@
     "viewAll": "عرض الكل",
     "service": "الخدمة",
     "date": "التاريخ",
-    "status": "الحالة"
+    "status": "الحالة",
+    "noAttachments": "لا توجد مرفقات"
   },
   "signupForm": {
     "welcome": "اهلا بيك في",
@@ -905,6 +906,19 @@
     "successComplete": "تم إكمال المشروع بنجاح",
     "confirmCompletion": "هل أنت متأكد من اكتمال المشروع واستلام كافة المتطلبات؟",
     "back": "عودة إلى قائمة الطلبات"
+  },
+  "requestLifecycle": {
+    "title": "مراحل الطلب"
+  },
+  "requestSteps": {
+    "new": "طلب جديد",
+    "newDesc": "تم استلام الطلب",
+    "priced": "تم التسعير",
+    "payment": "مرحلة الدفع",
+    "paidPending": "بانتظار تأكيد الدفع",
+    "execution": "قيد التنفيذ",
+    "providerPending": "بانتظار قبول المزود",
+    "completed": "مكتمل"
   },
   "rating": {
     "title": "قيم تجربتك معنا",
