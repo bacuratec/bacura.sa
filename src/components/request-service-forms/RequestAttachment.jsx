@@ -2,12 +2,17 @@ import React from "react";
 import AttachmentCard from "./AttachmentCard";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { FolderOpen, FileText, Receipt, File as FileIcon, Eye, Download, ExternalLink } from "lucide-react";
+import { FolderOpen, FileText, Receipt, File as FileIcon, Eye, Download, ExternalLink, Check, X, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { useParams } from "next/navigation";
 
-const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
+const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId, request }) => {
   const role = useSelector((state) => state.auth.role);
   const { t } = useTranslation();
+  const params = useParams();
+
+  // Use propsRequestId if provide, fallback to URL param 'id'
+  const requestId = propsRequestId || params?.id;
 
   const list = Array.isArray(attachments) ? attachments : [];
 
@@ -17,10 +22,11 @@ const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
 
   const handleAcceptReceipt = async (attachment) => {
     if (!requestId) return window.alert(t('RequestAttachment.noRequestContext') || 'لم يتم العثور على بيانات الطلب');
+
     if (!window.confirm(t('RequestAttachment.confirmAccept') || 'هل تأكدت من قبول هذا الإيصال؟')) return;
 
     try {
-      // find lookup id for request-status 'paid'
+      // Find lookup id for request-status 'paid'
       const { data: lt } = await supabase.from('lookup_types').select('id').eq('code', 'request-status').maybeSingle();
       let statusId = null;
       if (lt?.id) {
@@ -28,7 +34,9 @@ const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
         statusId = lv?.id || null;
       }
 
-      const updatePayload = { payment_status: 'paid', receipt_approved: true, receipt_approved_at: new Date().toISOString() };
+      // We only update columns that exist. Based on DB check, payment_status and receipt_approved are missing on 'requests'.
+      // We will update the associated payment record instead if possible.
+      const updatePayload = { updated_at: new Date().toISOString() };
       if (statusId) updatePayload.status_id = statusId;
 
       const { error } = await supabase.from('requests').update(updatePayload).eq('id', requestId);
@@ -38,7 +46,14 @@ const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
         return;
       }
 
-      // Optionally mark attachment as admin-reviewed via request_phase_lookup_id 26 (example)
+      // Update associated payment records
+      try {
+        await supabase.from('payments').update({ payment_status: 'paid' }).eq('request_id', requestId);
+      } catch (pe) {
+        console.warn('Failed to update payments table:', pe);
+      }
+
+      // Mark attachment as admin-reviewed via request_phase_lookup_id 26
       try {
         await supabase.from('attachments').update({ request_phase_lookup_id: 26 }).eq('id', attachment.id);
       } catch (e) {
@@ -58,14 +73,32 @@ const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
     const reason = window.prompt(t('RequestAttachment.rejectReason') || 'أدخل سبب الرفض');
     if (!reason) return;
     try {
-      const { error } = await supabase.from('requests').update({ payment_status: 'receipt_rejected', admin_notes: reason, receipt_approved: false, receipt_approved_at: null }).eq('id', requestId);
+      // Find lookup id for request-status 'waiting_payment'
+      const { data: lt } = await supabase.from('lookup_types').select('id').eq('code', 'request-status').maybeSingle();
+      let waitingPaymentId = null;
+      if (lt?.id) {
+        const { data: lv } = await supabase.from('lookup_values').select('id').eq('lookup_type_id', lt.id).eq('code', 'waiting_payment').maybeSingle();
+        waitingPaymentId = lv?.id || null;
+      }
+
+      const updatePayload = { admin_notes: reason, updated_at: new Date().toISOString() };
+      if (waitingPaymentId) updatePayload.status_id = waitingPaymentId;
+
+      const { error } = await supabase.from('requests').update(updatePayload).eq('id', requestId);
       if (error) {
         console.error('Failed to reject receipt (update request):', error);
         window.alert(t('RequestAttachment.rejectFailed') || 'فشل رفض الإيصال');
         return;
       }
 
-      // Optionally mark attachment as rejected via a phase id (example: 27)
+      // Update associated payment records
+      try {
+        await supabase.from('payments').update({ payment_status: 'rejected', admin_notes: reason }).eq('request_id', requestId);
+      } catch (pe) {
+        console.warn('Failed to update payments table:', pe);
+      }
+
+      // Mark attachment as rejected via a phase id 27
       try {
         await supabase.from('attachments').update({ request_phase_lookup_id: 27 }).eq('id', attachment.id);
       } catch (e) {
@@ -82,7 +115,9 @@ const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
 
   const getPublicUrl = (path) => {
     if (!path) return "#";
-    return supabase.storage.from('attachments').getPublicUrl(path).data.publicUrl;
+    // If the path starts with 'attachments/', remove it because .from('attachments') already adds it
+    const cleanPath = path.startsWith("attachments/") ? path.replace("attachments/", "") : path;
+    return supabase.storage.from('attachments').getPublicUrl(cleanPath).data.publicUrl;
   };
 
   const handleDeleteAttachment = async (id, filePath) => {
@@ -206,7 +241,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
                       <th className="px-6 py-4 text-center">{t("RequestAttachment.type") || "النوع"}</th>
                       <th className="px-6 py-4 text-center">{t("RequestAttachment.size") || "الحجم"}</th>
                       <th className="px-6 py-4 text-center">{t("RequestAttachment.uploadedAt") || "تاريخ الرفع"}</th>
-                      <th className="px-6 py-4 text-left">{t("common.action") || "تحميل"}</th>
+                      <th className="px-6 py-4 text-left">{t("common.actions") || "الإجراءات"}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -232,15 +267,42 @@ const RequestAttachment = ({ attachments, onDeleted, requestId }) => {
                           {it.created_at ? new Date(it.created_at).toLocaleDateString() : (it.createdAt ? new Date(it.createdAt).toLocaleDateString() : '-')}
                         </td>
                         <td className="px-6 py-4 text-left">
-                          <a
-                            href={getPublicUrl(it.file_path || it.filePathUrl)}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex p-2 bg-white text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
-                            title={t("common.download") || "تحميل"}
-                          >
-                            <Download className="w-4 h-4" />
-                          </a>
+                          <div className="flex items-center justify-end gap-2">
+                            <a
+                              href={getPublicUrl(it.file_path || it.filePathUrl)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-2 bg-white text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                              title={t("common.download") || "تحميل"}
+                            >
+                              <Download className="w-4 h-4" />
+                            </a>
+                            {role === 'Admin' && (
+                              <>
+                                <button
+                                  onClick={() => handleAcceptReceipt(it)}
+                                  className="p-2 bg-white text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                                  title={t("common.accept") || "قبول"}
+                                >
+                                  <Check className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleRejectReceipt(it)}
+                                  className="p-2 bg-white text-rose-600 border border-rose-100 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                                  title={t("common.reject") || "رفض"}
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteAttachment(it.id, it.file_path || it.filePathUrl)}
+                                  className="p-2 bg-white text-gray-400 border border-gray-100 rounded-xl hover:bg-gray-900 hover:text-white transition-all shadow-sm"
+                                  title={t("common.delete") || "حذف"}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}

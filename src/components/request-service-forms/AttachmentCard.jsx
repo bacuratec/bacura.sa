@@ -6,7 +6,9 @@ import { Eye, Download, Trash2, X } from "lucide-react";
 
 const getPublicUrl = (path) => {
   if (!path) return "#";
-  const { data } = supabase.storage.from("attachments").getPublicUrl(path);
+  // If the path starts with 'attachments/', remove it because .from('attachments') already adds it
+  const cleanPath = path.startsWith("attachments/") ? path.replace("attachments/", "") : path;
+  const { data } = supabase.storage.from("attachments").getPublicUrl(cleanPath);
   return data?.publicUrl || "#";
 };
 

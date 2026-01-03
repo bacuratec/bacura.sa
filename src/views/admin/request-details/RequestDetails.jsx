@@ -81,7 +81,7 @@ const RequestDetails = () => {
           <div className="xl:col-span-2 space-y-8">
             <RequestLifecycle request={data} />
             <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
-            <RequestAttachment attachments={attachments} />
+            <RequestAttachment request={data} attachments={attachments} requestId={data?.id} onDeleted={() => refetchRequesterDetails()} />
             {firstApprove && (
               <AdminAttachmentForm data={data} refetch={refetchRequesterDetails} />
             )}

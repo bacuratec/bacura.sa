@@ -790,7 +790,36 @@
     "file": "اسم الملف",
     "type": "نوع الملف",
     "size": "الحجم",
-    "uploadedAt": "تاريخ الرفع"
+    "uploadedAt": "تاريخ الرفع",
+    "noProviderWarning": "تنبيه: لم يتم تعيين مزود خدمة لهذا الطلب. قبول الإيصال سيغير حالة الطلب إلى 'مدفوع' ولكن لن يتم إنشاء مشروع تلقائياً. هل تريد المتابعة؟",
+    "noRequestContext": "لم يتم العثور على بيانات الطلب",
+    "confirmAccept": "هل أنت متأكد من قبول هذا الإيصال؟",
+    "acceptFailed": "فشل قبول الإيصال",
+    "rejectReason": "أدخل سبب الرفض",
+    "rejectFailed": "فشل رفض الإيصال",
+    "confirmDelete": "هل تريد حذف هذا الملف؟",
+    "deleteFailed": "فشل حذف الملف"
+  },
+  "AdminAssignProvider": {
+    "title": "تعيين مزود الخدمة",
+    "providerLabel": "اختيار مزود لتنفيذ العرض",
+    "providerPlaceholder": "ابحث عن مزود باسمه...",
+    "priceLabel": "سعر شراء الخدمة",
+    "pricePlaceholder": "أدخل السعر الذي سيصل للمزود...",
+    "submit": "إرسال العرض للمزود",
+    "update": "تحديث العرض",
+    "submitting": "جاري المعالجة...",
+    "success": "تم إرسال العرض للمزود بنجاح",
+    "error": "حدث خطأ أثناء تعيين المزود",
+    "providerRequired": "يرجى اختيار مزود",
+    "priceRequired": "يرجى إدخال السعر",
+    "priceType": "يجب أن يكون السعر رقماً",
+    "pending": "بانتظار الرد",
+    "accepted": "تم القبول",
+    "rejected": "تم الرفض",
+    "rejectionReason": "سبب الرفض",
+    "assignedStatus": "المزود المعين للعرض",
+    "waitForReceiptApproval": "انتظر موافقة المسؤول على الإيصال قبل تعيين مزود."
   },
   "attachmentForm": {
     "title": "إرسال إيصال التحويل",
@@ -1007,19 +1036,6 @@
     "priceType": "السعر غير صحيح",
     "priceRequired": "أدخل السعر",
     "urlInvalid": "رابط غير صحيح"
-  },
-  "AdminAssignProvider": {
-    "title": "تعيين مزود الخدمة",
-    "providerLabel": "المزوّد",
-    "providerPlaceholder": "اختر مزوداً",
-    "priceLabel": "سعر المزود",
-    "pricePlaceholder": "أدخل السعر (اختياري)",
-    "submit": "تعيين",
-    "providerRequired": "اختر مزوداً",
-    "priceType": "سعر غير صحيح",
-    "submitting": "جاري الحفظ...",
-    "success": "تم تعيين المزود بنجاح",
-    "error": "حدث خطأ أثناء تعيين المزود"
   },
   "servicesAdmin": {
     "title": "إدارة الخدمات",

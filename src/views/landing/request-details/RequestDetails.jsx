@@ -182,7 +182,7 @@ const RequestDetails = ({ initialData, id }) => {
                 <div className="w-1.5 h-6 bg-secondary rounded-full"></div>
                 {t("projects.attachments") || "المرفقات"}
               </h3>
-              <RequestAttachment attachments={attachments} onDeleted={() => refetchRequesterDetails()} requestId={requestId} />
+              <RequestAttachment request={data} attachments={attachments} onDeleted={() => refetchRequesterDetails()} requestId={requestId} />
             </div>
           </div>
 

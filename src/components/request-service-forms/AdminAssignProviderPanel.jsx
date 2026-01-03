@@ -29,7 +29,7 @@ const AdminAssignProviderPanel = ({ data, refetch }) => {
     try {
       const result = await triggerSearch({
         name: inputValue,
-        AccountStatus: 104, // Assuming 104 is 'Active' / 'Verified' status for providers
+        AccountStatus: 201, // 201 is 'Active' status for providers
         PageNumber: 1,
         PageSize: 50
       }).unwrap();
