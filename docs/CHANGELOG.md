@@ -1,5 +1,135 @@
 # سجل التغييرات (Changelog)
 
+## [2.1.0] - 2026-01-03
+
+### ✨ ميزات جديدة
+
+#### Migration: الإنشاء التلقائي للمشاريع عند الدفع
+- ✅ **Function: `auto_create_order_on_payment()`**
+  - ينشئ مشروعاً تلقائياً في جدول `orders` عند تحديث حالة الطلب إلى 204 (مدفوع)
+  - يتحقق من عدم وجود مشروع مسبق
+  - يستخدم حالة "بانتظار البدء" كحالة افتراضية
+- ✅ **Function: `sync_order_status_with_request()`**
+  - يزامن حالة المشروع مع حالة الطلب تلقائياً
+  - خريطة تحويل من حالات الطلبات إلى حالات المشاريع
+- ✅ **Triggers تلقائية**
+  - `trigger_auto_create_order_on_payment` - ينفذ عند تحديث requests
+  - `trigger_sync_order_status` - يزامن الحالات
+- ✅ **Backfill Script**
+  - يحول جميع الطلبات المدفوعة الحالية إلى مشاريع
+- ✅ **Indexes** لتحسين أداء جدول orders
+
+#### المكونات الجديدة
+- ✅ **PaymentOptions.jsx** - نظام دفع محسّن
+  - 3 خيارات دفع: بطاقة، تحويل بنكي، نقدي
+  - عرض بيانات التحويل البنكي الكاملة
+  - رفع إيصال الدفع كمرفقات
+  - واجهة مستخدم عصرية ومتجاوبة
+- ✅ **RequestChat.jsx** - نظام محادثة متكامل
+  - إنشاء تذكرة تلقائية للمحادثة
+  - ربط التذكرة بالطلب أو المشروع
+  - إرسال واستقبال الرسائل
+  - عرض سجل المحادثات
+
+#### API Endpoints الجديدة
+- ✅ `ticketMessagesApi.js` - إدارة رسائل التذاكر
+  - `useGetTicketMessagesQuery`
+  - `useSendTicketMessageMutation`
+
+### 🔧 تحسينات
+
+#### قاعدة البيانات
+- ✅ تحسين أداء جدول `orders` من خلال الـ indexes
+- ✅ تلقائية سير العمل من طلب إلى مشروع
+
+#### Frontend
+- ✅ تحسين تجربة الدفع مع خيارات متعددة
+- ✅ تحسين التواصل مع المحادثة المباشرة
+- ✅ واجهة مستخدم أكثر احترافية
+
+### 📚 التوثيق
+- ✅ **MIGRATION_GUIDE.md** - دليل تطبيق سريع
+- ✅ **walkthrough.md** - مراجعة شاملة مع carousel تفاعلي
+- ✅ **implementation_plan.md** - خطة تنفيذ مفصلة
+- ✅ **verify_migration.sql** - سكريبت التحقق من التطبيق
+- ✅ **apply-migration.js** - سكريبت Node.js للتطبيق
+
+### 📋 الملفات الجديدة
+
+#### Database Migrations
+- `supabase/migrations/20260101_auto_create_order_on_payment.sql`
+- `supabase/migrations/verify_migration.sql`
+
+#### Frontend Components
+- `src/components/landing-components/request-service/PaymentOptions.jsx`
+- `src/components/landing-components/request-service/RequestChat.jsx`
+- `src/components/landing-components/request-service/RequestRating.jsx`
+- `src/components/admin-components/tickets/AdminTicketChat.jsx`
+- `src/components/shared/UserAvatarMenu.jsx`
+
+#### API
+- `src/redux/api/ticketMessagesApi.js`
+
+#### Utilities
+- `src/utils/format.ts`
+- `src/utils/statusMapper.ts`
+- `src/utils/tr.ts`
+
+#### Scripts
+- `apply-migration.js` - تطبيق migration
+- `MIGRATION_GUIDE.md` - دليل التطبيق
+
+### ⚠️ ملاحظات مهمة
+
+> [!IMPORTANT]
+> **Migration يجب تطبيقه يدوياً**
+> 
+> بسبب قيود الصلاحيات، يجب تطبيق migration عبر Supabase SQL Editor:
+> 1. افتح https://tqskjoufozgyactjnrix.supabase.co
+> 2. اذهب إلى SQL Editor
+> 3. انسخ محتوى `20260101_auto_create_order_on_payment.sql`
+> 4. الصق في SQL Editor واضغط RUN
+
+> [!WARNING]
+> **PowerShell Execution Policy**
+> 
+> إذا واجهت مشكلة في تشغيل npm/npx، استخدم:
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+> ```
+
+### 🔄 خطوات الترقية
+
+1. **تطبيق Migration على قاعدة البيانات**
+   - راجع [MIGRATION_GUIDE.md](../MIGRATION_GUIDE.md)
+
+2. **لا حاجة لتحديث Dependencies**
+   - جميع المكونات الجديدة تستخدم المكتبات الموجودة
+
+3. **التحقق من التطبيق**
+   ```sql
+   -- في Supabase SQL Editor
+   \i supabase/migrations/verify_migration.sql
+   ```
+
+4. **تشغيل التطبيق**
+   ```bash
+   npm run dev
+   ```
+
+### 📊 الإحصائيات
+
+- **Migration files جديدة**: 2 ملفات
+- **Frontend components جديدة**: 5 مكونات
+- **API endpoints جديدة**: 1 ملف
+- **Utility files جديدة**: 3 ملفات
+- **ملفات معدلة**: 45+ ملف
+- **Functions SQL مضافة**: 2 دوال
+- **Triggers مضافة**: 2 triggers
+- **Indexes مضافة**: 4+ indexes
+
+---
+
 ## [2.0.0] - 2024-12-XX
 
 ### ✨ ميزات جديدة

@@ -16,25 +16,27 @@ export default async function RequestsPage() {
   };
 
   try {
-    const countFor = async (filters = {}) => {
-      let query = supabase.from("requests").select("*", { count: "exact", head: true });
-      Object.entries(filters).forEach(([k, v]) => {
-        if (v !== undefined && v !== null && v !== "") query = query.eq(k, v);
-      });
+    const countFor = async (statusId = null) => {
+      let query = supabase.from("requests").select("id", { count: "exact", head: true });
+      if (statusId) query = query.eq("status_id", statusId);
+
       const { count, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error(`Error counting requests for status ${statusId}:`, error);
+        return 0;
+      }
       return count || 0;
     };
 
     stats.totalRequestsCount = await countFor();
-    stats.underProcessingRequestsCount = await countFor({ status_id: 500 });
-    stats.initiallyApprovedRequestsCount = await countFor({ status_id: 501 });
-    stats.waitingForPaymentRequestsCount = await countFor({ status_id: 502 });
-    stats.rejectedRequestsCount = await countFor({ status_id: 503 });
-    stats.approvedRequestsCount = await countFor({ status_id: 504 });
-    stats.newRequestssCount = await countFor({ status_id: 505 });
+    stats.newRequestssCount = await countFor(7); // pending
+    stats.underProcessingRequestsCount = await countFor(207); // under_review
+    stats.initiallyApprovedRequestsCount = await countFor(8); // priced
+    stats.waitingForPaymentRequestsCount = await countFor(21); // waiting_payment
+    stats.rejectedRequestsCount = await countFor(10); // rejected
+    stats.approvedRequestsCount = await countFor(11); // completed
   } catch (err) {
-    console.error("Error fetching requests stats:", err);
+    console.error("Critical error fetching requests stats:", err);
   }
 
   // Check for user to optionally show layout

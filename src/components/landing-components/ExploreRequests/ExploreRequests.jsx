@@ -63,12 +63,12 @@ const ExploreRequests = ({ stats }) => {
   const activeService = (services || []).find((s) => String(s.id) === String(ServiceId));
 
   const totalRows = (() => {
-    if (RequestStatus === "500") return stats?.underProcessingRequestsCount || 0;
-    if (RequestStatus === "501") return stats?.initiallyApprovedRequestsCount || 0;
-    if (RequestStatus === "502") return stats?.waitingForPaymentRequestsCount || 0;
-    if (RequestStatus === "503") return stats?.rejectedRequestsCount || 0;
-    if (RequestStatus === "504") return stats?.approvedRequestsCount || 0;
-    if (RequestStatus === "505") return stats?.newRequestssCount || 0;
+    if (RequestStatus === "207") return stats?.underProcessingRequestsCount || 0;
+    if (RequestStatus === "8") return stats?.initiallyApprovedRequestsCount || 0;
+    if (RequestStatus === "21") return stats?.waitingForPaymentRequestsCount || 0;
+    if (RequestStatus === "10") return stats?.rejectedRequestsCount || 0;
+    if (RequestStatus === "11") return stats?.approvedRequestsCount || 0;
+    if (RequestStatus === "7") return stats?.newRequestssCount || 0;
     return stats?.totalRequestsCount || 0;
   })();
 
@@ -125,38 +125,38 @@ const ExploreRequests = ({ stats }) => {
     },
     {
       name: t("requestsUser.status_new"),
-      href: "?RequestStatus=505",
+      href: "?RequestStatus=7",
       numbers: stats?.newRequestssCount,
       color: "#B76E00",
     },
     {
       name: t("requestsUser.status_processing"),
-      href: "?RequestStatus=500",
+      href: "?RequestStatus=207",
       numbers: stats?.underProcessingRequestsCount,
       color: "#B76E00",
     },
     {
       name: t("requestsUser.status_initial_approval"),
-      href: "?RequestStatus=501",
+      href: "?RequestStatus=8",
       numbers: stats?.initiallyApprovedRequestsCount,
 
       color: "#007867",
     },
     {
       name: t("requestsUser.status_waiting_payment"),
-      href: "?RequestStatus=502",
+      href: "?RequestStatus=21",
       numbers: stats?.waitingForPaymentRequestsCount,
       color: "#b76f21",
     },
     {
       name: t("requestsUser.status_rejected"),
-      href: "?RequestStatus=503",
+      href: "?RequestStatus=10",
       numbers: stats?.rejectedRequestsCount,
       color: "#B71D18",
     },
     {
       name: t("requestsUser.status_completed"),
-      href: "?RequestStatus=504",
+      href: "?RequestStatus=11",
       numbers: stats?.approvedRequestsCount,
       color: "#007867",
     },
