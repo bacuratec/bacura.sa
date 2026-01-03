@@ -3,6 +3,7 @@ import AttachmentCard from "./AttachmentCard";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { FolderOpen, FileText, Receipt, File as FileIcon } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const RequestAttachment = ({ attachments }) => {
   const role = useSelector((state) => state.auth.role);
@@ -77,11 +78,44 @@ const RequestAttachment = ({ attachments }) => {
                 )}
               </h4>
             </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {requesterPaymentFiles.map((item) => (
                 <AttachmentCard key={item.id || item.fileUrl} item={item} />
               ))}
             </div>
+
+            {/* Details table for receipts */}
+            <div className="mt-4 bg-gray-50 border border-gray-100 rounded-lg p-4">
+              <h5 className="text-sm font-bold mb-2">{t("RequestAttachment.receiptDetails") || "تفاصيل الإيصال"}</h5>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead>
+                    <tr className="text-gray-600">
+                      <th className="py-2">{t("RequestAttachment.file") || "الملف"}</th>
+                      <th className="py-2">{t("RequestAttachment.type") || "النوع"}</th>
+                      <th className="py-2">{t("RequestAttachment.size") || "الحجم"}</th>
+                      <th className="py-2">{t("RequestAttachment.uploadedAt") || "تاريخ الرفع"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {requesterPaymentFiles.map((it) => (
+                      <tr key={it.id} className="border-t border-gray-100">
+                        <td className="py-2">
+                          <a href={(it.file_path || it.filePathUrl) ? (supabase.storage.from('attachments').getPublicUrl(it.file_path || it.filePathUrl).data.publicUrl) : '#'} target="_blank" rel="noreferrer" className="text-primary underline">
+                            {it.file_name || it.fileName || it.fileName || ''}
+                          </a>
+                        </td>
+                        <td className="py-2">{it.content_type || it.contentType || '-'}</td>
+                        <td className="py-2">{it.size_bytes ? `${(it.size_bytes/1024).toFixed(1)} KB` : (it.sizeBytes ? `${(it.sizeBytes/1024).toFixed(1)} KB` : '-')}</td>
+                        <td className="py-2">{it.created_at ? new Date(it.created_at).toLocaleString() : (it.createdAt ? new Date(it.createdAt).toLocaleString() : '-')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
         )}
 

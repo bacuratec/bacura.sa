@@ -89,21 +89,27 @@ export default function PaymentOptions({ amount, requestId, attachmentsGroupKey,
               return;
             }
             groupId = created.id;
-          }
 
-          // Upload each file to storage and create attachments record
-          for (const file of files) {
-            const ext = file.name.split(".").pop();
-            const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-            const path = `attachments/${groupId}/${unique}.${ext}`;
-
-            const { data: storageRes, error: storageErr } = await supabase.storage
-              .from("attachments")
-              .upload(path, file, { cacheControl: "3600", upsert: false });
-
-            if (storageErr) {
-              console.error("Storage upload error:", storageErr);
-              toast.error(tr("payment.errorUpload", "فشل في رفع بعض الملفات"));
+            // If this upload is for an existing request, attach the group_key to the request
+            if (requestId) {
+              try {
+                const { error: updateErr } = await supabase
+                  .from("requests")
+                  .update({ attachments_group_key: groupKey })
+                  .eq("id", requestId);
+                if (updateErr) {
+                  // Not critical; log for diagnostics
+                  console.warn("Could not update request with attachments_group_key:", updateErr);
+                } else {
+                  // refresh parent data if provided
+                  if (typeof refetch === "function") {
+                    refetch();
+                  }
+                }
+              } catch (uerr) {
+                console.warn("Error attaching group_key to request:", uerr);
+              }
+            }
               return;
             }
 
