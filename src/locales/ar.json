@@ -785,7 +785,12 @@
     "adminPricingFilesForYou": "ملفات التسعير الخاصة بك",
     "adminPricingFilesForAdmin": "ملفات التسعير الخاصة بالمسؤول",
     "requesterReceiptForYou": "إيصال التحويل الخاص بك",
-    "requesterReceiptForRequester": "إيصال التحويل الخاص بطالب الخدمة"
+    "requesterReceiptForRequester": "إيصال التحويل الخاص بطالب الخدمة",
+    "receiptDetails": "تفاصيل إيصال الدفع",
+    "file": "اسم الملف",
+    "type": "نوع الملف",
+    "size": "الحجم",
+    "uploadedAt": "تاريخ الرفع"
   },
   "attachmentForm": {
     "title": "إرسال إيصال التحويل",

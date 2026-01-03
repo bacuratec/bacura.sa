@@ -130,6 +130,7 @@ export const ordersApi = createApi({
           "status:lookup_values!requests_status_id_fkey(id,name_ar,name_en,code)",
           "city:cities(id,name_ar,name_en)",
           "provider:providers!requests_provider_id_fkey(id,name)",
+          "assigned_provider:providers!requests_assigned_provider_id_fkey(id,name)",
         ],
       }),
       providesTags: ["Requests"],
@@ -258,14 +259,46 @@ export const ordersApi = createApi({
     }),
     // Assign provider fields directly on request
     assignProviderToRequest: builder.mutation({
-      query: ({ requestId, providerId, providerPrice }) => ({
+      // Use queryFn to check receipt approval before assigning provider (defense-in-depth)
+      async queryFn({ requestId, providerId, providerPrice }, _queryApi, _extraOptions, baseQuery) {
+        // 1) fetch request
+        const reqRes = await baseQuery({ table: 'requests', method: 'GET', id: requestId });
+        if (reqRes.error) return { error: reqRes.error };
+        const request = reqRes.data;
+        if (!request) return { error: { status: 'NOT_FOUND', message: 'Request not found' } };
+
+        // 2) enforce receipt approval
+        if (!request.receipt_approved) {
+          return { error: { status: 'FORBIDDEN', message: 'Cannot assign provider: receipt not approved' } };
+        }
+
+        // 3) proceed with update
+        const updatePayload = {
+          assigned_provider_id: providerId,
+          provider_quoted_price: providerPrice ?? null,
+          provider_response: 'pending',
+          provider_response_at: null,
+          provider_rejection_reason: null,
+          updated_at: new Date().toISOString(),
+        };
+
+        const updRes = await baseQuery({ table: 'requests', method: 'PUT', id: requestId, body: updatePayload });
+        if (updRes.error) return { error: updRes.error };
+        return { data: updRes.data };
+      },
+      invalidatesTags: ["Requests"],
+    }),
+
+    // Provider responds to an assignment (accept or reject)
+    providerRespond: builder.mutation({
+      query: ({ requestId, response, rejectionReason = null }) => ({
         table: "requests",
         method: "PUT",
         id: requestId,
         body: {
-          provider_id: providerId,
-          provider_price: providerPrice ?? null,
-          provider_assigned_at: new Date().toISOString(),
+          provider_response: response, // 'accepted' or 'rejected'
+          provider_response_at: new Date().toISOString(),
+          provider_rejection_reason: response === 'rejected' ? rejectionReason : null,
           updated_at: new Date().toISOString(),
         },
       }),

@@ -5,7 +5,12 @@ import RequestDetailsInfo from "../../../components/admin-components/requests/Re
 import { useRouter } from "next/navigation";
 import LoadingPage from "../../LoadingPage";
 import NotFound from "../../not-found/NotFound";
-import { useGetRequestDetailsQuery, useRequesterRespondPriceMutation, useGetOrderByRequestQuery } from "../../../redux/api/ordersApi";
+import {
+  useGetRequestDetailsQuery,
+  useRequesterRespondPriceMutation,
+  useGetOrderByRequestQuery,
+  useGetAttachmentsByGroupKeyQuery
+} from "../../../redux/api/ordersApi";
 import RequesterAttachmentForm from "../../../components/request-service-forms/RequesterAttachmentForm";
 import RequestAttachment from "../../../components/request-service-forms/RequestAttachment";
 import RequestStatusStepper from "../../../components/landing-components/request-service/RequestStatusStepper";
@@ -57,6 +62,11 @@ const RequestDetails = ({ initialData, id }) => {
 
   const { data: orderData } = useGetOrderByRequestQuery(requestId);
 
+  const { data: attachmentsData } = useGetAttachmentsByGroupKeyQuery(
+    requestData?.attachments_group_key || requestData?.attachmentsGroupKey,
+    { skip: !requestData?.attachments_group_key && !requestData?.attachmentsGroupKey }
+  );
+
   // Use orderData?.id if available for rating
   const effectiveOrderId = orderData?.id || requestData?.orderId || initialData?.orderId;
 
@@ -70,6 +80,7 @@ const RequestDetails = ({ initialData, id }) => {
   const [adminData, setAdminData] = useState(null);
 
   const data = requestData || initialData || adminData;
+  const attachments = attachmentsData || [];
   const userRole = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user'))?.role : null;
   const userId = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user'))?.id : null;
   const handleChatScroll = () => {
@@ -77,7 +88,6 @@ const RequestDetails = ({ initialData, id }) => {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const attachments = Array.isArray(data?.attachments) ? data.attachments : [];
   const status = data?.status || data?.requestStatus;
   const statusCode = status?.code || "";
   const isCompleted = statusCode === "completed" || statusCode === "rated";
@@ -172,7 +182,7 @@ const RequestDetails = ({ initialData, id }) => {
                 <div className="w-1.5 h-6 bg-secondary rounded-full"></div>
                 {t("projects.attachments") || "المرفقات"}
               </h3>
-              <RequestAttachment attachments={attachments} />
+              <RequestAttachment attachments={attachments} onDeleted={() => refetchRequesterDetails()} requestId={requestId} />
             </div>
           </div>
 

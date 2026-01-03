@@ -736,7 +736,12 @@
     "adminPricingFilesForYou": "Your Pricing Files",
     "adminPricingFilesForAdmin": "Admin’s Pricing Files",
     "requesterReceiptForYou": "Your Transfer Receipt",
-    "requesterReceiptForRequester": "Requester’s Transfer Receipt"
+    "requesterReceiptForRequester": "Requester’s Transfer Receipt",
+    "receiptDetails": "Payment Receipt Details",
+    "file": "File Name",
+    "type": "Content Type",
+    "size": "Size",
+    "uploadedAt": "Uploaded At"
   },
   "attachmentForm": {
     "title": "Send Transfer Receipt",

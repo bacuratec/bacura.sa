@@ -19,6 +19,19 @@ export const detailsApi = createApi({
       }),
       providesTags: ["ProviderDetails"],
     }),
+    getProviderByUserId: builder.query({
+      query: (userId) => ({
+        table: "providers",
+        method: "GET",
+        filters: { user_id: userId },
+        joins: [
+          "user:users!providers_user_id_fkey(id,email,phone,role,is_blocked)",
+          "entity_type:lookup_values!providers_entity_type_id_fkey(id,name_ar,name_en,code)",
+          "city:cities(id,name_ar,name_en)",
+        ],
+      }),
+      providesTags: ["ProviderDetails"],
+    }),
     getRequesterDetails: builder.query({
       query: (id) => ({
         table: "requesters",
@@ -48,6 +61,7 @@ export const detailsApi = createApi({
 
 export const {
   useGetProviderDetailsQuery,
+  useGetProviderByUserIdQuery,
   useGetRequesterDetailsQuery,
   useGetAdminDetailsQuery,
 } = detailsApi;

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import NewOrders from "../../../components/provider-components/home-components/new-orders/NewOrders";
+import InvitationsList from "../../../components/provider-components/home-components/invitations/InvitationsList";
 import HeadTitle from "../../../components/shared/head-title/HeadTitle";
 import {
   ListChecks,
@@ -11,21 +12,22 @@ import {
   ShieldCheck,
   CalendarX,
   Star,
+  Mail,
 } from "lucide-react";
 import Statistics from "../../../components/admin-components/home/statistics/Statistics";
 import BarchartStats from "../../../components/shared/barChart/BarChart";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useGetProviderStatisticsQuery } from "../../../redux/api/providerStatisticsApi";
-import { useGetProviderDetailsQuery } from "../../../redux/api/usersDetails";
+import { useGetProviderDetailsQuery, useGetProviderByUserIdQuery } from "../../../redux/api/usersDetails";
 
 const Home = () => {
   const { t } = useTranslation();
   const userId = useSelector((state) => state.auth.userId);
 
-  // Get provider ID from user details
-  const { data: providerData } = useGetProviderDetailsQuery(userId);
-  const providerId = providerData?.id;
+  // Get provider ID from user details using the auth userId (UUID)
+  const { data: providerData } = useGetProviderByUserIdQuery(userId, { skip: !userId });
+  const providerId = Array.isArray(providerData) ? providerData[0]?.id : providerData?.id;
 
   // Get provider statistics
   const { data: providerStats } = useGetProviderStatisticsQuery(
@@ -160,6 +162,30 @@ const Home = () => {
               <div className="h-[400px]">
                 <BarchartStats data={ordersStats} />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Invitations Section */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-8 px-4">
+            <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                <Mail className="w-6 h-6" />
+              </span>
+              {t("providerHome.invitations") || "دعوات العمل الجديدة"}
+              {providerId && (
+                <span className="text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full font-bold">
+                  {t("providerHome.limitedOffer") || "عرض السعر محدد"}
+                </span>
+              )}
+            </h2>
+            <div className="h-1 flex-1 mx-6 bg-gray-100 rounded-full hidden md:block" />
+          </div>
+
+          <div className="glass-card p-2 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-2xl">
+            <div className="bg-white rounded-[2.2rem] overflow-hidden">
+              <InvitationsList providerId={providerId} />
             </div>
           </div>
         </div>

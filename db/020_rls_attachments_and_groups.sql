@@ -42,6 +42,29 @@ BEGIN
 END
 $$;
 
+-- Policy: allow admin users to select groups and attachments (Admin role)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_policy p JOIN pg_catalog.pg_class c ON p.polrelid = c.oid
+    WHERE c.relname = 'attachment_groups' AND p.polname = 'attachment_groups_select_admin'
+  ) THEN
+    EXECUTE 'CREATE POLICY attachment_groups_select_admin ON public.attachment_groups FOR SELECT USING (get_user_role() = ''Admin'')';
+  END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_policy p JOIN pg_catalog.pg_class c ON p.polrelid = c.oid
+    WHERE c.relname = 'attachments' AND p.polname = 'attachments_select_admin'
+  ) THEN
+    EXECUTE 'CREATE POLICY attachments_select_admin ON public.attachments FOR SELECT USING (get_user_role() = ''Admin'')';
+  END IF;
+END
+$$;
+
 -- Policy: allow inserting attachments only when group belongs to auth.uid()
 DO $$
 BEGIN
@@ -51,6 +74,29 @@ BEGIN
   ) THEN
     -- Use group_id (the new row's column value) in the subquery instead of referencing "new" explicitly
     EXECUTE 'CREATE POLICY attachments_insert_if_group_owner ON public.attachments FOR INSERT WITH CHECK ((SELECT created_by_user_id FROM public.attachment_groups WHERE id = group_id) = auth.uid())';
+  END IF;
+END
+$$;
+
+-- Policy: allow admin users to UPDATE/DELETE attachments (Admin role)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_policy p JOIN pg_catalog.pg_class c ON p.polrelid = c.oid
+    WHERE c.relname = 'attachments' AND p.polname = 'attachments_update_admin'
+  ) THEN
+    EXECUTE 'CREATE POLICY attachments_update_admin ON public.attachments FOR UPDATE USING (get_user_role() = ''Admin'') WITH CHECK (get_user_role() = ''Admin'')';
+  END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_policy p JOIN pg_catalog.pg_class c ON p.polrelid = c.oid
+    WHERE c.relname = 'attachments' AND p.polname = 'attachments_delete_admin'
+  ) THEN
+    EXECUTE 'CREATE POLICY attachments_delete_admin ON public.attachments FOR DELETE USING (get_user_role() = ''Admin'')';
   END IF;
 END
 $$;
