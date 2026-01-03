@@ -14,7 +14,8 @@
     "start": "next start",
     "lint": "eslint .",
     "preview": "next start",
-    "seed:supabase": "node scripts/seed-supabase-users.mjs"
+    "seed:supabase": "node scripts/seed-supabase-users.mjs",
+    "test:e2e:ui": "npx playwright test tests/e2e/upload.spec.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

@@ -1,20 +1,38 @@
 "use server";
 
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin, validateSupabaseAdminKey } from "@/lib/supabase";
 
 export async function POST(request) {
   try {
     if (!supabaseAdmin) {
       return NextResponse.json({ message: "Supabase admin not configured" }, { status: 500 });
     }
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+    console.log(`Using Key Start: ${key ? key.substring(0, 10) + "..." : "MISSING"}`);
+
+    // Validate the key quickly to return a clear error when misconfigured
+    const validation = await validateSupabaseAdminKey();
+    if (!validation.ok) {
+      console.error("Supabase key validation failed:", validation.message);
+      return NextResponse.json({ message: "Supabase service key invalid or misconfigured", details: validation.message }, { status: 500 });
+    }
 
     const url = new URL(request.url);
     const groupKey = url.searchParams.get("groupKey");
-    const form = await request.formData();
+    console.log(`API POST /api/attachments - groupKey: ${groupKey}`);
+
+    let form;
+    try {
+      form = await request.formData();
+    } catch (err) {
+      console.error("Error parsing formData:", err);
+      return NextResponse.json({ message: "Invalid form data", details: err.message }, { status: 400 });
+    }
+
     const files = form.getAll("files");
-    const attachmentUploaderLookupIdRaw = form.get("attachmentUploaderLookupId");
     const requestPhaseCodeRaw = form.get("requestPhaseLookupId");
+    console.log(`Files count: ${files?.length || 0}, Phase: ${requestPhaseCodeRaw}`);
 
     if (!groupKey) {
       return NextResponse.json({ message: "Missing groupKey" }, { status: 400 });
@@ -23,22 +41,37 @@ export async function POST(request) {
       return NextResponse.json({ message: "No files provided" }, { status: 400 });
     }
 
-    const { data: group } = await supabaseAdmin
+    const { data: group, error: fetchGroupErr } = await supabaseAdmin
       .from("attachment_groups")
       .select("id,group_key")
       .eq("group_key", groupKey)
       .maybeSingle();
+
+    if (fetchGroupErr) {
+      console.error("Error fetching group:", fetchGroupErr);
+    }
+
     let groupId = group?.id || null;
+    console.log(`Found groupId: ${groupId}`);
+
     if (!groupId) {
+      console.log(`Creating new group for key: ${groupKey}`);
       const { data: created, error: createErr } = await supabaseAdmin
         .from("attachment_groups")
         .insert({ group_key: groupKey })
         .select("id")
         .single();
+
       if (createErr || !created?.id) {
-        return NextResponse.json({ message: "Failed to create attachment group" }, { status: 500 });
+        console.error("Failed to create group:", createErr);
+        const details = createErr?.message || String(createErr);
+        if ((details || "").toLowerCase().includes("invalid api key") || (details || "").toLowerCase().includes("invalid service key")) {
+          return NextResponse.json({ message: "Supabase service key invalid", details }, { status: 500 });
+        }
+        return NextResponse.json({ message: "Failed to create attachment group", details }, { status: 500 });
       }
       groupId = created.id;
+      console.log(`Created groupId: ${groupId}`);
     }
 
     let requestPhaseLookupId = null;
@@ -46,47 +79,22 @@ export async function POST(request) {
       if (!isNaN(requestPhaseCodeRaw)) {
         requestPhaseLookupId = parseInt(requestPhaseCodeRaw);
       } else {
-        const { data: type } = await supabaseAdmin
-          .from("lookup_types")
+        // Fallback for code-based strings
+        const { data: phase } = await supabaseAdmin
+          .from("lookup_values")
           .select("id")
-          .eq("code", "request-phase")
+          .eq("code", String(requestPhaseCodeRaw))
           .maybeSingle();
-        if (type?.id) {
-          const { data: phase } = await supabaseAdmin
-            .from("lookup_values")
-            .select("id")
-            .eq("lookup_type_id", type.id)
-            .eq("code", String(requestPhaseCodeRaw))
-            .maybeSingle();
-          requestPhaseLookupId = phase?.id || null;
-        }
+        requestPhaseLookupId = phase?.id || null;
       }
     }
-
-    let attachmentUploaderLookupId = null;
-    if (attachmentUploaderLookupIdRaw) {
-      if (!isNaN(attachmentUploaderLookupIdRaw)) {
-        attachmentUploaderLookupId = parseInt(attachmentUploaderLookupIdRaw);
-      } else {
-        const { data: type } = await supabaseAdmin
-          .from("lookup_types")
-          .select("id")
-          .eq("code", "attachment-uploader")
-          .maybeSingle();
-        if (type?.id) {
-          const { data: uploader } = await supabaseAdmin
-            .from("lookup_values")
-            .select("id")
-            .eq("lookup_type_id", type.id)
-            .eq("code", String(attachmentUploaderLookupIdRaw))
-            .maybeSingle();
-          attachmentUploaderLookupId = uploader?.id || null;
-        }
-      }
-    }
+    console.log(`Resolved Phase ID: ${requestPhaseLookupId}`);
 
     const uploaded = [];
+    console.log(`Processing ${files.length} files for group ${groupKey}`);
+
     for (const file of files) {
+      console.log(`Uploading file: ${file.name} (${file.size} bytes)`);
       const arrayBuffer = await file.arrayBuffer();
       const bytes = Buffer.from(arrayBuffer);
       const ext = file.name.split(".").pop();
@@ -99,9 +107,13 @@ export async function POST(request) {
           contentType: file.type || "application/octet-stream",
           upsert: false,
         });
+
       if (storageErr) {
+        console.error("Storage upload error:", storageErr);
         return NextResponse.json({ message: "Storage upload failed", details: storageErr.message }, { status: 500 });
       }
+
+      console.log(`Saved to storage: ${storageRes.path}. Inserting into DB...`);
 
       const { error: insertErr } = await supabaseAdmin
         .from("attachments")
@@ -112,15 +124,17 @@ export async function POST(request) {
           content_type: file.type || null,
           size_bytes: file.size || null,
           request_phase_lookup_id: requestPhaseLookupId,
-          attachment_uploader_lookup_id: attachmentUploaderLookupId,
         });
+
       if (insertErr) {
+        console.error("Database insert error:", insertErr);
         return NextResponse.json({ message: "Database insert failed", details: insertErr.message }, { status: 500 });
       }
 
       uploaded.push({ path: storageRes?.path || path, name: file.name });
     }
 
+    console.log(`Successfully uploaded ${uploaded.length} files.`);
     return NextResponse.json({ ok: true, uploaded }, { status: 200 });
   } catch (e) {
     console.error("API Attachments Error:", e);

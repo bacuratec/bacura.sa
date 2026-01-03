@@ -22,7 +22,7 @@ import { useGetProviderDetailsQuery } from "../../../redux/api/usersDetails";
 const Home = () => {
   const { t } = useTranslation();
   const userId = useSelector((state) => state.auth.userId);
-  
+
   // Get provider ID from user details
   const { data: providerData } = useGetProviderDetailsQuery(userId);
   const providerId = providerData?.id;
@@ -106,21 +106,83 @@ const Home = () => {
     },
   ];
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50/30">
       <title>{t("providerHome.title")}</title>
       <meta name="description" content={t("providerHome.description")} />
-      <HeadTitle
-        title={t("providerHome.title")}
-        // description={t("providerHome.description")}
-      />
-      <div className="flex items-start flex-col lg:flex-row">
-        <Statistics
-          stats={ordersStatistics}
-          title={t("providerHome.statisticsTitle")}
-        />
-        <BarchartStats data={ordersStats} />
+
+      <div className="container mx-auto px-4 py-10 max-w-7xl animate-fade-in">
+        <div className="mb-10 text-center lg:text-start relative group">
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+          <HeadTitle
+            title={t("providerHome.title")}
+          />
+          <p className="text-gray-400 mt-2 text-sm font-medium tracking-wide">
+            {t("providerHome.welcomeBack") || "أهلاً بك مجدداً في لوحة التحكم الخاصة بك"}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Main Statistics Section */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="glass-card p-4 rounded-[2.5rem] relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
+              <div className="absolute top-0 right-0 w-32 h-32 premium-gradient-primary opacity-10 rounded-full -mr-16 -mt-16 blur-2xl" />
+              <Statistics
+                stats={ordersStatistics}
+                title={t("providerHome.statisticsTitle")}
+              />
+            </div>
+
+            <div className="p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-premium relative overflow-hidden group">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-yellow-50 flex items-center justify-center text-yellow-500">
+                  <Star className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest">{t("providerHome.rating") || "التقييم العام"}</h4>
+                  <p className="text-3xl font-black text-gray-800">{providerStats?.averageRating || "5.0"}</p>
+                </div>
+              </div>
+              <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                <div className="h-full premium-gradient-warning" style={{ width: `${(providerStats?.averageRating || 5) * 20}%` }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Bar Chart Section */}
+          <div className="lg:col-span-8">
+            <div className="glass-card p-8 rounded-[2.5rem] transition-all duration-500 hover:shadow-2xl">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-xl font-black flex items-center gap-2">
+                  <div className="w-2 h-8 bg-primary rounded-full" />
+                  {t("providerHome.analytics") || "تحليلات الأداء"}
+                </h3>
+              </div>
+              <div className="h-[400px]">
+                <BarchartStats data={ordersStats} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* New Orders Section */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-8 px-4">
+            <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl premium-gradient-primary flex items-center justify-center text-white shadow-lg">
+                <ListChecks className="w-6 h-6" />
+              </span>
+              {t("providerHome.newOrders") || "الطلبات الجديدة"}
+            </h2>
+            <div className="h-1 flex-1 mx-6 bg-gray-100 rounded-full hidden md:block" />
+          </div>
+
+          <div className="glass-card p-2 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-2xl">
+            <div className="bg-white rounded-[2.2rem] overflow-hidden">
+              <NewOrders />
+            </div>
+          </div>
+        </div>
       </div>
-      <NewOrders />
     </div>
   );
 };

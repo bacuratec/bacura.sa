@@ -34,6 +34,25 @@ export const supabaseAdmin =
       )
     : null
 
+/**
+ * Validate Supabase admin key by doing a lightweight query.
+ * Returns { ok: boolean, message?: string }
+ */
+export async function validateSupabaseAdminKey() {
+  if (!supabaseAdmin) return { ok: false, message: "supabaseAdmin not initialized" };
+  try {
+    const { data, error } = await supabaseAdmin.from("attachment_groups").select("id").limit(1);
+    if (error) {
+      console.error("Supabase key validation error:", error);
+      return { ok: false, message: error.message || String(error) };
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error("Supabase key validation unexpected error:", e);
+    return { ok: false, message: String(e) };
+  }
+}
+
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
 
 export type Profile = Tables<'profiles'>

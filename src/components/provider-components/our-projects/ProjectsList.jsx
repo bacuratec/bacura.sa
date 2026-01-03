@@ -212,18 +212,20 @@ const ProjectsList = ({ stats }) => {
     : [];
 
   return (
-    <div className="py-5">
-      <div className="container">
-        <div className="rounded-3xl bg-white p-5">
-          <CustomDataTable
-            tabs={tabs}
-            columns={columns}
-            data={sortedData}
-            searchableFields={["orderNumber"]}
-            searchPlaceholder={t("searchPlaceholder")}
-            isLoading={isLoading}
-            totalRows={totalRows}
-          />
+    <div className="py-8 bg-gray-50/20">
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className="glass-card p-2 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-2xl">
+          <div className="bg-white rounded-[2.2rem] overflow-hidden p-6">
+            <CustomDataTable
+              tabs={tabs}
+              columns={columns}
+              data={sortedData}
+              searchableFields={["orderNumber"]}
+              searchPlaceholder={t("searchPlaceholder")}
+              isLoading={isLoading}
+              totalRows={totalRows}
+            />
+          </div>
         </div>
       </div>
     </div>

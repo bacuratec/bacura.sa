@@ -99,7 +99,7 @@ const RequestDetails = () => {
 
             {/* Provider Assignment */}
             <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <AdminAssignProviderPanel refetch={refetchRequesterDetails} />
+              <AdminAssignProviderPanel data={data} refetch={refetchRequesterDetails} />
             </div>
           </div>
 

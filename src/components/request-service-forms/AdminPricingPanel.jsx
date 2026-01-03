@@ -52,27 +52,55 @@ const AdminPricingPanel = ({ refetch }) => {
       </div>
       <Formik initialValues={{ adminPrice: "", adminNotes: "", adminProposalFileUrl: "" }} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
-          <Form className="grid gap-4">
+          <Form className="grid gap-5">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">{t("AdminPricingPanel.price") || "السعر"} <span className="text-red-500">*</span></label>
-              <Field name="adminPrice" type="number" className="w-full px-4 py-2 border border-gray-300 rounded-xl" placeholder={t("AdminPricingPanel.enterPrice") || "أدخل السعر"} />
-              <ErrorMessage name="adminPrice" component="div" className="text-red-500 text-sm mt-1" />
+              <label className="block mb-1.5 text-xs font-black text-gray-400 uppercase tracking-widest px-1">
+                {t("AdminPricingPanel.price") || "قيمة العرض المالي"} <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Field
+                  name="adminPrice"
+                  type="number"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-lg font-bold text-primary focus:border-primary/50 transition-all outline-none pl-12"
+                  placeholder="0.00"
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400">SAR</div>
+              </div>
+              <ErrorMessage name="adminPrice" component="div" className="text-red-500 text-[10px] font-bold mt-1 px-1" />
             </div>
+
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">{t("AdminPricingPanel.notes") || "ملاحظات"}</label>
-              <Field as="textarea" name="adminNotes" className="w-full px-4 py-2 border border-gray-300 rounded-xl" placeholder={t("AdminPricingPanel.enterNotes") || "أدخل الملاحظات"} />
-              <ErrorMessage name="adminNotes" component="div" className="text-red-500 text-sm mt-1" />
+              <label className="block mb-1.5 text-xs font-black text-gray-400 uppercase tracking-widest px-1">
+                {t("AdminPricingPanel.notes") || "ملاحظات إضافية"}
+              </label>
+              <Field
+                as="textarea"
+                name="adminNotes"
+                className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm min-h-[100px] focus:border-primary/50 transition-all outline-none"
+                placeholder={t("AdminPricingPanel.enterNotes") || "أدخل أية تفاصيل أو اشتراطات للملف..."}
+              />
+              <ErrorMessage name="adminNotes" component="div" className="text-red-500 text-[10px] font-bold mt-1 px-1" />
             </div>
+
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">{t("AdminPricingPanel.proposalUrl") || "رابط ملف العرض"}</label>
-              <Field name="adminProposalFileUrl" className="w-full px-4 py-2 border border-gray-300 rounded-xl" placeholder={t("AdminPricingPanel.enterUrl") || "أدخل الرابط"} />
-              <ErrorMessage name="adminProposalFileUrl" component="div" className="text-red-500 text-sm mt-1" />
+              <label className="block mb-1.5 text-xs font-black text-gray-400 uppercase tracking-widest px-1">
+                {t("AdminPricingPanel.proposalUrl") || "رابط العرض الفني (Drive/Dropbox)"}
+              </label>
+              <Field
+                name="adminProposalFileUrl"
+                className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:border-primary/50 transition-all outline-none"
+                placeholder="https://..."
+              />
+              <ErrorMessage name="adminProposalFileUrl" component="div" className="text-red-500 text-[10px] font-bold mt-1 px-1" />
             </div>
-            <div className="flex items-center justify-end mt-4">
-              <button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/80 py-2 px-6 rounded-xl text-white font-medium disabled:opacity-70 text-sm">
-                {isSubmitting ? (t("AdminPricingPanel.saving") || "جاري الحفظ...") : (t("AdminPricingPanel.save") || "حفظ")}
-              </button>
-            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full premium-gradient-secondary text-white py-3.5 rounded-2xl font-black text-sm transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-secondary/30 disabled:opacity-50 mt-2"
+            >
+              {isSubmitting ? (t("AdminPricingPanel.saving") || "جاري الحفظ...") : (t("AdminPricingPanel.save") || "حفظ وإرسال العرض")}
+            </button>
           </Form>
         )}
       </Formik>

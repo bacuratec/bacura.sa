@@ -19,8 +19,8 @@ export default function PaymentOptions({ amount, requestId, attachmentsGroupKey,
   const [files, setFiles] = useState([]);
   const [notes, setNotes] = useState("");
 
-  // Try to get userId from Redux first
-  const { userId: reduxUserId } = useSelector((state) => state.auth || {});
+  // Try to get userId and role from Redux first
+  const { userId: reduxUserId, role: reduxRole } = useSelector((state) => state.auth || {});
 
   const onUploadChange = (e) => {
     setFiles(Array.from(e.target.files || []));
@@ -45,21 +45,122 @@ export default function PaymentOptions({ amount, requestId, attachmentsGroupKey,
         return;
       }
 
-      // Upload receipt(s) as attachments
+      // Upload receipt(s) as attachments directly to Supabase (authenticated users only)
       if (files.length > 0) {
-        // Ensure we have a group key. If not, we might need to handle this (e.g. prompt user or fail).
-        // Usually requests have a key. If not, we use the one passed.
-        if (attachmentsGroupKey) {
-          const fd = new FormData();
-          // 702 might be specific to legacy. Let's try to omit uploader ID or keep it if it's required.
-          // But definitely update Phase to 24 (During Project) for visibility.
-          fd.append("attachmentUploaderLookupId", 702);
-          fd.append("requestPhaseLookupId", 25);
-          files.forEach((f) => fd.append("files", f));
-          await axios.post(`${getAppBaseUrl()}api/attachments?groupKey=${attachmentsGroupKey}`, fd);
-        } else {
-          console.warn("No attachment group key found, skipping receipt upload");
-          toast.error(tr("payment.errorNoGroupKey", "خطأ: لا يمكن رفع الإيصال (رمز المجموعة مفقود)"));
+        if (!supabase) {
+          toast.error(tr("payment.errorNoSupabase", "خطأ: إعداد Supabase غير موجود. تحقق من المتغيرات البيئية."));
+          return;
+        }
+
+        // Ensure the user is authenticated and we have an ID
+        let uid = userId;
+        if (!uid) {
+          const { data: { session } } = await supabase.auth.getSession();
+          uid = session?.user?.id;
+        }
+
+        if (!uid) {
+          toast.error(tr("payment.errorUser", "لم يتم العثور على بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى."));
+          return;
+        }
+
+        // Resolve or create attachment group
+        let groupKey = attachmentsGroupKey;
+        let groupId = null;
+
+        try {
+          if (groupKey) {
+            const { data: group } = await supabase.from("attachment_groups").select("id,group_key").eq("group_key", groupKey).maybeSingle();
+            groupId = group?.id || null;
+          }
+
+          if (!groupId) {
+            // create a new group on behalf of the user (RLS should allow this when created_by_user_id = auth.uid())
+            groupKey = groupKey || `group_${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+            const { data: created, error: createErr } = await supabase
+              .from("attachment_groups")
+              .insert({ group_key: groupKey, created_by_user_id: uid })
+              .select("id,group_key")
+              .single();
+
+            if (createErr) {
+              console.error("Failed to create attachment group (client):", createErr);
+              toast.error(tr("payment.errorGroupCreate", "تعذر إنشاء مجموعة المرفقات. تحقق من صلاحيات قاعدة البيانات."));
+              return;
+            }
+            groupId = created.id;
+          }
+
+          // Upload each file to storage and create attachments record
+          for (const file of files) {
+            const ext = file.name.split(".").pop();
+            const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            const path = `attachments/${groupId}/${unique}.${ext}`;
+
+            const { data: storageRes, error: storageErr } = await supabase.storage
+              .from("attachments")
+              .upload(path, file, { cacheControl: "3600", upsert: false });
+
+            if (storageErr) {
+              console.error("Storage upload error:", storageErr);
+              toast.error(tr("payment.errorUpload", "فشل في رفع بعض الملفات"));
+              return;
+            }
+
+            // Resolve uploader lookup id by code (map by user role)
+            let uploaderLookupId = null;
+            try {
+              // map role => uploader code (string)
+              const roleToCode = {
+                Provider: '700',
+                Requester: '701',
+                Admin: '702',
+              };
+              const uploaderCode = roleToCode[reduxRole] || '701'; // default to Requester
+
+              // Get lookup_type id
+              const { data: lt } = await supabase.from('lookup_types').select('id').eq('code', 'attachment-uploader').maybeSingle();
+              if (lt?.id) {
+                const { data: lv } = await supabase
+                  .from('lookup_values')
+                  .select('id')
+                  .eq('lookup_type_id', lt.id)
+                  .eq('code', String(uploaderCode))
+                  .maybeSingle();
+                uploaderLookupId = lv?.id || null;
+              }
+            } catch (err) {
+              console.warn('Could not resolve uploader lookup id:', err);
+            }
+
+            // Build insert payload - include uploader only if resolved
+            const insertPayload = {
+              group_id: groupId,
+              file_path: storageRes?.path || path,
+              file_name: file.name,
+              content_type: file.type || null,
+              size_bytes: file.size || null,
+              request_phase_lookup_id: 25,
+            };
+            if (uploaderLookupId) insertPayload.attachment_uploader_lookup_id = uploaderLookupId;
+
+            const { error: insertErr } = await supabase.from("attachments").insert(insertPayload);
+
+            if (insertErr) {
+              console.error("Database insert error (attachments):", insertErr);
+              // PostgREST schema error (missing column) => show actionable message
+              if (insertErr?.code === "PGRST204" || (insertErr?.message || "").toLowerCase().includes("could not find")) {
+                toast.error("خطأ في قاعدة البيانات: عمود مفقود (attachment_uploader_lookup_id). يرجى تشغيل ترحيل قاعدة البيانات.");
+              } else {
+                toast.error(tr("payment.errorInsert", "فشل في تسجيل المرفق"));
+              }
+              return;
+            }
+          }
+
+        } catch (uploadErr) {
+          console.error("Error uploading attachments directly:", uploadErr);
+          toast.error(tr("payment.errorUploadGeneric", "حدث خطأ أثناء رفع المرفقات"));
           return;
         }
       }
