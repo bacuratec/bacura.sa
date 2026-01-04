@@ -34,13 +34,18 @@ const AdminAssignProviderPanel = ({ data, refetch }) => {
         PageSize: 50
       }).unwrap();
 
-      const options = result?.map((provider) => ({
+      // Handle paginated response structure: {data: [], count: number}
+      const providers = result?.data || result || [];
+
+      const options = providers.map((provider) => ({
         value: provider.id,
         label: provider.name,
         provider: provider
       }));
+
       callback(options || []);
-    } catch {
+    } catch (error) {
+      console.error('Error loading providers:', error);
       callback([]);
     }
   }, 500);
