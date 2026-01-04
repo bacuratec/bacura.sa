@@ -204,9 +204,24 @@ const AdminAssignProviderPanel = ({ data, refetch }) => {
                 (values.providerId === (assignedProvider?.id || "") && values.providerPrice === (data?.provider_quoted_price || "")) ||
                 (data?.status?.code !== 'paid')
               }
-              className="w-full premium-gradient-primary text-white py-3.5 rounded-2xl font-black text-sm transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100 mt-2"
+              className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white py-4 rounded-2xl font-black text-base transition-all duration-300 hover:scale-[1.02] shadow-2xl hover:shadow-indigo-500/50 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
             >
-              {isSubmitting ? (t("AdminAssignProvider.submitting") || "جاري المعالجة...") : (assignedProvider ? t("AdminAssignProvider.update") || "تحديث العرض" : t("AdminAssignProvider.submit") || "إرسال العرض للمزود")}
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {t("AdminAssignProvider.submitting") || "جاري المعالجة..."}
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  {assignedProvider ? (t("AdminAssignProvider.update") || "تحديث العرض") : (t("AdminAssignProvider.submit") || "إرسال العرض للمزود")}
+                </>
+              )}
             </button>
             {data?.status?.code !== 'paid' && (
               <p className="text-xs text-gray-500 mt-2">{t("AdminAssignProvider.waitForPayment") || "يجب أن يكون الطلب في حالة 'مدفوع' قبل تعيين مزود الخدمة."}</p>

@@ -12,8 +12,8 @@ const Statistics = ({ title, stats }) => {
         </h2>
         <div
           className={`grid ${pathname === "/admin" || pathname === "/provider"
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-1"
-              : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+            ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-1"
+            : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
             } gap-4 md:gap-6`}
         >
           {stats?.length > 0 &&
@@ -34,19 +34,19 @@ const Statistics = ({ title, stats }) => {
                     </div>
 
                     <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-inner"
+                      className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg"
                       style={{
-                        backgroundColor: `${item?.color || '#F3F4F6'}20`,
-                        color: item?.color || '#374151'
+                        backgroundColor: `${item?.color || '#F3F4F6'}`,
+                        color: '#1F2937'
                       }}
                     >
                       {item?.ic ? (
-                        React.cloneElement(item?.icon, { size: 22, strokeWidth: 2.5 })
+                        React.cloneElement(item?.icon, { size: 32, strokeWidth: 2.5, className: "drop-shadow-sm" })
                       ) : (
                         <img
                           src={typeof item?.icon === "string" ? item.icon : (item?.icon?.src || "")}
                           alt={item?.title || "icon"}
-                          className="w-6 h-6 object-contain filter group-hover:drop-shadow-sm"
+                          className="w-8 h-8 object-contain filter group-hover:drop-shadow-md"
                         />
                       )}
                     </div>

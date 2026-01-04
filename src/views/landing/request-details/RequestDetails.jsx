@@ -258,13 +258,16 @@ const RequestDetails = ({ initialData, id }) => {
                   </div>
                   <div className="flex gap-4 w-full md:w-auto">
                     <button
-                      className="flex-1 md:flex-none bg-primary text-white px-12 py-5 rounded-2xl font-black text-lg shadow-xl shadow-primary/30 transform hover:-translate-y-1 transition-all"
+                      className="flex-1 md:flex-none bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white px-12 py-5 rounded-2xl font-black text-lg shadow-2xl hover:shadow-emerald-500/50 transform hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                       onClick={async () => {
                         await respondPrice({ requestId, accepted: true, statusId: 21 }).unwrap();
                         toast.success(t("requestDetails.priceAccepted"));
                         refetchRequesterDetails();
                       }}
                     >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
                       {t("common.accept") || "قبول العرض"}
                     </button>
                     <button
@@ -332,9 +335,24 @@ const RequestDetails = ({ initialData, id }) => {
                     <button
                       onClick={handleCompleteProject}
                       disabled={isCompleting}
-                      className="bg-white text-emerald-700 px-12 py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-105 transition-all transform active:scale-95"
+                      className="bg-white text-emerald-700 px-12 py-5 rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all transform active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isCompleting ? t("common.loading") : (t("requestDetails.finishNow") || "إنهاء المشروع الآن")}
+                      {isCompleting ? (
+                        <>
+                          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          {t("common.loading")}
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {t("requestDetails.finishNow") || "إنهاء المشروع الآن"}
+                        </>
+                      )}
                     </button>
                   </div>
                 )}

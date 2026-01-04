@@ -13,13 +13,13 @@ import { useGetCitiesQuery } from "../../../redux/api/citiesApi";
 import fileUpload from "@/assets/icons/fileUpload.svg";
 import { Camera, Upload, User, Mail, Phone, Calendar as CalendarIcon, MapPin, Building, FileText } from "lucide-react";
 
-  import {
-    useUpdateAdminMutation,
-    useUpdateProviderMutation,
-    useUpdateRequesterMutation,
-    useUpdateUserContactMutation,
-  } from "../../../redux/api/updateApi";
-  import { useCreateRequesterMutation } from "../../../redux/api/updateApi";
+import {
+  useUpdateAdminMutation,
+  useUpdateProviderMutation,
+  useUpdateRequesterMutation,
+  useUpdateUserContactMutation,
+} from "../../../redux/api/updateApi";
+import { useCreateRequesterMutation } from "../../../redux/api/updateApi";
 import {
   useGetProviderEntityTypesQuery,
   useGetRequesterEntityTypesQuery,
@@ -237,19 +237,19 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                   if (role === "Requester") {
                     payload = data?.id
                       ? {
-                          requesterId: data?.id,
-                          name: values.FullName || values.name || "",
-                          commercialRegNo: values.CommercialRegistrationNumber || null,
-                          cityId: values.address || null,
-                          entityTypeLookupId: values.InstitutionTypeLookupId || null,
-                        }
+                        requesterId: data?.id,
+                        name: values.FullName || values.name || "",
+                        commercialRegNo: values.CommercialRegistrationNumber || null,
+                        cityId: values.address || null,
+                        entityTypeLookupId: values.InstitutionTypeLookupId || null,
+                      }
                       : {
-                          userId: data?.userId || data?.user?.id,
-                          name: values.FullName || values.name || "",
-                          commercialRegNo: values.CommercialRegistrationNumber || null,
-                          cityId: values.address || null,
-                          entityTypeLookupId: values.InstitutionTypeLookupId || null,
-                        };
+                        userId: data?.userId || data?.user?.id,
+                        name: values.FullName || values.name || "",
+                        commercialRegNo: values.CommercialRegistrationNumber || null,
+                        cityId: values.address || null,
+                        entityTypeLookupId: values.InstitutionTypeLookupId || null,
+                      };
                   } else if (role === "Provider") {
                     payload = {
                       providerId: data?.id,
@@ -480,12 +480,23 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-12 py-3.5 rounded-2xl font-black shadow-xl shadow-primary/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 flex items-center justify-center gap-2"
+                      className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-12 py-4 rounded-2xl font-black text-base shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {isLoading ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <>
+                          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          {tr("profile.saving", "جاري الحفظ...")}
+                        </>
                       ) : (
-                        tr("profile.confirm", "تأكيـد")
+                        <>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          {tr("profile.confirm", "تأكيـد")}
+                        </>
                       )}
                     </button>
                   </div>

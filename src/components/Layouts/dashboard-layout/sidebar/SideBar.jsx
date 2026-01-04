@@ -3,24 +3,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  ClipboardList,
+  FolderKanban,
+  Star,
+  MessageSquare
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { useGetProviderOrderStatisticsQuery } from "@/redux/api/adminStatisticsApi";
-
-import homeIcon from "../../../../assets/icons/homeIcon.svg";
-import homeIconActive from "../../../../assets/icons/homeIconActive.svg";
-
-import requestOrders from "../../../../assets/icons/requestOrders.svg";
-import requestOrdersActive from "../../../../assets/icons/requestOrdersActive.svg";
-
-import projects from "../../../../assets/icons/projects.svg";
-import projectsActive from "../../../../assets/icons/projectsActive.svg";
-
-import rates from "../../../../assets/icons/rates.svg";
-import ratesActive from "../../../../assets/icons/ratesActive.svg";
-
-import reports from "../../../../assets/icons/reports.svg";
-import reportsActive from "../../../../assets/icons/reportsActive.svg";
 import { getAppBaseUrl } from "../../../../utils/env";
 
 const SideBar = ({ data }) => {
@@ -33,26 +26,22 @@ const SideBar = ({ data }) => {
     {
       name: t("navProvider.availableOrders"),
       href: "/provider/active-orders",
-      icon: requestOrders,
-      iconActive: requestOrdersActive,
+      icon: ClipboardList,
     },
     {
       name: t("navProvider.myProjects"),
       href: "/provider/our-projects",
-      icon: projects,
-      iconActive: projectsActive,
+      icon: FolderKanban,
     },
     {
       name: t("navProvider.myRatings"),
       href: "/provider/our-rates",
-      icon: rates,
-      iconActive: ratesActive,
+      icon: Star,
     },
     {
       name: t("navProvider.reports"),
       href: "/provider/tickets",
-      icon: reports,
-      iconActive: reportsActive,
+      icon: MessageSquare,
     },
   ];
 
@@ -151,16 +140,14 @@ const SideBar = ({ data }) => {
             <Link
               href={"/provider"}
               aria-current={pathname === "/provider" ? "page" : undefined}
-              className={`group flex items-center gap-4 py-3 px-6 text-gray-700 ${
-                pathname === "/provider"
-                  ? "text-primary font-medium bg-gray-100 border-r-4 border-r-primary"
-                  : "hover:text-primary"
-              }`}
+              className={`group flex items-center gap-4 py-3 px-6 text-gray-700 ${pathname === "/provider"
+                ? "text-primary font-medium bg-gray-100 border-r-4 border-r-primary"
+                : "hover:text-primary"
+                }`}
             >
-              <img
-                src={pathname === "/provider" ? homeIconActive : homeIcon}
-                alt="home"
-                className="w-6 h-6"
+              <Home
+                className={`w-6 h-6 ${pathname === "/provider" ? "text-primary" : "text-gray-400"}`}
+                strokeWidth={2.5}
               />
               {!collapsed && <span className="truncate">{t("navProvider.home")}</span>}
               {pathname === "/provider" && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
@@ -171,16 +158,18 @@ const SideBar = ({ data }) => {
               <Link
                 href={item.href}
                 aria-current={pathname.includes(item.href) ? "page" : undefined}
-                className={`group flex items-center gap-4 py-3 px-6 text-gray-700 ${
-                  pathname.includes(item.href)
-                    ? "text-primary font-medium bg-gray-100 border-r-4 border-r-primary"
-                    : "hover:text-primary"
-                }`}
+                className={`group flex items-center gap-4 py-3 px-6 text-gray-700 ${pathname.includes(item.href)
+                  ? "text-primary font-medium bg-gray-100 border-r-4 border-r-primary"
+                  : "hover:text-primary"
+                  }`}
               >
                 {(() => {
-                  const iconSrc = pathname.includes(item.href) ? item.iconActive : item.icon;
-                  const src = typeof iconSrc === "string" ? iconSrc : (iconSrc?.src || "");
-                  return <img src={src} alt={item.name} className="w-6 h-6" loading="lazy" decoding="async" />;
+                  const IconComponent = item.icon;
+                  const isActive = pathname.includes(item.href);
+                  return <IconComponent
+                    className={`w-6 h-6 ${isActive ? "text-primary" : "text-gray-400"}`}
+                    strokeWidth={2.5}
+                  />;
                 })()}
                 {!collapsed && <span className="truncate">{item.name}</span>}
                 {!collapsed && item.href === "/provider/our-projects" && typeof providerStats?.totalOrders === "number" && (

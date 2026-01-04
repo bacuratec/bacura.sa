@@ -200,10 +200,13 @@ const ProjectsList = ({ stats }) => {
     },
   ];
 
+  // Ensure projects is always an array
+  const baseData = Array.isArray(projects) ? projects : (projects?.data || []);
+
   const filteredProjects =
     OrderStatusLookupId === ""
-      ? projects?.filter((item) => item.status?.id !== 17)
-      : projects;
+      ? baseData?.filter((item) => item.status?.id !== 17)
+      : baseData;
 
   const sortedData = filteredProjects
     ? [...filteredProjects]?.sort(

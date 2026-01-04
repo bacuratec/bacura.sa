@@ -43,7 +43,7 @@ const Home = () => {
     {
       number: providerStats?.totalOrdersCount ?? 0,
       title: t("providerHome.totalOrders"),
-      icon: <ListChecks />,
+      icon: <ListChecks className="w-7 h-7" />,
       color: "#F0F4FF",
       ic: true,
     },
@@ -53,56 +53,56 @@ const Home = () => {
     {
       number: providerStats?.waitingForApprovalOrdersCount ?? 0,
       title: t("providerHome.waitingApproval"),
-      icon: <Hourglass />,
+      icon: <Hourglass className="w-6 h-6" />,
       color: "#FFF8E1",
       ic: true,
     },
     {
       number: providerStats?.waitingToStartOrdersCount ?? 0,
       title: t("providerHome.waitingStart"),
-      icon: <Clock />,
+      icon: <Clock className="w-6 h-6" />,
       color: "#E1F5FE",
       ic: true,
     },
     {
       number: providerStats?.ongoingOrdersCount ?? 0,
       title: t("providerHome.ongoing"),
-      icon: <Loader />,
+      icon: <Loader className="w-6 h-6 animate-spin" />,
       color: "#E8F5E9",
       ic: true,
     },
     {
       number: providerStats?.completedOrdersCount ?? 0,
       title: t("providerHome.completed"),
-      icon: <CheckCircle2 />,
+      icon: <CheckCircle2 className="w-6 h-6" />,
       color: "#F1F8E9",
       ic: true,
     },
     {
       number: providerStats?.rejectedOrdersCount ?? 0,
       title: t("providerHome.rejected"),
-      icon: <XCircle />,
+      icon: <XCircle className="w-6 h-6" />,
       color: "#FFEBEE",
       ic: true,
     },
     {
       number: providerStats?.serviceCompletedOrdersCount ?? 0,
       title: t("providerHome.serviceCompleted"),
-      icon: <ShieldCheck />,
+      icon: <ShieldCheck className="w-6 h-6" />,
       color: "#E8EAF6",
       ic: true,
     },
     {
       number: providerStats?.expiredOrdersCount ?? 0,
       title: t("providerHome.expired"),
-      icon: <CalendarX />,
+      icon: <CalendarX className="w-6 h-6" />,
       color: "#FFF3E0",
       ic: true,
     },
     {
       number: providerStats?.averageRating ?? 0,
       title: t("providerHome.averageRating"),
-      icon: <Star />,
+      icon: <Star className="w-6 h-6 fill-current" />,
       color: "#FFFDE7",
       ic: true,
     },
@@ -170,8 +170,8 @@ const Home = () => {
         <div className="mt-12">
           <div className="flex items-center justify-between mb-8 px-4">
             <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                <Mail className="w-6 h-6" />
+              <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-xl shadow-indigo-200 hover:scale-110 transition-transform">
+                <Mail className="w-7 h-7" />
               </span>
               {t("providerHome.invitations") || "دعوات العمل الجديدة"}
               {providerId && (
@@ -194,8 +194,8 @@ const Home = () => {
         <div className="mt-12">
           <div className="flex items-center justify-between mb-8 px-4">
             <h2 className="text-2xl font-black text-gray-800 flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl premium-gradient-primary flex items-center justify-center text-white shadow-lg">
-                <ListChecks className="w-6 h-6" />
+              <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-500 flex items-center justify-center text-white shadow-xl shadow-emerald-200 hover:scale-110 transition-transform">
+                <ListChecks className="w-7 h-7" />
               </span>
               {t("providerHome.newOrders") || "الطلبات الجديدة"}
             </h2>

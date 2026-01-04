@@ -19,7 +19,11 @@ const AdminPricingPanel = ({ refetch }) => {
   const validationSchema = Yup.object().shape({
     adminPrice: Yup.number().typeError(t("AdminPricingPanel.priceType") || "السعر غير صحيح").required(t("AdminPricingPanel.priceRequired") || "أدخل السعر"),
     adminNotes: Yup.string().nullable(),
-    adminProposalFileUrl: Yup.string().url(t("AdminPricingPanel.urlInvalid") || "رابط غير صحيح").nullable(),
+    adminProposalFileUrl: Yup.string()
+      .nullable()
+      .test('is-url-or-empty', t("AdminPricingPanel.urlInvalid") || "رابط غير صحيح",
+        value => !value || /^https?:\/\/.+/.test(value)
+      ),
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
@@ -97,9 +101,24 @@ const AdminPricingPanel = ({ refetch }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full premium-gradient-secondary text-white py-3.5 rounded-2xl font-black text-sm transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-secondary/30 disabled:opacity-50 mt-2"
+              className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-4 rounded-2xl font-black text-base transition-all duration-300 hover:scale-[1.02] shadow-2xl hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
             >
-              {isSubmitting ? (t("AdminPricingPanel.saving") || "جاري الحفظ...") : (t("AdminPricingPanel.save") || "حفظ وإرسال العرض")}
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {t("AdminPricingPanel.saving") || "جاري الحفظ..."}
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  {t("AdminPricingPanel.save") || "حفظ وإرسال العرض"}
+                </>
+              )}
             </button>
           </Form>
         )}
@@ -140,9 +159,24 @@ const AdminMarkPaidAction = ({ requestId, refetch }) => {
             }
           }}
           disabled={isLoading}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-sm transition-colors"
+          className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:shadow-green-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          {isLoading ? "..." : (t("AdminPricingPanel.markAsPaid") || "تحديد كـ مدفوع")}
+          {isLoading ? (
+            <>
+              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              جاري المعالجة...
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {t("AdminPricingPanel.markAsPaid") || "تحديد كـ مدفوع"}
+            </>
+          )}
         </button>
       </div>
     </div>
