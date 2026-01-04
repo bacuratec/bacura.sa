@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import CustomDataTable from "../../shared/datatable/DataTable";
+import TableActions from "../../shared/TableActions";
 import { Edit, PlusIcon, Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
@@ -81,7 +82,6 @@ const CustomersTable = () => {
         />
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];
