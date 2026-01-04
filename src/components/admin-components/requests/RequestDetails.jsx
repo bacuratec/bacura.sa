@@ -13,7 +13,9 @@ import {
   FileCheck,
   UserCheck,
   Clock,
-  Info
+  Info,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 
 const RequestDetails = ({ data }) => {
@@ -113,7 +115,7 @@ const RequestDetails = ({ data }) => {
                         }`}>
                         {data.provider_response === 'accepted' ? (
                           <>
-                            <CheckCircle2 className="w-2.5 h-2.5" />
+                            <CheckCircle className="w-2.5 h-2.5" />
                             {t("AdminAssignProvider.accepted") || "تم القبول"}
                           </>
                         ) : data.provider_response === 'rejected' ? (

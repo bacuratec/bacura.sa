@@ -205,7 +205,7 @@ const ProviderProjectsDetails = () => {
                   <button
                     onClick={() => handleAction("start")}
                     disabled={loadingCreateState}
-                    className="w-full premium-gradient-warning text-white shadow-lg py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-yellow-500/25"
+                    className="w-full premium-gradient-warning text-white shadow-lg py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-yellow-500/40 border border-yellow-500/20"
                   >
                     {t("providerProjectsDetails.start") || "بدء العمل"}
                   </button>
@@ -215,7 +215,7 @@ const ProviderProjectsDetails = () => {
                   <button
                     onClick={() => handleAction("complete")}
                     disabled={loadingCreateState}
-                    className="w-full premium-gradient-success text-white shadow-lg py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-green-500/25 text-lg"
+                    className="w-full premium-gradient-success text-white shadow-lg py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-green-500/40 border border-green-500/20"
                   >
                     {t("providerProjectsDetails.complete") || "إكمال المشروع"}
                   </button>
@@ -292,16 +292,30 @@ const ProviderProjectsDetails = () => {
                   className="w-full premium-gradient-primary text-white py-4 rounded-2xl font-black text-sm transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-primary/30 disabled:opacity-50"
                   disabled={!newDeliverable.title.trim()}
                   onClick={async () => {
-                    if (!newDeliverable.title.trim()) return;
-                    await addDeliverable({
-                      orderId: id,
-                      providerId: projectData?.provider?.id,
-                      title: newDeliverable.title,
-                      description: newDeliverable.description,
-                      deliveryFileUrl: newDeliverable.url,
-                    }).unwrap();
-                    setNewDeliverable({ title: "", description: "", url: "" });
-                    refetchDeliverables();
+                    const title = newDeliverable.title.trim();
+                    if (!title) return;
+
+                    if (!id || !projectData?.provider?.id) {
+                      toast.error(t("common.error") || "Error: Missing Order/Provider ID");
+                      return;
+                    }
+
+                    try {
+                      await addDeliverable({
+                        orderId: id,
+                        providerId: projectData?.provider?.id,
+                        title: title,
+                        description: newDeliverable.description,
+                        deliveryFileUrl: newDeliverable.url,
+                      }).unwrap();
+
+                      toast.success(t("providerProjectsDetails.addDeliverableSuccess") || "تم إضافة التسليم بنجاح");
+                      setNewDeliverable({ title: "", description: "", url: "" });
+                      refetchDeliverables();
+                    } catch (error) {
+                      console.error("Failed to add deliverable:", error);
+                      toast.error(error?.data?.message || error?.message || t("providerProjectsDetails.addDeliverableError") || "حدث خطأ أثناء إضافة التسليم");
+                    }
                   }}
                 >
                   {t("providerProjectsDetails.addDeliverable", "تأكيد وإضافة التسليم")}

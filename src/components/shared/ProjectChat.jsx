@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGetProjectMessagesQuery, useAddProjectMessageMutation } from "@/redux/api/ordersApi";
 import { Send, User } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ProjectChat = ({ orderId, userId, title }) => {
     const { t } = useTranslation();
@@ -13,12 +14,26 @@ const ProjectChat = ({ orderId, userId, title }) => {
 
     const handleSendMessage = async () => {
         if (!newMessage.trim()) return;
+
+        console.log("Attempting to send message:", { orderId, userId, message: newMessage });
+
+        if (!orderId || !userId) {
+            console.error("Cannot send message: Missing orderId or userId", { orderId, userId });
+            const missing = [];
+            if (!orderId) missing.push("Order ID");
+            if (!userId) missing.push("User ID");
+            toast.error(`Error: Missing chat context (${missing.join(", ")})`);
+            return;
+        }
+
         try {
             await addMessage({ orderId, senderId: userId, message: newMessage }).unwrap();
             setNewMessage("");
             refetchMessages();
         } catch (error) {
-            console.error("Failed to send message", error);
+            console.error("Failed to send message:", error);
+            // toast.error(t("project.sendMessageError", "فشل إرسال الرسالة")); // Uncomment if you have this translation key
+            toast.error("Fialed to send message: " + (error?.data?.message || error?.message || "Unknown error"));
         }
     };
 

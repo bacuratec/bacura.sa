@@ -276,8 +276,8 @@ export const ordersApi = createApi({
         const request = reqRes.data;
         if (!request) return { error: { status: 'NOT_FOUND', message: 'Request not found' } };
 
-        // 2) enforce paid status (code = 'paid')
-        if (request?.status?.code !== 'paid') {
+        // 2) enforce paid status (code = 'paid' OR payment_status = 'paid')
+        if (request?.status?.code !== 'paid' && request?.payment_status !== 'paid') {
           return { error: { status: 'FORBIDDEN', message: 'Cannot assign provider: request must be in paid status' } };
         }
 

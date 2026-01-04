@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
+import Link from "next/link";
 import { useGetTicketsQuery } from "../../../redux/api/ticketApi";
 import LoadingPage from "../../LoadingPage";
-const logo = "/vite.png";
-import OptimizedImage from "@/components/shared/OptimizedImage";
 import TicketModal from "../../../components/landing-components/profile-components/TicketModal";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -67,9 +66,10 @@ const Tickets = () => {
         <div className="space-y-4">
           {tickets?.length > 0 ? (
             tickets.map((item) => (
-              <div
+              <Link
                 key={item?.id}
-                className="group flex flex-col sm:flex-row sm:items-center gap-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/20 transition-all duration-300"
+                href={`/tickets/${item.id}`}
+                className="group flex flex-col sm:flex-row sm:items-center gap-4 p-5 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/20 transition-all duration-300 block"
               >
                 <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary shrink-0 transition-transform group-hover:scale-105">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" x2="4" y1="22" y2="15" /></svg>
@@ -106,7 +106,7 @@ const Tickets = () => {
                     <span className="rtl:rotate-180">→</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <div className="text-center py-16 bg-white rounded-3xl border-2 border-dashed border-gray-100">

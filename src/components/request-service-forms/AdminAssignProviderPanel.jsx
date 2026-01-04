@@ -94,6 +94,11 @@ const AdminAssignProviderPanel = ({ data, refetch }) => {
     }
   };
 
+  const isPaid =
+    data?.status?.code?.toLowerCase() === 'paid' ||
+    data?.status?.id === 204 ||
+    data?.payment_status === 'paid';
+
   return (
     <section className="bg-white rounded-[2rem] shadow-custom border border-gray-100 p-6 animate-fade-in-up">
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
@@ -202,7 +207,7 @@ const AdminAssignProviderPanel = ({ data, refetch }) => {
               disabled={
                 isSubmitting ||
                 (values.providerId === (assignedProvider?.id || "") && values.providerPrice === (data?.provider_quoted_price || "")) ||
-                (data?.status?.code !== 'paid' && data?.payment_status !== 'paid')
+                !isPaid
               }
               className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white py-4 rounded-2xl font-black text-base transition-all duration-300 hover:scale-[1.02] shadow-2xl hover:shadow-indigo-500/50 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
             >
@@ -223,7 +228,7 @@ const AdminAssignProviderPanel = ({ data, refetch }) => {
                 </>
               )}
             </button>
-            {(data?.status?.code !== 'paid' && data?.payment_status !== 'paid') && (
+            {!isPaid && (
               <p className="text-xs text-gray-500 mt-2">{t("AdminAssignProvider.waitForPayment") || "يجب أن يكون الطلب في حالة 'مدفوع' قبل تعيين مزود الخدمة."}</p>
             )}
           </Form>
