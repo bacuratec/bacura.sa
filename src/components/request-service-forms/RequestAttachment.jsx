@@ -31,7 +31,9 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId, 
       let statusId = null;
       if (lt?.id) {
         const { data: lv } = await supabase.from('lookup_values').select('id').eq('lookup_type_id', lt.id).eq('code', 'paid').maybeSingle();
-        statusId = lv?.id || null;
+        statusId = lv?.id || 204; // Fallback to 204 (legacy/standard ID) if not found
+      } else {
+        statusId = 204; // Fallback if lookup type not found
       }
 
       // We only update columns that exist.
@@ -39,9 +41,9 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId, 
       const updatePayload = {
         updated_at: new Date().toISOString(),
         requester_accepted_price: true,
-        payment_status: 'paid'
+        payment_status: 'paid',
+        status_id: statusId // Force update status ID
       };
-      if (statusId) updatePayload.status_id = statusId;
 
       const { error } = await supabase.from('requests').update(updatePayload).eq('id', requestId);
       if (error) {
