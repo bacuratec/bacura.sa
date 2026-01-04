@@ -101,7 +101,36 @@ const RequestDetails = ({ data }) => {
               <DetailItem
                 icon={<UserCheck className="w-5 h-5 text-green-600" />}
                 label={t("request.provider") || "مزوّد الخدمة"}
-                value={providerName}
+                value={
+                  <div className="flex flex-col gap-1.5">
+                    <span>{providerName}</span>
+                    {data?.provider_response && (
+                      <span className={`inline-flex items-center gap-1 w-fit px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-tight ${data.provider_response === 'accepted'
+                        ? 'bg-green-100 text-green-700'
+                        : data.provider_response === 'rejected'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-amber-100 text-amber-700'
+                        }`}>
+                        {data.provider_response === 'accepted' ? (
+                          <>
+                            <CheckCircle2 className="w-2.5 h-2.5" />
+                            {t("AdminAssignProvider.accepted") || "تم القبول"}
+                          </>
+                        ) : data.provider_response === 'rejected' ? (
+                          <>
+                            <XCircle className="w-2.5 h-2.5" />
+                            {t("AdminAssignProvider.rejected") || "تم الرفض"}
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-2.5 h-2.5" />
+                            {t("AdminAssignProvider.pending") || "بانتظار الرد"}
+                          </>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                }
                 highlight
               />
             )}

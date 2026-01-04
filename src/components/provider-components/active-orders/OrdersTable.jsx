@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useSearchParams } from "@/utils/useSearchParams";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useGetProjectsProvidersQuery, useProviderProjectStateMutation } from "../../../redux/api/projectsApi";
 import { useSelector } from "react-redux";
@@ -9,7 +9,9 @@ import { useTranslation } from "react-i18next";
 import { Eye, Check, X } from "lucide-react";
 import { LanguageContext } from "@/context/LanguageContext";
 import { useGetProviderByUserIdQuery } from "../../../redux/api/usersDetails";
-import { useState } from "react";
+import toast from "react-hot-toast";
+
+import { formatCurrency } from "@/utils/currency";
 
 const OrdersTable = () => {
   const { lang } = useContext(LanguageContext);
@@ -30,32 +32,6 @@ const OrdersTable = () => {
   const [updateOrderStatus, { isLoading: isUpdating }] = useProviderProjectStateMutation();
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
-  const handleAcceptOrder = async (orderId) => {
-    try {
-      setProcessingOrderId(orderId);
-      // Status 18 = waiting_start (accepted)
-      await updateOrderStatus({ orderId, statusId: 18 }).unwrap();
-      refetch();
-    } catch (error) {
-      console.error('Failed to accept order:', error);
-    } finally {
-      setProcessingOrderId(null);
-    }
-  };
-
-  const handleRejectOrder = async (orderId) => {
-    try {
-      setProcessingOrderId(orderId);
-      // Status 16 = rejected
-      await updateOrderStatus({ orderId, statusId: 16 }).unwrap();
-      refetch();
-    } catch (error) {
-      console.error('Failed to reject order:', error);
-    } finally {
-      setProcessingOrderId(null);
-    }
-  };
-
   const {
     data: projects,
     isLoading,
@@ -66,6 +42,52 @@ const OrdersTable = () => {
     OrderStatusLookupId: OrderStatusLookupId || undefined, // Use URL param or show all
     providerId,
   }, { skip: !providerId });
+
+  const handleAcceptOrder = async (orderId) => {
+    try {
+      setProcessingOrderId(orderId);
+      // Status 18 = waiting_start (accepted)
+      await updateOrderStatus({ orderId, statusId: 18 }).unwrap();
+      toast.success(t("orders.acceptSuccess") || "تم قبول الطلب بنجاح");
+      refetch();
+    } catch (error) {
+      console.error('Failed to accept order:', error);
+      toast.error(t("orders.acceptError") || "فشل قبول الطلب");
+    } finally {
+      setProcessingOrderId(null);
+    }
+  };
+
+  const handleRejectOrder = async (orderId) => {
+    if (!window.confirm(t("orders.confirmReject") || "هل أنت متأكد من رفض هذا الطلب؟")) return;
+    try {
+      setProcessingOrderId(orderId);
+      // Status 19 = rejected (was 16)
+      await updateOrderStatus({ orderId, statusId: 19 }).unwrap();
+      toast.success(t("orders.rejectSuccess") || "تم رفض الطلب بنجاح");
+      refetch();
+    } catch (error) {
+      console.error('Failed to reject order:', error);
+      toast.error(t("orders.rejectError") || "فشل رفض الطلب");
+    } finally {
+      setProcessingOrderId(null);
+    }
+  };
+
+  const handleStartOrder = async (orderId) => {
+    try {
+      setProcessingOrderId(orderId);
+      // Status 13 = processing (ongoing)
+      await updateOrderStatus({ orderId, statusId: 13 }).unwrap();
+      toast.success(t("orders.startSuccess") || "تم بدء العمل على المشروع");
+      refetch();
+    } catch (error) {
+      console.error('Failed to start order:', error);
+      toast.error(t("orders.startError") || "فشل بدء العمل");
+    } finally {
+      setProcessingOrderId(null);
+    }
+  };
 
   useEffect(() => {
     if (providerId) {
@@ -102,6 +124,14 @@ const OrdersTable = () => {
       wrap: true,
     },
     {
+      name: t("orders.columns.price") || "أتعاب المشروع",
+      selector: (row) => {
+        const amount = row.payout || row.request?.provider_quoted_price;
+        return typeof amount === "number" ? formatCurrency(amount, lang) : "-";
+      },
+      wrap: true,
+    },
+    {
       name: t("orders.columns.startDate") || "تاريخ البداية",
       selector: (row) =>
         row?.startDate
@@ -118,43 +148,47 @@ const OrdersTable = () => {
 
     {
       name: t("orders.columns.status") || "الحالة",
-      cell: (row) => (
-        <span
-          className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-            ${(row?.orderStatus?.id === 603 || row?.status?.code === 'completed')
-              ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-              : (row?.orderStatus?.id === 602 || row?.status?.code === 'accepted')
-                ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                : (row?.orderStatus?.id === 605 || row?.orderStatus?.id === 604 || row?.status?.code === 'rejected')
-                  ? "bg-red-100 text-red-700"
-                  : (row?.orderStatus?.id === 601 || row?.status?.code === 'waiting-approval')
-                    ? "bg-red-100 text-[#B76E00]"
-                    : "bg-gray-100 text-gray-600"
-            }`}
-        >
-          {lang === "ar"
-            ? (row?.orderStatus?.nameAr || row?.status?.name_ar || "-")
-            : (row?.orderStatus?.nameEn || row?.status?.name_en || "-")}
-        </span>
-      ),
+      cell: (row) => {
+        const statusId = row.status?.id || row.order_status_id;
+        return (
+          <span
+            className={`text-nowrap px-2 py-1 rounded-lg text-xs font-bold
+              ${statusId === 15
+                ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
+                : statusId === 13
+                  ? "border border-blue-200 bg-blue-50 text-blue-700"
+                  : statusId === 19 || statusId === 20
+                    ? "bg-red-50 text-red-700 border border-red-100"
+                    : statusId === 18
+                      ? "bg-amber-50 text-[#B76E00] border border-amber-100"
+                      : statusId === 17
+                        ? "bg-purple-50 text-purple-700 border border-purple-100"
+                        : "bg-gray-100 text-gray-600"
+              }`}
+          >
+            {lang === "ar"
+              ? row.status?.name_ar || "-"
+              : row.status?.name_en || "-"}
+          </span>
+        );
+      },
       wrap: true,
     },
     {
       name: t("orders.columns.action") || "الإجراءات",
       cell: (row) => {
-        // Show accept/reject buttons for orders that are not completed (15) or rejected (16)
-        const canAcceptReject = row?.order_status_id !== 15 && row?.order_status_id !== 16;
+        const statusId = row.status?.id || row.order_status_id;
         const isProcessing = processingOrderId === row.id;
 
         return (
           <div className="flex items-center gap-2">
-            {/* Accept/Reject buttons for pending orders */}
-            {canAcceptReject && (
+            {/* If Waiting Approval (17) -> Show Accept/Reject */}
+            {statusId === 17 && (
               <>
                 <button
                   onClick={() => handleAcceptOrder(row.id)}
                   disabled={isProcessing}
-                  className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition disabled:opacity-50"
                   title={t("orders.accept") || "قبول"}
                 >
                   <Check className="w-4 h-4" />
@@ -162,7 +196,7 @@ const OrdersTable = () => {
                 <button
                   onClick={() => handleRejectOrder(row.id)}
                   disabled={isProcessing}
-                  className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition disabled:opacity-50"
                   title={t("orders.reject") || "رفض"}
                 >
                   <X className="w-4 h-4" />
@@ -170,7 +204,29 @@ const OrdersTable = () => {
               </>
             )}
 
-            {/* View button */}
+            {/* If Waiting Start (18) -> Show Start/Reject */}
+            {statusId === 18 && (
+              <>
+                <button
+                  onClick={() => handleStartOrder(row.id)}
+                  disabled={isProcessing}
+                  className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
+                  title={t("projects.start") || "بدء العمل"}
+                >
+                  <Check className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleRejectOrder(row.id)}
+                  disabled={isProcessing}
+                  className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition disabled:opacity-50"
+                  title={t("orders.reject") || "رفض"}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </>
+            )}
+
+            {/* View button always visible */}
             <Link
               href={
                 role === "Admin"
@@ -179,7 +235,7 @@ const OrdersTable = () => {
                     ? `/projects/${row.id}`
                     : `/provider/projects/${row.id}`
               }
-              className="bg-[#1A71F6] text-white p-2 rounded-lg hover:bg-blue-700 transition"
+              className="bg-gray-100 text-gray-600 p-2 rounded-lg hover:bg-gray-200 transition"
               title={t("orders.view") || "عرض"}
             >
               <Eye className="w-4 h-4" />
@@ -189,7 +245,7 @@ const OrdersTable = () => {
       },
       ignoreRowClick: true,
       button: true,
-      width: "200px",
+      width: "180px",
     },
   ];
 

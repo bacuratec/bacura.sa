@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import HeadTitle from "../../../components/admin-components/users-details/HeadTitle";
 import ProjectListInfo from "../../../components/admin-components/projects/ProjectListInfo";
 import { useParams } from "@/utils/useParams";
@@ -21,6 +21,7 @@ import { FiveHoursTimer } from "./FiveHoursTimer";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import ProjectChat from "@/components/shared/ProjectChat";
+import toast from "react-hot-toast";
 
 const ProviderProjectsDetails = () => {
   const { t } = useTranslation();
@@ -47,42 +48,63 @@ const ProviderProjectsDetails = () => {
   const startISO = projectData?.assignTime; // اختار اللي يناسبك
 
   const [statusId, setStatusId] = useState(null);
-  // const orderAttachments = projectData?.orderAttachments || [];
 
   useEffect(() => {
-    setStatusId(projectData?.orderStatus?.id);
+    setStatusId(projectData?.orderStatus?.id || projectData?.order_status_id);
   }, [projectData]);
+
   const [rejected, setRejected] = useState(false);
   const [ProviderProjectState, { isLoading: loadingCreateState }] =
     useProviderProjectStateMutation();
 
+  const mappedData = useMemo(() => {
+    if (!projectData) return null;
+    return {
+      ...projectData,
+      orderNumber: projectData?.id?.substring(0, 8) || 'N/A',
+      orderStatus: projectData?.status || {
+        id: projectData.order_status_id,
+        nameAr: projectData.status?.name_ar,
+        nameEn: projectData.status?.name_en
+      },
+      description: projectData?.request?.description || projectData?.order_title,
+      startDate: projectData?.start_date || projectData?.request?.created_at || projectData?.created_at || null,
+      endDate: projectData?.end_date || projectData?.completed_at || projectData?.updated_at || null,
+      servicePricing: projectData?.payout ?? projectData?.request?.provider_quoted_price ?? null,
+      services: projectData?.request?.service
+        ? [{ titleAr: projectData.request.service.name_ar, titleEn: projectData.request.service.name_en }]
+        : [],
+      requester: { fullName: projectData?.request?.requester?.name || null },
+      providers: projectData?.provider?.name ? [{ fullName: projectData.provider.name }] : [],
+    };
+  }, [projectData]);
+
   const handleAction = async (actionType) => {
+    let targetStatusId;
+    switch (actionType) {
+      case "approve": targetStatusId = 18; break;
+      case "reject": targetStatusId = 19; break;
+      case "start": targetStatusId = 13; break;
+      case "complete": targetStatusId = 15; break;
+      default: return;
+    }
+
     try {
-      const payload = {
+      await ProviderProjectState({
         orderId: id,
-        approvalAction: actionType === "approve" ? true : undefined,
-        startAction: actionType === "start" ? true : undefined,
-        completeServiceAction: actionType === "complete" ? true : undefined,
-      };
+        statusId: targetStatusId,
+      }).unwrap();
 
-      if (actionType === "reject") {
-        payload.approvalAction = false;
-      }
-
-      await ProviderProjectState(payload).unwrap();
+      toast.success(t("orders.success") || "تمت العملية بنجاح");
 
       if (actionType === "reject") {
         setRejected(true);
-      } else {
-        // reload projectData to get latest status from backend
-        // eslint-disable-next-line no-unused-vars
-        setStatusId((prev) =>
-          actionType === "approve" ? 18 : actionType === "start" ? 13 : 15
-        );
       }
+
       refetch();
     } catch (error) {
       console.error("حدث خطأ أثناء تحديث حالة المشروع:", error);
+      toast.error(t("orders.error") || "حدث خطأ أثناء تنفيذ الإجراء");
     }
   };
 
@@ -90,15 +112,15 @@ const ProviderProjectsDetails = () => {
     return <LoadingPage />;
   }
 
-  if (!projectData) {
+  if (!projectData || !mappedData) {
     return <NotFound />;
   }
   return (
     <div className="py-10 bg-gray-50/50 min-h-screen">
       <title>
         {t("providerProjectsDetails.projectDetails", {
-          number: projectData?.orderNumber,
-        }) || `تفاصيل المشروع #${projectData?.orderNumber}`}
+          number: mappedData?.orderNumber,
+        }) || `تفاصيل المشروع #${mappedData?.orderNumber}`}
       </title>
       <div className="container px-4 mx-auto max-w-7xl animate-fade-in">
         <div className="mb-8 p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-premium overflow-hidden relative group">
@@ -109,16 +131,16 @@ const ProviderProjectsDetails = () => {
           <div className="relative z-10">
             <HeadTitle
               title={t("providerProjectsDetails.projectDetails", {
-                number: projectData?.orderNumber,
-              }) || `تفاصيل المشروع #${projectData?.orderNumber}`}
+                number: mappedData?.orderNumber,
+              }) || `تفاصيل المشروع #${mappedData?.orderNumber}`}
               nav1={t("providerProjectsDetails.projectNav1") || "الرئيسية"}
               nav2={t("providerProjectsDetails.projectNav2") || "مشاريعي"}
               typeProject={
                 lang === "ar"
-                  ? projectData?.orderStatus?.nameAr
-                  : projectData?.orderStatus?.nameEn
+                  ? mappedData?.orderStatus?.nameAr
+                  : mappedData?.orderStatus?.nameEn
               }
-              statusProject={projectData?.orderStatus?.id}
+              statusProject={mappedData?.orderStatus?.id}
             />
           </div>
         </div>
@@ -128,7 +150,7 @@ const ProviderProjectsDetails = () => {
           <div className="lg:col-span-7 space-y-6 lg:space-y-8">
             <div className="glass-card p-1 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
               <div className="bg-white rounded-[2.2rem] overflow-hidden">
-                <ProjectListInfo data={projectData} />
+                <ProjectListInfo data={mappedData} />
               </div>
             </div>
 
@@ -139,7 +161,7 @@ const ProviderProjectsDetails = () => {
                 </div>
                 {t("providerProjectsDetails.description", "الوصف")}
               </h3>
-              <ProjectDescription des={projectData?.description} />
+              <ProjectDescription des={mappedData?.description} />
             </div>
           </div>
 

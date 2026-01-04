@@ -38,6 +38,7 @@ BEGIN
                 provider_id,
                 order_title,
                 order_status_id,
+                payout,
                 start_date,
                 created_at
             ) VALUES (
@@ -45,20 +46,22 @@ BEGIN
                 NEW.assigned_provider_id,
                 COALESCE(NEW.title, 'مشروع جديد'),
                 waiting_approval_status_id,
+                NEW.provider_quoted_price,
                 NOW(),
                 NOW()
             );
             
-            RAISE NOTICE 'Created order for request % with assigned provider %', NEW.id, NEW.assigned_provider_id;
+            RAISE NOTICE 'Created order for request % with assigned provider % and payout %', NEW.id, NEW.assigned_provider_id, NEW.provider_quoted_price;
         ELSIF existing_order_id IS NOT NULL THEN
-            -- Update existing order with new provider
+            -- Update existing order with new provider and payout
             UPDATE orders
             SET 
                 provider_id = NEW.assigned_provider_id,
+                payout = NEW.provider_quoted_price,
                 updated_at = NOW()
             WHERE id = existing_order_id;
             
-            RAISE NOTICE 'Updated order % with new provider %', existing_order_id, NEW.assigned_provider_id;
+            RAISE NOTICE 'Updated order % with new provider % and payout %', existing_order_id, NEW.assigned_provider_id, NEW.provider_quoted_price;
         END IF;
     END IF;
     

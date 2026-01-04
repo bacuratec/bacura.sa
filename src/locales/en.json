@@ -655,6 +655,7 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "status": "Status",
+      "price": "Project Fee",
       "action": "Action"
     },
     "buttons": {

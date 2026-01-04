@@ -154,9 +154,9 @@ const ProjectsList = ({ stats }) => {
       wrap: true,
     },
     {
-      name: t("services.price") || "السعر",
+      name: t("orders.columns.price") || "أتعاب المشروع",
       selector: (row) => {
-        const amount = row?.request?.service?.base_price;
+        const amount = row.payout || row.request?.provider_quoted_price;
         return typeof amount === "number" ? formatCurrency(amount, lang) : "-";
       },
       wrap: true,

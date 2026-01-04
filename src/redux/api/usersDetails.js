@@ -69,6 +69,17 @@ export const detailsApi = createApi({
       }),
       providesTags: ["AdminDetails"],
     }),
+    getAdminDetails: builder.query({
+      query: (id) => ({
+        table: "admins",
+        method: "GET",
+        id,
+        joins: [
+          "user:users!admins_user_id_fkey(id,email,phone,role,is_blocked)",
+        ],
+      }),
+      providesTags: ["AdminDetails"],
+    }),
   }),
 });
 

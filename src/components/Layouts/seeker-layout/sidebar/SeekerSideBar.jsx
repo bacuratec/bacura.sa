@@ -19,7 +19,7 @@ const SeekerSideBar = ({ data }) => {
     const Links = [
         {
             name: t("navSeeker.home") || "Home",
-            href: "/profile",
+            href: "/home",
             icon: Home,
         },
         {
@@ -117,7 +117,7 @@ const SeekerSideBar = ({ data }) => {
             <nav ref={scrollRef} className="flex-1 mt-4 overflow-y-auto select-none">
                 <ul>
                     {Links.map((item, i) => {
-                        const isActive = pathname === item.href || (item.href !== "/profile" && pathname.startsWith(item.href));
+                        const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
                         return (
                             <li key={i}>
                                 <Link

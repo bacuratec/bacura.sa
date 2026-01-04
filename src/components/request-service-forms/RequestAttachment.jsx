@@ -34,9 +34,13 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId, 
         statusId = lv?.id || null;
       }
 
-      // We only update columns that exist. Based on DB check, payment_status and receipt_approved are missing on 'requests'.
+      // We only update columns that exist.
       // We will update the associated payment record instead if possible.
-      const updatePayload = { updated_at: new Date().toISOString() };
+      const updatePayload = {
+        updated_at: new Date().toISOString(),
+        requester_accepted_price: true,
+        payment_status: 'paid'
+      };
       if (statusId) updatePayload.status_id = statusId;
 
       const { error } = await supabase.from('requests').update(updatePayload).eq('id', requestId);

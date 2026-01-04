@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { LanguageContext } from "@/context/LanguageContext";
 
-export default function RequestStatusStepper({ status }) {
+export default function RequestStatusStepper({ status, providerResponse }) {
   const { lang } = useContext(LanguageContext);
   const rawCode = status?.code || "";
   const currentCode = rawCode === "accepted" ? "waiting_payment" : rawCode;
@@ -17,10 +17,13 @@ export default function RequestStatusStepper({ status }) {
     { code: "completed", labelAr: "مكتمل", labelEn: "Completed" },
   ];
 
-  const currentIndex = Math.max(
-    steps.findIndex((s) => s.code === currentCode),
-    0
-  );
+  let currentIndex = steps.findIndex((s) => s.code === currentCode);
+  if (currentIndex === -1) currentIndex = 0;
+
+  // Advance index if provider has accepted even if status is still 'paid'
+  if (providerResponse === 'accepted' && currentCode === 'paid') {
+    currentIndex = steps.findIndex((s) => s.code === 'provider_assigned');
+  }
 
   return (
     <div className="w-full py-8 overflow-x-auto no-scrollbar">

@@ -61,8 +61,14 @@ const RequestLifecycle = ({ request }) => {
             id: "execution",
             label: t("requestSteps.execution") || "التنفيذ",
             icon: <UserCheck className="w-5 h-5" />,
-            status: isProjectStarted(request) ? "completed" : (isPaid(request) ? "current" : "pending"),
-            description: request.provider ? request.provider.name : (t("requestSteps.providerPending") || "تعيين مزود"),
+            status: isProjectStarted(request) || request.provider_response === 'accepted' ? "completed" : (isPaid(request) ? "current" : "pending"),
+            description: request.provider_response === 'accepted'
+                ? (t("requestSteps.providerAccepted") || "تم قبول الطلب من " + (request.provider?.name || ""))
+                : request.provider_response === 'rejected'
+                    ? (t("requestSteps.providerRejected") || "تم الرفض من المزود")
+                    : request.provider
+                        ? (t("requestSteps.waitingProvider") || "بانتظار موافقة " + request.provider.name)
+                        : (t("requestSteps.providerPending") || "تعيين مزود"),
         },
         {
             id: "completed",

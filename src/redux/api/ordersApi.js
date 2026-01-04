@@ -264,21 +264,27 @@ export const ordersApi = createApi({
     assignProviderToRequest: builder.mutation({
       // Use queryFn to check paid status before assigning provider (defense-in-depth)
       async queryFn({ requestId, providerId, providerPrice }, _queryApi, _extraOptions, baseQuery) {
-        // 1) fetch request
-        const reqRes = await baseQuery({ table: 'requests', method: 'GET', id: requestId });
+        // 1) fetch request with status code
+        const reqRes = await baseQuery({
+          table: 'requests',
+          method: 'GET',
+          id: requestId,
+          joins: ["status:lookup_values!requests_status_id_fkey(code)"]
+        });
+
         if (reqRes.error) return { error: reqRes.error };
         const request = reqRes.data;
         if (!request) return { error: { status: 'NOT_FOUND', message: 'Request not found' } };
 
-        // 2) enforce paid status (status_id = 204 for 'paid')
-        if (request.status_id !== 204) {
+        // 2) enforce paid status (code = 'paid')
+        if (request?.status?.code !== 'paid') {
           return { error: { status: 'FORBIDDEN', message: 'Cannot assign provider: request must be in paid status' } };
         }
 
         // 3) proceed with update
         const updatePayload = {
           assigned_provider_id: providerId,
-          provider_quoted_price: providerPrice ?? null,
+          provider_quoted_price: providerPrice ?? null, // Use input price
           provider_response: 'pending',
           provider_response_at: null,
           provider_rejection_reason: null,

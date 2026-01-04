@@ -203,7 +203,7 @@ const RequestDetails = ({ initialData, id }) => {
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-8">
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm p-6 overflow-hidden">
-              <RequestStatusStepper status={status} />
+              <RequestStatusStepper status={status} providerResponse={data?.provider_response} />
             </div>
 
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm p-10">
