@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 
 import LoadingPage from "../../LoadingPage";
 import {
-  useGetAdminDetailsQuery,
-  useGetProviderDetailsQuery,
-  useGetRequesterDetailsQuery,
+  useGetAdminByUserIdQuery,
+  useGetProviderByUserIdQuery,
+  useGetRequesterByUserIdQuery,
 } from "../../../redux/api/usersDetails";
 
 import UserData from "../../../components/shared/profile-details/UserData";
@@ -30,22 +30,26 @@ const ProfileDetails = () => {
   const userId = useSelector((state) => state.auth.userId);
 
   const {
-    data: providerData,
+    data: providerDataResult,
     refetch: refetchProvider,
     isLoading: loadingProvider,
-  } = useGetProviderDetailsQuery(userId, { skip: role !== "Provider" });
+  } = useGetProviderByUserIdQuery(userId, { skip: role !== "Provider" });
 
   const {
-    data: requesterData,
+    data: requesterDataResult,
     refetch: refetchRequester,
     isLoading: loadingRequester,
-  } = useGetRequesterDetailsQuery(userId, { skip: role !== "Requester" });
+  } = useGetRequesterByUserIdQuery(userId, { skip: role !== "Requester" });
 
   const {
-    data: adminData,
+    data: adminDataResult,
     refetch: refetchAdmin,
     isLoading: loadingAdmin,
-  } = useGetAdminDetailsQuery(userId, { skip: role !== "Admin" });
+  } = useGetAdminByUserIdQuery(userId, { skip: role !== "Admin" });
+
+  const providerData = Array.isArray(providerDataResult) ? providerDataResult[0] : providerDataResult;
+  const requesterData = Array.isArray(requesterDataResult) ? requesterDataResult[0] : requesterDataResult;
+  const adminData = Array.isArray(adminDataResult) ? adminDataResult[0] : adminDataResult;
 
   const isProvider = role === "Provider";
   const isRequester = role === "Requester";
@@ -53,14 +57,14 @@ const ProfileDetails = () => {
   const data = isProvider
     ? providerData
     : isRequester
-    ? requesterData
-    : adminData;
+      ? requesterData
+      : adminData;
 
   const refetch = isProvider
     ? refetchProvider
     : isRequester
-    ? refetchRequester
-    : refetchAdmin;
+      ? refetchRequester
+      : refetchAdmin;
 
   const isLoading = loadingProvider || loadingRequester || loadingAdmin;
 
@@ -74,8 +78,8 @@ const ProfileDetails = () => {
         {isProvider
           ? t("profile.providerDetails")
           : isRequester
-          ? t("profile.requesterDetails")
-          : t("profile.adminDetails")}
+            ? t("profile.requesterDetails")
+            : t("profile.adminDetails")}
       </title>
       <div className="container">
         {role !== "Admin" && (
@@ -100,22 +104,22 @@ const ProfileDetails = () => {
             isProvider
               ? t("profile.providerDetails")
               : isRequester
-              ? t("profile.requesterDetails")
-              : t("profile.adminDetails")
+                ? t("profile.requesterDetails")
+                : t("profile.adminDetails")
           }
           nav1={
             isProvider
               ? t("profile.providerNav")
               : isRequester
-              ? t("profile.requesterNav")
-              : t("profile.adminNav")
+                ? t("profile.requesterNav")
+                : t("profile.adminNav")
           }
           nav2={
             isProvider
               ? t("profile.providerDetails")
               : isRequester
-              ? t("profile.requesterDetails")
-              : t("profile.adminDetails")
+                ? t("profile.requesterDetails")
+                : t("profile.adminDetails")
           }
         />
 

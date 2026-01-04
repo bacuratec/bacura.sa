@@ -29,7 +29,7 @@ const RatesList = () => {
 
   const columns = [
     {
-      name: t("rates.projectNumber"),
+      name: t("rates.projectNumber") || "رقم المشروع",
       cell: (row) => (
         <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
           {row.orderNumber}
@@ -37,16 +37,16 @@ const RatesList = () => {
       ),
     },
     {
-      name: t("rates.projectName"),
+      name: t("rates.projectName") || "اسم المشروع",
       cell: (row) => row.orderTitle,
     },
     {
-      name: t("rates.clientName"),
+      name: t("rates.clientName") || "اسم العميل",
       selector: (row) => row.requester?.fullName,
       sortable: true,
     },
     {
-      name: t("rates.ratingStars"),
+      name: t("rates.ratingStars") || "التقييم",
       cell: (row) => (
         <div className="flex items-center gap-1">
           {Array.from({ length: 5 }).map((_, index) => (
@@ -61,7 +61,7 @@ const RatesList = () => {
       ),
     },
     {
-      name: t("rates.clientNotes"),
+      name: t("rates.clientNotes") || "ملاحظات العميل",
       selector: (row) => row.ratingNotes,
       sortable: true,
       cell: (row) => (
@@ -80,7 +80,7 @@ const RatesList = () => {
             columns={columns}
             data={ratings}
             searchableFields={["orderTitle", "orderNumber", "ratingNotes"]}
-            searchPlaceholder={t("searchPlaceholder")}
+            searchPlaceholder={t("searchPlaceholder") || "بحث..."}
             defaultPage={PageNumber}
             defaultPageSize={PageSize}
             isLoading={isLoading}

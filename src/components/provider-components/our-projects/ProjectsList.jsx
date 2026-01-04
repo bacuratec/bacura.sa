@@ -4,6 +4,7 @@ import CustomDataTable from "../../shared/datatable/DataTable";
 import { useContext, useEffect } from "react";
 import dayjs from "dayjs";
 import { useGetProjectsProvidersQuery } from "../../../redux/api/projectsApi";
+import { useGetProviderByUserIdQuery } from "../../../redux/api/usersDetails";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Eye } from "lucide-react";
@@ -33,6 +34,11 @@ const ProjectsList = ({ stats }) => {
     return stats?.totalOrdersCount || 0;
   })();
 
+  const userId = useSelector((state) => state.auth.userId);
+  const { data: providerDataResult } = useGetProviderByUserIdQuery(userId, { skip: !userId });
+  const providerData = Array.isArray(providerDataResult) ? providerDataResult[0] : providerDataResult;
+  const providerId = providerData?.id;
+
   const {
     data: projects,
     isLoading,
@@ -41,40 +47,43 @@ const ProjectsList = ({ stats }) => {
     PageNumber,
     PageSize,
     OrderStatusLookupId,
-  });
+    providerId,
+  }, { skip: !providerId });
 
   useEffect(() => {
-    refetch();
+    if (providerId) {
+      refetch();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [PageNumber, PageSize, OrderStatusLookupId]);
+  }, [PageNumber, PageSize, OrderStatusLookupId, providerId]);
 
   const tabs = [
     {
-      name: t("orders.tabs.all"),
+      name: t("orders.tabs.all") || "الكل",
       href: "",
       numbers: stats?.totalOrdersCount,
       color: "#637381",
     },
     {
-      name: t("orders.tabs.waitingForApproval"),
+      name: t("orders.tabs.waitingForApproval") || "بانتظار الموافقة",
       href: "?OrderStatusLookupId=17",
       numbers: stats?.waitingForApprovalOrdersCount,
       color: "#B76E00",
     },
     {
-      name: t("orders.tabs.waitingToStart"),
+      name: t("orders.tabs.waitingToStart") || "بانتظار البدء",
       href: "?OrderStatusLookupId=18",
       numbers: stats?.waitingToStartOrdersCount,
       color: "#B76E00",
     },
     {
-      name: t("orders.tabs.ongoing"),
+      name: t("orders.tabs.ongoing") || "قيد التنفيذ",
       href: "?OrderStatusLookupId=13",
       numbers: stats?.ongoingOrdersCount,
       color: "#b76f21",
     },
     {
-      name: t("orders.tabs.completedService"),
+      name: t("orders.tabs.completedService") || "خدمة مكتملة",
       // Service Completed often means provider finished but admin/user hasn't approved yet? 
       // Or status 11? 
       // In projects table, completed is 15.
@@ -92,13 +101,13 @@ const ProjectsList = ({ stats }) => {
     //   color: "#007867",
     // },
     {
-      name: t("orders.tabs.rejected"),
+      name: t("orders.tabs.rejected") || "مرفوض",
       href: "?OrderStatusLookupId=19",
       numbers: stats?.rejectedOrdersCount,
       color: "#B71D18",
     },
     {
-      name: t("orders.tabs.expired"),
+      name: t("orders.tabs.expired") || "منتهي",
       href: "?OrderStatusLookupId=20",
       numbers: stats?.expiredOrdersCount,
       color: "#B71D18",
@@ -107,7 +116,7 @@ const ProjectsList = ({ stats }) => {
 
   const columns = [
     {
-      name: t("orders.columns.orderNumber"),
+      name: t("orders.columns.orderNumber") || "رقم الطلب",
       cell: (row) => (
         <span className={`rounded-lg text-xs text-blue-600 font-normal`}>
           {row?.orderNumber || row?.id?.substring(0, 8)}
@@ -115,17 +124,17 @@ const ProjectsList = ({ stats }) => {
       ),
     },
     {
-      name: t("orders.columns.requester"),
+      name: t("orders.columns.requester") || "مقدم الطلب",
       selector: (row) => row?.requester?.name || t("unknown") || "-",
       wrap: true,
     },
     {
-      name: t("orders.columns.provider"),
+      name: t("orders.columns.provider") || "مزود الخدمة",
       selector: (row) => row?.provider?.name || t("unknown") || "-",
       wrap: true,
     },
     {
-      name: t("projects.serviceType"),
+      name: t("projects.serviceType") || "نوع الخدمة",
       selector: (row) =>
         lang === "ar"
           ? row?.request?.service?.name_ar || "-"
@@ -133,19 +142,19 @@ const ProjectsList = ({ stats }) => {
       wrap: true,
     },
     {
-      name: t("orders.columns.startDate"),
+      name: t("orders.columns.startDate") || "تاريخ البدء",
       selector: (row) =>
         row?.started_at ? dayjs(row.started_at).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
-      name: t("orders.columns.endDate"),
+      name: t("orders.columns.endDate") || "تاريخ الانتهاء",
       selector: (row) =>
         row?.completed_at ? dayjs(row.completed_at).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
-      name: t("services.price"),
+      name: t("services.price") || "السعر",
       selector: (row) => {
         const amount = row?.request?.service?.base_price;
         return typeof amount === "number" ? formatCurrency(amount, lang) : "-";
@@ -154,7 +163,7 @@ const ProjectsList = ({ stats }) => {
       sortable: true,
     },
     {
-      name: t("orders.columns.status"),
+      name: t("orders.columns.status") || "الحالة",
       cell: (row) => (
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
@@ -177,7 +186,7 @@ const ProjectsList = ({ stats }) => {
       wrap: true,
     },
     {
-      name: t("orders.columns.action"),
+      name: t("orders.columns.action") || "الإجراءات",
       cell: (row) => (
         <div className="overflow-visible">
           <Link
@@ -224,7 +233,7 @@ const ProjectsList = ({ stats }) => {
               columns={columns}
               data={sortedData}
               searchableFields={["orderNumber"]}
-              searchPlaceholder={t("searchPlaceholder")}
+              searchPlaceholder={t("searchPlaceholder") || "بحث برقم الطلب..."}
               isLoading={isLoading}
               totalRows={totalRows}
             />

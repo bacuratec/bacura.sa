@@ -11,14 +11,22 @@ const ActiveOrders = () => {
   }, []);
 
   return (
-    <div>
-      <title>{t("activeOrders.title")}</title>
-      <meta name="description" content={t("activeOrders.description")} />
-      <HeadTitle
-        title={t("activeOrders.title")}
-        // description={t("activeOrders.description")}
-      />
-      <OrdersTable />
+    <div className="min-h-screen bg-gray-50/30">
+      <title>{t("activeOrders.title") || "الطلبات المتاحة"}</title>
+      <meta name="description" content={t("activeOrders.description") || "عرض وإدارة الطلبات المتاحة للقبول أو الرفض"} />
+
+      <div className="container mx-auto px-4 py-10 max-w-7xl">
+        <div className="mb-8">
+          <HeadTitle
+            title={t("activeOrders.title") || "الطلبات المتاحة"}
+          />
+          <p className="text-gray-500 mt-3 text-base">
+            {t("activeOrders.description") || "قائمة الطلبات المعينة لك من قبل الإدارة. يمكنك قبول أو رفض الطلبات حسب توفرك."}
+          </p>
+        </div>
+
+        <OrdersTable />
+      </div>
     </div>
   );
 };

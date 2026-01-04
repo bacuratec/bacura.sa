@@ -45,11 +45,24 @@ export const detailsApi = createApi({
       }),
       providesTags: ["RequesterDetails"],
     }),
-    getAdminDetails: builder.query({
-      query: (id) => ({
+    getRequesterByUserId: builder.query({
+      query: (userId) => ({
+        table: "requesters",
+        method: "GET",
+        filters: { user_id: userId },
+        joins: [
+          "user:users!requesters_user_id_fkey(id,email,phone,role,is_blocked)",
+          "entity_type:lookup_values!requesters_entity_type_id_fkey(id,name_ar,name_en,code)",
+          "city:cities(id,name_ar,name_en)",
+        ],
+      }),
+      providesTags: ["RequesterDetails"],
+    }),
+    getAdminByUserId: builder.query({
+      query: (userId) => ({
         table: "admins",
         method: "GET",
-        id,
+        filters: { user_id: userId },
         joins: [
           "user:users!admins_user_id_fkey(id,email,phone,role,is_blocked)",
         ],
@@ -63,5 +76,7 @@ export const {
   useGetProviderDetailsQuery,
   useGetProviderByUserIdQuery,
   useGetRequesterDetailsQuery,
+  useGetRequesterByUserIdQuery,
   useGetAdminDetailsQuery,
+  useGetAdminByUserIdQuery,
 } = detailsApi;

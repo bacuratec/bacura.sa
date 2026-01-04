@@ -7,14 +7,14 @@ import Support from "../../../components/landing-components/profile-components/S
 import RecentRequests from "../../../components/landing-components/profile-components/RecentRequests";
 import { useGetUserOrdersQuery } from "../../../redux/api/ordersApi";
 import Link from "next/link";
-import { useGetRequesterDetailsQuery } from "../../../redux/api/usersDetails";
+import { useGetRequesterByUserIdQuery } from "../../../redux/api/usersDetails";
 import { useSelector } from "react-redux";
 import LoadingPage from "../../LoadingPage";
 import UserData from "../../../components/shared/profile-details/UserData";
 import SuspendModal from "../../../components/shared/suspend-modal/SuspendModal";
 import AttachmentsTable from "../../../components/admin-components/projects/AttachmentsTable";
 import { useGetTicketsQuery } from "../../../redux/api/ticketApi";
-import { useGetProjectStatisticsQuery } from "../../../redux/api/projectsApi";
+import { useGetRequesterStatisticsQuery } from "../../../redux/api/projectsApi";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
@@ -36,7 +36,8 @@ const Profile = () => {
   }, []);
   const [openSuspend, setOpenSuspend] = useState(false);
   const userId = useSelector((state) => state.auth.userId);
-  const { data, refetch, isLoading } = useGetRequesterDetailsQuery(userId);
+  const { data: requesterDataResult, refetch, isLoading } = useGetRequesterByUserIdQuery(userId, { skip: !userId });
+  const data = Array.isArray(requesterDataResult) ? requesterDataResult[0] : requesterDataResult;
   useEffect(() => {
     const createdAt = data?.creationTime || data?.creation_time || data?.created_at;
     if (createdAt) {
@@ -56,53 +57,57 @@ const Profile = () => {
       setFormattedDate("");
     }
   }, [data]);
-  const { data: userOrders } = useGetUserOrdersQuery({ PageNumber: 1, PageSize: 5 });
+  const { data: userOrders } = useGetUserOrdersQuery({
+    PageNumber: 1,
+    PageSize: 5,
+    requesterId: data?.id
+  }, { skip: !data?.id });
   const {
     data: tickets,
     refetch: refetchTickets,
     isLoading: isLoadingTickets,
   } = useGetTicketsQuery();
-  const { data: projectsStats } = useGetProjectStatisticsQuery({});
+  const { data: projectsStats } = useGetRequesterStatisticsQuery({ requesterId: data?.id }, { skip: !data?.id });
 
   const projectStatistics = [
     {
-      number: projectsStats?.totalOrdersCount ?? 0,
-      title: t("profile.stats.totalOrders"),
+      number: projectsStats?.totalRequests ?? 0,
+      title: t("profile.stats.totalRequests") || "إجمالي الطلبات",
       icon: <Wallet />,
       color: "#F9FDF1",
       ic: true,
     },
     {
-      number: projectsStats?.waitingForApprovalOrdersCount ?? 0,
-      title: t("profile.stats.waitingApproval"),
+      number: projectsStats?.newRequests ?? 0,
+      title: t("profile.stats.newRequests") || "طلبات جديدة",
       icon: <Clock />,
       color: "#FFF4E5",
       ic: true,
     },
     {
-      number: projectsStats?.waitingToStartOrdersCount ?? 0,
-      title: t("profile.stats.waitingStart"),
+      number: projectsStats?.pricedRequests ?? 0,
+      title: t("profile.stats.priced") || "بانتظار الموافقة",
       icon: <Play />,
       color: "#F0F7FF",
       ic: true,
     },
     {
-      number: projectsStats?.ongoingOrdersCount ?? 0,
-      title: t("profile.stats.ongoing"),
+      number: projectsStats?.totalOrders ?? 0,
+      title: t("profile.stats.totalOrders") || "إجمالي المشاريع",
       icon: <ListChecks />,
       color: "#EAF9F0",
       ic: true,
     },
     {
-      number: projectsStats?.completedOrdersCount ?? 0,
-      title: t("profile.stats.completed"),
+      number: projectsStats?.ongoing ?? 0,
+      title: t("profile.stats.ongoing") || "قيد التنفيذ",
       icon: <Check />,
       color: "#F1F1FD",
       ic: true,
     },
     {
-      number: projectsStats?.serviceCompletedOrdersCount ?? 0,
-      title: t("profile.stats.servicesCompleted"),
+      number: projectsStats?.completed ?? 0,
+      title: t("profile.stats.completed") || "مكتملة",
       icon: <ShieldCheck />,
       color: "#FDF6F1",
       ic: true,

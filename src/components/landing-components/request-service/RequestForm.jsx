@@ -138,17 +138,31 @@ const RequestForm = ({ services }) => {
         return;
       }
 
-      // 2. جلب requester_id من جدول requesters باستخدام userId
+      // 2. جلب requester_id من جدول requesters باستخدام userId (مع إنشاء ملف تعريفي تلقائي إذا لم يوجد)
+      let requesterId = null;
       const { data: requesterRow, error: requesterErr } = await supabase
         .from("requesters")
         .select("id")
         .eq("user_id", userId)
-        .single();
-      if (requesterErr || !requesterRow?.id) {
-        toast.error("تعذر تحديد هوية طالب الخدمة");
-        return;
+        .maybeSingle();
+
+      if (!requesterRow?.id) {
+        console.log("Requester profile not found, creating one...");
+        const { data: newUser, error: createErr } = await supabase
+          .from("requesters")
+          .insert([{ user_id: userId, full_name: "Service Seeker" }])
+          .select("id")
+          .single();
+
+        if (createErr || !newUser?.id) {
+          console.error("Failed to self-heal requester profile:", createErr);
+          toast.error("تعذر تهيئة حساب طالب الخدمة، يرجى التواصل مع الدعم");
+          return;
+        }
+        requesterId = newUser.id;
+      } else {
+        requesterId = requesterRow.id;
       }
-      const requesterId = requesterRow.id;
 
       // 3. تحديد الخدمة المختارة (قاعدة: طلب واحد مرتبط بخدمة واحدة)
       const selectedServiceId = values.selectedServices?.[0];
@@ -158,27 +172,31 @@ const RequestForm = ({ services }) => {
         return;
       }
 
-      // 4. جلب status_id حسب نوع الخدمة
-      await supabase
-        .from("lookup_types")
-        .select("id")
-        .eq("code", "requester-entity-types") // placeholder to ensure table exists
-        .maybeSingle();
-      const { data: reqStatusType } = await supabase
-        .from("lookup_types")
-        .select("id")
-        .eq("code", "request-status")
-        .single();
+      // 4. جلب status_id حسب نوع الخدمة (تحسين البحث ليكون أكثر مرونة)
+      let statusId = null;
       const statusCode = hasPricedService ? "priced" : "pending";
-      const { data: statusRow } = await supabase
-        .from("lookup_values")
-        .select("id")
-        .eq("lookup_type_id", reqStatusType.id)
-        .eq("code", statusCode)
-        .single();
-      const statusId = statusRow?.id;
+
+      try {
+        const { data: statusLookup } = await supabase
+          .from("lookup_values")
+          .select("id")
+          .eq("code", statusCode)
+          .maybeSingle();
+
+        statusId = statusLookup?.id;
+
+        // Fallback IDs based on common DB seeds if lookup fails
+        if (!statusId) {
+          if (statusCode === "pending") statusId = 7;
+          if (statusCode === "priced") statusId = 8;
+        }
+      } catch (err) {
+        console.warn("Status lookup failed, using fallbacks");
+        statusId = statusCode === "pending" ? 7 : 8;
+      }
+
       if (!statusId) {
-        toast.error("تعذر تحديد حالة الطلب");
+        toast.error("تعذر تحديد حالة الطلب بشكل آمن");
         return;
       }
 

@@ -92,13 +92,16 @@ main {
 .sidebar-scroll::-webkit-scrollbar {
   width: 5px;
 }
+
 .sidebar-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .sidebar-scroll::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
+
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.4);
 }
@@ -110,11 +113,32 @@ main {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Safe area padding */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Premium Gradients */
+.premium-gradient-primary {
+  background: linear-gradient(135deg, #1967AE 0%, #114a7e 100%);
+  background-size: 200% 200%;
+}
+
+.premium-gradient-secondary {
+  background: linear-gradient(135deg, #F3BF45 0%, #d4a02c 100%);
+  background-size: 200% 200%;
+}
+
+.shadow-premium {
+  box-shadow: 0 10px 25px -5px rgba(25, 103, 174, 0.3);
+}
+
+.shadow-premium-secondary {
+  box-shadow: 0 10px 25px -5px rgba(243, 191, 69, 0.3);
 }

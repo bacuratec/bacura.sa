@@ -84,7 +84,7 @@ export const ordersApi = createApi({
     }),
     // Get User Requests (Requester)
     getUserOrders: builder.query({
-      query: ({ PageNumber = 1, PageSize = 10, RequestStatus = "", CityId = "", ServiceId = "" }) => {
+      query: ({ PageNumber = 1, PageSize = 10, RequestStatus = "", CityId = "", ServiceId = "", requesterId = "" }) => {
         const filters = {};
         if (RequestStatus) {
           filters.status_id = RequestStatus;
@@ -94,6 +94,9 @@ export const ordersApi = createApi({
         }
         if (ServiceId) {
           filters.service_id = ServiceId;
+        }
+        if (requesterId) {
+          filters.requester_id = requesterId;
         }
         // Get requester_id from user_id - assumes RLS handles this filtering if we don't pass id, or we need to pass it?
         // Supabase query usually uses auth.uid() automatically for RLS, but if we want to filter by requester_id column explicitly:
@@ -283,7 +286,10 @@ export const ordersApi = createApi({
         };
 
         const updRes = await baseQuery({ table: 'requests', method: 'PUT', id: requestId, body: updatePayload });
-        if (updRes.error) return { error: updRes.error };
+        if (updRes.error) {
+          // Explicitly return the error so unwrap() can catch it and handleSubmit can reset isLoading
+          return { error: updRes.error };
+        }
         return { data: updRes.data };
       },
       invalidatesTags: ["Requests"],

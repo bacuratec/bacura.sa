@@ -43,7 +43,7 @@ const InvitationsList = ({ providerId }) => {
 
     const columns = [
         {
-            name: t("invitations.columns.title"),
+            name: t("invitations.columns.title") || "عنوان الطلب",
             selector: (row) => row.title,
             wrap: true,
             cell: (row) => (
@@ -54,15 +54,15 @@ const InvitationsList = ({ providerId }) => {
             )
         },
         {
-            name: t("invitations.columns.requester"),
+            name: t("invitations.columns.requester") || "مقدم الطلب",
             selector: (row) => row.requester?.name || "-",
         },
         {
-            name: t("invitations.columns.service"),
+            name: t("invitations.columns.service") || "الخدمة",
             selector: (row) => lang === 'ar' ? row.service?.name_ar : row.service?.name_en,
         },
         {
-            name: t("invitations.columns.offeredPrice"),
+            name: t("invitations.columns.offeredPrice") || "السعر المعروض",
             cell: (row) => (
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full border border-green-100 font-bold text-xs">
                     <DollarSign className="w-3 h-3" />
@@ -71,24 +71,24 @@ const InvitationsList = ({ providerId }) => {
             ),
         },
         {
-            name: t("invitations.columns.date"),
+            name: t("invitations.columns.date") || "التاريخ",
             selector: (row) => dayjs(row.created_at).format("DD/MM/YYYY"),
         },
         {
-            name: t("invitations.columns.actions"),
+            name: t("invitations.columns.actions") || "الإجراءات",
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => handleResponse(row.id, 'accepted')}
                         className="p-2 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition"
-                        title={t("invitations.accept")}
+                        title={t("invitations.accept") || "قبول"}
                     >
                         <CheckCircle className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => handleResponse(row.id, 'rejected')}
                         className="p-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition"
-                        title={t("invitations.reject")}
+                        title={t("invitations.reject") || "رفض"}
                     >
                         <XCircle className="w-4 h-4" />
                     </button>

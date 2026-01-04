@@ -15,10 +15,24 @@ export default async function RequestsPage() {
     newRequestssCount: 0,
   };
 
+  // Check for user to optionally show layout
+  const { data: { user } } = await supabase.auth.getUser();
+  let requester = null;
+
+  if (user) {
+    const { data } = await supabase
+      .from('requesters')
+      .select('id, name')
+      .eq('user_id', user.id)
+      .single();
+    requester = data;
+  }
+
   try {
     const countFor = async (statusId = null) => {
       let query = supabase.from("requests").select("id", { count: "exact", head: true });
       if (statusId) query = query.eq("status_id", statusId);
+      if (requester) query = query.eq("requester_id", requester.id);
 
       const { count, error } = await query;
       if (error) {
@@ -37,19 +51,6 @@ export default async function RequestsPage() {
     stats.approvedRequestsCount = await countFor(11); // completed
   } catch (err) {
     console.error("Critical error fetching requests stats:", err);
-  }
-
-  // Check for user to optionally show layout
-  const { data: { user } } = await supabase.auth.getUser();
-  let requester = null;
-
-  if (user) {
-    const { data } = await supabase
-      .from('requesters')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-    requester = data;
   }
 
   if (requester) {

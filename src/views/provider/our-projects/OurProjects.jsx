@@ -12,14 +12,22 @@ const Projects = () => {
   const projectsStats = null;
 
   return (
-    <div>
-      <title>{t("projects.pageTitle")}</title>
-      <meta name="description" content={t("projects.pageDescription")} />
-      <HeadTitle
-        title={t("projects.pageTitle")}
-        // description={t("projects.pageDescription")}
-      />
-      <ProjectsList stats={projectsStats} />
+    <div className="min-h-screen bg-gray-50/30">
+      <title>{t("projects.pageTitle") || "مشاريعي"}</title>
+      <meta name="description" content={t("projects.pageDescription") || "عرض وإدارة جميع مشاريعك الجارية والمكتملة"} />
+
+      <div className="container mx-auto px-4 py-10 max-w-7xl">
+        <div className="mb-8">
+          <HeadTitle
+            title={t("projects.pageTitle") || "مشاريعي"}
+          />
+          <p className="text-gray-500 mt-3 text-base">
+            {t("projects.pageDescription") || "تابع تقدم مشاريعك، قم بتحديث الحالة، ورفع الملفات المطلوبة."}
+          </p>
+        </div>
+
+        <ProjectsList stats={projectsStats} />
+      </div>
     </div>
   );
 };

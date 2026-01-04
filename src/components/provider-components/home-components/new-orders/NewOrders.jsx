@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../../shared/datatable/DataTable";
 import { useContext, useEffect } from "react";
 import dayjs from "dayjs";
-import { useGetProjectsQuery } from "@/redux/api/projectsApi";
+import { useGetProjectsProvidersQuery } from "@/redux/api/projectsApi";
+import { useGetProviderByUserIdQuery } from "@/redux/api/usersDetails";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Eye } from "lucide-react";
@@ -13,30 +13,35 @@ const OrdersTable = () => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
-  const role = useSelector((state) => state.auth.role);
-  const searchParams = useSearchParams();
-  const PageNumber = searchParams.get("PageNumber") || 1;
-  const PageSize = searchParams.get("PageSize") || 30;
-  const OrderStatusLookupId = searchParams.get("OrderStatusLookupId") || "";
+  const userId = useSelector((state) => state.auth.userId);
+  const { data: providerDataResult } = useGetProviderByUserIdQuery(userId, { skip: !userId });
+  const providerData = Array.isArray(providerDataResult) ? providerDataResult[0] : providerDataResult;
+  const providerId = providerData?.id;
+
+  const PageNumber = 1;
+  const PageSize = 10;
 
   const {
     data: projects,
     isLoading,
     refetch,
-  } = useGetProjectsQuery({
+  } = useGetProjectsProvidersQuery({
     PageNumber,
     PageSize,
-    OrderStatusLookupId: 600,
-  });
+    OrderStatusLookupId: 18, // Waiting to Start
+    providerId,
+  }, { skip: !providerId });
 
   useEffect(() => {
-    refetch();
+    if (providerId) {
+      refetch();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [PageNumber, PageSize, OrderStatusLookupId]);
+  }, [providerId]);
 
   const columns = [
     {
-      name: t("orders.columns.orderNumber"),
+      name: t("orders.columns.orderNumber") || "رقم الطلب",
       cell: (row) => (
         <span className="rounded-lg text-xs text-blue-600 font-normal">
           {row?.orderNumber || row?.id?.slice?.(0, 8) || "-"}
@@ -44,69 +49,52 @@ const OrdersTable = () => {
       ),
     },
     {
-      name: t("orders.columns.requester"),
-      selector: (row) => row.requester?.fullName || row.request?.requester?.name || "-",
+      name: t("orders.columns.requester") || "مقدم الطلب",
+      selector: (row) => row.request?.requester?.name || "-",
       wrap: true,
     },
     {
-      name: t("orders.columns.provider"),
-      selector: (row) => row.providers?.fullName || row.provider?.name || "-",
-      wrap: true,
-    },
-    {
-      name: t("projects.serviceType"),
+      name: t("projects.serviceType") || "نوع الخدمة",
       selector: (row) =>
         lang === "ar"
-          ? row.services?.[0]?.titleAr || row.request?.service?.name_ar || "-"
-          : row.services?.[0]?.titleEn || row.request?.service?.name_en || "-",
+          ? row.request?.service?.name_ar || "-"
+          : row.request?.service?.name_en || "-",
       wrap: true,
     },
     {
-      name: t("orders.columns.startDate"),
-      selector: (row) => row.startDate ? dayjs(row.startDate).format("DD/MM/YYYY hh:mm A") : (row.created_at ? dayjs(row.created_at).format("DD/MM/YYYY hh:mm A") : "-"),
+      name: t("orders.columns.startDate") || "تاريخ البدء",
+      selector: (row) => row.created_at ? dayjs(row.created_at).format("DD/MM/YYYY hh:mm A") : "-",
       wrap: true,
     },
     {
-      name: t("orders.columns.endDate"),
-      selector: (row) => row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY hh:mm A") : "-",
-      wrap: true,
-    },
-    {
-      name: t("orders.columns.status"),
+      name: t("orders.columns.status") || "الحالة",
       cell: (row) => (
         <span
           className={`text-nowrap px-0.5 py-1 rounded-lg text-xs font-bold
-              ${
-                row.orderStatus?.id === 603
-                  ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
-                  : row.orderStatus?.id === 602
-                  ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
-                  : row.orderStatus?.id === 605 || row.orderStatus?.id === 604
+              ${row.status?.id === 15
+              ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
+              : row.status?.id === 13
+                ? "border border-[#B2EECC] bg-[#EEFBF4] text-[#007867]"
+                : row.status?.id === 19 || row.status?.id === 20
                   ? "bg-red-100 text-red-700"
-                  : row.orderStatus?.id === 601
-                  ? "bg-red-100 text-[#B76E00]"
-                  : "bg-gray-100 text-gray-600"
-              }`}
+                  : row.status?.id === 18
+                    ? "bg-amber-100 text-[#B76E00]"
+                    : "bg-gray-100 text-gray-600"
+            }`}
         >
-          {lang === "ar" ? row.orderStatus?.nameAr : row.orderStatus?.nameEn}
+          {lang === "ar" ? row.status?.name_ar : row.status?.name_en}
         </span>
       ),
       wrap: true,
     },
     {
-      name: t("orders.columns.action"),
+      name: t("orders.columns.action") || "الإجراءات",
       cell: (row) => (
         <Link
-          href={
-            role === "Admin"
-              ? `/admin/projects/${row.id}`
-              : role === "Requester"
-              ? `/projects/${row.id}`
-              : `/provider/projects/${row.id}`
-          }
-          className="bg-[#1A71F6] text-white px-1 py-1 rounded-xl hover:bg-blue-700 transition text-xs font-medium ml-5 text-nowrap"
+          href={`/provider/projects/${row.id}`}
+          className="bg-[#1A71F6] text-white px-2 py-2 rounded-xl hover:bg-blue-700 transition text-xs font-medium flex items-center justify-center whitespace-nowrap"
         >
-          <Eye />
+          <Eye size={16} />
         </Link>
       ),
       ignoreRowClick: true,
@@ -114,17 +102,9 @@ const OrdersTable = () => {
     },
   ];
 
-  const baseData = Array.isArray(projects) ? projects : (projects?.data || []);
-  const filteredProjects =
-    OrderStatusLookupId === ""
-      ? baseData?.filter((item) => (item.orderStatus?.id === 600) || (item.status?.id === 600) || (item.order_status_id === 600))
-      : baseData;
-
-  const sortedData = filteredProjects
-    ? [...filteredProjects]?.sort((a, b) => {
-        return Number(b?.orderNumber || b?.id) - Number(a?.orderNumber || a?.id);
-      })
-    : [];
+  const sortedData = Array.isArray(projects)
+    ? [...projects]?.sort((a, b) => dayjs(b.created_at).unix() - dayjs(a.created_at).unix())
+    : (projects?.data ? [...projects.data]?.sort((a, b) => dayjs(b.created_at).unix() - dayjs(a.created_at).unix()) : []);
 
   return (
     <div className="py-5">
@@ -133,8 +113,8 @@ const OrdersTable = () => {
           <CustomDataTable
             columns={columns}
             data={sortedData}
-            searchableFields={["orderNumber"]}
-            searchPlaceholder={t("searchPlaceholder")}
+            searchableFields={["id"]}
+            searchPlaceholder={t("searchPlaceholder") || "بحث برقم الطلب..."}
             isLoading={isLoading}
           />
         </div>

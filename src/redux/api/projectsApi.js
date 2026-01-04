@@ -138,6 +138,59 @@ export const projectsApi = createApi({
       },
       providesTags: ["Orders"],
     }),
+    // Get Requester Specific Statistics (Requests & Orders)
+    getRequesterStatistics: builder.query({
+      async queryFn({ requesterId }, _queryApi, _extraOptions, baseQuery) {
+        try {
+          // 1) Get Requests counts
+          const reqFilters = { requester_id: requesterId };
+
+          const [totalReqs, waitingAppr, priced, waitingPay, rejected, completed, newReqs, underReview] = await Promise.all([
+            baseQuery({ table: 'requests', method: 'GET', filters: reqFilters, pagination: { page: 1, pageSize: 1 } }),
+            baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 9 }, pagination: { page: 1, pageSize: 1 } }), // initial approval
+            baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 8 }, pagination: { page: 1, pageSize: 1 } }), // priced
+            baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 21 }, pagination: { page: 1, pageSize: 1 } }), // waiting payment
+            baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 10 }, pagination: { page: 1, pageSize: 1 } }), // rejected
+            baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 11 }, pagination: { page: 1, pageSize: 1 } }), // completed
+            baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 7 }, pagination: { page: 1, pageSize: 1 } }), // new
+            baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 207 }, pagination: { page: 1, pageSize: 1 } }), // under review
+          ]);
+
+          // 2) Get Orders (Projects) counts
+          // Filtering orders by request.requester_id requires a join as seen in getProjectsRequesters
+          const orderBaseQuery = {
+            table: 'orders',
+            method: 'GET',
+            filters: { "request.requester_id": requesterId },
+            joins: ["request:requests!inner(id,requester_id)"],
+            pagination: { page: 1, pageSize: 1 }
+          };
+
+          const [totalOrders, waitingStart, ongoing, orderCompleted] = await Promise.all([
+            baseQuery(orderBaseQuery),
+            baseQuery({ ...orderBaseQuery, filters: { ...orderBaseQuery.filters, order_status_id: 18 } }), // waiting to start
+            baseQuery({ ...orderBaseQuery, filters: { ...orderBaseQuery.filters, order_status_id: 13 } }), // ongoing
+            baseQuery({ ...orderBaseQuery, filters: { ...orderBaseQuery.filters, order_status_id: 15 } }), // completed
+          ]);
+
+          const stats = {
+            totalRequests: totalReqs.data?.count || 0,
+            newRequests: newReqs.data?.count || 0,
+            pricedRequests: priced.data?.count || 0,
+            waitingPayment: waitingPay.data?.count || 0,
+            totalOrders: totalOrders.data?.count || 0,
+            waitingStart: waitingStart.data?.count || 0,
+            ongoing: ongoing.data?.count || 0,
+            completed: orderCompleted.data?.count || 0,
+          };
+
+          return { data: stats };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', message: error.message } };
+        }
+      },
+      providesTags: ["Orders", "Requests"],
+    }),
     // Provider Update Order Status
     ProviderProjectState: builder.mutation({
       query: (body) => ({
@@ -200,4 +253,5 @@ export const {
   useGetProjectsProvidersQuery,
   useGetProjectsRequestersQuery,
   useDeleteProjectMutation,
+  useGetRequesterStatisticsQuery,
 } = projectsApi;

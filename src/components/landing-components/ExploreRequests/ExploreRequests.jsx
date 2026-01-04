@@ -13,6 +13,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { useState } from "react";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import { useGetUserOrdersQuery } from "../../../redux/api/ordersApi";
+import { useGetRequesterByUserIdQuery } from "../../../redux/api/usersDetails";
+import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 
 import { TablePageSkeleton } from "../../shared/skeletons/PageSkeleton";
@@ -29,6 +31,10 @@ const ExploreRequests = ({ stats }) => {
   const CityId = searchParams.get("CityId") || "";
   const ServiceId = searchParams.get("ServiceId") || "";
 
+  const { userId } = useSelector((state) => state.auth);
+  const { data: requesterDataResult } = useGetRequesterByUserIdQuery(userId, { skip: !userId });
+  const requesterData = Array.isArray(requesterDataResult) ? requesterDataResult[0] : requesterDataResult;
+
   const {
     data: orders,
     isLoading,
@@ -41,7 +47,8 @@ const ExploreRequests = ({ stats }) => {
     RequestStatus,
     CityId,
     ServiceId,
-  });
+    requesterId: requesterData?.id,
+  }, { skip: !requesterData?.id });
 
   const { data: cities, isLoading: citiesLoading } = useGetCitiesQuery();
   const { data: services, isLoading: servicesLoading } = useGetServicesQuery();
@@ -87,6 +94,7 @@ const ExploreRequests = ({ stats }) => {
           return;
         }
         let query = supabase.from("requests").select("*", { count: "exact", head: true });
+        if (requesterData?.id) query = query.eq("requester_id", requesterData.id);
         if (RequestStatus) query = query.eq("status_id", RequestStatus);
         if (CityId) query = query.eq("city_id", CityId);
         if (ServiceId) query = query.eq("service_id", ServiceId);
@@ -108,9 +116,11 @@ const ExploreRequests = ({ stats }) => {
   }, [RequestStatus, CityId, ServiceId]);
 
   useEffect(() => {
-    refetch();
+    if (requesterData?.id) {
+      refetch();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [PageNumber, PageSize, RequestStatus]);
+  }, [PageNumber, PageSize, RequestStatus, CityId, ServiceId, requesterData?.id]);
 
   if (isLoading) {
     return <TablePageSkeleton />;

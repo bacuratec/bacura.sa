@@ -26,6 +26,7 @@ import { formatCurrency } from "@/utils/currency";
 import dayjs from "dayjs";
 
 import { DetailPageSkeleton } from "../../../components/shared/skeletons/PageSkeleton";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
 import RequestRating from "../../../components/landing-components/request-service/RequestRating";
 import { useGetRatingsQuery } from "../../../redux/api/ratingsApi";
@@ -78,6 +79,18 @@ const RequestDetails = ({ initialData, id }) => {
   const [respondPrice] = useRequesterRespondPriceMutation();
   const [completeRequest, { isLoading: isCompleting }] = useAdminCompleteRequestMutation();
   const [adminData, setAdminData] = useState(null);
+
+  // Realtime Subscriptions
+  useRealtimeSync('requests', `id=eq.${requestId}`, () => {
+    console.log("Request updated via Realtime, refetching...");
+    refetchRequesterDetails();
+  });
+
+  useRealtimeSync('orders', `request_id=eq.${requestId}`, () => {
+    console.log("Order updated via Realtime, reload might be needed...");
+    // If we have a dedicated query for order, refetch it here or just page reload for safety
+    window.location.reload();
+  });
 
   const data = requestData || initialData || adminData;
   const attachments = attachmentsData || [];
@@ -177,12 +190,13 @@ const RequestDetails = ({ initialData, id }) => {
               </div>
             </div>
 
-            <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-8">
-              <h3 className="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
-                <div className="w-1.5 h-6 bg-secondary rounded-full"></div>
-                {t("projects.attachments") || "المرفقات"}
-              </h3>
-              <RequestAttachment request={data} attachments={attachments} onDeleted={() => refetchRequesterDetails()} requestId={requestId} />
+            {/* Quick Actions / Help Sidebar */}
+            <div className="bg-gradient-to-br from-primary to-blue-700 rounded-[32px] p-8 text-white shadow-xl">
+              <h4 className="font-black text-lg mb-2">{t("common.needHelp") || "هل تحتاج مساعدة؟"}</h4>
+              <p className="text-white/70 text-sm mb-6">{t("common.supportDesc") || "فريقنا متواجد دائماً لخدمتك ومتابعة طلبك"}</p>
+              <a href="/support" className="block w-full text-center bg-white text-primary py-3 rounded-xl font-black text-sm hover:bg-gray-50 transition-colors">
+                {t("common.contactSupport") || "تواصل بالدعم الفني"}
+              </a>
             </div>
           </div>
 
@@ -196,56 +210,71 @@ const RequestDetails = ({ initialData, id }) => {
               <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
             </div>
 
-            {/* Offer Section */}
-            {(data?.admin_price || data?.admin_notes || data?.admin_proposal_file_url) && (
-              <div className="rounded-[40px] border border-gray-100 p-10 bg-white shadow-custom animate-fade-in-up">
-                <div className="flex items-center justify-between mb-8 border-b border-gray-50 pb-6">
-                  <div className="text-xl text-gray-900 font-black flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-xl text-primary">
-                      <Star className="w-5 h-5 fill-current" />
-                    </div>
-                    {t("requestDetails.adminOffer") || "عرض السعر من الإدارة"}
-                  </div>
-                </div>
+            {/* Attachments - Now Fixed in Main Content per User Request */}
+            <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm p-8">
+              <h3 className="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
+                <div className="w-1.5 h-6 bg-secondary rounded-full"></div>
+                {t("projects.attachments") || "مرفقات الطلب والملفات"}
+              </h3>
+              <RequestAttachment
+                request={data}
+                attachments={attachments}
+                onDeleted={() => refetchRequesterDetails()}
+                requestId={requestId}
+              />
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  {typeof data?.admin_price === "number" && (
-                    <div className="bg-primary/5 p-6 rounded-[32px] border border-primary/10">
-                      <span className="text-[10px] font-black uppercase text-primary/60 tracking-[0.2em] block mb-2">{t("pricing.total") || "السعر الإجمالي"}</span>
-                      <div className="text-4xl font-black text-primary">
-                        {formatCurrency(Number(data.admin_price), lang)}
+            {/* Offer Section - Visible from 'priced' stage onwards */}
+            {(data?.admin_price || data?.admin_notes || data?.admin_proposal_file_url) &&
+              (['priced', 'waiting_payment', 'paid', 'provider_assigned', 'pending_delivery', 'under_review', 'completed', 'rated'].includes(statusCode) || data?.requestStatus?.id === 8) && (
+                <div className="rounded-[40px] border border-gray-100 p-10 bg-white shadow-custom animate-fade-in-up">
+                  <div className="flex items-center justify-between mb-8 border-b border-gray-50 pb-6">
+                    <div className="text-xl text-gray-900 font-black flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-xl text-primary">
+                        <Star className="w-5 h-5 fill-current" />
                       </div>
+                      {t("requestDetails.adminOffer") || "عرض السعر من الإدارة"}
                     </div>
-                  )}
+                  </div>
 
-                  {data?.admin_proposal_file_url && (
-                    <a
-                      href={data.admin_proposal_file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex flex-col justify-center bg-gray-50 hover:bg-gray-100 p-6 rounded-[32px] border border-gray-100 transition-all group"
-                    >
-                      <span className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] block mb-2">{t("pricing.proposal") || "ملخص العرض"}</span>
-                      <div className="flex items-center gap-3 text-gray-900 font-black group-hover:text-primary transition-colors">
-                        <div className="p-2 bg-white rounded-xl shadow-sm">
-                          <Download className="w-5 h-5" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    {typeof data?.admin_price === "number" && (
+                      <div className="bg-primary/5 p-6 rounded-[32px] border border-primary/10">
+                        <span className="text-[10px] font-black uppercase text-primary/60 tracking-[0.2em] block mb-2">{t("pricing.total") || "السعر الإجمالي"}</span>
+                        <div className="text-4xl font-black text-primary">
+                          {formatCurrency(Number(data.admin_price), lang)}
                         </div>
-                        {t("requestDetails.downloadProposal") || "تحميل ملف العرض"}
                       </div>
-                    </a>
+                    )}
+
+                    {data?.admin_proposal_file_url && (
+                      <a
+                        href={data.admin_proposal_file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex flex-col justify-center bg-gray-50 hover:bg-gray-100 p-6 rounded-[32px] border border-gray-100 transition-all group"
+                      >
+                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] block mb-2">{t("pricing.proposal") || "ملخص العرض"}</span>
+                        <div className="flex items-center gap-3 text-gray-900 font-black group-hover:text-primary transition-colors">
+                          <div className="p-2 bg-white rounded-xl shadow-sm">
+                            <Download className="w-5 h-5" />
+                          </div>
+                          {t("requestDetails.downloadProposal") || "تحميل ملف العرض"}
+                        </div>
+                      </a>
+                    )}
+                  </div>
+
+                  {data?.admin_notes && (
+                    <div className="bg-gray-50/50 rounded-[32px] p-8 text-gray-600 leading-relaxed border border-gray-100 italic relative">
+                      <div className="absolute top-4 left-4 opacity-10">
+                        <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.899 14.899 16 16 16H19V10H14V4H20V16C20 18.209 18.209 20 16 20H14.017V21ZM5.017 21V20C3.359 20 2 18.641 2 17V4H8V16H5.017C5.017 17.101 5.899 18 7 18H8.017V21H5.017Z" /></svg>
+                      </div>
+                      {data.admin_notes}
+                    </div>
                   )}
                 </div>
-
-                {data?.admin_notes && (
-                  <div className="bg-gray-50/50 rounded-[32px] p-8 text-gray-600 leading-relaxed border border-gray-100 italic relative">
-                    <div className="absolute top-4 left-4 opacity-10">
-                      <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.899 14.899 16 16 16H19V10H14V4H20V16C20 18.209 18.209 20 16 20H14.017V21ZM5.017 21V20C3.359 20 2 18.641 2 17V4H8V16H5.017C5.017 17.101 5.899 18 7 18H8.017V21H5.017Z" /></svg>
-                    </div>
-                    {data.admin_notes}
-                  </div>
-                )}
-              </div>
-            )}
+              )}
 
             {/* Respond Action */}
             {data?.admin_price && !data?.requester_accepted_price && !data?.requester_rejection_reason && (statusCode === "priced" || data?.requestStatus?.id === 8) && (
@@ -300,8 +329,8 @@ const RequestDetails = ({ initialData, id }) => {
               </div>
             )}
 
-            {/* Payment Section */}
-            {showPayment && !data?.payment_status?.includes('paid') && (
+            {/* Payment Section - ONLY in 'waiting_payment' stage */}
+            {showPayment && statusCode === 'waiting_payment' && !data?.payment_status?.includes('paid') && (
               <div className="bg-white rounded-[40px] shadow-custom border border-gray-100 p-10 overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-secondary to-primary" />
                 <div className="mb-10 text-center">
@@ -356,7 +385,10 @@ const RequestDetails = ({ initialData, id }) => {
                     </button>
                   </div>
                 )}
-                <RequestChat requestId={requestId} orderId={orderData?.id || data?.orderId} userId={userId} />
+                {/* Chat - Visible only after some initial progress (Priced or later) */}
+                {['priced', 'waiting_payment', 'paid', 'provider_assigned', 'pending_delivery', 'under_review', 'completed', 'rated'].includes(statusCode) && (
+                  <RequestChat requestId={requestId} orderId={orderData?.id || data?.orderId} userId={userId} />
+                )}
               </div>
             )}
 

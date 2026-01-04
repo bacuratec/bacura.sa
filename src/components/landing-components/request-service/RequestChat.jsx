@@ -23,9 +23,16 @@ export default function RequestChat({ requestId, orderId, userId, ticketOwnerId 
   const { data: tickets } = useGetTicketsByFiltersQuery(filters, { skip: !ownerId });
   const firstTicket = Array.isArray(tickets) ? tickets[0] : (tickets?.data?.[0] || null);
   const [ticketId, setTicketId] = useState(firstTicket?.id || null);
-  const { data: messages } = useGetTicketMessagesQuery(ticketId, { skip: !ticketId });
+  const { data: messages, refetch: refetchMessages } = useGetTicketMessagesQuery(ticketId, { skip: !ticketId });
   const [sendMessage, { isLoading: sending }] = useSendTicketMessageMutation();
   const [text, setText] = useState("");
+
+  const { useRealtimeSync } = require("@/hooks/useRealtimeSync");
+
+  useRealtimeSync('ticket_messages', `ticket_id=eq.${ticketId}`, () => {
+    console.log("New message via Realtime, refetching...");
+    refetchMessages();
+  });
 
   useEffect(() => {
     if (firstTicket?.id && !ticketId) setTicketId(firstTicket.id);

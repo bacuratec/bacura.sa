@@ -98,7 +98,7 @@ const ProviderProjectsDetails = () => {
       <title>
         {t("providerProjectsDetails.projectDetails", {
           number: projectData?.orderNumber,
-        })}
+        }) || `تفاصيل المشروع #${projectData?.orderNumber}`}
       </title>
       <div className="container px-4 mx-auto max-w-7xl animate-fade-in">
         <div className="mb-8 p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-premium overflow-hidden relative group">
@@ -110,9 +110,9 @@ const ProviderProjectsDetails = () => {
             <HeadTitle
               title={t("providerProjectsDetails.projectDetails", {
                 number: projectData?.orderNumber,
-              })}
-              nav1={t("providerProjectsDetails.projectNav1")}
-              nav2={t("providerProjectsDetails.projectNav2")}
+              }) || `تفاصيل المشروع #${projectData?.orderNumber}`}
+              nav1={t("providerProjectsDetails.projectNav1") || "الرئيسية"}
+              nav2={t("providerProjectsDetails.projectNav2") || "مشاريعي"}
               typeProject={
                 lang === "ar"
                   ? projectData?.orderStatus?.nameAr
@@ -137,7 +137,7 @@ const ProviderProjectsDetails = () => {
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" /></svg>
                 </div>
-                {t("providerProjectsDetails.description") || "الوصف"}
+                {t("providerProjectsDetails.description", "الوصف")}
               </h3>
               <ProjectDescription des={projectData?.description} />
             </div>
@@ -148,7 +148,7 @@ const ProviderProjectsDetails = () => {
             {/* Action Buttons Box */}
             <div className="glass-card p-8 rounded-[2.5rem] border-2 border-primary/10 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-              <h3 className="text-lg font-bold mb-6 shimmer-text inline-block">{t("providerProjectsDetails.actions") || "الإجراءات"}</h3>
+              <h3 className="text-lg font-bold mb-6 shimmer-text inline-block">{t("providerProjectsDetails.actions", "الإجراءات")}</h3>
 
               <div className="flex flex-wrap items-center gap-4 relative z-10">
                 {statusId === 17 && !rejected && (
@@ -161,21 +161,21 @@ const ProviderProjectsDetails = () => {
                       disabled={loadingCreateState}
                       className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95"
                     >
-                      {t("providerProjectsDetails.reject")}
+                      {t("providerProjectsDetails.reject") || "رفض الطلب"}
                     </button>
                     <button
                       onClick={() => handleAction("approve")}
                       disabled={loadingCreateState}
                       className="flex-1 premium-gradient-primary text-white shadow-lg py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-blue-500/25"
                     >
-                      {t("providerProjectsDetails.approve")}
+                      {t("providerProjectsDetails.approve") || "قبول الطلب"}
                     </button>
                   </>
                 )}
 
                 {rejected && (
                   <div className="w-full text-center p-4 bg-red-50 rounded-2xl border border-red-100 text-red-600 font-bold animate-pulse">
-                    {t("providerProjectsDetails.rejectedStatus")}
+                    {t("providerProjectsDetails.rejectedStatus") || "تم رفض الطلب"}
                   </div>
                 )}
 
@@ -185,7 +185,7 @@ const ProviderProjectsDetails = () => {
                     disabled={loadingCreateState}
                     className="w-full premium-gradient-warning text-white shadow-lg py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-yellow-500/25"
                   >
-                    {t("providerProjectsDetails.start")}
+                    {t("providerProjectsDetails.start") || "بدء العمل"}
                   </button>
                 )}
 
@@ -195,7 +195,7 @@ const ProviderProjectsDetails = () => {
                     disabled={loadingCreateState}
                     className="w-full premium-gradient-success text-white shadow-lg py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 hover:shadow-green-500/25 text-lg"
                   >
-                    {t("providerProjectsDetails.complete")}
+                    {t("providerProjectsDetails.complete") || "إكمال المشروع"}
                   </button>
                 )}
               </div>
@@ -207,13 +207,13 @@ const ProviderProjectsDetails = () => {
                 <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
-                {t("providerProjectsDetails.deliverables") || "التسليمات"}
+                {t("providerProjectsDetails.deliverables", "التسليمات")}
               </h3>
 
               <div className="space-y-4 max-h-[400px] overflow-auto pr-2 custom-scrollbar">
                 {(deliverablesData || []).length === 0 ? (
                   <div className="py-10 text-center text-gray-400 font-medium italic">
-                    {t("providerProjectsDetails.noDeliverables") || "لا يوجد تسليمات حالياً"}
+                    {t("providerProjectsDetails.noDeliverables", "لا يوجد تسليمات حالياً")}
                   </div>
                 ) : (
                   (deliverablesData || []).map((d) => (
@@ -236,7 +236,7 @@ const ProviderProjectsDetails = () => {
                           rel="noopener noreferrer"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                          {t("providerProjectsDetails.download") || "تحميل الملف المصاحب"}
+                          {t("providerProjectsDetails.download", "تحميل الملف المصاحب")}
                         </a>
                       )}
                     </div>
@@ -251,20 +251,20 @@ const ProviderProjectsDetails = () => {
                     className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 text-sm focus:border-primary/50 transition-all duration-300 shadow-sm group-hover:shadow-md"
                     value={newDeliverable.title}
                     onChange={(e) => setNewDeliverable({ ...newDeliverable, title: e.target.value })}
-                    placeholder={t("providerProjectsDetails.deliverableTitle") || "عنوان التسليم (مثال: المسودة الأولى)"}
+                    placeholder={t("providerProjectsDetails.deliverableTitle", "عنوان التسليم (مثال: المسودة الأولى)")}
                   />
                 </div>
                 <textarea
                   className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 text-sm focus:border-primary/50 transition-all duration-300 shadow-sm group-hover:shadow-md min-h-[100px]"
                   value={newDeliverable.description}
                   onChange={(e) => setNewDeliverable({ ...newDeliverable, description: e.target.value })}
-                  placeholder={t("providerProjectsDetails.deliverableDesc") || "وصف موجز لما تم إنجازه..."}
+                  placeholder={t("providerProjectsDetails.deliverableDesc", "وصف موجز لما تم إنجازه...")}
                 />
                 <input
                   className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 text-sm focus:border-primary/50 transition-all duration-300 shadow-sm group-hover:shadow-md"
                   value={newDeliverable.url}
                   onChange={(e) => setNewDeliverable({ ...newDeliverable, url: e.target.value })}
-                  placeholder={t("providerProjectsDetails.deliverableUrl") || "رابط الملف (Google Drive, Dropbox, etc.)"}
+                  placeholder={t("providerProjectsDetails.deliverableUrl", "رابط الملف (Google Drive, Dropbox, etc.)")}
                 />
                 <button
                   className="w-full premium-gradient-primary text-white py-4 rounded-2xl font-black text-sm transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-primary/30 disabled:opacity-50"
@@ -282,7 +282,7 @@ const ProviderProjectsDetails = () => {
                     refetchDeliverables();
                   }}
                 >
-                  {t("providerProjectsDetails.addDeliverable") || "تأكيد وإضافة التسليم"}
+                  {t("providerProjectsDetails.addDeliverable", "تأكيد وإضافة التسليم")}
                 </button>
               </div>
             </div>
@@ -293,7 +293,7 @@ const ProviderProjectsDetails = () => {
         {projectData?.orderAttachments?.length > 0 && (
           <div className="mt-12 glass-card p-0 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-2xl">
             <AttachmentsTable
-              title={t("providerProjectsDetails.attachmentsTitle")}
+              title={t("providerProjectsDetails.attachmentsTitle") || "المرفقات"}
               attachments={projectData?.orderAttachments}
             />
           </div>
@@ -304,7 +304,7 @@ const ProviderProjectsDetails = () => {
           <ProjectChat
             orderId={id}
             userId={userId}
-            title={t("providerProjectsDetails.messages") || "المحادثة الفنية"}
+            title={t("providerProjectsDetails.messages", "المحادثة الفنية")}
           />
         </div>
 

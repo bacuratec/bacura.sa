@@ -109,14 +109,14 @@ const Home = () => {
   ];
   return (
     <div className="min-h-screen bg-gray-50/30">
-      <title>{t("providerHome.title")}</title>
-      <meta name="description" content={t("providerHome.description")} />
+      <title>{t("providerHome.title") || "الرئيسية"}</title>
+      <meta name="description" content={t("providerHome.description") || "لوحة التحكم الخاصة بمزود الخدمة"} />
 
       <div className="container mx-auto px-4 py-10 max-w-7xl animate-fade-in">
         <div className="mb-10 text-center lg:text-start relative group">
           <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
           <HeadTitle
-            title={t("providerHome.title")}
+            title={t("providerHome.title") || "الرئيسية"}
           />
           <p className="text-gray-400 mt-2 text-sm font-medium tracking-wide">
             {t("providerHome.welcomeBack") || "أهلاً بك مجدداً في لوحة التحكم الخاصة بك"}
