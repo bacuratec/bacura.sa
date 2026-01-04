@@ -259,7 +259,7 @@ export const ordersApi = createApi({
     }),
     // Assign provider fields directly on request
     assignProviderToRequest: builder.mutation({
-      // Use queryFn to check receipt approval before assigning provider (defense-in-depth)
+      // Use queryFn to check paid status before assigning provider (defense-in-depth)
       async queryFn({ requestId, providerId, providerPrice }, _queryApi, _extraOptions, baseQuery) {
         // 1) fetch request
         const reqRes = await baseQuery({ table: 'requests', method: 'GET', id: requestId });
@@ -267,9 +267,9 @@ export const ordersApi = createApi({
         const request = reqRes.data;
         if (!request) return { error: { status: 'NOT_FOUND', message: 'Request not found' } };
 
-        // 2) enforce receipt approval
-        if (!request.receipt_approved) {
-          return { error: { status: 'FORBIDDEN', message: 'Cannot assign provider: receipt not approved' } };
+        // 2) enforce paid status (status_id = 204 for 'paid')
+        if (request.status_id !== 204) {
+          return { error: { status: 'FORBIDDEN', message: 'Cannot assign provider: request must be in paid status' } };
         }
 
         // 3) proceed with update

@@ -202,14 +202,14 @@ const AdminAssignProviderPanel = ({ data, refetch }) => {
               disabled={
                 isSubmitting ||
                 (values.providerId === (assignedProvider?.id || "") && values.providerPrice === (data?.provider_quoted_price || "")) ||
-                (!data?.receipt_approved)
+                (data?.status?.code !== 'paid')
               }
               className="w-full premium-gradient-primary text-white py-3.5 rounded-2xl font-black text-sm transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100 mt-2"
             >
               {isSubmitting ? (t("AdminAssignProvider.submitting") || "جاري المعالجة...") : (assignedProvider ? t("AdminAssignProvider.update") || "تحديث العرض" : t("AdminAssignProvider.submit") || "إرسال العرض للمزود")}
             </button>
-            {!data?.receipt_approved && (
-              <p className="text-xs text-gray-500 mt-2">{t("AdminAssignProvider.waitForReceiptApproval") || "انتظر موافقة المسؤول على الإيصال قبل تعيين مزود."}</p>
+            {data?.status?.code !== 'paid' && (
+              <p className="text-xs text-gray-500 mt-2">{t("AdminAssignProvider.waitForPayment") || "يجب أن يكون الطلب في حالة 'مدفوع' قبل تعيين مزود الخدمة."}</p>
             )}
           </Form>
         )}
