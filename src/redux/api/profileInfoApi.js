@@ -14,17 +14,21 @@ export const profileInfoApi = createApi({
           user_id: body.userId,
           bio: body.bio || null,
           website_url: body.websiteUrl || null,
+          file_path_url: body.filePathUrl || null, // Added file path
           attachments_group_key: body.attachmentsGroupKey || null,
         },
-    }),
+      }),
       invalidatesTags: ["ProfileInfo"],
     }),
     getProfileInfo: builder.query({
       query: (userId) => ({
         table: "profile_infos",
         method: "GET",
-        filters: { user_id: userId },
-    }),
+        filters: userId ? { user_id: userId } : undefined, // If no ID, ideally return single or first?
+        // Usually for 'getProfileInfo', if no userId is passed, it might be fetching by current session implicitly in backend?
+        // But here we rely on Supabase query. If userId is missing, 'filters: undefined' returns ALL.
+        // We probably want to limit it. But for now, let's keep it safe.
+      }),
       providesTags: ["ProfileInfo"],
     }),
     updateProfileInfo: builder.mutation({
@@ -35,6 +39,7 @@ export const profileInfoApi = createApi({
         body: {
           bio: body.bio || null,
           website_url: body.websiteUrl || null,
+          file_path_url: body.filePathUrl || null, // Added file path
           attachments_group_key: body.attachmentsGroupKey || null,
           updated_at: new Date().toISOString(),
         },

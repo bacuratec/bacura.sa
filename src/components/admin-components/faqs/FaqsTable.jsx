@@ -41,13 +41,13 @@ const FaqsTable = () => {
   const columns = [
     {
       name: t("question.question"),
-      selector: (row) => row?.questionString || "-",
+      selector: (row) => row?.question_ar || row?.question_en || "-",
       wrap: true,
       grow: 2,
     },
     {
       name: t("question.answer"),
-      selector: (row) => row?.answer || "-",
+      selector: (row) => row?.answer_ar || row?.answer_en || "-",
       wrap: true,
       grow: 3,
     },

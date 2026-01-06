@@ -5,6 +5,9 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
 
+import OptimizedImage from "@/components/shared/OptimizedImage";
+import { normalizeImageSrc } from "@/utils/image";
+
 import {
   useCreatePartnerMutation,
   useUpdatePartnerMutation,
@@ -146,17 +149,18 @@ const UpsertPartner = () => {
                     const file = e.target.files?.[0];
                     setFieldValue("image", file || null);
                     if (file) {
-                      const url = URL.createObjectURL(file);
-                      setPreview(url);
+                      setPreview(file); // Store file object for local preview
                     }
                   }}
                   className="w-full border rounded p-2 bg-primary/10 focus:outline-primary"
                 />
               ) : (
                 <div className="relative inline-block mt-2">
-                  <img
-                    src={preview}
+                  <OptimizedImage
+                    src={typeof preview === 'string' ? normalizeImageSrc(preview) : URL.createObjectURL(preview)}
                     alt="Preview"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-cover rounded-md border"
                   />
                   <button

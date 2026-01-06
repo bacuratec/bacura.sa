@@ -1,19 +1,23 @@
 "use client";
 
-import logo from "../../../../assets/images/logoFooter.png";
-import twitter from "../../../../assets/icons/twitter.svg";
-import linked from "../../../../assets/icons/linked.svg";
-import insta from "../../../../assets/icons/insta.svg";
-import facebook from "../../../../assets/icons/facebook.svg";
 import Link from "next/link";
 import { useSelector } from "react-redux";
-import { FaSnapchat, FaTiktok, FaWhatsapp } from "react-icons/fa";
+import {
+  FaSnapchat,
+  FaTiktok,
+  FaWhatsapp,
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaTwitter
+} from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useGetProfileInfoQuery } from "../../../../redux/api/profileInfoApi";
 import { getAppBaseUrl } from "../../../../utils/env";
 import { formatLastUpdate, getLastUpdateTime } from "../../../../utils/buildInfo";
 import { useEffect, useState } from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
+import logo from "../../../../assets/images/logoFooter.png";
 
 const Footer = () => {
   const { t, i18n } = useTranslation();
@@ -22,7 +26,15 @@ const Footer = () => {
 
   const role = useSelector((state) => state.auth.role);
 
-  const { data } = useGetProfileInfoQuery();
+  const { data: profileList } = useGetProfileInfoQuery();
+  const profile = Array.isArray(profileList) ? profileList[0] : profileList;
+  const filePath = profile?.file_path_url || profile?.filePathUrl;
+
+  const profileUrl = filePath
+    ? (filePath.startsWith("http")
+      ? filePath
+      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/attachments/${filePath}`)
+    : "#";
 
   useEffect(() => {
     // Get last update time and format it
@@ -33,20 +45,19 @@ const Footer = () => {
   }, [i18n.language]);
 
   const socials = [
-    { icon: facebook, url: "https://www.facebook.com/Bacuratec?locale=ar_AR" },
-    { icon: twitter, url: "https://x.com/Bacura_tec?s=21" },
+    { icon: <FaFacebookF />, url: "https://www.facebook.com/Bacuratec?locale=ar_AR" },
+    { icon: <FaTwitter />, url: "https://x.com/Bacura_tec?s=21" },
     {
-      icon: insta,
+      icon: <FaInstagram />,
       url: "https://www.instagram.com/Bacura_tec?igsh=azFzMDY4aGd6ejZv&utm_source=qr",
     },
     {
       icon: <FaSnapchat />,
       url: "https://www.snapchat.com/@Bacura_tec?invite_id=G6fAPTsA&locale=ar_SA%40calendar%3Dgregorian&share_id=a5POSbAvQj-vUY3rK49XUw&xp_id=1&sid=d6804253db774afcbeae7c8ce1688c21",
-      ic: true,
     },
-    { icon: <FaTiktok />, url: "https://www.tiktok.com/@Bacura_tec", ic: true },
-    { icon: linked, url: "https://www.linkedin.com/company/Bacura-tec/" },
-    { icon: <FaWhatsapp />, url: "https://wa.me/+966547000015", ic: true },
+    { icon: <FaTiktok />, url: "https://www.tiktok.com/@Bacura_tec" },
+    { icon: <FaLinkedinIn />, url: "https://www.linkedin.com/company/Bacura-tec/" },
+    { icon: <FaWhatsapp />, url: "https://wa.me/+966547000015" },
   ];
   return (
     <footer className="pt-10 xl:mt-20 border border-t border-t-primary block mt-5">
@@ -63,26 +74,24 @@ const Footer = () => {
               />
             </div>
             <div className="flex flex-col gap-3">
-              <a
-                href={`${base}${data?.filePathUrl}`}
-                target="_blank"
-                className="hidden lg:block underline"
-              >
-                {t("footer.profile")}
-              </a>
+              {filePath && (
+                <a
+                  href={profileUrl}
+                  target="_blank"
+                  className="hidden lg:block underline text-primary hover:text-primary/80 transition-colors"
+                >
+                  {t("footer.profile")}
+                </a>
+              )}
               <ul className="hidden lg:flex gap-3">
                 {socials.map((social, index) => (
                   <li key={index}>
                     <a
                       href={social?.url}
                       target="_blank"
-                      className="w-8 h-8 flex items-center justify-center border rounded-full"
+                      className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm text-lg"
                     >
-                      {social?.ic ? (
-                        social?.icon
-                      ) : (
-                        <OptimizedImage src={social.icon} alt="Social" width={20} height={20} />
-                      )}
+                      {social.icon}
                     </a>
                   </li>
                 ))}
@@ -122,26 +131,24 @@ const Footer = () => {
             </ul>
           </div>
           <div className="lg:hidden flex flex-col gap-3 col-span-2">
-            <a
-              href={`${base}${data?.filePathUrl}`}
-              target="_blank"
-              className="underline"
-            >
-              {t("footer.profile")}
-            </a>
-            <ul className="lg:hidden flex gap-3 ">
+            {filePath && (
+              <a
+                href={profileUrl}
+                target="_blank"
+                className="underline text-primary hover:text-primary/80 transition-colors"
+              >
+                {t("footer.profile")}
+              </a>
+            )}
+            <ul className="lg:hidden flex gap-3 flex-wrap justify-center">
               {socials.map((social, index) => (
                 <li key={index}>
                   <a
                     href={social?.url}
                     target="_blank"
-                    className="w-6 h-6 flex items-center justify-center border rounded-full"
+                    className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm text-base"
                   >
-                    {social?.ic ? (
-                      social?.icon
-                    ) : (
-                      <OptimizedImage src={social.icon} alt="Social" width={16} height={16} />
-                    )}
+                    {social.icon}
                   </a>
                 </li>
               ))}

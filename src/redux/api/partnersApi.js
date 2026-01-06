@@ -29,6 +29,14 @@ export const partnersApi = createApi({
       }),
       providesTags: ["Partners"],
     }),
+    getAllPartners: builder.query({
+      query: () => ({
+        table: "partners",
+        method: "GET",
+        orderBy: { column: "created_at", ascending: false },
+      }),
+      providesTags: ["Partners"],
+    }),
     getPartnerDetails: builder.query({
       query: (id) => ({
         table: "partners",
@@ -67,6 +75,7 @@ export const partnersApi = createApi({
 export const {
   useCreatePartnerMutation,
   useGetPartnersQuery,
+  useGetAllPartnersQuery,
   useGetPartnerDetailsQuery,
   useUpdatePartnerMutation,
   useDeletePartnerMutation,

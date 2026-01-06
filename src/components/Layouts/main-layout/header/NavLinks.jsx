@@ -4,7 +4,7 @@
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 
-const NavLinks = ({ links, isActive, onClick }) => {
+const NavLinks = ({ links, isActive, onClick, itemClassName }) => {
   const { t } = useTranslation();
   return (
     <>
@@ -12,9 +12,8 @@ const NavLinks = ({ links, isActive, onClick }) => {
         <Link
           href="/"
           onClick={onClick}
-          className={`transition-all duration-300 ${
-            isActive("/") ? "text-primary font-bold" : "hover:text-primary"
-          }`}
+          className={`transition-all duration-300 ${isActive("/") ? "text-primary font-bold" : "hover:text-primary"
+            } ${itemClassName || ""}`}
         >
           {t("nav.home")}
         </Link>
@@ -24,9 +23,8 @@ const NavLinks = ({ links, isActive, onClick }) => {
           <Link
             href={href}
             onClick={onClick}
-            className={`transition-all duration-300 ${
-              isActive(href) ? "text-primary font-bold" : "hover:text-primary"
-            }`}
+            className={`transition-all duration-300 ${isActive(href) ? "text-primary font-bold" : "hover:text-primary"
+              } ${itemClassName || ""}`}
           >
             {name}
           </Link>

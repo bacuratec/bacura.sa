@@ -28,7 +28,7 @@ const Partners = () => {
           </div>
         </div>
         <p className="mt-4 text-sm sm:text-base md:text-lg text-[#636363] font-medium text-center md:text-right">
-          {t("partners.description")}
+          {t("partners.landingDescription")}
         </p>
       </div>
       <section className="mt-5">
@@ -76,7 +76,7 @@ const Partners = () => {
                         </div>
                       </div>
                       {logo?.name ? (
-                        <p className="mt-4 text-center text-sm font-semibold text-gray-600 group-hover:text-primary transition-colors duration-300">
+                        <p className="mt-4 text-center text-base font-bold text-gray-700 group-hover:text-primary transition-colors duration-300">
                           {logo.name}
                         </p>
                       ) : null}

@@ -1,12 +1,14 @@
 import { useState } from "react";
 import Link from "next/link";
+import OptimizedImage from "@/components/shared/OptimizedImage";
+import { normalizeImageSrc } from "@/utils/image";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import { Edit, PlusIcon, Trash } from "lucide-react";
+import { Edit, PlusIcon, Trash, Check, X } from "lucide-react";
 import toast from "react-hot-toast";
 import ModalDelete from "./ModalDelete";
 import {
   useDeletePartnerMutation,
-  useGetPartnersQuery,
+  useGetAllPartnersQuery,
 } from "../../../redux/api/partnersApi";
 import { useTranslation } from "react-i18next";
 import TableActions from "../../shared/TableActions";
@@ -14,7 +16,7 @@ import TableActions from "../../shared/TableActions";
 const PartnersTable = () => {
   const { t } = useTranslation();
 
-  const { data: partners, isLoading, refetch } = useGetPartnersQuery();
+  const { data: partners, isLoading, refetch } = useGetAllPartnersQuery();
   const [deletePartner, { isLoading: isDeleting }] = useDeletePartnerMutation();
 
   const [openDelete, setOpenDelete] = useState(false);
@@ -48,14 +50,32 @@ const PartnersTable = () => {
     },
     {
       name: t("partners.image"),
-      // selector: (row) => row?.imageBase64 || "-",
       cell: (row) => (
-        <div className="flex items-center gap-3">
-          <img src={row.imageBase64} alt="" className="w-10 h-10 rounded-xl" />
+        <div className="flex items-center gap-3 justify-center">
+          <OptimizedImage
+            src={normalizeImageSrc(row.logo_url || row.imageBase64)}
+            alt={row.name}
+            width={50}
+            height={50}
+            className="w-12 h-12 rounded-lg object-contain bg-gray-50 border border-gray-100 p-1"
+          />
         </div>
       ),
       wrap: true,
-      grow: 3,
+      grow: 2,
+    },
+    {
+      name: t("partners.status") || "الحالة",
+      cell: (row) => (
+        <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${row.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {row.is_active ? (
+            <><Check className="w-3 h-3" /> {t("active") || "نشط"}</>
+          ) : (
+            <><X className="w-3 h-3" /> {t("inactive") || "غير نشط"}</>
+          )}
+        </div>
+      ),
+      sortable: true,
     },
     {
       name: t("partners.actions"),
@@ -77,6 +97,8 @@ const PartnersTable = () => {
         />
       ),
       ignoreRowClick: true,
+      button: true,
+      allowOverflow: true,
       style: { overflow: "visible" },
     },
   ];

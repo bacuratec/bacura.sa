@@ -23,11 +23,14 @@ export const metadata: Metadata = {
   },
 };
 
+import ServiceWorkerUnregister from "@/components/shared/ServiceWorkerUnregister";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head />
       <body className={inter.className}>
+        <ServiceWorkerUnregister />
         <script
           dangerouslySetInnerHTML={{
             __html: `try{var l=localStorage.getItem('lang')||'ar';var d=l==='ar'?'rtl':'ltr';var h=document.documentElement;h&&h.setAttribute('lang',l);h&&h.setAttribute('dir',d);}catch(e){}`,

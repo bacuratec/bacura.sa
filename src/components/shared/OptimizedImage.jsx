@@ -18,20 +18,41 @@ export default function OptimizedImage({
   blurDataURL = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxmaWx0ZXIgaWQ9J2EnPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249JzAuOCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxJyBoZWlnaHQ9JzEnIGZpbHRlcj0ndXJsKCNhKScgZmlsbD0nI2VhZWFlYScvPjwvc3ZnPg==",
 }) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  const defaultBucket = process.env.NEXT_PUBLIC_SUPABASE_IMAGES_BUCKET || "attachments";
+  const defaultBucket = process.env.NEXT_PUBLIC_SUPABASE_IMAGES_BUCKET || "images";
   const [failed, setFailed] = useState(false);
   const resolvedSrc = useMemo(() => {
     let val = typeof src === "string" ? src : (src?.src || "");
-    if (val && !/^https?:\/\//i.test(val)) {
-      if (supabaseUrl && /^(public\/)?attachments\//i.test(val)) {
-        const cleaned = val.replace(/^public\//, "");
-        val = `${supabaseUrl}/storage/v1/object/public/${cleaned}`;
-      } else if (supabaseUrl && /^storage\/v1\/object\//i.test(val)) {
-        val = `${supabaseUrl}/${val}`;
-      } else if (supabaseUrl && defaultBucket && /^services\//i.test(val)) {
-        val = `${supabaseUrl}/storage/v1/object/public/${defaultBucket}/${val}`;
-      }
+
+    // If it's a data URI or already http(s), just return it
+    if (!val || val.startsWith("data:") || /^https?:\/\//i.test(val)) {
+      return val;
     }
+
+    // Handle Supabase relative paths
+    if (supabaseUrl) {
+      if (/^(public\/)?attachments\//i.test(val)) {
+        const cleaned = val.replace(/^public\//, "");
+        return `${supabaseUrl}/storage/v1/object/public/${cleaned}`;
+      }
+      if (/^(partners|customers|services)\//i.test(val)) {
+        // e.g. "partners/123.jpg" -> full URL
+        return `${supabaseUrl}/storage/v1/object/public/${defaultBucket}/${val}`;
+      }
+      // If none of the above specific folders, but still looks like a path
+      // Maybe it already has bucket in it?
+      // Assuming 'attachments' is the default bucket if not specified in path? 
+      // Actually, my upload logic uses 'images' bucket often (which defaults to 'attachments' env var fallback).
+      // Let's rely on the fact that if it's relative, it needs a base.
+
+      // Safety: if it looks like a full storage path "storage/v1/...", prepend valid host
+      if (/^storage\/v1\/object\//i.test(val)) {
+        return `${supabaseUrl}/${val}`;
+      }
+
+      // Fallback: assume it's in the default bucket
+      return `${supabaseUrl}/storage/v1/object/public/${defaultBucket}/${val}`;
+    }
+
     return val;
   }, [src, supabaseUrl, defaultBucket]);
   const finalSrc = failed ? (typeof fallbackSrc === "string" ? fallbackSrc : (fallbackSrc?.src || "")) : resolvedSrc;
@@ -41,7 +62,7 @@ export default function OptimizedImage({
     if (fb) {
       return <img src={fb} alt={alt} className={className} loading="lazy" decoding="async" />;
     }
-    return <img src="" alt={alt} className={className} loading="lazy" decoding="async" />;
+    return null;
   }
   if (isSvg) {
     return <img src={finalSrc} alt={alt} className={className} loading="lazy" decoding="async" onError={() => setFailed(true)} />;

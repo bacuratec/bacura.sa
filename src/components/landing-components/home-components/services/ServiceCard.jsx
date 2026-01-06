@@ -1,10 +1,11 @@
 import React from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
+import { ServiceIcon } from "@/constants/servicesData";
 import { getServiceIcon } from "@/utils/serviceIcon";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang }) => {
+const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang, color }) => {
   return (
     <motion.div
       title={description}
@@ -13,17 +14,17 @@ const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang
     >
       <div className="flex items-start justify-between">
         <span className="text-sm sm:text-base text-gray-400">{index}</span>
-        
+
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="rounded-xl bg-[#F1F1F1] p-3 w-fit flex items-center justify-center text-primary">
-          <OptimizedImage src={imageUrl || icon} alt={title || ""} width={40} height={40} className="object-cover" fallbackSrc={getServiceIcon(title, description)} />
-        </div>
+        {/* Render Icon Component if available, otherwise fallback to image/old behavior */}
+        <ServiceIcon icon={icon} color={color} size={32} />
+
         {isActive === false ? (
-          <span className="text-xs text-red-600">غير متاحة حالياً</span>
+          <span className="text-xs text-red-600 font-bold">غير متاحة حالياً</span>
         ) : (
-          <span className="text-xs text-green-600">متاحة</span>
+          <span className="text-xs text-green-600 font-bold">متاحة</span>
         )}
       </div>
 
@@ -36,9 +37,9 @@ const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang
 
       <div className="flex justify-end mt-auto">
         <Link href="/request-service">
-            <motion.span whileTap={{ scale: 0.95 }} className="btn btn-primary inline-block">
-                اطلب الخدمة
-            </motion.span>
+          <motion.span whileTap={{ scale: 0.95 }} className="btn btn-primary inline-block">
+            اطلب الخدمة
+          </motion.span>
         </Link>
       </div>
     </motion.div>

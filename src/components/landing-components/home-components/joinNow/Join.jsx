@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import NumberBg from "../../../shared/numberBg/NumberBg";
 import joinNow from "../../../../assets/images/joinNow.jpg";
-import join from "../../../../assets/icons/join.svg";
+
 import { useSelector } from "react-redux";
 import { AppLink } from "../../../../utils/routing";
 import { useTranslation } from "react-i18next";
@@ -31,11 +32,13 @@ const Join = () => {
               viewport={{ once: true }}
               className="bg-secondary/10 rounded-[32px] sm:rounded-xl p-4 sm:p-6 w-full max-w-[550px] shadow-md"
             >
-              <div className="w-full h-full rounded-xl overflow-hidden">
-                <img
+              <div className="w-full h-full rounded-xl overflow-hidden relative min-h-[300px]">
+                <Image
                   src={joinNow}
                   alt="Join Now"
-                  className="w-full h-full object-cover rounded-xl"
+                  fill
+                  className="object-cover rounded-xl"
+                  placeholder="blur"
                 />
               </div>
             </motion.div>
@@ -56,15 +59,13 @@ const Join = () => {
               </p>
               <AppLink
                 href={role === "Requester" ? "/request-service" : "/signup"}
-                className="flex items-center gap-2 self-start sm:self-end mt-4 sm:mt-6 lg:mt-10"
+                className="flex items-center gap-2 self-start sm:self-end mt-4 sm:mt-6 lg:mt-10 group"
               >
-                <span className="font-bold text-sm sm:text-base text-primary">
+                <span className="font-bold text-sm sm:text-base text-primary group-hover:underline">
                   {role === "Requester" ? t("join.request") : t("join.signup")}
                 </span>
-                <img
-                  src={join}
-                  alt="join"
-                  className="w-4 sm:w-5 ltr:rotate-180"
+                <ArrowLeft
+                  className="w-4 sm:w-5 ltr:rotate-180 text-primary transition-transform group-hover:-translate-x-1 ltr:group-hover:translate-x-1"
                 />
               </AppLink>
             </motion.div>

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import CustomersTable from "../../../components/admin-components/customers/CustomersTable";
 
-const Partners = () => {
+const CustomersAdmin = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -16,11 +16,11 @@ const Partners = () => {
       <meta name="description" content={t("customers.description")} />
       <HeadTitle
         title={t("customers.titlePage")}
-        // description={t("partners.description")}
+        description={t("customers.description")}
       />
       <CustomersTable />
     </div>
   );
 };
 
-export default Partners;
+export default CustomersAdmin;

@@ -38,6 +38,7 @@
   "partners": {
     "titlePage": "شركاؤنا",
     "description": "هنا يمكنك إدارة وعرض جميع شركاء المنصة",
+    "landingDescription": "نفخر بشراكتنا مع كبرى الشركات والمؤسسات لتقديم أفضل الحلول التقنية.",
     "titleHero": "شركاؤنا",
     "addPartner": "إضافة شريك",
     "partnerName": "اسم الشريك",
@@ -81,6 +82,7 @@
   "customers": {
     "titlePage": "عملاؤنا",
     "description": "هنا يمكنك إدارة وعرض جميع عملاء المنصة",
+    "landingDescription": "نتشرف بخدمة نخبة من العملاء في القطاعين الحكومي والخاص.",
     "titleHero": "عملاؤنا",
     "addCustomer": "إضافة عميل",
     "customerName": "اسم العميل",

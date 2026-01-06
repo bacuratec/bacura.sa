@@ -1,14 +1,14 @@
 // components/shared/DataTable.jsx
 import { useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
-import { Search, FileQuestion } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { useLocation } from "@/utils/useLocation";
 import { useNavigate } from "@/utils/useNavigate";
 import { useSearchParams } from "@/utils/useSearchParams";
 import { useTranslation } from "react-i18next";
-import EmptyState from "../../shared/EmptyState";
 import { SkeletonTable } from "../../shared/skeletons/Skeleton";
+import EmptyState from "../../shared/EmptyState";
 
 const CustomDataTable = ({
   columns,
@@ -20,8 +20,9 @@ const CustomDataTable = ({
   tabs = [],
   totalRows = 0,
   defaultPage = 1,
-  defaultPageSize = 10,
+  defaultPageSize = 15,
   isLoading,
+  isServerPagination = true,
 }) => {
   const { t } = useTranslation();
   const path = useLocation();
@@ -30,12 +31,24 @@ const CustomDataTable = ({
     return v === key ? fallback : v;
   };
 
+  // ... (customStyles object remains unchanged from previous read)
   const customStyles = {
     tableWrapper: {
       style: {
         borderRadius: tabs?.length > 0 ? "0 0 12px 12px" : "12px",
-        overflow: "visible",
+        overflow: "visible", // This is important for dropdowns
         border: "1px solid #e5e7eb",
+      },
+    },
+    table: {
+      style: {
+        borderRadius: tabs?.length > 0 ? "0 0 12px 12px" : "12px",
+        overflow: "visible",
+      },
+    },
+    responsiveWrapper: {
+      style: {
+        overflow: "visible",
       },
     },
     headCells: {
@@ -55,6 +68,7 @@ const CustomDataTable = ({
     },
   };
 
+  // ... (existing logic: searchParams, initialQ, search, navigate, location, isProjectDetail, filteredData, handleSearchChange, etc.)
   const searchParams = useSearchParams();
   const initialQ = (searchParams?.get && searchParams.get("q")) || "";
   const [search, setSearch] = useState(initialQ);
@@ -168,16 +182,17 @@ const CustomDataTable = ({
           responsive
           customStyles={customStyles}
           noDataComponent={
-            <div className="py-20 flex flex-col items-center justify-center text-gray-400">
-              <FileQuestion className="w-16 h-16 mb-4 opacity-20" />
-              <p className="text-lg font-medium">{tr("noData", "لا توجد بيانات")}</p>
-              <p className="text-sm">{tr("noDataDesc", "لم يتم العثور على سجلات مطابقة")}</p>
-            </div>
+            <EmptyState
+              title={tr("noData", "لا توجد بيانات")}
+              description={tr("noDataDesc", "لم يتم العثور على سجلات مطابقة")}
+              className="py-20"
+            />
           }
-          paginationServer
-          paginationTotalRows={totalRows}
+          paginationServer={isServerPagination}
+          paginationTotalRows={isServerPagination ? totalRows : filteredData?.length}
           paginationDefaultPage={parseInt(defaultPage)}
           paginationPerPage={parseInt(defaultPageSize)}
+          paginationRowsPerPageOptions={[15, 25, 50, 100]}
           onChangePage={isProjectDetail ? () => { } : handlePageChange}
           onChangeRowsPerPage={isProjectDetail ? () => { } : handlePerRowsChange}
           progressPending={isLoading}
@@ -190,6 +205,6 @@ const CustomDataTable = ({
       </div>
     </div>
   );
-};
+}; // End of CustomDataTable
 
 export default CustomDataTable;

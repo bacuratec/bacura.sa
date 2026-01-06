@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
+import OptimizedImage from "@/components/shared/OptimizedImage";
+import { normalizeImageSrc } from "@/utils/image";
 import CustomDataTable from "../../shared/datatable/DataTable";
 import TableActions from "../../shared/TableActions";
 import { Edit, PlusIcon, Trash } from "lucide-react";
@@ -55,8 +57,14 @@ const CustomersTable = () => {
       name: t("customers.image"),
       // selector: (row) => row?.imageBase64 || "-",
       cell: (row) => (
-        <div className="flex items-center gap-3">
-          <img src={row.imageBase64} alt="" className="w-10 h-10 rounded-xl" />
+        <div className="flex items-center gap-3 justify-center">
+          <OptimizedImage
+            src={normalizeImageSrc(row.logo_url || row.imageBase64)}
+            alt={row.name}
+            width={50}
+            height={50}
+            className="w-12 h-12 rounded-lg object-contain bg-gray-50 border border-gray-100 p-1"
+          />
         </div>
       ),
       wrap: true,
@@ -68,12 +76,12 @@ const CustomersTable = () => {
         <TableActions
           actions={[
             {
-              label: t("customers.edit") || "تعديل",
+              label: t("customers.edit", "تعديل"),
               icon: <Edit className="w-4 h-4" />,
               href: `/admin/update-customer/${row.id}`,
             },
             {
-              label: t("customers.delete") || "حذف",
+              label: t("customers.delete", "حذف"),
               icon: <Trash className="w-4 h-4" />,
               onClick: () => askToDelete(row.id),
               variant: "destructive",
@@ -83,6 +91,8 @@ const CustomersTable = () => {
       ),
       ignoreRowClick: true,
       button: true,
+      allowOverflow: true,
+      style: { overflow: "visible" }, // Keeping this just in case, but allowOverflow is the key
     },
   ];
 

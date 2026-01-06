@@ -73,18 +73,20 @@ const Customers = () => {
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                     viewport={{ once: true }}
                   >
-                    <div className="relative w-full lg:h-[200px] h-[150px] rounded-xl overflow-hidden shadow-md">
+                    <div className="relative w-full lg:h-[200px] h-[150px] rounded-xl overflow-hidden shadow-md flex items-center justify-center p-4 bg-white">
                       <OptimizedImage
-                        src={normalizeImageSrc(logo?.imageBase64 || logo?.imageUrl || logo?.image_url)}
+                        src={normalizeImageSrc(logo?.logo_url || logo?.imageBase64 || logo?.imageUrl || logo?.image_url)}
                         alt={`brand-logo-${i}`}
                         fill
                         sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="w-full h-full object-fill"
+                        className="w-full h-full object-contain"
                       />
                     </div>
-                    {/* <h3 className="text-lg font-semibold text-gray-700">
-                      {logo?.name}
-                    </h3> */}
+                    {logo?.name && (
+                      <h3 className="mt-2 text-center text-sm font-semibold text-gray-700">
+                        {logo.name}
+                      </h3>
+                    )}
                   </motion.div>
                 </SwiperSlide>
               ) : null

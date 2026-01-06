@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../../components/shared/head-title/HeadTitle";
 import {
   useCreateProfileInfoMutation,
   useGetProfileInfoQuery,
+  useUpdateProfileInfoMutation,
 } from "../../../redux/api/profileInfoApi";
+import { useSelector } from "react-redux";
+import { uploadFileToStorage } from "../../../utils/imageUpload";
 import pdfIcon from "@/assets/images/pdf.png";
 import fileUploadImg from "@/assets/icons/fileUpload.svg";
 import toast from "react-hot-toast";
@@ -14,40 +17,40 @@ import { motion as m } from "framer-motion";
 
 const base = getAppBaseUrl();
 
-// Card for already-uploaded attachments (your original style)
+// Card for already-uploaded attachments
 export const AttachmentCard = ({ item }) => {
+  const filePath = item?.filePathUrl || item?.file_path_url;
+  if (!filePath) return null;
+
+  // Construct full URL if it's relative
+  const fullUrl = filePath.startsWith("http") ? filePath : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/attachments/${filePath}`;
+
   return (
     <a
-      href={`${base}${item?.filePathUrl}`}
+      href={fullUrl}
       target="_blank"
       rel="noreferrer"
-      key={item?.id}
       className="attachCard max-w-52 xl:h-44 lg:h-36 md:h-32 sm:h-28 h-24 bg-gray-300/30 backdrop-blur-md rounded-lg md:rounded-xl lg:rounded-2xl flex flex-col gap-3 items-center justify-center overflow-hidden cursor-pointer shadow-lg transition-all duration-500 hover:shadow-xl"
     >
-      {item?.attachmentExtension === ".pdf" ? (
+      {filePath.endsWith(".pdf") ? (
         <img
-          src={pdfIcon}
+          src={typeof pdfIcon === "string" ? pdfIcon : (pdfIcon?.src || "")}
           alt="pdf"
           className="w-12 h-12 md:w-14 lg:w-16 xl:w-20 md:h-14 lg:h-16 xl:h-20 object-contain"
+          loading="lazy"
         />
       ) : (
         <img
-          src={`${base}${item?.filePathUrl}`}
-          alt={item?.fileName || "attachment"}
-          className="w-12 h-12 md:w-14 lg:w-16 xl:w-20 md:h-14 lg:h-16 xl:h-20 object-contain"
+          src={fullUrl}
+          alt="attachment"
+          className="w-12 h-12 md:w-14 lg:w-16 xl:w-20 md:h-14 lg:h-16 xl:h-20 object-cover"
         />
       )}
-      <h4 className="text-[10px] md:text-xs text-center">
-        {(() => {
-          const fullName = item?.fileName || "";
-          const lastDotIndex = fullName.lastIndexOf(".");
-          const name =
-            lastDotIndex !== -1 ? fullName.slice(0, lastDotIndex) : fullName;
-          const ext = lastDotIndex !== -1 ? fullName.slice(lastDotIndex) : "";
-
-          return name.slice(0, 8) + ext;
-        })()}
-      </h4>
+      <div className="px-2 w-full text-center">
+        <h4 className="text-[10px] md:text-xs truncate">
+          {t("profile.viewProfile") || "عرض الملف"}
+        </h4>
+      </div>
     </a>
   );
 };
@@ -56,20 +59,19 @@ const SelectedAttachmentCard = ({ file, onRemove }) => {
   const isPdf = file.type === "application/pdf" || file.name.endsWith(".pdf");
   const previewUrl = isPdf ? null : URL.createObjectURL(file);
 
-  // We rely on the parent to revoke object URLs when removing / unmounting
   return (
     <div className="relative w-36 h-28 bg-gray-100 rounded-lg flex flex-col items-center justify-center p-2 shadow">
       <button
         type="button"
         onClick={onRemove}
-        className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow text-red-600"
+        className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow text-red-600 z-10 hover:bg-red-50"
         aria-label="remove"
       >
         ✕
       </button>
 
       {isPdf ? (
-        <img src={typeof pdfIcon === "string" ? pdfIcon : (pdfIcon?.src || "")} alt="pdf" className="w-12 h-12 object-contain" loading="lazy" decoding="async" />
+        <img src={typeof pdfIcon === "string" ? pdfIcon : (pdfIcon?.src || "")} alt="pdf" className="w-12 h-12 object-contain" />
       ) : (
         <img
           src={previewUrl}
@@ -77,16 +79,8 @@ const SelectedAttachmentCard = ({ file, onRemove }) => {
           className="w-12 h-12 object-cover rounded"
         />
       )}
-      <h4 className="mt-1 text-[11px] text-center truncate w-full">
-        {(() => {
-          const fullName = file.name || "";
-          const lastDotIndex = fullName.lastIndexOf(".");
-          const name =
-            lastDotIndex !== -1 ? fullName.slice(0, lastDotIndex) : fullName;
-          const ext = lastDotIndex !== -1 ? fullName.slice(lastDotIndex) : "";
-
-          return name.slice(0, 8) + ext;
-        })()}
+      <h4 className="mt-1 text-[11px] text-center truncate w-full px-1">
+        {file.name}
       </h4>
     </div>
   );
@@ -94,9 +88,17 @@ const SelectedAttachmentCard = ({ file, onRemove }) => {
 
 const ProfileInfo = () => {
   const { t } = useTranslation();
-  const { data } = useGetProfileInfoQuery(); // existing uploaded attachments (if any)
-  const [createProfileInfo, { isLoading: uploading }] =
-    useCreateProfileInfoMutation();
+  const { user } = useSelector((state) => state.auth);
+  // We try to fetch profile for this user
+  const { data: profileList, refetch } = useGetProfileInfoQuery(user?.id, {
+    skip: !user?.id,
+  });
+
+  // profileList is usually an array from Supabase select
+  const currentProfile = Array.isArray(profileList) ? profileList[0] : profileList;
+
+  const [createProfileInfo, { isLoading: creating }] = useCreateProfileInfoMutation();
+  const [updateProfileInfo, { isLoading: updating }] = useUpdateProfileInfoMutation();
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -105,7 +107,6 @@ const ProfileInfo = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // لو في File URL قديم نحذفه
     if (preview?.url) URL.revokeObjectURL(preview.url);
 
     const newPreview = {
@@ -115,31 +116,55 @@ const ProfileInfo = () => {
 
     setSelectedFile(file);
     setPreview(newPreview);
-
-    e.target.value = null; // علشان لو اختار نفس الملف تاني
+    e.target.value = null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!selectedFile) {
-      toast.error("Please attach a file");
+      toast.error(t("errors.noFileAttached") || "Please attach a file first");
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error("User not found (Reload page)");
       return;
     }
 
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
+      // 1. Upload file to Supabase (attachments bucket)
+      const filePath = await uploadFileToStorage(selectedFile, "attachments", "profiles");
 
-      await createProfileInfo(formData).unwrap();
-      toast.success("Uploaded successfully");
+      if (!filePath) {
+        return; // Error toast already shown in utility
+      }
 
+      // 2. Save/Update Profile Info in DB
+      const payload = {
+        userId: user.id,
+        filePathUrl: filePath, // Storing relative path
+      };
+
+      if (currentProfile?.id) {
+        // Update
+        await updateProfileInfo({ userId: user.id, body: payload }).unwrap();
+        toast.success("Profile Updated Successfully");
+      } else {
+        // Create
+        await createProfileInfo({ ...payload, bio: "", websiteUrl: "" }).unwrap();
+        toast.success("Profile Created Successfully");
+      }
+
+      // Cleanup
       if (preview?.url) URL.revokeObjectURL(preview.url);
       setSelectedFile(null);
       setPreview(null);
+      refetch();
+
     } catch (err) {
       console.error(err);
-      toast.error("Upload failed");
+      toast.error("Operation failed: " + (err?.data?.message || err.message));
     }
   };
 
@@ -212,10 +237,10 @@ const ProfileInfo = () => {
             <div className="flex pt-6 border-t border-gray-50">
               <button
                 type="submit"
-                disabled={uploading}
+                disabled={creating || updating}
                 className="ml-auto bg-primary hover:bg-primary/90 text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center gap-2"
               >
-                {uploading ? (
+                {creating || updating ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     {t("profileInfo.uploading") || "جارٍ الرفع..."}
@@ -232,22 +257,15 @@ const ProfileInfo = () => {
         </div>
 
         {/* show already-uploaded attachments from server */}
-        {data && Array.isArray(data) && data.length > 0 && (
+        {currentProfile && (currentProfile.filePathUrl || currentProfile.file_path_url) && (
           <div className="mt-12 space-y-6">
             <h3 className="text-xl font-black text-gray-800 flex items-center gap-3">
               <div className="w-2 h-6 bg-primary rounded-full"></div>
-              {t("profile.uploadedAttachments") || "المرفقات المرفوعة سابقا"}
+              {t("profile.uploadedAttachments") || "الملف التعريفي الحالي"}
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {data.map((item) => (
-                <AttachmentCard key={item.id} item={item} />
-              ))}
+            <div className="flex justify-start">
+              <AttachmentCard item={currentProfile} />
             </div>
-          </div>
-        )}
-        {data && !Array.isArray(data) && (
-          <div className="mt-12">
-            <AttachmentCard item={data} />
           </div>
         )}
       </div>

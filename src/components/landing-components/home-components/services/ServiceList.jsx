@@ -2,10 +2,8 @@
 
 import React, { useContext, useRef, useEffect, useMemo } from "react";
 import ServiceCard from "./ServiceCard";
-import s1 from "../../../../assets/icons/s1.svg";
-import s2 from "../../../../assets/icons/s2.svg";
-import s3 from "../../../../assets/icons/s3.svg";
 import { AppLink } from "../../../../utils/routing";
+import { PLATFORM_SERVICES } from "@/constants/servicesData";
 import { LanguageContext } from "@/context/LanguageContext";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -19,37 +17,46 @@ const ServiceList = ({ data, isLoading }) => {
   const containerRef = useRef(null);
 
   const items = useMemo(() => {
-    const icons = [s1, s2, s3];
-    if (!Array.isArray(data)) return [];
-    return data.map((item, idx) => {
-      const title =
-        (lang === "ar" ? item.titleAr : item.titleEn) ||
-        (lang === "ar" ? item.name_ar : item.name_en) ||
-        "خدمة";
-      const description =
-        (lang === "ar" ? item.descriptionAr : item.descriptionEn) ||
-        (lang === "ar" ? item.description_ar : item.description_en) ||
-        item.description ||
-        "";
-      const price = item.price ?? item.base_price ?? null;
-      const imageUrl = item.image_url || item.imageUrl || null;
-      const isActive = item.is_active;
+    // Return empty if data is not an array (though we will use PLATFORM_SERVICES mainly)
+    const dbServices = Array.isArray(data) ? data : [];
+
+    // Map PLATFORM_SERVICES to ensure we show the standard 8 services with correct icons
+    return PLATFORM_SERVICES.map((standardService, idx) => {
+      // Find matching service in DB to get price/active status
+      // We look for a match by name (English or Arabic)
+      const dbMatch = dbServices.find(item => {
+        const nameAr = item.name_ar || item.titleAr || "";
+        const nameEn = item.name_en || item.titleEn || "";
+        return nameAr.includes(standardService.name_ar) ||
+          standardService.name_ar.includes(nameAr) ||
+          nameEn.toLowerCase().includes(standardService.name_en.toLowerCase());
+      });
+
+      const title = lang === "ar" ? standardService.name_ar : standardService.name_en;
+      const description = lang === "ar" ? standardService.description_ar : standardService.description_en;
+
+      // Use DB price if available, otherwise null
+      const price = dbMatch?.price ?? dbMatch?.base_price ?? null;
+      // Use DB active status if available, default to true if no match (or handled by logic)
+      const isActive = dbMatch ? dbMatch.is_active !== false : true;
+
       return {
-        id: item.id,
+        id: dbMatch?.id || standardService.id,
         index: idx + 1,
         title,
         description,
         price,
-        imageUrl,
+        imageUrl: null, // We generally don't use images for main services anymore, we use icons
         isActive,
-        icon: icons[idx % icons.length] || s1,
+        icon: standardService.icon, // The correct Lucide icon
+        color: standardService.color
       };
     });
   }, [data, lang]);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    
+
     const ctx = gsap.context(() => {
       gsap.from(".service-item", {
         scrollTrigger: {
@@ -100,6 +107,7 @@ const ServiceList = ({ data, isLoading }) => {
                   price={item.price}
                   isActive={item.isActive}
                   lang={lang}
+                  color={item.color}
                 />
               </div>
             ))}

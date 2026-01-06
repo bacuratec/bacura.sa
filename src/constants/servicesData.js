@@ -5,8 +5,8 @@ import {
     Truck,
     Wrench,
     MessageSquare,
-    BarChart,
-    Eye,
+    FileText,
+    ClipboardCheck,
     GraduationCap,
     Briefcase
 } from 'lucide-react';
@@ -19,7 +19,7 @@ export const PLATFORM_SERVICES = [
         description_ar: 'تنفيذ المشاريع الإنشائية والمعمارية بأعلى معايير الجودة والدقة.',
         description_en: 'Execution of construction and architectural projects with the highest quality and precision.',
         icon: Hammer,
-        color: '#0071FF'
+        color: '#1b6b91ab'
     },
     {
         id: 2,
@@ -28,7 +28,7 @@ export const PLATFORM_SERVICES = [
         description_ar: 'توريد أجود المواد والمعدات اللازمة للمشاريع الإنشائية.',
         description_en: 'Supply of high-quality materials and equipment for construction projects.',
         icon: Truck,
-        color: '#FFAB00'
+        color: '#1b6b91ab'
     },
     {
         id: 3,
@@ -37,7 +37,7 @@ export const PLATFORM_SERVICES = [
         description_ar: 'تقديم خدمات الصيانة الدورية والطارئة لضمان استدامة المنشآت.',
         description_en: 'Providing periodic and emergency maintenance services to ensure facility sustainability.',
         icon: Wrench,
-        color: '#36B37E'
+        color: '#1b6b91ab'
     },
     {
         id: 4,
@@ -46,7 +46,7 @@ export const PLATFORM_SERVICES = [
         description_ar: 'تقديم استشارات مهنية متخصصة في المجالات الهندسية والتقنية.',
         description_en: 'Providing professional specialized consulting in engineering and technical fields.',
         icon: MessageSquare,
-        color: '#FF5630'
+        color: '#1b6b91ab'
     },
     {
         id: 5,
@@ -54,8 +54,8 @@ export const PLATFORM_SERVICES = [
         name_en: 'Project Study',
         description_ar: 'إعداد دراسات جدوى وتحليلات فنية متكاملة للمشاريع قبل البدء.',
         description_en: 'Preparing feasibility studies and integrated technical analysis for projects before starting.',
-        icon: BarChart,
-        color: '#6554C0'
+        icon: FileText,
+        color: '#1b6b91ab'
     },
     {
         id: 6,
@@ -63,8 +63,8 @@ export const PLATFORM_SERVICES = [
         name_en: 'Project Supervision',
         description_ar: 'الإشراف الفني المباشر على مراحل التنفيذ لضمان مطابقة المواصفات.',
         description_en: 'Direct technical supervision of execution stages to ensure specification compliance.',
-        icon: Eye,
-        color: '#00B8D9'
+        icon: ClipboardCheck,
+        color: '#1b6b91ab'
     },
     {
         id: 7,
@@ -73,7 +73,7 @@ export const PLATFORM_SERVICES = [
         description_ar: 'برامج تدريبية متخصصة لتطوير المهارات الهندسية والفنية.',
         description_en: 'Specialized training programs to develop engineering and technical skills.',
         icon: GraduationCap,
-        color: '#FF8B00'
+        color: '#1b6b91ab'
     },
     {
         id: 8,
@@ -82,7 +82,7 @@ export const PLATFORM_SERVICES = [
         description_ar: 'إدارة متكاملة للمشاريع من التخطيط وحتى التسليم النهائي.',
         description_en: 'Integrated project management from planning to final delivery.',
         icon: Briefcase,
-        color: '#253858'
+        color: '#1b6b91ab'
     }
 ];
 
