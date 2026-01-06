@@ -11,6 +11,8 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import { supabase } from "@/lib/supabaseClient";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/redux/slices/authSlice";
 
 const SignupForm = () => {
   const { t } = useTranslation();
@@ -28,6 +30,7 @@ const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const isProvider = pathname === "/signup-provider";
+  const dispatch = useDispatch();
 
   const router = useRouter();
 
@@ -37,6 +40,9 @@ const SignupForm = () => {
   useEffect(() => {
     const fetchLookups = async () => {
       try {
+        // تحديد الدور فوراً بناءً على الرابط
+        setRole(isProvider ? "Provider" : "Requester");
+
         // جلب المدن من جدول cities
         const { data: citiesData, error: citiesError } = await supabase
           .from("cities")
@@ -80,8 +86,6 @@ const SignupForm = () => {
             nameEn: item.name_en,
           }))
         );
-
-        setRole(isProvider ? "Provider" : "Requester");
       } catch (error) {
         toast.error(
           error?.data?.message || t("signupForm.lookupError") || "حدث خطأ أثناء جلب البيانات"
@@ -274,7 +278,21 @@ const SignupForm = () => {
       }
 
       toast.success(t("signupForm.registerSuccess"));
-      router.push("/login");
+      toast.success(t("signupForm.registerSuccess"));
+
+      // Auto Login Logic
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        dispatch(setCredentials({
+          token: session.access_token,
+          refreshToken: session.refresh_token,
+          role: role,
+          userId: uid
+        }));
+        router.push("/home"); // Redirect to home immediately
+      } else {
+        router.push("/login");
+      }
     } catch (error) {
       toast.error(
         error?.message || t("signupForm.registerError") || "حدث خطأ أثناء التسجيل"

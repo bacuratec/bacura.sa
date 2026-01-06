@@ -75,7 +75,7 @@ export default async function HomePage({ searchParams }) {
   } else {
     const { data: requester } = await supabase
       .from('requesters')
-      .select('id,name,attachments(*)')
+      .select('id,name') // Removed attachments(*)
       .eq('user_id', user.id)
       .maybeSingle();
     const requesterId = requester?.id || null;
@@ -106,31 +106,10 @@ export default async function HomePage({ searchParams }) {
       }));
       roleData.requestCount = requestsCount || 0;
     } else {
-      const { count: requestsCount } = await supabase
-        .from('requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('requester.user_id', user.id);
-      const { data: requests } = await supabase
-        .from('requests')
-        .select(`
-          id,
-          title,
-          created_at,
-          service:services(name_ar,name_en),
-          status:lookup_values!requests_status_id_fkey(name_ar,name_en,code),
-          requester:requesters!requests_requester_id_fkey(user_id)
-        `)
-        .eq('requester.user_id', user.id)
-        .order('created_at', { ascending: false })
-        .range(reqFrom, reqTo);
-      reqs = (requests || []).map(r => ({
-        id: r.id,
-        title: r.title || '-',
-        serviceName: r.service ? (r.service.name_ar || r.service.name_en) : '-',
-        statusName: r.status ? (r.status.name_ar || r.status.name_en) : '-',
-        created_at: r.created_at
-      }));
-      roleData.requestCount = requestsCount || 0;
+      // Fallback: If no requester profile yet, return empty to prevent errors or leaks
+      // This is safer than trying to filter by user_id which might leak or fail
+      reqs = [];
+      roleData.requestCount = 0;
     }
     const { count: ticketsCount } = await supabase
       .from('tickets')
@@ -142,7 +121,7 @@ export default async function HomePage({ searchParams }) {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .range(notFrom, notTo);
-    roleData = { role, requester, requests: reqs, notifications: tickets || [], requestCount: roleData.requestCount, notificationsCount: ticketsCount || 0, reqPageSize, reqPageNumber, notPageSize, notPageNumber };
+    roleData = { role, requester: requester || {}, requests: reqs, notifications: tickets || [], requestCount: roleData.requestCount, notificationsCount: ticketsCount || 0, reqPageSize, reqPageNumber, notPageSize, notPageNumber };
   }
 
   const Card = ({ title, children, subtitle }) => (
