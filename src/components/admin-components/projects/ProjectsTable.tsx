@@ -26,9 +26,9 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
   const role = useSelector((state: any) => state.auth.role);
   const searchParams = useSearchParams();
 
-  const PageNumber = searchParams.get("PageNumber") || "1";
-  const PageSize = searchParams.get("PageSize") || "30";
-  const OrderStatusLookupId = searchParams.get("OrderStatusLookupId") || "";
+  const PageNumber = searchParams?.get("PageNumber") || "1";
+  const PageSize = searchParams?.get("PageSize") || "30";
+  const OrderStatusLookupId = searchParams?.get("OrderStatusLookupId") || "";
 
   // Map string codes to IDs for API query
   const getStatusId = (code: string) => {
