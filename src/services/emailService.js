@@ -10,16 +10,26 @@ import nodemailer from "nodemailer";
  */
 const transporter = nodemailer.createTransport({
     host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
-    port: parseInt(process.env.ZOHO_SMTP_PORT) || 465,
-    secure: true, // true for 465, false for other ports
+    port: parseInt(process.env.ZOHO_SMTP_PORT) || 587, // Changed to 587 for STARTTLS
+    secure: false, // false for port 587, true for 465
     auth: {
         user: process.env.ZOHO_SMTP_USER,
         pass: process.env.ZOHO_SMTP_PASS
     },
+    // إعدادات إضافية لـ Zoho
+    tls: {
+        rejectUnauthorized: false, // قبول الشهادات
+        minVersion: 'TLSv1.2'
+    },
+    requireTLS: true, // Force TLS
     // تحسين الأداء
     pool: true,
     maxConnections: 5,
-    maxMessages: 100
+    maxMessages: 100,
+    // Timeout settings
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 30000
 });
 
 /**
