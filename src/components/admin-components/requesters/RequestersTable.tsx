@@ -24,9 +24,9 @@ const RequestersTable = ({ stats }: RequestersTableProps) => {
   const searchParams = useSearchParams();
 
   // Extract values from URL
-  const PageNumber = searchParams.get("PageNumber") || "1";
-  const PageSize = searchParams.get("PageSize") || "30";
-  const AccountStatus = searchParams.get("AccountStatus") || "";
+  const PageNumber = searchParams?.get("PageNumber") || "1";
+  const PageSize = searchParams?.get("PageSize") || "30";
+  const AccountStatus = searchParams?.get("AccountStatus") || "";
 
   const {
     data: response,
@@ -45,7 +45,7 @@ const RequestersTable = ({ stats }: RequestersTableProps) => {
   const totalRows = response?.count || 0;
 
   const [openDelete, setOpenDelete] = useState(false);
-  const [selectedId, setSelectedId] = useState < string | null > (null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     refetch();
@@ -196,8 +196,8 @@ const RequestersTable = ({ stats }: RequestersTableProps) => {
             <button
               onClick={() => handleToggleBlock(row.user_id, !row.user?.is_blocked)}
               className={`group relative p-2.5 bg-white rounded-xl border shadow-sm transition-all duration-300 ${row.user?.is_blocked
-                  ? "text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white"
-                  : "text-rose-600 border-rose-100 hover:bg-rose-600 hover:text-white"
+                ? "text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white"
+                : "text-rose-600 border-rose-100 hover:bg-rose-600 hover:text-white"
                 }`}
               title={row.user?.is_blocked ? t("unblock") : t("block")}
             >

@@ -25,9 +25,9 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
     const searchParams = useSearchParams();
 
     // Extract values from URL
-    const PageNumber = searchParams.get("PageNumber") || "1";
-    const PageSize = searchParams.get("PageSize") || "30";
-    const rawStatus = searchParams.get("AccountStatus") || "";
+    const PageNumber = searchParams?.get("PageNumber") || "1";
+    const PageSize = searchParams?.get("PageSize") || "30";
+    const rawStatus = searchParams?.get("AccountStatus") || "";
     const allowedStatuses = ["200", "201", "202", "203"];
     const AccountStatus = allowedStatuses.includes(rawStatus) ? rawStatus : "";
 

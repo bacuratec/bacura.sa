@@ -25,9 +25,9 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
     const searchParams = useSearchParams();
 
     // Extract values from URL
-    const PageNumber = searchParams.get("PageNumber") || "1";
-    const PageSize = searchParams.get("PageSize") || "30";
-    const RequestStatus = searchParams.get("RequestStatus") || "";
+    const PageNumber = searchParams?.get("PageNumber") || "1";
+    const PageSize = searchParams?.get("PageSize") || "30";
+    const RequestStatus = searchParams?.get("RequestStatus") || "";
 
     const {
         data: response,
