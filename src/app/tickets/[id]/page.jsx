@@ -3,7 +3,7 @@ import TicketDetails from '@/views/landing/tickets/TicketDetails';
 import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 
 export default async function TicketDetailsPage({ params }) {
-    const { id } = params;
+    const { id } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 

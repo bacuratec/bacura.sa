@@ -37,6 +37,7 @@ const TicketDetails = ({ ticketId }) => {
 
     const handleSendMessage = async () => {
         if (!newMessage.trim()) return;
+        if (!ticketId) return; // Prevent sending if no ID
         try {
             await sendMessage({ ticketId, senderId: userId, message: newMessage }).unwrap();
             setNewMessage("");
