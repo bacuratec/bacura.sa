@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const Services = ({ data }) => {
+const Services = ({ data, isLoading }) => {
   const { t } = useTranslation();
   const location = useLocation();
   const sectionRef = useRef(null);
@@ -32,18 +32,18 @@ const Services = ({ data }) => {
         duration: 0.6,
         ease: "power3.out"
       })
-      .from(descRef.current, {
-        y: 30,
-        opacity: 0,
-        duration: 0.6,
-        ease: "power3.out"
-      }, "-=0.3")
-      .from(listRef.current, {
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power3.out"
-      }, "-=0.3");
+        .from(descRef.current, {
+          y: 30,
+          opacity: 0,
+          duration: 0.6,
+          ease: "power3.out"
+        }, "-=0.3")
+        .from(listRef.current, {
+          y: 50,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power3.out"
+        }, "-=0.3");
 
     }, sectionRef);
 
@@ -77,8 +77,8 @@ const Services = ({ data }) => {
 
         {/* قائمة الخدمات */}
         <div ref={listRef} className="mt-6 sm:mt-10 md:mt-16 lg:mt-20 xl:mt-[165px]">
-          <ServiceList data={data} />
-        </div>
+          +          <ServiceList data={data} isLoading={isLoading} />
+          +        </div>
       </div>
     </section>
   );

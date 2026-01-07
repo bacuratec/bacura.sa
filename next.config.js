@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  compress: true,
+
 
   // Standalone output is handled by Netlify plugin v5
   // output: 'standalone',

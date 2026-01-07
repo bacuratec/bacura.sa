@@ -57,122 +57,130 @@ const Footer = () => {
     },
     { icon: <FaTiktok />, url: "https://www.tiktok.com/@Bacura_tec" },
     { icon: <FaLinkedinIn />, url: "https://www.linkedin.com/company/Bacura-tec/" },
-    { icon: <FaWhatsapp />, url: "https://wa.me/+966547000015" },
   ];
   return (
-    <footer className="pt-10 xl:mt-20 border border-t border-t-primary block mt-5">
+    <footer className="pt-16 pb-8 bg-gray-50 border-t border-primary/20 mt-10">
       <div className="container">
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10 lg:gap-16 xl:gap-20">
-          <div className="desc flex flex-col justify-between items-center gap-4 col-span-2 lg:col-span-3 xl:col-span-2">
-            <div className="logo w-full h-32 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {/* Column 1: Logo & Vision */}
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-right gap-6">
+            <div className="relative w-48 h-16">
               <OptimizedImage
                 src={logo}
-                alt="logo"
+                alt="Bacura Logo"
                 fill
                 className="object-contain"
-                sizes="(max-width: 768px) 100vw, 33vw"
               />
             </div>
-            <div className="flex flex-col gap-3">
+            <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
+              باكورة أعمال للتقنية، شريكك الرقمي الموثوق لتحويل الأفكار إلى واقع تقني متقن.
+            </p>
+
+            {/* Socials - Desktop */}
+            <div className="hidden lg:flex gap-3 mt-2">
+              {socials.map((social, index) => (
+                <a
+                  key={index}
+                  href={social.url}
+                  target="_blank"
+                  className="w-9 h-9 flex items-center justify-center bg-white border border-gray-200 rounded-full text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 shadow-sm"
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 2: Important Links */}
+          <div className="flex flex-col items-center lg:items-start gap-4">
+            <h5 className="font-bold text-gray-800 text-lg relative pb-2 w-fit">
+              {t("footer.importantLinks")}
+              <span className="absolute bottom-0 right-0 w-1/2 h-0.5 bg-primary rounded-full"></span>
+            </h5>
+            <ul className="flex flex-col gap-3 text-center lg:text-right w-full">
+              <li><Link href="/" className="text-gray-600 hover:text-primary transition-colors text-sm">{t("footer.home")}</Link></li>
+              <li><Link href="/about-us" className="text-gray-600 hover:text-primary transition-colors text-sm">{t("footer.about")}</Link></li>
+              <li><Link href="/our-services" className="text-gray-600 hover:text-primary transition-colors text-sm">{t("footer.services")}</Link></li>
+              <li><Link href="/how-it-work" className="text-gray-600 hover:text-primary transition-colors text-sm">{t("footer.howItWorks")}</Link></li>
+              <li><Link href="/faqs" className="text-gray-600 hover:text-primary transition-colors text-sm">{t("footer.faq")}</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 3: Contact & Legal */}
+          <div className="flex flex-col items-center lg:items-start gap-4">
+            <h5 className="font-bold text-gray-800 text-lg relative pb-2 w-fit">
+              سياسات وشروط
+              <span className="absolute bottom-0 right-0 w-1/2 h-0.5 bg-primary rounded-full"></span>
+            </h5>
+            <ul className="flex flex-col gap-3 text-center lg:text-right w-full">
+              <li><Link href="/terms" className="text-gray-600 hover:text-primary transition-colors text-sm">الشروط والأحكام</Link></li>
+              <li><Link href="/privacy" className="text-gray-600 hover:text-primary transition-colors text-sm">سياسة الخصوصية</Link></li>
+              <li><Link href="/national-location" className="text-gray-600 hover:text-primary transition-colors text-sm">العنوان الوطني</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact Us */}
+          <div className="flex flex-col items-center lg:items-start gap-4">
+            <h5 className="font-bold text-gray-800 text-lg relative pb-2 w-fit">
+              تواصل معنا
+              <span className="absolute bottom-0 right-0 w-1/2 h-0.5 bg-primary rounded-full"></span>
+            </h5>
+            <div className="flex flex-col gap-4 w-full">
+              <a href="https://wa.me/+966547000015" target="_blank" className="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all group">
+                <div className="w-10 h-10 flex items-center justify-center bg-green-50 text-green-500 rounded-full group-hover:bg-green-500 group-hover:text-white transition-colors">
+                  <FaWhatsapp size={20} />
+                </div>
+                <div className="flex flex-col text-right">
+                  <span className="text-xs text-gray-500">محادثة فورية</span>
+                  <span className="text-sm font-semibold dir-ltr text-gray-800">+966 54 700 0015</span>
+                </div>
+              </a>
+
               {filePath && (
                 <a
                   href={profileUrl}
                   target="_blank"
-                  className="hidden lg:block underline text-primary hover:text-primary/80 transition-colors"
+                  className="flex items-center justify-center gap-2 p-3 bg-primary/5 text-primary border border-primary/20 rounded-xl hover:bg-primary hover:text-white transition-all text-sm font-medium"
                 >
                   {t("footer.profile")}
                 </a>
               )}
-              <ul className="hidden lg:flex gap-3">
-                {socials.map((social, index) => (
-                  <li key={index}>
-                    <a
-                      href={social?.url}
-                      target="_blank"
-                      className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm text-lg"
-                    >
-                      {social.icon}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+            </div>
+
+            {/* Socials - Mobile */}
+            <div className="lg:hidden flex gap-3 mt-4 justify-center w-full">
+              {socials.map((social, index) => (
+                <a
+                  key={index}
+                  href={social.url}
+                  target="_blank"
+                  className="w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-full text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 shadow-sm"
+                >
+                  {social.icon}
+                </a>
+              ))}
             </div>
           </div>
-          <div className="socials flex flex-col gap-5">
-            <h5 className="font-semibold text-sm md:text-base">
-              {t("footer.importantLinks")}
-            </h5>
-            <ul className="flex flex-col gap-3">
-              <li className="text-xs md:text-sm">
-                <Link href="/">{t("footer.home")}</Link>
-              </li>
-              <li className="text-xs md:text-sm">
-                <Link href="/about-us">{t("footer.about")}</Link>
-              </li>
-              <li className="text-xs md:text-sm">
-                <Link href="/our-services">{t("footer.services")}</Link>
-              </li>
-              <li className="text-xs md:text-sm">
-                <Link href="/how-it-work">{t("footer.howItWorks")}</Link>
-              </li>
-              <li className="text-xs md:text-sm">
-                <Link href="/faqs">{t("footer.faq")}</Link>
-              </li>
-              {role !== "Requester" && (
-                <li className="text-xs md:text-sm">
-                  <Link
-                    href="/signup-provider"
-                    onClick={() => window.scrollTo(0, 0)}
-                  >
-                    {t("footer.joinAsProvider")}
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </div>
-          <div className="lg:hidden flex flex-col gap-3 col-span-2">
-            {filePath && (
-              <a
-                href={profileUrl}
-                target="_blank"
-                className="underline text-primary hover:text-primary/80 transition-colors"
-              >
-                {t("footer.profile")}
-              </a>
-            )}
-            <ul className="lg:hidden flex gap-3 flex-wrap justify-center">
-              {socials.map((social, index) => (
-                <li key={index}>
-                  <a
-                    href={social?.url}
-                    target="_blank"
-                    className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm text-base"
-                  >
-                    {social.icon}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
-        <div className="flex flex-col justify-center items-center gap-2 flex-wrap border-t border-t-[#2B2D32] py-5 mt-10">
-          <p className="text-center text-xs">{t("footer.rights")}</p>
+
+        {/* Footer Bottom */}
+        <div className="border-t border-gray-200 pt-8 mt-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center">
           {lastUpdate && (
-            <p className="text-center text-xs text-gray-500">
+            <p className="text-xs text-gray-400 order-3 md:order-1">
               {t("footer.lastUpdate")}: {lastUpdate}
             </p>
           )}
-          {/* <ul className="flex items-center gap-7 text-xs">
-            <li className="underline">
-              <Link to="/">{t("footer.cookies")}</Link>
-            </li>
-            <li className="underline">
-              <Link to="/">{t("footer.terms")}</Link>
-            </li>
-            <li className="underline">
-              <Link to="/">{t("footer.privacy")}</Link>
-            </li>
-          </ul> */}
+
+          <div className="flex flex-col items-center gap-1 order-1 md:order-2">
+            <p className="text-sm text-gray-600 font-medium">{t("footer.rights")}</p>
+          </div>
+
+          <div className="order-2 md:order-3 text-sm text-gray-500 flex items-center gap-1">
+            <span>تم التطوير بواسطة</span>
+            <a href="https://bacura.sa" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:text-primary/80 transition-colors">
+              الحاضنة الرقمية باكورة التقنية
+            </a>
+          </div>
         </div>
       </div>
     </footer>

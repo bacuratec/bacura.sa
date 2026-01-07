@@ -24,9 +24,12 @@ html {
 }
 
 body {
-  font-family: 'Neo Sans Arabic', sans-serif;
+  font-family: 'Neo Sans Arabic', 'Noto Sans Arabic', sans-serif;
   overflow-x: hidden;
   background-color: #FCFBFC;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* في حالة دعم اللغة الإنجليزية */
@@ -151,4 +154,86 @@ main {
 
 .shadow-premium-secondary {
   box-shadow: 0 10px 25px -5px rgba(243, 191, 69, 0.3);
+}
+
+/* Merged from globals.css */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition shadow-btn;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary/90 disabled:opacity-60;
+  }
+
+  .btn-blue {
+    @apply bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-60;
+  }
+
+  .btn-yellow {
+    @apply bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-60;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600 disabled:opacity-60;
+  }
+
+  .btn-ghost {
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-60;
+  }
+
+  .input {
+    @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm;
+  }
+
+  .input-search {
+    @apply pr-10;
+  }
+
+  .card {
+    @apply rounded-2xl bg-white p-5 shadow-custom;
+  }
+
+  .modal {
+    @apply bg-white rounded-xl p-6 shadow-lg;
+  }
+
+  /* Premium Design System Extensions */
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .shimmer-text {
+    background: linear-gradient(90deg, #1A71F6, #60A5FA, #1A71F6);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 2s linear infinite;
+  }
+
+  @keyframes shimmer {
+    to {
+      background-position: 200% center;
+    }
+  }
 }

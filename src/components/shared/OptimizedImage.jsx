@@ -21,10 +21,15 @@ export default function OptimizedImage({
   const defaultBucket = process.env.NEXT_PUBLIC_SUPABASE_IMAGES_BUCKET || "images";
   const [failed, setFailed] = useState(false);
   const resolvedSrc = useMemo(() => {
-    let val = typeof src === "string" ? src : (src?.src || "");
+    // If src is a static import object (with src property), return it directly
+    if (typeof src === 'object' && src !== null && 'src' in src) {
+      return src;
+    }
+
+    let val = src;
 
     // If it's a data URI or already http(s), just return it
-    if (!val || val.startsWith("data:") || /^https?:\/\//i.test(val)) {
+    if (!val || typeof val !== 'string' || val.startsWith("data:") || /^https?:\/\//i.test(val)) {
       return val;
     }
 

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import logoutIcon from "@/assets/icons/logout.svg";
+import logo from "../../../../assets/images/logo-landing.png";
 import NavLinks from "./NavLinks";
 import { useTranslation } from "react-i18next";
+import OptimizedImage from "@/components/shared/OptimizedImage";
 
 const MobileMenu = ({
   isOpen,
@@ -18,8 +20,21 @@ const MobileMenu = ({
   if (!isOpen) return null;
 
   return (
-    <div className="lg:hidden mt-4 space-y-4 animate-fade-in">
-      <nav>
+    <div className="lg:hidden animate-fade-in flex flex-col h-full bg-white">
+      {/* Branding Header in Menu */}
+      <div className="flex items-center justify-center py-6 border-b border-gray-100 mb-2">
+        <Link href="/" onClick={onClose} className="block w-[100px] hover:scale-105 transition-transform">
+          <OptimizedImage
+            src={logo}
+            alt="Bacura Logo"
+            width={100}
+            height={67}
+            className="w-full h-auto object-contain"
+          />
+        </Link>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto px-4 py-2">
         <ul className="flex flex-col gap-2 text-[#2B2D32] text-sm">
           <NavLinks
             links={links}

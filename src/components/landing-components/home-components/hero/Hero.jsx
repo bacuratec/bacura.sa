@@ -41,12 +41,12 @@ const Hero = () => {
     <section ref={heroRef} className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[80vh] xl:h-[calc(100vh-75px)] overflow-hidden">
       <div className="w-full h-full relative before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-[#1967AE33] before:z-10">
         <div className="w-full h-full relative">
-          <Image 
-            src={heroImg} 
-            alt="Hero Background" 
+          <Image
+            src={heroImg}
+            alt="Hero Background"
             fill
             priority
-            className="object-cover"
+            className="object-cover object-[center_bottom]"
           />
           <div className="absolute top-0 left-0 w-full h-full bg-black/40"></div>
         </div>

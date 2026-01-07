@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Hero from "@/components/landing-components/home-components/hero/Hero";
-import Services from "@/components/landing-components/home-components/services/Services";
-import AboutUs from "@/components/landing-components/home-components/aboutUs/AboutUs";
-import HowItWork from "@/components/landing-components/home-components/howItWork/HowItWork";
-import Join from "@/components/landing-components/home-components/joinNow/Join";
-import Faqs from "@/components/landing-components/home-components/faqs/Faqs";
 import { servicesService } from "@/services/api";
-import LoadingPage from "../../LoadingPage";
-import Partners from "@/components/landing-components/home-components/partners/Partners";
 import { useTranslation } from "react-i18next";
-import Customers from "@/components/landing-components/home-components/customers/Customers";
 import MainLayout from "@/components/Layouts/main-layout/MainLayout";
+
+// Dynamic imports for heavy below-the-fold components
+const Services = dynamic(() => import("@/components/landing-components/home-components/services/Services"), {
+    ssr: true // SEO content is important for services
+});
+const AboutUs = dynamic(() => import("@/components/landing-components/home-components/aboutUs/AboutUs"));
+const HowItWork = dynamic(() => import("@/components/landing-components/home-components/howItWork/HowItWork"));
+const Join = dynamic(() => import("@/components/landing-components/home-components/joinNow/Join"));
+const Faqs = dynamic(() => import("@/components/landing-components/home-components/faqs/Faqs"));
+const Partners = dynamic(() => import("@/components/landing-components/home-components/partners/Partners"));
+const Customers = dynamic(() => import("@/components/landing-components/home-components/customers/Customers"));
 
 const Home = () => {
     const { t } = useTranslation();
@@ -34,16 +38,13 @@ const Home = () => {
         fetchServices();
     }, []);
 
-    if (isLoading) {
-        return <LoadingPage />;
-    }
     return (
         <MainLayout>
             <div className="bg-white">
                 <title>{t("home.metaTitle")}</title>
                 <meta name="description" content={t("about.metaDescription")} />
                 <Hero />
-                <Services data={services} />
+                <Services data={services} isLoading={isLoading} />
                 <AboutUs />
                 <HowItWork />
                 <Join />
