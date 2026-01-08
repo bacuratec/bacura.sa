@@ -68,6 +68,12 @@ class AuthService {
       const { data, error } = await client.auth.signUp({
         email: credentials.email,
         password: credentials.password,
+        options: {
+          data: {
+            role: credentials.role,
+            full_name: credentials.fullName,
+          }
+        }
       })
 
       if (error) {
@@ -166,7 +172,7 @@ class AuthService {
   onAuthStateChange(callback: (event: string, session: any) => void) {
     const client = supabase as any
     if (!client) {
-      return { data: { subscription: { unsubscribe: () => {} } } }
+      return { data: { subscription: { unsubscribe: () => { } } } }
     }
     return client.auth.onAuthStateChange(callback)
   }
