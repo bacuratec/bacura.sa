@@ -277,7 +277,23 @@ const SignupForm = () => {
         }
       }
 
-      toast.success(t("signupForm.registerSuccess"));
+      // إرسال بريد ترحيبي لمزود الخدمة
+      if (role === "Provider") {
+        try {
+          await fetch("/api/auth/send-provider-welcome", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: values.email,
+              name: values.fullName,
+              role: "Provider",
+            }),
+          });
+        } catch (emailErr) {
+          console.error("Failed to send welcome email", emailErr);
+        }
+      }
+
       toast.success(t("signupForm.registerSuccess"));
 
       // Auto Login Logic
