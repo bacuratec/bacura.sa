@@ -8,13 +8,66 @@ import { useParams } from "next/navigation";
 
 const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }) => {
   const role = useSelector((state) => state.auth.role);
+  const userId = useSelector((state) => state.auth.userId);
   const { t } = useTranslation();
   const params = useParams();
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
   // Use propsRequestId if provide, fallback to URL param 'id'
   const requestId = propsRequestId || params?.id;
 
   const list = Array.isArray(attachments) ? attachments : [];
+
+  // Check if user is Admin from multiple sources
+  React.useEffect(() => {
+    const checkAdminStatus = async () => {
+      // 1. Check Redux role
+      const normalizedRole = role ? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase() : null;
+      console.log('[RequestAttachment] Redux role:', role, 'normalized:', normalizedRole);
+
+      if (normalizedRole === 'Admin') {
+        setIsAdmin(true);
+        return;
+      }
+
+      // 2. Check Supabase session metadata
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const metadataRole = user?.user_metadata?.role;
+        const normalizedMetadataRole = metadataRole ? metadataRole.charAt(0).toUpperCase() + metadataRole.slice(1).toLowerCase() : null;
+        console.log('[RequestAttachment] Metadata role:', metadataRole, 'normalized:', normalizedMetadataRole);
+
+        if (normalizedMetadataRole === 'Admin') {
+          setIsAdmin(true);
+          return;
+        }
+
+        // 3. Check users table in database
+        if (user?.id) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          const dbRole = userData?.role;
+          const normalizedDbRole = dbRole ? dbRole.charAt(0).toUpperCase() + dbRole.slice(1).toLowerCase() : null;
+          console.log('[RequestAttachment] DB role:', dbRole, 'normalized:', normalizedDbRole);
+
+          if (normalizedDbRole === 'Admin') {
+            setIsAdmin(true);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('[RequestAttachment] Error checking admin status:', error);
+      }
+
+      setIsAdmin(false);
+    };
+
+    checkAdminStatus();
+  }, [role, userId]);
 
   const requestFiles = list.filter((item) => item.request_phase_lookup_id === 22 || item.request_phase_lookup_id === 23 || item.requestPhaseLookupId === 22 || item.requestPhaseLookupId === 23) || [];
   const adminFiles = list.filter((item) => item.request_phase_lookup_id === 24 || item.requestPhaseLookupId === 24) || [];
@@ -198,7 +251,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
               <FileText className="w-4 h-4" />
               <h4 className="text-base">
                 {t(
-                  role === "Admin"
+                  isAdmin
                     ? "RequestAttachment.adminPricingFilesForYou"
                     : "RequestAttachment.adminPricingFilesForAdmin"
                 ) || "ملفات عرض السعر"}
@@ -218,7 +271,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
               <Receipt className="w-4 h-4" />
               <h4 className="text-base">
                 {t(
-                  role === "Admin"
+                  isAdmin
                     ? "RequestAttachment.requesterReceiptForRequester"
                     : "RequestAttachment.requesterReceiptForYou"
                 ) || "إيصال السداد"}
@@ -283,7 +336,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
                             >
                               <Download className="w-4 h-4" />
                             </a>
-                            {role === 'Admin' && (
+                            {isAdmin && (
                               <>
                                 <button
                                   onClick={() => handleAcceptReceipt(it)}
