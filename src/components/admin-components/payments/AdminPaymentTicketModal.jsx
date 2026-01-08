@@ -32,8 +32,8 @@ export default function AdminPaymentTicketModal({ open, onClose, userId, related
       toast.success(tr("ticket.success", "تم إرسال التذكرة"));
       resetForm();
       onClose();
-    } catch (error) {
-      toast.error(tr("ticket.error", "حدث خطأ أثناء إرسال التذكرة"));
+    } catch {
+      toast.error(t("tickets.failedToCreate"));
     } finally {
       setSubmitting(false);
     }

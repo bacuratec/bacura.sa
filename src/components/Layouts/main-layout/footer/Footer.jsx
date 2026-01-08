@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSelector } from "react-redux";
+
 import {
   FaSnapchat,
   FaTiktok,
@@ -13,7 +13,6 @@ import {
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useGetProfileInfoQuery } from "../../../../redux/api/profileInfoApi";
-import { getAppBaseUrl } from "../../../../utils/env";
 import { formatLastUpdate, getLastUpdateTime } from "../../../../utils/buildInfo";
 import { useEffect, useState } from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
@@ -21,10 +20,7 @@ import logo from "../../../../assets/images/logoFooter.png";
 
 const Footer = () => {
   const { t, i18n } = useTranslation();
-  const base = getAppBaseUrl();
   const [lastUpdate, setLastUpdate] = useState("");
-
-  const role = useSelector((state) => state.auth.role);
 
   const { data: profileList } = useGetProfileInfoQuery();
   const profile = Array.isArray(profileList) ? profileList[0] : profileList;

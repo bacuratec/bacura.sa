@@ -113,7 +113,7 @@ const RequestLifecycle = ({ request }) => {
                 {/* <div className="absolute top-5 transition-all duration-500 h-1 bg-green-500 rounded-full -z-0" style={{ width: '50%' }}></div> */}
 
                 <div className="flex justify-between relative z-10 w-full">
-                    {steps.map((step, index) => {
+                    {steps.map((step) => {
                         const isCompleted = step.status === 'completed';
                         const isCurrent = step.status === 'current';
                         const isPending = step.status === 'pending';

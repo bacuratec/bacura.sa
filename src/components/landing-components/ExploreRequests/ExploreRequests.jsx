@@ -113,7 +113,7 @@ const ExploreRequests = ({ stats }) => {
     return () => {
       mounted = false;
     };
-  }, [RequestStatus, CityId, ServiceId]);
+  }, [RequestStatus, CityId, ServiceId, requesterData?.id]);
 
   useEffect(() => {
     if (requesterData?.id) {

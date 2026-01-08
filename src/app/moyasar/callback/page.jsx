@@ -44,7 +44,7 @@ export default function Page() {
       }
     };
     verify();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   if (state.loading) {
     return <div className="container mx-auto p-8 text-center">جاري التحقق من الدفع...</div>;

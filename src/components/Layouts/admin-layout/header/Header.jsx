@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import NotificationsModal from "../../NotificationsModal";
 import { useGetNotificationsQuery } from "../../../../redux/api/notificationsApi";
 import LanguageDropdown from "../../LanguageDropdown";
-import { seedDemoData } from "../../../../utils/supabase/seedDemoData";
 import RoleBadge from "../../../shared/RoleBadge";
 
 import userImg from "../../../../assets/images/user.jpg";
@@ -36,8 +35,8 @@ const Header = ({ data }) => {
   const imageUrl =
     typeof data?.profilePictureUrl === "string" && data.profilePictureUrl.length > 0
       ? (data.profilePictureUrl.startsWith("http")
-          ? data.profilePictureUrl
-          : `${getAppBaseUrl()}/${data.profilePictureUrl}`)
+        ? data.profilePictureUrl
+        : `${getAppBaseUrl()}/${data.profilePictureUrl}`)
       : (typeof userImg === "string" ? userImg : (userImg?.src || ""));
 
   return (

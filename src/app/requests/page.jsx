@@ -64,9 +64,8 @@ export default async function RequestsPage() {
   return <ExploreContent stats={stats} />;
 }
 
-export function generateMetadata() {
-  return {
-    title: 'تصفح الطلبات | باكورة أعمال',
-    description: 'تصفح طلبات الخدمة ومتابعة حالتها',
-  };
-}
+// eslint-disable-next-line react-refresh/only-export-components
+export const metadata = {
+  title: 'تصفح الطلبات | باكورة أعمال',
+  description: 'تصفح طلبات الخدمة ومتابعة حالتها',
+};

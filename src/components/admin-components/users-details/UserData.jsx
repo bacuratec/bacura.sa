@@ -7,12 +7,13 @@ import { useTranslation } from "react-i18next";
 import { LanguageContext } from "@/context/LanguageContext";
 import { getAppBaseUrl } from "../../../utils/env";
 
+
 const UserData = ({ data, refetch }) => {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
 
+
   const {
-    id,
     name: fullName,
     email,
     phoneNumber,

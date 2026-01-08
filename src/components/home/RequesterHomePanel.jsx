@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabaseClient";
 import { tr as trHelper } from "@/utils/tr";
@@ -17,14 +17,14 @@ export default function RequesterHomePanel({
   initialNotificationsCount = 0,
 }) {
   const { t } = useTranslation();
-  const tr = (key, fallback) => trHelper(t, key, fallback);
+  const tr = useCallback((key, fallback) => trHelper(t, key, fallback), [t]);
   const [reqs, setReqs] = useState(initialRequests || []);
   const [tickets, setTickets] = useState(initialNotifications || []);
   const [reqCount, setReqCount] = useState(initialRequestCount || 0);
   const [notCount, setNotCount] = useState(initialNotificationsCount || 0);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       setLoading(true);
       if (!requesterId || !userId) {
@@ -66,11 +66,11 @@ export default function RequesterHomePanel({
     } finally {
       setLoading(false);
     }
-  };
+  }, [requesterId, userId, reqPageSize, notPageSize, initialRequestCount, initialRequests, initialNotificationsCount, initialNotifications]);
 
   useEffect(() => {
     load();
-  }, [requesterId, userId, reqPageSize, notPageSize]);
+  }, [requesterId, userId, reqPageSize, notPageSize, load]);
 
   useEffect(() => {
     if (!requesterId || !userId) return;
@@ -82,7 +82,7 @@ export default function RequesterHomePanel({
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [requesterId, userId]);
+  }, [requesterId, userId, load]);
 
   const RequestsList = useMemo(
     () => ({ items }) =>
@@ -126,7 +126,7 @@ export default function RequesterHomePanel({
           </a>
         </div>
       ),
-    [t]
+    [tr]
   );
 
   const NotificationsList = useMemo(
@@ -143,7 +143,7 @@ export default function RequesterHomePanel({
       ) : (
         <div className="text-gray-500 text-sm">{tr("home.noNotifications", "لا توجد إشعارات")}</div>
       ),
-    [t]
+    [tr]
   );
 
   const incompleteReqs = useMemo(() => {

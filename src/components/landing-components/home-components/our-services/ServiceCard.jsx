@@ -1,6 +1,6 @@
 import { ServiceIcon } from "@/constants/servicesData";
 
-const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang, color }) => {
+const ServiceCard = ({ icon, title, description, index, isActive, color }) => {
   return (
     <div
       title={description}
