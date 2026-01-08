@@ -97,19 +97,40 @@ export const getRoleByMembership = async (userId) => {
  * Priority 2: user_metadata or JWT (fallback)
  */
 export const detectUserRole = async (user, session) => {
-  // Priority 1: Check users table
-  let role = await getRoleFromUsersTable(user.id);
-  if (role) return role;
+  if (!user) return null;
 
-  // Fallback: Membership in specific tables
-  role = await getRoleByMembership(user.id);
-  if (role) return role;
+  // Use a timeout to prevent infinite loading if DB is unresponsive
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Role detection timeout")), 5000)
+  );
 
-  // Priority 2: Check metadata/JWT
-  role = getRoleFromMetadata(user, session);
-  if (role) return role;
+  const detectionPromise = (async () => {
+    try {
+      // Priority 1: Check users table
+      let role = await getRoleFromUsersTable(user.id);
+      if (role) return role;
 
-  return null;
+      // Fallback: Membership in specific tables
+      role = await getRoleByMembership(user.id);
+      if (role) return role;
+
+      // Priority 2: Check metadata/JWT
+      role = getRoleFromMetadata(user, session);
+      if (role) return role;
+
+      return "Requester"; // Default fallback
+    } catch (err) {
+      console.error("Error in detectUserRole internal:", err);
+      return "Requester";
+    }
+  })();
+
+  try {
+    return await Promise.race([detectionPromise, timeoutPromise]);
+  } catch (error) {
+    console.warn("Role detection timed out, falling back to Requester");
+    return "Requester";
+  }
 };
 
 

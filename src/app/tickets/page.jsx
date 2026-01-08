@@ -3,23 +3,29 @@ import TicketsContent from './TicketsContent';
 import SeekerLayout from '@/components/Layouts/seeker-layout/SeekerLayout';
 
 export default async function TicketsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const supabase = await createClient();
 
-  let requester = null;
-  if (user) {
-    const { data } = await supabase.from('requesters').select('*').eq('user_id', user.id).single();
-    requester = data;
-  }
+    // Safety check for user with timeout (3s)
+    const userPromise = supabase.auth.getUser();
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
 
-  if (requester) {
+    const { data: { user } } = await Promise.race([userPromise, timeoutPromise]);
+
+    let requester = null;
+    if (user) {
+      const { data } = await supabase.from('requesters').select('*').eq('user_id', user.id).maybeSingle();
+      requester = data;
+    }
+
     return (
       <SeekerLayout requester={requester}>
         <TicketsContent />
       </SeekerLayout>
     );
+  } catch (error) {
+    console.error("Server-side TicketsPage error:", error);
+    return <TicketsContent />;
   }
-
-  return <TicketsContent />;
 }
 
