@@ -14,7 +14,7 @@ export const useAuth = () => {
     setIsLoading(true)
     try {
       const { user: authUser, profile: userProfile, error } = await authService.login(credentials)
-      
+
       if (error) {
         toast.error(error.message || 'فشل تسجيل الدخول')
         return { success: false, error }
@@ -24,7 +24,7 @@ export const useAuth = () => {
         setUser(authUser)
         setProfile(userProfile)
         toast.success('تم تسجيل الدخول بنجاح')
-        
+
         // Redirect based on role
         if (userProfile.role === 'Admin') {
           safeReplace(router, '/admin')
@@ -33,7 +33,7 @@ export const useAuth = () => {
         } else {
           safeReplace(router, '/profile')
         }
-        
+
         return { success: true }
       } else {
         // Handle case where authUser or userProfile is missing
@@ -52,7 +52,7 @@ export const useAuth = () => {
     setIsLoading(true)
     try {
       const { user: authUser, profile: userProfile, error } = await authService.signup(credentials)
-      
+
       if (error) {
         toast.error(error.message || 'فشل إنشاء الحساب')
         return { success: false, error }
@@ -62,7 +62,7 @@ export const useAuth = () => {
         setUser(authUser)
         setProfile(userProfile)
         toast.success('تم إنشاء الحساب بنجاح')
-      safeReplace(router, '/profile')
+        safeReplace(router, '/profile')
         return { success: true }
       } else {
         // Handle case where authUser or userProfile is missing
@@ -85,7 +85,7 @@ export const useAuth = () => {
         toast.error(error.message || 'فشل تسجيل الخروج')
         return { success: false, error }
       }
-      
+
       storeLogout()
       safeReplace(router, '/login')
       toast.success('تم تسجيل الخروج بنجاح')
@@ -100,9 +100,18 @@ export const useAuth = () => {
 
   const checkAuth = async () => {
     setIsLoading(true)
+
+    // Add a safety timeout for checkAuth (5 seconds)
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Auth check timed out')), 5000)
+    )
+
     try {
-      const { user: authUser, profile: userProfile, error } = await authService.getCurrentUser()
-      
+      const { user: authUser, profile: userProfile, error } = await Promise.race([
+        authService.getCurrentUser(),
+        timeoutPromise
+      ]) as any
+
       if (error || !authUser) {
         storeLogout()
         return { success: false, error }
@@ -112,8 +121,9 @@ export const useAuth = () => {
       setProfile(userProfile)
       return { success: true }
     } catch (error) {
+      console.error('CheckAuth error:', error)
       storeLogout()
-      return { success: false, error }
+      return { success: false, error: error as any }
     } finally {
       setIsLoading(false)
     }

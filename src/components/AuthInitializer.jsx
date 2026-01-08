@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "@/lib/supabaseClient";
 import { setCredentials, logout } from "@/redux/slices/authSlice";
@@ -11,44 +11,48 @@ export default function AuthInitializer({ children }) {
   const dispatch = useDispatch();
   const { token, role } = useSelector((state) => state.auth);
   const [isInitializing, setIsInitializing] = useState(true);
+  const initialized = useRef(false);
 
   useEffect(() => {
+    // Safety timeout to prevent infinite loading (8 seconds)
+    const timeoutId = setTimeout(() => {
+      setIsInitializing(false);
+    }, 8000);
+
     const initializeAuth = async () => {
+      if (!supabase) {
+        console.warn("Supabase client not initialized.");
+        setIsInitializing(false);
+        return;
+      }
+
       try {
-        // التحقق من Supabase session
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error("Error getting session:", error);
           setIsInitializing(false);
           return;
         }
 
-        if (session && session.user) {
-          // إذا كان هناك session لكن لا يوجد role في Redux
-          // أو إذا كنا نريد تحديث الـ role دائماً
+        if (session?.user) {
           if (!role || !token) {
             try {
               const userRole = await detectUserRole(session.user, session);
-              
               if (userRole) {
-                dispatch(
-                  setCredentials({
-                    token: session.access_token,
-                    refreshToken: session.refresh_token || null,
-                    role: userRole,
-                    userId: session.user.id,
-                  })
-                );
+                dispatch(setCredentials({
+                  token: session.access_token,
+                  refreshToken: session.refresh_token || null,
+                  role: userRole,
+                  userId: session.user.id,
+                }));
               }
             } catch (err) {
               console.error("Error detecting role:", err);
             }
           }
         } else {
-          // لا يوجد session - مسح البيانات
           if (token || role) {
-            // هنا نستخدم logout مباشرة لأننا تأكدنا من عدم وجود جلسة
             dispatch(logout());
           }
         }
@@ -56,52 +60,43 @@ export default function AuthInitializer({ children }) {
         console.error("Error initializing auth:", err);
       } finally {
         setIsInitializing(false);
+        initialized.current = true;
       }
     };
 
-    initializeAuth();
+    if (!initialized.current) {
+      initializeAuth();
+    } else {
+      setIsInitializing(false);
+    }
 
-    // الاستماع لتغييرات auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    let subscription = null;
+    if (supabase) {
+      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === "SIGNED_OUT" || !session) {
-          // عند تسجيل الخروج، نقوم بمسح البيانات من Redux فقط
-          // لا نستدعي logoutUser لأنه يحاول عمل signOut مرة أخرى
           dispatch(logout());
-        } else if (event === "SIGNED_IN" && session) {
-          // إذا تم تسجيل الدخول، جلب الدور
+        } else if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
           try {
             const userRole = await detectUserRole(session.user, session);
-            
             if (userRole) {
-              dispatch(
-                setCredentials({
-                  token: session.access_token,
-                  refreshToken: session.refresh_token || null,
-                  role: userRole,
-                  userId: session.user.id,
-                })
-              );
+              dispatch(setCredentials({
+                token: session.access_token,
+                refreshToken: session.refresh_token || null,
+                role: userRole,
+                userId: session.user.id,
+              }));
             }
           } catch (err) {
-            console.error("Error detecting role on sign in:", err);
+            console.error("Auth change role error:", err);
           }
-        } else if (event === "TOKEN_REFRESHED" && session) {
-             // تحديث التوكن في الستيت
-             dispatch(
-                setCredentials({
-                  token: session.access_token,
-                  refreshToken: session.refresh_token || null,
-                  role: role, // Keep existing role or re-fetch if needed
-                  userId: session.user.id,
-                })
-              );
         }
-      }
-    );
+      });
+      subscription = data.subscription;
+    }
 
     return () => {
-      subscription.unsubscribe();
+      clearTimeout(timeoutId);
+      if (subscription) subscription.unsubscribe();
     };
   }, [dispatch, token, role]);
 

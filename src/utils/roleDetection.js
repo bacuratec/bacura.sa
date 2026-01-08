@@ -46,6 +46,7 @@ export const getRoleFromMetadata = (user, session) => {
  * Get role from users table
  */
 export const getRoleFromUsersTable = async (userId) => {
+  if (!supabase) return null;
   try {
     const { data: user, error } = await supabase
       .from("users")
@@ -73,6 +74,7 @@ export const getRoleFromUsersTable = async (userId) => {
  * Fallback: Detect role by membership in requesters/providers/admins tables
  */
 export const getRoleByMembership = async (userId) => {
+  if (!supabase) return null;
   try {
     const [{ data: req }, { data: prov }, { data: adm }] = await Promise.all([
       supabase.from("requesters").select("user_id").eq("user_id", userId).maybeSingle(),
