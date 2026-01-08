@@ -1,5 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
+
 const path = require('path');
 
 // Supabase credentials
@@ -16,7 +16,6 @@ async function applyMigrationDirect() {
 
     try {
         const migrationPath = path.join(__dirname, 'supabase', 'migrations', '20260101_auto_create_order_on_payment.sql');
-        const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
         console.log('📝 محتوى Migration SQL جاهز');
         console.log('⚠️  ملاحظة: يجب تطبيق هذا SQL يدوياً في Supabase Dashboard:\n');
@@ -27,7 +26,7 @@ async function applyMigrationDirect() {
         console.log('4. اضغط RUN\n');
 
         // Check if tables exist
-        const { data: tables, error } = await supabase
+        const { error } = await supabase
             .from('orders')
             .select('id')
             .limit(1);

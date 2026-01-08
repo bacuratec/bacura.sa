@@ -11,7 +11,7 @@ async function runMigration() {
         console.log('🚀 Starting migration...\n');
 
         // Test connection first
-        const { data: testData, error: testError } = await supabase
+        const { error: testError } = await supabase
             .from('users')
             .select('count')
             .limit(1);
@@ -40,7 +40,7 @@ async function runMigration() {
         }
 
         // Check if project_messages table exists
-        const { data: messagesData, error: messagesError } = await supabase
+        const { error: messagesError } = await supabase
             .from('project_messages')
             .select('*')
             .limit(1);
@@ -54,7 +54,7 @@ async function runMigration() {
         }
 
         // Check if project_deliverables table exists
-        const { data: deliverablesData, error: deliverablesError } = await supabase
+        const { error: deliverablesError } = await supabase
             .from('project_deliverables')
             .select('*')
             .limit(1);

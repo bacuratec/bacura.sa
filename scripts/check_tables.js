@@ -1,7 +1,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
-const path = require('path');
+
 
 function parseEnv(filePath) {
     if (!fs.existsSync(filePath)) return {};
@@ -37,7 +37,7 @@ async function check() {
     const tables = ['lookup_values', 'request_statuses', 'orders', 'projects', 'attachments', 'attachment_groups'];
 
     for (const t of tables) {
-        const { data, error } = await client.from(t).select('count', { count: 'exact', head: true }).limit(1);
+        const { error } = await client.from(t).select('count', { count: 'exact', head: true }).limit(1);
         if (error) {
             console.log(`Table ${t}: MISSING or ERROR (${error.message})`);
         } else {

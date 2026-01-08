@@ -9,21 +9,21 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function checkFK() {
-    const { data, error } = await supabase.rpc('get_foreign_keys_for_table', { table_name: 'requests' });
+    await supabase.rpc('get_foreign_keys_for_table', { table_name: 'requests' });
     // If RPC doesn't exist, we can try direct query if policies allow, but usually standard info schema is accesssible
 
     // Alternative: Introspection query on information_schema
     // But standard supabase client doesn't do raw sql comfortably without rpc.
 
     // Let's just try to select with the join and see if it errors.
-    const { data: testData, error: testError } = await supabase
+    const { error: testError } = await supabase
         .from('requests')
         .select('id, provider:providers!requests_provider_id_fkey(id,name)')
         .limit(1);
 
     console.log('Test Link 1 (explicit FK):', testError ? testError.message : 'Success');
 
-    const { data: testData2, error: testError2 } = await supabase
+    const { error: testError2 } = await supabase
         .from('requests')
         .select('id, provider:providers(id,name)')
         .limit(1);

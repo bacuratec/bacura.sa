@@ -1,0 +1,49 @@
+
+> bacura@0.0.0 lint
+> eslint .
+
+
+C:\Users\USER\Documents\GitHub\bacura.sa\apply-migration.js
+  19:15  warning  'migrationSQL' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  30:23  warning  'tables' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\check-env.js
+  18:14  warning  'error' is defined but never used  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\diagnostic.js
+   55:17  warning  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  115:18  warning  'error' is defined but never used                                                     no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\scripts\add_missing_columns.js
+  32:19  warning  'functions' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  32:37  warning  'funcError' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\scripts\check_fk.js
+  12:13  warning  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  12:19  warning  'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u      no-unused-vars
+  19:19  warning  'testData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  26:19  warning  'testData2' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\scripts\check_key.js
+  4:7  warning  'path' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\scripts\check_tables.js
+   4:7   warning  'path' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  40:17  warning  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\scripts\find_request.js
+  12:19  warning  'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\scripts\run_migration.js
+  14:23  warning  'testData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+  43:23  warning  'messagesData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u      no-unused-vars
+  57:23  warning  'deliverablesData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\scripts\test_upload_manual.js
+  3:7  warning  'fs' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\USER\Documents\GitHub\bacura.sa\simple-diagnostic.js
+  89:10  warning  'error' is defined but never used  no-unused-vars
+
+✖ 20 problems (0 errors, 20 warnings)
+

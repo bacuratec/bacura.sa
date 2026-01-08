@@ -86,7 +86,7 @@ try {
         if (exists) passedChecks++;
         console.log(`   ${exists ? '✅' : '❌'} ${dep}${exists ? ` (${deps[dep]})` : ''}`);
     }
-} catch (error) {
+} catch {
     console.log('   ⚠️  Could not read package.json');
 }
 console.log('');

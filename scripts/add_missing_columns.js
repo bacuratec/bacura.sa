@@ -29,7 +29,7 @@ async function addMissingColumns() {
     // However, usually we can't run DDL via the JS client unless there is an RPC.
 
     // Let's check if there is an exec_sql rpc
-    const { data: functions, error: funcError } = await supabase.rpc('get_functions');
+    await supabase.rpc('get_functions');
     // If no such function, we might fail.
 
     // Plan B: Create a migration file and hope the user runs it? 

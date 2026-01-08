@@ -9,7 +9,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function findRequest() {
-    const { data, error } = await supabase
+    const { data } = await supabase
         .from('requests')
         .select('id, admin_price, status_id')
         .ilike('id', 'a8504930%');

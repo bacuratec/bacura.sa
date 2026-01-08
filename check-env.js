@@ -15,7 +15,7 @@ function loadEnv() {
                 }
             }
         });
-    } catch (error) {
+    } catch {
         console.log('Error loading .env');
     }
 }

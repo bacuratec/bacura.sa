@@ -52,15 +52,15 @@ async function runDiagnostics() {
 
     totalChecks++;
     try {
-        const { data, error } = await supabase.from('profiles').select('count').limit(1);
-        if (!error) {
+        const { error: countError } = await supabase.from('profiles').select('count').limit(1);
+        if (!countError) {
             passedChecks++;
             console.log('   ✅ Connected to Supabase');
         } else {
-            console.log('   ❌ Connection failed:', error.message);
+            console.log('   ❌ Connection failed:', countError.message);
         }
-    } catch (error) {
-        console.log('   ❌ Connection error:', error.message);
+    } catch (err) {
+        console.log('   ❌ Connection error:', err.message);
     }
     console.log('');
 
@@ -112,7 +112,7 @@ async function runDiagnostics() {
             } else {
                 console.log(`   ⚠️  ${check.table}: Check manually in Supabase`);
             }
-        } catch (error) {
+        } catch {
             console.log(`   ⚠️  ${check.table}: Unable to verify`);
         }
     }
