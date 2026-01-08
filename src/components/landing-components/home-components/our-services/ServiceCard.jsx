@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ServiceIcon } from "@/constants/servicesData";
 
 const ServiceCard = ({ icon, title, description, index, isActive, color }) => {
@@ -30,9 +31,9 @@ const ServiceCard = ({ icon, title, description, index, isActive, color }) => {
       </div>
 
       <div className="flex justify-end">
-        <a href="/request-service" className="btn btn-primary">
+        <Link href="/request-service" className="btn btn-primary">
           اطلب الخدمة
-        </a>
+        </Link>
       </div>
     </div>
   );
