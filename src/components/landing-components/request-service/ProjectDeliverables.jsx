@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useGetDeliverablesQuery, useUpdateDeliverableStatusMutation } from "@/redux/api/ordersApi";
 import dayjs from "dayjs";
@@ -25,7 +25,7 @@ const ProjectDeliverables = ({ orderId, isProvider = false }) => {
             }).unwrap();
             toast.success(status === 'accepted' ? t("deliverables.accepted") : t("deliverables.rejected"));
             refetch();
-        } catch (error) {
+        } catch {
             toast.error(t("common.error"));
         }
     };

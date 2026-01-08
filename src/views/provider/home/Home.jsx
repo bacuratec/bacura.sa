@@ -19,7 +19,7 @@ import BarchartStats from "../../../components/shared/barChart/BarChart";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useGetProviderStatisticsQuery } from "../../../redux/api/providerStatisticsApi";
-import { useGetProviderDetailsQuery, useGetProviderByUserIdQuery } from "../../../redux/api/usersDetails";
+import { useGetProviderByUserIdQuery } from "../../../redux/api/usersDetails";
 
 const Home = () => {
   const { t } = useTranslation();

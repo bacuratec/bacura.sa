@@ -26,35 +26,35 @@ export default function NotificationSettings() {
     });
 
     useEffect(() => {
+        const loadPreferences = async () => {
+            try {
+                setLoading(true);
+
+                const { data, error } = await supabase
+                    .from('notification_preferences')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
+
+                if (data) {
+                    setPreferences(data);
+                }
+            } catch (error) {
+                console.error('Error loading preferences:', error);
+                showMessage('حدث خطأ أثناء تحميل الإعدادات', 'error');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         if (user) {
             loadPreferences();
         }
     }, [user]);
-
-    async function loadPreferences() {
-        try {
-            setLoading(true);
-
-            const { data, error } = await supabase
-                .from('notification_preferences')
-                .select('*')
-                .eq('user_id', user.id)
-                .single();
-
-            if (error && error.code !== 'PGRST116') {
-                throw error;
-            }
-
-            if (data) {
-                setPreferences(data);
-            }
-        } catch (error) {
-            console.error('Error loading preferences:', error);
-            showMessage('حدث خطأ أثناء تحميل الإعدادات', 'error');
-        } finally {
-            setLoading(false);
-        }
-    }
 
     async function savePreferences() {
         setSaving(true);

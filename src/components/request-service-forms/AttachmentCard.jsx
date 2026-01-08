@@ -29,7 +29,7 @@ const formatDate = (iso) => {
     if (!iso) return "";
     const d = new Date(iso);
     return d.toLocaleString();
-  } catch (e) {
+  } catch {
     return iso || "";
   }
 };

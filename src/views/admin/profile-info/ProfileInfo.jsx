@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import HeadTitle from "../../../components/shared/head-title/HeadTitle";
 import {
@@ -11,14 +11,15 @@ import { uploadFileToStorage } from "../../../utils/imageUpload";
 import pdfIcon from "@/assets/images/pdf.png";
 import fileUploadImg from "@/assets/icons/fileUpload.svg";
 import toast from "react-hot-toast";
-import { getAppBaseUrl } from "../../../utils/env";
+
 import { FileText, Download, Eye } from "lucide-react";
 import { motion as m } from "framer-motion";
 
-const base = getAppBaseUrl();
+
 
 // Card for already-uploaded attachments
 export const AttachmentCard = ({ item }) => {
+  const { t } = useTranslation();
   const filePath = item?.filePathUrl || item?.file_path_url;
   if (!filePath) return null;
 

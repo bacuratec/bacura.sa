@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import { useState } from "react";
-import edit from "@/assets/icons/edit.svg";
+
+
 import ProfileModal from "../../shared/profile-modal/ProfileModal";
 import { useTranslation } from "react-i18next";
 

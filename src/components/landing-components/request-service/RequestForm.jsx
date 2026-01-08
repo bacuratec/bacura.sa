@@ -98,20 +98,7 @@ const RequestForm = ({ services }) => {
       return !!service && typeof service.base_price === "number" && service.base_price > 0;
     });
   };
-  const isAnyServicesSelect = (selectedServices) => {
-    if (!selectedServices) return false;
-    return selectedServices.some((id) => {
-      const service = services.find((s) => String(s.id) === id);
-      return service?.isSelectable !== true;
-    });
-  };
-  const isAnyServicesSelectable = (selectedServices) => {
-    if (!selectedServices) return false;
-    return selectedServices.some((id) => {
-      const service = services.find((s) => String(s.id) === id);
-      return service?.isSelectable === true;
-    });
-  };
+
 
   const handleNext = async (validateForm, setTouched) => {
     const errors = await validateForm();
@@ -140,7 +127,7 @@ const RequestForm = ({ services }) => {
 
       // 2. جلب requester_id من جدول requesters باستخدام userId (مع إنشاء ملف تعريفي تلقائي إذا لم يوجد)
       let requesterId = null;
-      const { data: requesterRow, error: requesterErr } = await supabase
+      const { data: requesterRow } = await supabase
         .from("requesters")
         .select("id")
         .eq("user_id", userId)
@@ -190,7 +177,7 @@ const RequestForm = ({ services }) => {
           if (statusCode === "pending") statusId = 7;
           if (statusCode === "priced") statusId = 8;
         }
-      } catch (err) {
+      } catch {
         console.warn("Status lookup failed, using fallbacks");
         statusId = statusCode === "pending" ? 7 : 8;
       }
@@ -277,10 +264,6 @@ const RequestForm = ({ services }) => {
       >
         {({ values, setFieldValue, validateForm, setTouched }) => {
           const anyPriced = isAnyPricedSelected(values.selectedServices);
-          const anySelect = isAnyServicesSelect(values.selectedServices);
-          const anySelectable = isAnyServicesSelectable(
-            values.selectedServices
-          );
 
           const handleCheckboxChange = (e) => {
             const { value, checked } = e.target;

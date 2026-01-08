@@ -126,7 +126,7 @@ const AdminCompleteRequest = ({ data, refetch }) => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, isSubmitting, setFieldValue }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* عنوان الطلب */}

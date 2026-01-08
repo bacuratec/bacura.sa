@@ -80,26 +80,6 @@ export async function canSendEmail(userId, type) {
  * @param {Object} preferences - تفضيلات المستخدم
  * @returns {boolean} - true إذا كان الوقت الحالي ضمن ساعات الهدوء
  */
-function isInQuietHours(preferences) {
-    if (!preferences.quiet_hours_from || !preferences.quiet_hours_to) {
-        return false;
-    }
 
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-
-    const [fromHour, fromMin] = preferences.quiet_hours_from.split(':').map(Number);
-    const [toHour, toMin] = preferences.quiet_hours_to.split(':').map(Number);
-
-    const quietFrom = fromHour * 60 + fromMin;
-    const quietTo = toHour * 60 + toMin;
-
-    // التعامل مع ساعات الهدوء التي تمتد لليوم التالي (مثل 22:00 إلى 08:00)
-    if (quietFrom > quietTo) {
-        return currentTime >= quietFrom || currentTime <= quietTo;
-    }
-
-    return currentTime >= quietFrom && currentTime <= quietTo;
-}
 
 export default canSendEmail;

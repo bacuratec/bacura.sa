@@ -2,15 +2,12 @@ import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useCallback, useContext, useRef, useState } from "react";
 import * as Yup from "yup";
-import fileIcon from "@/assets/icons/selectImg.svg";
-import camIcon from "@/assets/icons/cam.svg";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css"; // استيراد التصميم الافتراضي
 import toast from "react-hot-toast";
 // import { updateUserProfile } from "../../rtk/slices/userSlice";
 import { useSelector } from "react-redux";
 import { useGetCitiesQuery } from "../../../redux/api/citiesApi";
-import fileUpload from "@/assets/icons/fileUpload.svg";
 import { Camera, Upload, User, Mail, Phone, Calendar as CalendarIcon, MapPin, Building, FileText } from "lucide-react";
 
 import {
@@ -35,7 +32,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
   const { lang } = useContext(LanguageContext);
   const tr = (key, fallback) => trHelper(t, key, fallback);
 
-  const [isChanges, setIsChanged] = useState(false);
+  const [setIsChanged] = useState(false);
   const role = useSelector((state) => state.auth.role);
   const validationSchema = Yup.object({
     FullName: Yup.string().required(t("profile.requiredFullName")),
@@ -94,7 +91,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
       reader.onload = () => setPreview(reader.result);
       reader.readAsDataURL(file);
     }
-  }, []);
+  }, [setIsChanged]);
 
   // تشغيل الكاميرا لالتقاط صورة
   const openCamera = useCallback(async () => {
@@ -285,7 +282,7 @@ export default function ProfileModal({ open, setOpen, data, refetch }) {
               }}
               enableReinitialize
             >
-              {({ setFieldValue, values, errors, touched }) => (
+              {({ setFieldValue, values }) => (
                 <Form className="bg-white p-6 sm:p-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Profile Picture Section */}

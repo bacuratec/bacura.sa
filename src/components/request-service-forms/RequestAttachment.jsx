@@ -6,7 +6,7 @@ import { FolderOpen, FileText, Receipt, File as FileIcon, Eye, Download, Externa
 import { supabase } from "@/lib/supabaseClient";
 import { useParams } from "next/navigation";
 
-const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId, request }) => {
+const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }) => {
   const role = useSelector((state) => state.auth.role);
   const { t } = useTranslation();
   const params = useParams();

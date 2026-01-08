@@ -3,9 +3,7 @@
 import React, { useContext, useMemo, useState } from "react";
 import { motion } from "framer-motion"; // ✅ استيراد Framer Motion
 import ServiceCard from "./ServiceCard";
-import s1 from "../../../../assets/icons/s1.svg";
-import s2 from "../../../../assets/icons/s2.svg";
-import s3 from "../../../../assets/icons/s3.svg";
+
 import { LanguageContext } from "@/context/LanguageContext";
 import { AppLink } from "../../../../utils/routing";
 

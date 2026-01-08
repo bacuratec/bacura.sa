@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
@@ -14,11 +14,10 @@ import { detectUserRole } from "@/utils/roleDetection";
 const LoginForm = () => {
   const { t } = useTranslation();
   const router = useRouter();
-  const searchParams = useSearchParams();
+
   const dispatch = useDispatch();
 
-  const fromParam = searchParams.get("from") || searchParams.get("redirect") || null;
-  const from = fromParam ? decodeURIComponent(fromParam) : "/";
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -28,7 +28,7 @@ const RequestRating = ({ orderId, userId, onRated }) => {
             }).unwrap();
             toast.success(t("rating.success") || "شكراً لتقييمك!");
             if (onRated) onRated();
-        } catch (error) {
+        } catch {
             toast.error(t("common.error"));
         }
     };
@@ -56,8 +56,8 @@ const RequestRating = ({ orderId, userId, onRated }) => {
                         >
                             <Star
                                 className={`w-12 h-12 transition-all duration-300 ${(hover || rating) >= star
-                                        ? "text-amber-400 fill-current drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] scale-110"
-                                        : "text-gray-200"
+                                    ? "text-amber-400 fill-current drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] scale-110"
+                                    : "text-gray-200"
                                     }`}
                                 strokeWidth={1.5}
                             />

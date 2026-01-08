@@ -29,7 +29,7 @@ export async function validateSupabaseAdminKey() {
   if (!supabaseAdmin) return { ok: false, message: "supabaseAdmin not initialized" };
   try {
     // Lightweight query to verify API key works
-    const { data, error } = await supabaseAdmin.from("attachment_groups").select("id").limit(1);
+    const { error } = await supabaseAdmin.from("attachment_groups").select("id").limit(1);
     if (error) {
       console.error("Supabase key validation error:", error);
       return { ok: false, message: error.message || String(error) };

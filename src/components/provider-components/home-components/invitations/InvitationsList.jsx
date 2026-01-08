@@ -36,7 +36,7 @@ const InvitationsList = ({ providerId }) => {
             await respondToInvitation({ requestId, response, rejectionReason, providerId }).unwrap();
             toast.success(response === 'accepted' ? t("invitations.acceptedSuccess") : t("invitations.rejectedSuccess"));
             refetch();
-        } catch (err) {
+        } catch {
             toast.error(t("invitations.error"));
         }
     };

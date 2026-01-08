@@ -36,7 +36,7 @@ const OrdersTable = () => {
     providerId,
   }, { skip: !providerId });
 
-  const [updateOrderStatus, { isLoading: isUpdating }] = useProviderProjectStateMutation();
+  const [updateOrderStatus] = useProviderProjectStateMutation();
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
   const handleAcceptOrder = async (orderId) => {
@@ -45,7 +45,7 @@ const OrdersTable = () => {
       await updateOrderStatus({ orderId, statusId: 18 }).unwrap();
       toast.success(t("orders.acceptSuccess") || "تم قبول الطلب بنجاح");
       refetch();
-    } catch (error) {
+    } catch {
       toast.error(t("orders.acceptError") || "فشل قبول الطلب");
     } finally {
       setProcessingOrderId(null);
@@ -59,7 +59,7 @@ const OrdersTable = () => {
       await updateOrderStatus({ orderId, statusId: 19 }).unwrap();
       toast.success(t("orders.rejectSuccess") || "تم رفض الطلب بنجاح");
       refetch();
-    } catch (error) {
+    } catch {
       toast.error(t("orders.rejectError") || "فشل رفض الطلب");
     } finally {
       setProcessingOrderId(null);
@@ -72,7 +72,7 @@ const OrdersTable = () => {
       await updateOrderStatus({ orderId, statusId: 13 }).unwrap();
       toast.success(t("orders.startSuccess") || "تم بدء العمل");
       refetch();
-    } catch (error) {
+    } catch {
       toast.error(t("orders.startError") || "فشل بدء العمل");
     } finally {
       setProcessingOrderId(null);

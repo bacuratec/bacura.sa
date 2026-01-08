@@ -1,11 +1,9 @@
 import React from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
 import { ServiceIcon } from "@/constants/servicesData";
-import { getServiceIcon } from "@/utils/serviceIcon";
-import Link from "next/link";
 import { motion } from "framer-motion";
 
-const ServiceCard = ({ icon, imageUrl, title, description, index, isActive, lang, color }) => {
+const ServiceCard = ({ icon, title, description, index, isActive, color }) => {
   return (
     <motion.div
       title={description}

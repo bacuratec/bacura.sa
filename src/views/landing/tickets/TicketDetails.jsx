@@ -3,7 +3,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Send, User, ChevronRight, AlertCircle, CheckCircle, Clock } from "lucide-react";
-import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 import { useGetTicketDetailsQuery } from "../../../redux/api/ticketApi";
 import { useGetTicketMessagesQuery, useSendTicketMessageMutation } from "../../../redux/api/ticketMessagesApi";
@@ -14,7 +14,7 @@ import dayjs from "dayjs";
 const TicketDetails = ({ ticketId }) => {
     const { t } = useTranslation();
     const { lang } = useContext(LanguageContext);
-    const router = useRouter();
+
     const messagesEndRef = useRef(null);
 
     const userId = useSelector((state) => state.auth.userId);

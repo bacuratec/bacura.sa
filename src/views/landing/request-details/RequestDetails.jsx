@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import HeadTitle from "../../../components/admin-components/users-details/HeadTitle";
 import RequestDetailsInfo from "../../../components/admin-components/requests/RequestDetails";
 import { useRouter } from "next/navigation";
@@ -78,7 +78,7 @@ const RequestDetails = ({ initialData, id }) => {
 
   const [respondPrice] = useRequesterRespondPriceMutation();
   const [completeRequest, { isLoading: isCompleting }] = useAdminCompleteRequestMutation();
-  const [adminData, setAdminData] = useState(null);
+  const [adminData] = useState(null);
 
   // Realtime Subscriptions
   useRealtimeSync('requests', `id=eq.${requestId}`, () => {
@@ -94,7 +94,6 @@ const RequestDetails = ({ initialData, id }) => {
 
   const data = requestData || initialData || adminData;
   const attachments = attachmentsData || [];
-  const userRole = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user'))?.role : null;
   const userId = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user'))?.id : null;
   const handleChatScroll = () => {
     const el = typeof window !== "undefined" ? document.getElementById("request-chat") : null;
@@ -132,7 +131,7 @@ const RequestDetails = ({ initialData, id }) => {
       await completeRequest({ requestId, statusId: 11 }).unwrap();
       toast.success(t("requestDetails.successComplete") || "تم إكمال المشروع بنجاح");
       refetchRequesterDetails();
-    } catch (error) {
+    } catch {
       toast.error(t("common.error"));
     }
   };

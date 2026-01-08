@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
-import { getMoyasarPublishableKey } from "@/utils/env";
+
 
 export default function MoyasarInvoiceButton({ amount, requestId, userId }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const publishable = getMoyasarPublishableKey();
+
 
   const handlePay = async () => {
     try {

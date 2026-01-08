@@ -145,7 +145,7 @@ export const projectsApi = createApi({
           // 1) Get Requests counts
           const reqFilters = { requester_id: requesterId };
 
-          const [totalReqs, waitingAppr, priced, waitingPay, rejected, completed, newReqs, underReview] = await Promise.all([
+          const [totalReqs, , priced, waitingPay, , , newReqs,] = await Promise.all([
             baseQuery({ table: 'requests', method: 'GET', filters: reqFilters, pagination: { page: 1, pageSize: 1 } }),
             baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 9 }, pagination: { page: 1, pageSize: 1 } }), // initial approval
             baseQuery({ table: 'requests', method: 'GET', filters: { ...reqFilters, status_id: 8 }, pagination: { page: 1, pageSize: 1 } }), // priced

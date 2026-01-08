@@ -29,7 +29,7 @@ const OrdersTable = () => {
   const PageSize = searchParams.get("PageSize") || 30;
   const OrderStatusLookupId = searchParams.get("OrderStatusLookupId") || "";
 
-  const [updateOrderStatus, { isLoading: isUpdating }] = useProviderProjectStateMutation();
+  const [updateOrderStatus] = useProviderProjectStateMutation();
   const [processingOrderId, setProcessingOrderId] = useState(null);
 
   const {
