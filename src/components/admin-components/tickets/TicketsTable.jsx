@@ -14,13 +14,21 @@ const TicketsTable = () => {
   const { lang } = useContext(LanguageContext);
   const tr = (key, fallback) => trHelper(t, key, fallback);
   const [open, setOpen] = useState(false);
-  const { data: tickets, isLoading, refetch } = useGetTicketsQuery();
   const role = useSelector((state) => state.auth.role);
+  const { data: tickets, isLoading, isError, error, refetch } = useGetTicketsQuery(undefined, {
+    // For admin, we don't necessarily need userId, but let's be safe
+  });
 
   useEffect(() => {
-    refetch();
+    if (role === "Admin") {
+      refetch();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);
+
+  if (isError) {
+    console.error("Admin TicketsTable error:", error);
+  }
 
   const columns = [
     {

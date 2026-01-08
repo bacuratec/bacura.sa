@@ -66,7 +66,7 @@ const Profile = () => {
     data: tickets,
     refetch: refetchTickets,
     isLoading: isLoadingTickets,
-  } = useGetTicketsQuery();
+  } = useGetTicketsQuery(userId, { skip: !userId });
   const { data: projectsStats } = useGetRequesterStatisticsQuery({ requesterId: data?.id }, { skip: !data?.id });
 
   const projectStatistics = [

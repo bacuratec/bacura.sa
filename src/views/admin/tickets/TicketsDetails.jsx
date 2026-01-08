@@ -17,7 +17,7 @@ const TicketsDetails = () => {
     window.scrollTo(0, 0);
   }, []);
   const { id } = useParams();
-  const { data: ticket, isLoading, refetch } = useGetTicketDetailsQuery(id);
+  const { data: ticket, isLoading, refetch } = useGetTicketDetailsQuery(id, { skip: !id });
   const status = ticket?.ticketStatus?.id;
   const [onToggleStatus, { isLoading: isLoadingUpdate }] =
     useUpdateTicketStatusMutation();

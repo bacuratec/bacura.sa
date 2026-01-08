@@ -19,9 +19,10 @@ const TicketDetails = ({ ticketId }) => {
 
     const userId = useSelector((state) => state.auth.userId);
 
-    const { data: ticket, isLoading: isLoadingTicket } = useGetTicketDetailsQuery(ticketId);
-    const { data: messages, isLoading: isLoadingMessages, refetch } = useGetTicketMessagesQuery(ticketId, {
-        pollingInterval: 5000 // Poll every 5s for new messages
+    const { data: ticket, isLoading: isLoadingTicket, isError: isTicketError } = useGetTicketDetailsQuery(ticketId, { skip: !ticketId });
+    const { data: messages, isLoading: isLoadingMessages, refetch, isError: isMessagesError } = useGetTicketMessagesQuery(ticketId, {
+        pollingInterval: 5000, // Poll every 5s for new messages
+        skip: !ticketId
     });
     const [sendMessage, { isLoading: isSending }] = useSendTicketMessageMutation();
 

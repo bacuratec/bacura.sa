@@ -25,15 +25,24 @@ const Tickets = () => {
     data: tickets,
     refetch,
     isLoading: isLoadingTickets,
-  } = useGetTicketsQuery(userId);
+    isError,
+    error
+  } = useGetTicketsQuery(userId, { skip: !userId });
 
   useEffect(() => {
-    refetch();
+    if (role && userId) {
+      refetch();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role]);
+  }, [role, userId]);
 
   if (isLoadingTickets) {
     return <LoadingPage />;
+  }
+
+  if (isError) {
+    console.error("Tickets error:", error);
+    // Continue to render empty state or error message instead of being stuck
   }
 
   return (
