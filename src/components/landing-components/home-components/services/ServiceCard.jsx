@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import OptimizedImage from "@/components/shared/OptimizedImage";
 import { ServiceIcon } from "@/constants/servicesData";
