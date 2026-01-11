@@ -59,6 +59,7 @@ const AboutComponent = () => {
             </ul>
 
             <h3 className="font-bold text-lg">{t("about.fieldsTitle")}</h3>
+            <p className="text-[#F1F1F1]">{t("about.fieldsIntro")}</p>
             <ul className="list-disc list-inside space-y-1">
               {t("about.fields", { returnObjects: true }).map((item, index) => (
                 <li key={index}>{item}</li>
@@ -66,6 +67,7 @@ const AboutComponent = () => {
             </ul>
 
             <h3 className="font-bold text-lg">{t("about.servicesTitle")}</h3>
+            <p className="text-[#F1F1F1]">{t("about.servicesIntro")}</p>
             <ul className="list-decimal list-inside space-y-1">
               {t("about.services", { returnObjects: true }).map(
                 (item, index) => (
