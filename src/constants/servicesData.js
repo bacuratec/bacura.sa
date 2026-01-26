@@ -13,17 +13,8 @@ import {
 
 export const PLATFORM_SERVICES = [
     {
-        id: 1,
-        name_ar: 'خدمة تنفيذ',
-        name_en: 'Execution Service',
-        description_ar: 'تنفيذ المشاريع الإنشائية والمعمارية بأعلى معايير الجودة والدقة.',
-        description_en: 'Execution of construction and architectural projects with the highest quality and precision.',
-        icon: Hammer,
-        color: '#1b6b91ab'
-    },
-    {
         id: 2,
-        name_ar: 'خدمة توريد',
+        name_ar: 'خدمة التوريد',
         name_en: 'Supply Service',
         description_ar: 'توريد أجود المواد والمعدات اللازمة للمشاريع الإنشائية.',
         description_en: 'Supply of high-quality materials and equipment for construction projects.',
@@ -31,35 +22,44 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
+        id: 1,
+        name_ar: 'خدمة التنفيذ',
+        name_en: 'Implementation Service',
+        description_ar: 'تنفيذ المشاريع الإنشائية والمعمارية بأعلى معايير الجودة والدقة.',
+        description_en: 'Execution of construction and architectural projects with the highest quality and precision.',
+        icon: Hammer,
+        color: '#1b6b91ab'
+    },
+    {
         id: 3,
-        name_ar: 'عقود صيانه',
-        name_en: 'Maintenance Contracts',
+        name_ar: 'خدمة الصيانة',
+        name_en: 'Maintenance Service',
         description_ar: 'تقديم خدمات الصيانة الدورية والطارئة لضمان استدامة المنشآت.',
         description_en: 'Providing periodic and emergency maintenance services to ensure facility sustainability.',
         icon: Wrench,
         color: '#1b6b91ab'
     },
     {
-        id: 4,
-        name_ar: 'إستشارة',
-        name_en: 'Consultation',
-        description_ar: 'تقديم استشارات مهنية متخصصة في المجالات الهندسية والتقنية.',
-        description_en: 'Providing professional specialized consulting in engineering and technical fields.',
-        icon: MessageSquare,
-        color: '#1b6b91ab'
-    },
-    {
         id: 5,
-        name_ar: 'دراسة مشاريع',
-        name_en: 'Project Study',
+        name_ar: 'خدمة تشخيص ودراسة المشاريع',
+        name_en: 'Project Diagnosis and Study',
         description_ar: 'إعداد دراسات جدوى وتحليلات فنية متكاملة للمشاريع قبل البدء.',
         description_en: 'Preparing feasibility studies and integrated technical analysis for projects before starting.',
         icon: FileText,
         color: '#1b6b91ab'
     },
     {
+        id: 8,
+        name_ar: 'خدمة إدارة المشاريع',
+        name_en: 'Project Management',
+        description_ar: 'إدارة متكاملة للمشاريع من التخطيط وحتى التسليم النهائي.',
+        description_en: 'Integrated project management from planning to final delivery.',
+        icon: Briefcase,
+        color: '#1b6b91ab'
+    },
+    {
         id: 6,
-        name_ar: 'إشراف مشاريع',
+        name_ar: 'خدمة الإشراف على المشاريع',
         name_en: 'Project Supervision',
         description_ar: 'الإشراف الفني المباشر على مراحل التنفيذ لضمان مطابقة المواصفات.',
         description_en: 'Direct technical supervision of execution stages to ensure specification compliance.',
@@ -67,21 +67,21 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 7,
-        name_ar: 'تدريب',
-        name_en: 'Training',
-        description_ar: 'برامج تدريبية متخصصة لتطوير المهارات الهندسية والفنية.',
-        description_en: 'Specialized training programs to develop engineering and technical skills.',
-        icon: GraduationCap,
+        id: 4,
+        name_ar: 'خدمة الاستشارات',
+        name_en: 'Consulting Service',
+        description_ar: 'تقديم استشارات مهنية متخصصة في المجالات الهندسية والتقنية.',
+        description_en: 'Providing professional specialized consulting in engineering and technical fields.',
+        icon: MessageSquare,
         color: '#1b6b91ab'
     },
     {
-        id: 8,
-        name_ar: 'إدارة مشاريع',
-        name_en: 'Project Management',
-        description_ar: 'إدارة متكاملة للمشاريع من التخطيط وحتى التسليم النهائي.',
-        description_en: 'Integrated project management from planning to final delivery.',
-        icon: Briefcase,
+        id: 7,
+        name_ar: 'خدمة التدريب',
+        name_en: 'Training Service',
+        description_ar: 'برامج تدريبية متخصصة لتطوير المهارات الهندسية والفنية.',
+        description_en: 'Specialized training programs to develop engineering and technical skills.',
+        icon: GraduationCap,
         color: '#1b6b91ab'
     }
 ];

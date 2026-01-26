@@ -21,7 +21,7 @@ const ServiceCard = ({ icon, title, description, index, isActive, color }) => {
         <ServiceIcon icon={icon} color={color} size={32} />
 
         {isActive === false ? (
-          <span className="text-xs text-red-600 font-bold">غير متاحة حالياً</span>
+          <span className="text-xs text-red-600 font-bold">قريباً سيتم إطلاقها</span>
         ) : (
           <span className="text-xs text-green-600 font-bold">متاحة</span>
         )}
