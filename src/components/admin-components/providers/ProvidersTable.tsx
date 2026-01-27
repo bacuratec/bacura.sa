@@ -184,7 +184,6 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
         },
         {
             name: t("orders.columns.status"),
-            center: true,
             cell: (row: any) => {
                 const status = row.profile_status;
                 const statusId = status?.id || row.profile_status_id;
@@ -196,7 +195,7 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                 else colors = "bg-gray-50 text-gray-700 border-gray-100 ring-gray-500/10";
 
                 return (
-                    <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
+                    <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center justify-center gap-2 ${colors}`}>
                         <span className={`w-2 h-2 rounded-full ${statusId === 201 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-current'}`} />
                         {lang === "ar" ? status?.name_ar || "غير معروف" : status?.name_en || "Unknown"}
                     </div>
@@ -205,7 +204,6 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
         },
         {
             name: t("orders.columns.action"),
-            center: true,
             width: "180px",
             cell: (row: any) => {
                 const statusId = row.profile_status?.id || row.profile_status_id;

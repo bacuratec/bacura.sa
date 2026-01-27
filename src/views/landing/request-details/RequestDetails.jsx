@@ -206,7 +206,7 @@ const RequestDetails = ({ initialData, id }) => {
             </div>
 
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm p-10">
-              <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
+              <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} isClient={true} />
             </div>
 
             {/* Attachments - Now Fixed in Main Content per User Request */}

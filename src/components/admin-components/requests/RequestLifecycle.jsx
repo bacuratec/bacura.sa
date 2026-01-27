@@ -11,132 +11,141 @@ const RequestLifecycle = ({ request }) => {
 
     if (!request) return null;
 
-    // Status Codes mapping
-    // 7: Pending (New)
-    // 8: Priced
-    // 21: Waiting Payment (or Accepted by user)
-    // 204: Paid
-    // 207: Under Review (Maybe between New and Priced?)
-    // 11: Completed
-    // 17, 18, 13: Project statuses (Provider assigned etc)
+    // Helper to format currency
+    function formatPrice(price) {
+        return new Intl.NumberFormat(lang === 'ar' ? 'ar-SA' : 'en-US', {
+            style: 'currency',
+            currency: 'SAR',
+            maximumFractionDigits: 0
+        }).format(price);
+    }
 
-    // We want to visualize: Received -> Priced -> Paid -> Provider Assigned -> Completed
-    // Or: Received -> Priced -> Paid -> Completed (Provider Assignment is parallel)
+    // Helper to format date
+    function formatDate(date) {
+        if (!date) return null;
+        return dayjs(date).format("DD/MM/YYYY");
+    }
 
-    /* 
-      Steps:
-      1. New (Received)
-      2. Priced (Admin Action)
-      3. Paid (User Action)
-      4. Execution (Provider Working)
-      5. Completed
-    */
+    // Status Checkers
+    const isPriced = !!request.admin_price || !!request.servicePrice; // Assuming admin_price is the one
+    const isPaid = request.payment_status === 'paid' || request.status?.code === 'paid' || [204, 11, 13, 15, 17, 18].includes(request.status_id);
+    const isExecution = [11, 13, 15, 17, 18].includes(request.status_id) || request.provider_response === 'accepted';
+    const isCompleted = request.status_id === 11 || request.status?.code === 'completed';
 
+    // Steps Definition
     const steps = [
         {
             id: "new",
-            label: t("requestSteps.new") || "بيانات الطلب",
+            label: "طلب جديد",
             icon: <Clock className="w-5 h-5" />,
-            status: "completed", // Always completed if request exists
+            status: "completed", // Always valid if we see the request
             date: request.created_at,
-            description: t("requestSteps.newDesc") || "تم استلام الطلب",
+            description: t("requestSteps.received", "تم استلام الطلب"),
         },
         {
             id: "priced",
-            label: t("requestSteps.priced") || "التسعير",
+            label: "مرحلة التسعير",
             icon: <DollarSign className="w-5 h-5" />,
-            status: request.admin_price ? "completed" : "current", // If price set, completed
-            date: request.updated_at, // Use updated_at logic
-            description: request.admin_price ? `${formatPrice(request.admin_price)} SAR` : (t("requestSteps.pricedPending") || "بانتظار التسعير"),
+            status: isPriced ? "completed" : "current",
+            date: isPriced ? request.updated_at : null, // Approximate
+            description: isPriced
+                ? formatPrice(request.admin_price || request.servicePrice)
+                : t("requestSteps.waitingPrice", "بانتظار التسعير"),
         },
         {
             id: "paid",
-            label: t("requestSteps.payment") || "الدفع",
+            label: "مرحلة الدفع",
             icon: <CheckCircle2 className="w-5 h-5" />,
-            status: isPaid(request) ? "completed" : (request.admin_price ? "current" : "pending"),
-            date: request.payment_status === "paid" ? request.updated_at : null,
-            description: isPaid(request) ? (t("requestSteps.paidDone") || "تم الدفع") : (t("requestSteps.paidPending") || "بانتظار الدفع"),
+            status: isPaid ? "completed" : (isPriced ? "current" : "pending"),
+            date: isPaid ? (request.payment_date || request.updated_at) : null,
+            description: isPaid
+                ? t("requestSteps.paid", "تم الدفع")
+                : t("requestSteps.waitingPayment", "بانتظار الدفع"),
         },
         {
             id: "execution",
-            label: t("requestSteps.execution") || "التنفيذ",
+            label: "مرحلة التنفيذ",
             icon: <UserCheck className="w-5 h-5" />,
-            status: isProjectStarted(request) || request.provider_response === 'accepted' ? "completed" : (isPaid(request) ? "current" : "pending"),
-            description: request.provider_response === 'accepted'
-                ? (t("requestSteps.providerAccepted") || "تم قبول الطلب من " + (request.provider?.name || ""))
-                : request.provider_response === 'rejected'
-                    ? (t("requestSteps.providerRejected") || "تم الرفض من المزود")
-                    : request.provider
-                        ? (t("requestSteps.waitingProvider") || "بانتظار موافقة " + request.provider.name)
-                        : (t("requestSteps.providerPending") || "تعيين مزود"),
+            status: isExecution ? "completed" : (isPaid ? "current" : "pending"),
+            date: isExecution ? (request.provider_assigned_at || request.updated_at) : null,
+            description: isExecution
+                ? (request.provider?.name ? `${t("requestSteps.with", "مع")} ${request.provider.name}` : t("requestSteps.processing", "جاري التنفيذ"))
+                : t("requestSteps.waitingExecution", "قيد الانتظار"),
         },
         {
             id: "completed",
-            label: t("requestSteps.completed") || "الإكمال",
+            label: "مكتمل",
             icon: <Check className="w-5 h-5" />,
-            status: isCompleted(request) ? "completed" : "pending",
-            date: request.completed_at,
-            description: isCompleted(request) ? (t("requestSteps.completedDone") || "تم الإكمال") : "",
+            status: isCompleted ? "completed" : (isExecution ? "current" : "pending"),
+            date: isCompleted ? (request.completed_at || request.updated_at) : null,
+            description: isCompleted
+                ? t("requestSteps.done", "تم الإنجاز")
+                : "",
         }
     ];
 
-    function formatPrice(price) {
-        return new Intl.NumberFormat(lang === 'ar' ? 'ar-SA' : 'en-US').format(price);
-    }
-
-    function isPaid(req) {
-        return req.status?.code === 'paid' || req.payment_status === 'paid' || [204, 11, 13, 15, 17, 18, 19, 20].includes(req.status_id);
-    }
-
-    function isProjectStarted(req) {
-        // If status is one of project statuses
-        return [11, 13, 15, 17, 18].includes(req.status_id);
-    }
-
-    function isCompleted(req) {
-        return req.status_id === 11 || req.status_id === 15; // 11 is 'completed' in requests, 15 is 'completed' in orders?
-    }
-
     return (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <h3 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
+        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 mb-8 overflow-hidden relative">
+            {/* Decorative Background */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-0" />
+
+            <h3 className="text-xl font-bold mb-10 text-gray-800 flex items-center gap-3 relative z-10">
+                <span className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center border border-green-100">
+                    <CheckCircle2 className="w-6 h-6" />
+                </span>
                 {t("requestLifecycle.title") || "دورة حياة الطلب"}
             </h3>
 
-            <div className="relative">
-                <div className="absolute top-5 left-0 right-0 h-1 bg-gray-100 rounded-full -z-0">
-                    {/* Progress Bar Background */}
-                </div>
+            <div className="relative px-4">
+                {/* Connecting Line - Background */}
+                <div className="absolute top-6 left-0 right-0 h-1 bg-gray-100 rounded-full -z-0 mx-10" />
 
-                {/* Progress Bar Foreground - simple logic for now */}
-                {/* <div className="absolute top-5 transition-all duration-500 h-1 bg-green-500 rounded-full -z-0" style={{ width: '50%' }}></div> */}
+                {/* Connecting Line - Progress (Green) */}
+                {/* This would need dynamic width calculation based on "completed" steps count */}
+                <div
+                    className="absolute top-6 right-0 h-1 bg-green-500 rounded-full -z-0 mx-10 transition-all duration-1000 ease-out rtl:left-auto rtl:origin-right ltr:origin-left"
+                    style={{
+                        width: `${(steps.filter(s => s.status === 'completed').length / (steps.length - 1)) * 100}%`
+                    }}
+                />
 
                 <div className="flex justify-between relative z-10 w-full">
-                    {steps.map((step) => {
+                    {steps.map((step, idx) => {
                         const isCompleted = step.status === 'completed';
                         const isCurrent = step.status === 'current';
-                        const isPending = step.status === 'pending';
+                        // const isPending = step.status === 'pending';
 
-                        let colorClass = isCompleted ? "bg-green-500 text-white ring-green-100" : (isCurrent ? "bg-blue-600 text-white ring-blue-100" : "bg-white text-gray-300 border-2 border-gray-200");
-                        if (isPending) colorClass = "bg-white text-gray-300 border-2 border-gray-200";
+                        let circleClass = "bg-white border-2 border-gray-200 text-gray-300";
+                        let ringClass = "";
+
+                        if (isCompleted) {
+                            circleClass = "bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/30";
+                        } else if (isCurrent) {
+                            circleClass = "bg-white border-2 border-blue-500 text-blue-500 animate-pulse";
+                            ringClass = "ring-4 ring-blue-500/10";
+                        }
 
                         return (
-                            <div key={step.id} className="flex flex-col items-center flex-1">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ring-4 ring-opacity-50 ${colorClass}`}>
-                                    {step.icon}
+                            <div key={step.id} className="flex flex-col items-center relative group min-w-[100px]">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 z-20 ${circleClass} ${ringClass}`}>
+                                    {isCompleted ? <Check className="w-6 h-6" strokeWidth={3} /> : step.icon}
                                 </div>
-                                <div className={`mt-3 text-center transition-all duration-300 ${isCurrent ? 'scale-105' : ''}`}>
-                                    <p className={`text-xs font-bold ${isCompleted ? 'text-green-700' : (isCurrent ? 'text-blue-700' : 'text-gray-400')}`}>
+
+                                <div className={`mt-4 text-center transition-all duration-300 flex flex-col items-center gap-1 ${isCurrent ? 'transform scale-105' : ''}`}>
+                                    <span className={`text-sm font-bold ${isCompleted ? 'text-green-700' : (isCurrent ? 'text-blue-700' : 'text-gray-400')}`}>
                                         {step.label}
-                                    </p>
-                                    <p className="text-[10px] text-gray-500 max-w-[80px] mt-1 leading-tight mx-auto">
-                                        {step.description}
-                                    </p>
-                                    {step.date && (
-                                        <p className="text-[9px] text-gray-400 mt-1 font-mono">
-                                            {dayjs(step.date).format("DD/MM/YYYY")}
-                                        </p>
+                                    </span>
+
+                                    {step.description && (
+                                        <span className="text-xs text-gray-500 font-medium bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100 max-w-[120px] truncate">
+                                            {step.description}
+                                        </span>
+                                    )}
+
+                                    {isCompleted && step.date && (
+                                        <span className="text-[10px] text-gray-400 font-mono mt-1 dir-ltr">
+                                            {formatDate(step.date)}
+                                        </span>
                                     )}
                                 </div>
                             </div>

@@ -65,7 +65,8 @@ const ProviderProjectsDetails = () => {
       orderStatus: projectData?.status || {
         id: projectData.order_status_id,
         nameAr: projectData.status?.name_ar,
-        nameEn: projectData.status?.name_en
+        nameEn: projectData.status?.name_en,
+        code: projectData.status?.code // Include code
       },
       description: projectData?.request?.description || projectData?.order_title,
       startDate: projectData?.start_date || projectData?.request?.created_at || projectData?.created_at || null,

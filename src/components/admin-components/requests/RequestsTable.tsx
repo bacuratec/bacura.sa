@@ -194,7 +194,7 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
                 const statusId = status?.id || row.status_id;
 
                 let colors = "";
-                if (statusId === 11) colors = "bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-500/10";
+                if ([11, 18, 13].includes(statusId)) colors = "bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-500/10";
                 else if (statusId === 7) colors = "bg-blue-50 text-blue-700 border-blue-100 ring-blue-500/10";
                 else if (statusId === 10) colors = "bg-rose-50 text-rose-700 border-rose-100 ring-rose-500/10";
                 else if (statusId === 21) colors = "bg-amber-50 text-amber-700 border-amber-100 ring-amber-500/10";
@@ -203,7 +203,7 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
                 return (
                     <div className="w-full flex justify-center">
                         <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
-                            <span className={`w-2 h-2 rounded-full ${statusId === 7 ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-current'}`} />
+                            <span className={`w-2 h-2 rounded-full ${[7].includes(statusId) ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : [11, 18, 13].includes(statusId) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-current'}`} />
                             {lang === "ar" ? status?.name_ar || "-" : status?.name_en || "-"}
                         </div>
                     </div>

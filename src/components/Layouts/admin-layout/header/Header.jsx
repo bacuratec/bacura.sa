@@ -16,7 +16,7 @@ import logoutIcon from "../../../../assets/icons/logout.svg";
 import notifications from "../../../../assets/icons/notifications.svg";
 import { getAppBaseUrl } from "../../../../utils/env";
 
-const Header = ({ data }) => {
+const Header = ({ data, collapsed }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const token = useSelector((state) => state.auth.token);
@@ -40,7 +40,8 @@ const Header = ({ data }) => {
       : (typeof userImg === "string" ? userImg : (userImg?.src || ""));
 
   return (
-    <header className="lg:mr-[250px] sticky top-0 right-0 bg-white py-6 border-b-2 border-b-[#E7E7E7] z-[500]">
+    <header className={`sticky top-0 right-0 bg-white py-4 border-b border-gray-100 z-[500] transition-all duration-300 ease-in-out ${collapsed ? "lg:mr-[88px]" : "lg:mr-[280px]"
+      }`}>
       <div className="container">
         <div className="flex items-center justify-between gap-7">
           <Link

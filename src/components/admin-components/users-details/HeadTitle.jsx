@@ -84,6 +84,32 @@ const HeadTitle = ({
       border: "#B2EECC",
       text: "#17663AB2",
     },
+    // Added project statuses
+    15: { // Completed
+      bg: "#EEFBF4",
+      border: "#B2EECC",
+      text: "#17663AB2",
+    },
+    13: { // Ongoing
+      bg: "#F7F7F8",
+      border: "#D1D1DB",
+      text: "#066F1D",
+    },
+    17: { // Pending
+      bg: "#FFF9EB",
+      border: "#FFDA85",
+      text: "#C78F0B",
+    },
+    18: { // Approved
+      bg: "#EEFBF4",
+      border: "#B2EECC",
+      text: "#17663AB2",
+    },
+    19: { // Rejected
+      bg: "#FEF0F4",
+      border: "#FBB1C4",
+      text: "#D50B3E",
+    },
   };
   const projectCurrentStyle = projectStatusStyles[statusProject];
 
