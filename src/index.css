@@ -43,7 +43,7 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
-  background-color: #F6D447;
+  background-color: #F3BF45;
   border-radius: 50%;
   cursor: pointer;
 }
@@ -52,7 +52,7 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  background-color: #F6D447;
+  background-color: #F3BF45;
   border-radius: 50%;
   cursor: pointer;
 }
@@ -167,11 +167,11 @@ main {
   }
 
   .btn-blue {
-    @apply bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-60;
+    @apply bg-primary text-white hover:bg-primary/90 disabled:opacity-60;
   }
 
   .btn-yellow {
-    @apply bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-60;
+    @apply bg-secondary text-white hover:bg-secondary/90 disabled:opacity-60;
   }
 
   .btn-danger {

@@ -152,7 +152,7 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
             cell: (row: any) => (
                 <div className="flex flex-col gap-2 py-3">
                     <div className="flex items-center gap-2 group cursor-pointer">
-                        <div className="p-1.5 bg-blue-50 text-blue-500 rounded-lg group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <div className="p-1.5 bg-primary/5 text-primary rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
                             <Mail className="w-3.5 h-3.5" />
                         </div>
                         <a href={`mailto:${row.user?.email || row.email}`} className="text-xs font-medium text-gray-600 group-hover:text-primary truncate max-w-[180px]">
@@ -236,7 +236,7 @@ const ProvidersTable = ({ stats }: ProvidersTableProps) => {
                         )}
                         <Link
                             href={`/admin/providers/${row.id}`}
-                            className="group relative p-2.5 bg-white text-blue-600 rounded-xl border border-blue-100 shadow-sm hover:bg-blue-600 hover:text-white transition-all duration-300"
+                            className="group relative p-2.5 bg-white text-primary rounded-xl border border-primary/10 shadow-sm hover:bg-primary hover:text-white transition-all duration-300"
                             title={t("providers.view")}
                         >
                             <Eye className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />

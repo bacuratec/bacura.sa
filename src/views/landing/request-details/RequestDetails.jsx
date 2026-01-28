@@ -190,10 +190,11 @@ const RequestDetails = ({ initialData, id }) => {
             </div>
 
             {/* Quick Actions / Help Sidebar */}
-            <div className="bg-gradient-to-br from-primary to-blue-700 rounded-[32px] p-8 text-white shadow-xl">
-              <h4 className="font-black text-lg mb-2">{t("common.needHelp") || "هل تحتاج مساعدة؟"}</h4>
-              <p className="text-white/70 text-sm mb-6">{t("common.supportDesc") || "فريقنا متواجد دائماً لخدمتك ومتابعة طلبك"}</p>
-              <a href="/support" className="block w-full text-center bg-white text-primary py-3 rounded-xl font-black text-sm hover:bg-gray-50 transition-colors">
+            <div className="bg-gradient-to-br from-[#1967AE] to-[#155490] rounded-[32px] p-8 text-white shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+              <h4 className="font-black text-lg mb-2 relative z-10">{t("common.needHelp") || "هل تحتاج مساعدة؟"}</h4>
+              <p className="text-white/80 text-sm mb-6 relative z-10 font-medium">{t("common.supportDesc") || "فريقنا متواجد دائماً لخدمتك ومتابعة طلبك"}</p>
+              <a href="/support" className="relative z-10 block w-full text-center bg-[#F3BF45] text-gray-900 py-3 rounded-xl font-black text-sm hover:bg-[#ffcf5c] transition-colors shadow-lg">
                 {t("common.contactSupport") || "تواصل بالدعم الفني"}
               </a>
             </div>
@@ -229,7 +230,7 @@ const RequestDetails = ({ initialData, id }) => {
                 <div className="rounded-[40px] border border-gray-100 p-10 bg-white shadow-custom animate-fade-in-up">
                   <div className="flex items-center justify-between mb-8 border-b border-gray-50 pb-6">
                     <div className="text-xl text-gray-900 font-black flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-xl text-primary">
+                      <div className="p-2 bg-secondary/10 rounded-xl text-secondary">
                         <Star className="w-5 h-5 fill-current" />
                       </div>
                       {t("requestDetails.adminOffer") || "عرض السعر من الإدارة"}
@@ -238,9 +239,9 @@ const RequestDetails = ({ initialData, id }) => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     {typeof data?.admin_price === "number" && (
-                      <div className="bg-primary/5 p-6 rounded-[32px] border border-primary/10">
-                        <span className="text-[10px] font-black uppercase text-primary/60 tracking-[0.2em] block mb-2">{t("pricing.total") || "السعر الإجمالي"}</span>
-                        <div className="text-4xl font-black text-primary">
+                      <div className="bg-[#1967AE]/5 p-6 rounded-[32px] border border-[#1967AE]/10">
+                        <span className="text-[10px] font-black uppercase text-[#1967AE]/60 tracking-[0.2em] block mb-2">{t("pricing.total") || "السعر الإجمالي"}</span>
+                        <div className="text-4xl font-black text-[#1967AE]">
                           {formatCurrency(Number(data.admin_price), lang)}
                         </div>
                       </div>
@@ -254,7 +255,7 @@ const RequestDetails = ({ initialData, id }) => {
                         className="flex flex-col justify-center bg-gray-50 hover:bg-gray-100 p-6 rounded-[32px] border border-gray-100 transition-all group"
                       >
                         <span className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] block mb-2">{t("pricing.proposal") || "ملخص العرض"}</span>
-                        <div className="flex items-center gap-3 text-gray-900 font-black group-hover:text-primary transition-colors">
+                        <div className="flex items-center gap-3 text-gray-900 font-black group-hover:text-[#1967AE] transition-colors">
                           <div className="p-2 bg-white rounded-xl shadow-sm">
                             <Download className="w-5 h-5" />
                           </div>
@@ -277,8 +278,8 @@ const RequestDetails = ({ initialData, id }) => {
 
             {/* Respond Action */}
             {data?.admin_price && !data?.requester_accepted_price && !data?.requester_rejection_reason && (statusCode === "priced" || data?.requestStatus?.id === 8) && (
-              <div className="rounded-[40px] bg-gray-900 p-10 text-white shadow-2xl animate-fade-in-up relative overflow-hidden">
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2"></div>
+              <div className="rounded-[40px] bg-[#1967AE] p-10 text-white shadow-2xl animate-fade-in-up relative overflow-hidden">
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/2"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
                   <div className="flex-1">
                     <h3 className="text-2xl font-black mb-3">{t("requestDetails.actionRequired") || "بانتظار قرارك النهائي"}</h3>
@@ -286,7 +287,7 @@ const RequestDetails = ({ initialData, id }) => {
                   </div>
                   <div className="flex gap-4 w-full md:w-auto">
                     <button
-                      className="flex-1 md:flex-none bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white px-12 py-5 rounded-2xl font-black text-lg shadow-2xl hover:shadow-emerald-500/50 transform hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                      className="flex-1 md:flex-none bg-gradient-to-r from-[#F3BF45] to-[#f5c960] hover:from-[#e0ae3b] hover:to-[#e0ae3b] text-gray-900 px-12 py-5 rounded-2xl font-black text-lg shadow-2xl hover:shadow-[#F3BF45]/30 transform hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                       onClick={async () => {
                         await respondPrice({ requestId, accepted: true, statusId: 21 }).unwrap();
                         toast.success(t("requestDetails.priceAccepted"));
@@ -294,12 +295,12 @@ const RequestDetails = ({ initialData, id }) => {
                       }}
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                       {t("common.accept") || "قبول العرض"}
                     </button>
                     <button
-                      className="flex-1 md:flex-none bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-5 rounded-2xl font-bold text-lg hover:bg-white/20 transition-all"
+                      className="flex-1 md:flex-none bg-white/5 backdrop-blur-md text-white border border-white/10 px-8 py-5 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all hover:border-white/20"
                       onClick={async () => {
                         const reason = window.prompt(t("requestDetails.rejectReason") || "سبب الرفض؟");
                         if (reason) {
@@ -317,13 +318,13 @@ const RequestDetails = ({ initialData, id }) => {
 
             {/* Rejection Note */}
             {data?.requester_rejection_reason && (
-              <div className="rounded-[32px] border border-rose-100 bg-rose-50/30 p-8 flex gap-6 items-center border-dashed">
-                <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm shrink-0">
+              <div className="rounded-[32px] border border-red-100 bg-red-50/30 p-8 flex gap-6 items-center border-dashed">
+                <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 shadow-sm shrink-0">
                   <XCircle className="w-7 h-7" />
                 </div>
                 <div>
-                  <p className="text-rose-900 font-black text-xl mb-1">{t("requestDetails.youRejected") || "تم رفض العرض"}</p>
-                  <p className="text-rose-600/70 font-medium">{t("requestDetails.reason") || "السبب"}: {data.requester_rejection_reason}</p>
+                  <p className="text-red-900 font-black text-xl mb-1">{t("requestDetails.youRejected") || "تم رفض العرض"}</p>
+                  <p className="text-red-600/70 font-medium">{t("requestDetails.reason") || "السبب"}: {data.requester_rejection_reason}</p>
                 </div>
               </div>
             )}
@@ -333,7 +334,7 @@ const RequestDetails = ({ initialData, id }) => {
               <div className="bg-white rounded-[40px] shadow-custom border border-gray-100 p-10 overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-secondary to-primary" />
                 <div className="mb-10 text-center">
-                  <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                  <div className="w-20 h-20 bg-[#1967AE]/5 text-[#1967AE] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
                     <CreditCard className="w-10 h-10" />
                   </div>
                   <h3 className="text-3xl font-black text-gray-900">{tr("payment.title", "الدفع")}</h3>
@@ -355,7 +356,7 @@ const RequestDetails = ({ initialData, id }) => {
 
                 {/* Completion Trigger for Seeker */}
                 {statusCode === "under_review" && !isCompleted && (
-                  <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[40px] p-10 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div className="bg-gradient-to-br from-[#1967AE] to-[#155490] rounded-[40px] p-10 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="space-y-2">
                       <h3 className="text-2xl font-black">{t("requestDetails.isDone") || "هل تم استلام العمل بنجاح؟"}</h3>
                       <p className="text-white/70 font-medium">{t("requestDetails.completeConfirmPrompt") || "إذا كنت راضياً عن النتائج، يرجى إغلاق المشروع للانتقال لمرحلة التقييم"}</p>
@@ -363,7 +364,7 @@ const RequestDetails = ({ initialData, id }) => {
                     <button
                       onClick={handleCompleteProject}
                       disabled={isCompleting}
-                      className="bg-white text-emerald-700 px-12 py-5 rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all transform active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-white text-[#1967AE] px-12 py-5 rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all transform active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isCompleting ? (
                         <>

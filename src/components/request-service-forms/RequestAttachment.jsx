@@ -267,7 +267,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
 
         {requesterPaymentFiles.length > 0 && (
           <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-2 text-emerald-600 font-bold">
+            <div className="flex items-center gap-2 text-[#1967AE] font-bold">
               <Receipt className="w-4 h-4" />
               <h4 className="text-base">
                 {t(
@@ -286,9 +286,9 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
 
             {/* Premium Details table for receipts */}
             <div className="mt-2 overflow-hidden bg-white border border-gray-100 rounded-[2rem] shadow-sm">
-              <div className="bg-emerald-50/30 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h5 className="text-sm font-black text-emerald-800 uppercase tracking-wider">{t("RequestAttachment.receiptDetails") || "تفاصيل الدفعات"}</h5>
-                <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-full">
+              <div className="bg-[#1967AE]/5 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h5 className="text-sm font-black text-[#1967AE] uppercase tracking-wider">{t("RequestAttachment.receiptDetails") || "تفاصيل الدفعات"}</h5>
+                <span className="px-3 py-1 bg-[#1967AE]/10 text-[#1967AE] text-[10px] font-black rounded-full">
                   {requesterPaymentFiles.length} {t("common.files") || "ملفات"}
                 </span>
               </div>
@@ -308,7 +308,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
                       <tr key={it.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                            <div className="w-8 h-8 rounded-lg bg-[#1967AE]/5 flex items-center justify-center text-[#1967AE]">
                               <Receipt className="w-4 h-4" />
                             </div>
                             <span className="font-bold text-gray-700 max-w-[200px] truncate">
@@ -331,7 +331,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
                               href={getPublicUrl(it.file_path || it.filePathUrl)}
                               target="_blank"
                               rel="noreferrer"
-                              className="p-2 bg-white text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                              className="p-2 bg-white text-gray-600 border border-gray-100 rounded-xl hover:bg-[#1967AE] hover:text-white hover:border-[#1967AE] transition-all shadow-sm group"
                               title={t("common.download") || "تحميل"}
                             >
                               <Download className="w-4 h-4" />
@@ -340,7 +340,7 @@ const RequestAttachment = ({ attachments, onDeleted, requestId: propsRequestId }
                               <>
                                 <button
                                   onClick={() => handleAcceptReceipt(it)}
-                                  className="p-2 bg-white text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                                  className="p-2 bg-white text-[#1967AE] border border-[#1967AE]/30 rounded-xl hover:bg-[#1967AE] hover:text-white transition-all shadow-sm"
                                   title={t("common.accept") || "قبول"}
                                 >
                                   <Check className="w-4 h-4" />

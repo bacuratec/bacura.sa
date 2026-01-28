@@ -166,13 +166,13 @@ export default function Page() {
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50" disabled={!table || isLoading}>
+          <button onClick={load} className="bg-primary text-white px-4 py-2 rounded disabled:opacity-50" disabled={!table || isLoading}>
             {t("Load")}
           </button>
           <button onClick={insert} className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50" disabled={!table || !valuesJson || isLoading}>
             {t("Insert")}
           </button>
-          <button onClick={update} className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50" disabled={!table || !valuesJson || isLoading}>
+          <button onClick={update} className="bg-secondary text-white px-4 py-2 rounded disabled:opacity-50" disabled={!table || !valuesJson || isLoading}>
             {t("Update")}
           </button>
           <button onClick={remove} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50" disabled={!table || isLoading}>

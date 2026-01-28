@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage: {
-        bgSlide: "linear-gradient(309deg, #F4BE2C -26.98%, #F8EDDF 268.72%)",
+        bgSlide: "linear-gradient(135deg, #1967AE 0%, #28415F 100%)",
         bgside: "linear-gradient(180deg, #A399E6, #DF7F6E)",
       },
       boxShadow: {
@@ -24,7 +24,7 @@ module.exports = {
         custom: "5px",
       },
       colors: {
-        mainColor: "#F5D446",
+        mainColor: "#F3BF45",
         text_color: "#000",
         primary: "#1967AE",
         secondary: "#F3BF45",

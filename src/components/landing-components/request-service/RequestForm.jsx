@@ -153,7 +153,21 @@ const RequestForm = ({ services }) => {
 
       // 3. تحديد الخدمة المختارة (قاعدة: طلب واحد مرتبط بخدمة واحدة)
       const selectedServiceId = values.selectedServices?.[0];
-      const selectedService = services.find((s) => String(s.id) === String(selectedServiceId));
+      let selectedService = services.find((s) => String(s.id) === String(selectedServiceId));
+
+      // Fallback: search in PLATFORM_SERVICES if not found in DB list (for title/display purposes)
+      if (!selectedService) {
+        const platformMatch = PLATFORM_SERVICES.find(s => String(s.id) === String(selectedServiceId));
+        if (platformMatch) {
+          selectedService = {
+            ...platformMatch,
+            name_ar: platformMatch.name_ar,
+            name_en: platformMatch.name_en,
+            base_price: platformMatch.base_price || 0 // Ensure price exists
+          };
+        }
+      }
+
       if (!selectedServiceId || !selectedService) {
         toast.error("يجب اختيار خدمة واحدة على الأقل");
         return;
@@ -520,7 +534,7 @@ const RequestForm = ({ services }) => {
                   {!showPayment && (
                     <button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 py-4 rounded-2xl text-white font-black text-base hover:scale-[1.02] transition-all shadow-2xl hover:shadow-purple-500/50 active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary py-4 rounded-2xl text-white font-black text-base hover:scale-[1.02] transition-all shadow-2xl hover:shadow-primary/50 active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={loadingCreateOrder || loadingCreateOrderPriced}
                     >
                       {loadingCreateOrder || loadingCreateOrderPriced ? (
@@ -563,9 +577,9 @@ const RequestForm = ({ services }) => {
                   <button
                     type="button"
                     onClick={() => handleNext(validateForm, setTouched)}
-                    className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-800 transition-all"
+                    className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-all"
                   >
-                    {t("next") || "التالي"}
+                    {tr("next", "التالي")}
                     <ArrowLeft size={20} className="rtl:rotate-180" />
                   </button>
                 )}

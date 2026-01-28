@@ -2,8 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 
 // Next.js uses process.env for environment variables
 // In Next.js, environment variables prefixed with NEXT_PUBLIC_ are available at build time and runtime
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // التحقق من وجود المتغيرات المطلوبة
 const validUrl = supabaseUrl?.trim() || '';
@@ -13,7 +13,7 @@ const validAnonKey = supabaseAnonKey?.trim() || '';
 // في build time (server-side)، لا نرمي خطأ لتجنب فشل البناء
 // في runtime (client-side)، نعرض تحذير فقط ولا نرمي خطأ إلا عند الاستخدام الفعلي
 if (!validUrl || !validAnonKey) {
-  const errorMessage = 
+  const errorMessage =
     "\n" +
     "╔════════════════════════════════════════════════════════════════╗\n" +
     "║  ⚠️  Supabase Configuration Missing                            ║\n" +
@@ -29,7 +29,7 @@ if (!validUrl || !validAnonKey) {
     "   https://app.supabase.com/project/_/settings/api\n\n" +
     "💡 Tip: Environment variables in Netlify are secure and not exposed in git.\n" +
     "═══════════════════════════════════════════════════════════════════\n";
-  
+
   // في build time (server-side)، نعرض تحذير فقط
   if (typeof window === 'undefined') {
     console.warn(errorMessage);
@@ -44,12 +44,12 @@ if (!validUrl || !validAnonKey) {
 export const supabase =
   validUrl && validAnonKey
     ? createClient(validUrl, validAnonKey, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        },
-        db: { schema: "public" },
-        global: { headers: { "x-client-info": "bacura-amal-frontend" } },
-      })
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+      db: { schema: "public" },
+      global: { headers: { "x-client-info": "bacura-amal-frontend" } },
+    })
     : null;

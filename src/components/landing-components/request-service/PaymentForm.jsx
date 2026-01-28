@@ -11,18 +11,18 @@ import { getStripePublishableKey } from "@/utils/env";
 
 const stripePublishableKey = getStripePublishableKey() || null;
 
-// فقط حمّل Stripe إذا كان المفتاح موجوداً وصحيحاً
-const stripePromise = stripePublishableKey && stripePublishableKey.trim() 
-  ? loadStripe(stripePublishableKey.trim()) 
-  : null;
+// فقط حمّل Stripe إذا كان المفتاح موجوداً وصحيحاً وليس مجرد نص مؤقت
+const isStripeKeyValid = stripePublishableKey && stripePublishableKey.trim() && !stripePublishableKey.includes("xxxx");
+const stripePromise = isStripeKeyValid ? loadStripe(stripePublishableKey.trim()) : null;
 
 export default function PaymentForm({ amount, consultationId, refetch }) {
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
   const [clientSecret, setClientSecret] = useState("");
-  const [paymentId, setPaymentId] = useState(null); // Store DB Payment ID
+  const [paymentId, setPaymentId] = useState(null);
   const [createPayment, { isLoading, error }] = useCreatePaymentMutation();
-  const [fallback, setFallback] = useState(false);
+  // Force fallback if Stripe key is invalid
+  const [fallback, setFallback] = useState(!isStripeKeyValid);
 
   useEffect(() => {
     // إذا لم يكن Stripe متوفراً، لا تفعل شيء
@@ -39,9 +39,9 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ amount, currency: "sar" }),
         });
-        
+
         const paymentData = await response.json();
-        
+
         if (!response.ok) {
           setFallback(true);
           throw new Error(paymentData.error || "Failed to create payment intent");
@@ -61,11 +61,11 @@ export default function PaymentForm({ amount, consultationId, refetch }) {
           paymentMethod: "stripe",
           paymentStatus: "pending",
         }).unwrap();
-        
+
         if (dbPayment?.data?.id) {
-            setPaymentId(dbPayment.data.id);
+          setPaymentId(dbPayment.data.id);
         } else if (dbPayment?.id) {
-             setPaymentId(dbPayment.id);
+          setPaymentId(dbPayment.id);
         }
 
         // 3. Show Form

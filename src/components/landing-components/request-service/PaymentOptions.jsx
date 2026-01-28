@@ -24,7 +24,7 @@ export default function PaymentOptions({ amount, requestId, attachmentsGroupKey,
   const { t } = useTranslation();
   const { lang } = useContext(LanguageContext);
   const tr = (k, f) => trHelper(t, k, f);
-  const [method, setMethod] = useState("bank");
+  const [method, setMethod] = useState("card");
   const [createPayment, { isLoading }] = useCreatePaymentMutation();
   const [files, setFiles] = useState([]);
   const [notes, setNotes] = useState("");
@@ -221,15 +221,21 @@ export default function PaymentOptions({ amount, requestId, attachmentsGroupKey,
 
                 <div className="flex justify-between items-center text-sm relative z-10">
                   <span className="text-gray-400 font-bold">{tr("payment.bankName", "اسم البنك")}:</span>
-                  <span className="font-black text-gray-900">بنك الراجحي</span>
+                  <span className="font-black text-gray-900">البنك الأهلي السعودي</span>
+                </div>
+                <div className="flex justify-between items-center text-sm relative z-10 border-t border-gray-50 pt-4">
+                  <span className="text-gray-400 font-bold">{tr("payment.accName", "اسم الحساب")}:</span>
+                  <div className="flex flex-col items-end">
+                    <span className="font-black text-gray-900">شركة باكورة التقنيات للمقاولات</span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center text-sm relative z-10 border-t border-gray-50 pt-4">
                   <span className="text-gray-400 font-bold">{tr("payment.accNumber", "رقم الحساب")}:</span>
-                  <span className="font-black text-gray-900 font-mono tracking-wider text-base">123456789012345</span>
+                  <span className="font-black text-gray-900 font-mono tracking-wider text-base">49400000475403</span>
                 </div>
                 <div className="flex justify-between items-center text-sm relative z-10 border-t border-gray-50 pt-4">
                   <span className="text-gray-400 font-bold">IBAN:</span>
-                  <span className="font-black text-primary font-mono tracking-wider text-base uppercase">SA12 3456 7890 1234 5678 90</span>
+                  <span className="font-black text-primary font-mono tracking-wider text-xs md:text-sm uppercase">SA17 1000 0049 4000 0047 5403</span>
                 </div>
               </div>
             </div>

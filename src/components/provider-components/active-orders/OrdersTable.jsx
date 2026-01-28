@@ -100,7 +100,7 @@ const OrdersTable = () => {
     {
       name: t("orders.columns.orderNumber") || "رقم الطلب",
       cell: (row) => (
-        <span className="rounded-lg text-xs text-blue-600 font-normal">
+        <span className="rounded-lg text-xs text-primary font-normal">
           {row?.orderNumber || row?.id?.slice?.(0, 8) || "-"}
         </span>
       ),
@@ -156,7 +156,7 @@ const OrdersTable = () => {
               ${statusId === 15
                 ? "border border-[#B2EECC] bg-[#EEFBF4] text-green-800"
                 : statusId === 13
-                  ? "border border-blue-200 bg-blue-50 text-blue-700"
+                  ? "border border-primary/20 bg-primary/10 text-primary"
                   : statusId === 19 || statusId === 20
                     ? "bg-red-50 text-red-700 border border-red-100"
                     : statusId === 18
@@ -210,7 +210,7 @@ const OrdersTable = () => {
                 <button
                   onClick={() => handleStartOrder(row.id)}
                   disabled={isProcessing}
-                  className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
+                  className="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition disabled:opacity-50"
                   title={t("projects.start") || "بدء العمل"}
                 >
                   <Check className="w-4 h-4" />

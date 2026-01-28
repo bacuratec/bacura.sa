@@ -13,7 +13,7 @@ import {
 
 export const PLATFORM_SERVICES = [
     {
-        id: 2,
+        id: '00000000-0000-0000-0000-000000000002',
         name_ar: 'خدمة التوريد',
         name_en: 'Supply Service',
         description_ar: 'توريد جميع المشتريات بسعر الجملة .',
@@ -22,7 +22,7 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 1,
+        id: '00000000-0000-0000-0000-000000000001',
         name_ar: 'خدمة التنفيذ',
         name_en: 'Implementation Service',
         description_ar: 'تنفيذ عقود المشاريع باحترافية ومهنية وخدمات ما بعد البيع من استجابة سريعة.',
@@ -31,7 +31,7 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 3,
+        id: '00000000-0000-0000-0000-000000000003',
         name_ar: 'خدمة الصيانة',
         name_en: 'Maintenance Service',
         description_ar: 'عقود الصيانة العامة و الدورية .',
@@ -40,7 +40,7 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 5,
+        id: '00000000-0000-0000-0000-000000000005',
         name_ar: 'خدمة تشخيص ودراسة المشاريع',
         name_en: 'Project Diagnosis and Study',
         description_ar: 'تقديم خدمة تشخيص مشاريع أنظمة التيار الخفيف من مختصين .',
@@ -49,7 +49,7 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 8,
+        id: '00000000-0000-0000-0000-000000000008',
         name_ar: 'خدمة إدارة المشاريع',
         name_en: 'Project Management',
         description_ar: 'خدمة إدارة قسم مشاريع التيار الخفيف للمنشآت الحكومية والتجارية (تشخيص مشاريع ، إدارة ، إشراف ، توريد ، تنفيذ ، استشارات ، تدريب)',
@@ -58,7 +58,7 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 6,
+        id: '00000000-0000-0000-0000-000000000006',
         name_ar: 'خدمة الإشراف على المشاريع',
         name_en: 'Project Supervision',
         description_ar: 'الإشراف والإدارة على مشاريع أنظمة التيار الخفيف وإدارتها من بداية المشروع حتى تسليمه وإغلاقه .',
@@ -67,7 +67,7 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 4,
+        id: '00000000-0000-0000-0000-000000000004',
         name_ar: 'خدمة الاستشارات',
         name_en: 'Consulting Service',
         description_ar: 'تقديم الاستشارات من استشاريين وخبراء في أنظمة التيار الخفيف .',
@@ -76,7 +76,7 @@ export const PLATFORM_SERVICES = [
         color: '#1b6b91ab'
     },
     {
-        id: 7,
+        id: '00000000-0000-0000-0000-000000000007',
         name_ar: 'خدمة التدريب',
         name_en: 'Training Service',
         description_ar: 'تدريب المهندسين والفنيين والإداريين في المنشآت الحكومية والتجارية على أنظمة التيار الخفيف .',

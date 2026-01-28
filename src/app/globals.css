@@ -44,13 +44,13 @@ a {
   }
 
   button {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-blue-400;
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-primary;
   }
 
   input,
   textarea,
   select {
-    @apply outline-none focus:ring-2 focus:ring-blue-400;
+    @apply outline-none focus:ring-2 focus:ring-primary;
   }
 }
 
@@ -64,11 +64,11 @@ a {
   }
 
   .btn-blue {
-    @apply bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-60;
+    @apply bg-primary text-white hover:bg-primary/90 disabled:opacity-60;
   }
 
   .btn-yellow {
-    @apply bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-60;
+    @apply bg-secondary text-white hover:bg-secondary/90 disabled:opacity-60;
   }
 
   .btn-danger {
@@ -102,11 +102,11 @@ a {
   }
 
   .premium-gradient-primary {
-    background: linear-gradient(135deg, #1A71F6 0%, #0052D4 100%);
+    background: linear-gradient(135deg, #1967AE 0%, #114a7e 100%);
   }
 
   .premium-gradient-secondary {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #F3BF45 0%, #d4a02c 100%);
   }
 
   .premium-gradient-success {
@@ -114,7 +114,7 @@ a {
   }
 
   .premium-gradient-warning {
-    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    background: linear-gradient(135deg, #F3BF45 0%, #D97706 100%);
   }
 
   .premium-shadow {
@@ -140,7 +140,7 @@ a {
   }
 
   .shimmer-text {
-    background: linear-gradient(90deg, #1A71F6, #60A5FA, #1A71F6);
+    background: linear-gradient(90deg, #1967AE, #60A5FA, #1967AE);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

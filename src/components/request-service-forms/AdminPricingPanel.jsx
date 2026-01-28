@@ -4,13 +4,16 @@ import toast from "react-hot-toast";
 import { useAdminSetRequestPriceMutation, useAdminMarkRequestPaidMutation, useGetRequestDetailsQuery } from "@/redux/api/ordersApi";
 import { useTranslation } from "react-i18next";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
-import { DollarSign } from "lucide-react";
+import { useEffect, useState } from "react";
+import { DollarSign, Upload, FileText, X } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const AdminPricingPanel = ({ refetch }) => {
   const { t } = useTranslation();
   const { id } = useParams();
   const [adminSetPrice] = useAdminSetRequestPriceMutation();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState("idle"); // idle, uploading, done, error
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,28 +22,68 @@ const AdminPricingPanel = ({ refetch }) => {
   const validationSchema = Yup.object().shape({
     adminPrice: Yup.number().typeError(t("AdminPricingPanel.priceType") || "السعر غير صحيح").required(t("AdminPricingPanel.priceRequired") || "أدخل السعر"),
     adminNotes: Yup.string().nullable(),
-    adminProposalFileUrl: Yup.string()
-      .nullable()
-      .test('is-url-or-empty', t("AdminPricingPanel.urlInvalid") || "رابط غير صحيح",
-        value => !value || /^https?:\/\/.+/.test(value)
-      ),
   });
+
+  const handleFileChange = (event) => {
+    const file = event.currentTarget.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        toast.error(t("AdminPricingPanel.fileTooLarge") || "حجم الملف كبير جداً (الحد الأقصى 10 ميجابايت)");
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+  };
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
+      setUploadStatus("uploading");
+      let proposalUrl = values.adminProposalFileUrl || ""; // Keep manual URL if no file
+
+      // Handle File Upload if exists
+      if (selectedFile) {
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `proposals/${id}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('attachments')
+          .upload(fileName, selectedFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('attachments')
+          .getPublicUrl(fileName);
+
+        proposalUrl = publicUrl;
+      }
+
       await adminSetPrice({
         requestId: id,
         adminPrice: values.adminPrice,
         adminNotes: values.adminNotes,
-        adminProposalFileUrl: values.adminProposalFileUrl,
+        adminProposalFileUrl: proposalUrl,
       }).unwrap();
+
       toast.success(t("AdminPricingPanel.success") || "تم حفظ السعر والبيانات");
+      setSelectedFile(null); // Reset file
+      setUploadStatus("done");
       refetch && refetch();
       resetForm();
     } catch (error) {
+      console.error(error);
+      setUploadStatus("error");
       toast.error(error?.data?.message || t("AdminPricingPanel.error") || "حدث خطأ أثناء الحفظ");
     } finally {
       setSubmitting(false);
+      setTimeout(() => setUploadStatus("idle"), 2000);
     }
   };
 
@@ -88,28 +131,69 @@ const AdminPricingPanel = ({ refetch }) => {
 
             <div>
               <label className="block mb-1.5 text-xs font-black text-gray-400 uppercase tracking-widest px-1">
-                {t("AdminPricingPanel.proposalUrl") || "رابط العرض الفني (Drive/Dropbox)"}
+                {t("AdminPricingPanel.proposalFile") || "ملف العرض الفني"}
               </label>
-              <Field
-                name="adminProposalFileUrl"
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:border-primary/50 transition-all outline-none"
-                placeholder="https://..."
-              />
-              <ErrorMessage name="adminProposalFileUrl" component="div" className="text-red-500 text-[10px] font-bold mt-1 px-1" />
+
+              {!selectedFile ? (
+                <div className="relative group">
+                  <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:bg-gray-50/50 hover:border-primary/30 transition-all cursor-pointer">
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.png,.jpg,.jpeg"
+                    />
+                    <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
+                      <div className="w-10 h-10 bg-primary/5 rounded-full flex items-center justify-center text-primary mb-1 group-hover:scale-110 transition-transform">
+                        <Upload className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-bold text-gray-600 group-hover:text-primary transition-colors">
+                        {t("AdminPricingPanel.uploadFile") || "اضغط لرفع ملف العرض"}
+                      </span>
+                      <span className="text-[10px] text-gray-400">
+                        PDF, Excel, Word, Images (Max 10MB)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-center justify-between animate-fade-in-up">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm shrink-0">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="text-sm font-bold text-gray-900 truncate max-w-[150px]">
+                        {selectedFile.name}
+                      </span>
+                      <span className="text-[10px] text-gray-500">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB • {t("common.readyToUpload") || "جاهز للرفع"}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="p-2 hover:bg-white rounded-lg text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-4 rounded-2xl font-black text-base transition-all duration-300 hover:scale-[1.02] shadow-2xl hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
+              disabled={isSubmitting || uploadStatus === "uploading"}
+              className="w-full bg-gradient-to-r from-primary to-[#155490] hover:from-[#155490] hover:to-primary text-white py-4 rounded-2xl font-black text-base transition-all duration-300 hover:scale-[1.02] shadow-2xl hover:shadow-primary/50 disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
             >
-              {isSubmitting ? (
+              {isSubmitting || uploadStatus === "uploading" ? (
                 <>
                   <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {t("AdminPricingPanel.saving") || "جاري الحفظ..."}
+                  {selectedFile && uploadStatus === 'uploading' ? (t("AdminPricingPanel.uploading") || "جاري رفع الملف...") : (t("AdminPricingPanel.saving") || "جاري الحفظ...")}
                 </>
               ) : (
                 <>
@@ -143,10 +227,10 @@ const AdminMarkPaidAction = ({ requestId, refetch }) => {
 
   return (
     <div className="mt-6 pt-6 border-t border-gray-100">
-      <div className="flex items-center justify-between bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+      <div className="flex items-center justify-between bg-secondary/5 p-4 rounded-xl border border-secondary/20">
         <div>
-          <h4 className="font-bold text-yellow-800">{t("AdminPricingPanel.cashPayment") || "الدفع الكاش / تحويل بنكي"}</h4>
-          <p className="text-sm text-yellow-700 mt-1">
+          <h4 className="font-bold text-gray-900">{t("AdminPricingPanel.cashPayment") || "الدفع الكاش / تحويل بنكي"}</h4>
+          <p className="text-sm text-gray-500 mt-1">
             {t("AdminPricingPanel.markPaidDesc") || "يمكنك تحديث حالة الطلب إلى 'مدفوع' يدوياً في حال استلام المبلغ نقداً أو عبر تحويل."}
           </p>
         </div>
@@ -159,7 +243,7 @@ const AdminMarkPaidAction = ({ requestId, refetch }) => {
             }
           }}
           disabled={isLoading}
-          className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:shadow-green-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="bg-secondary hover:bg-secondary/90 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:shadow-secondary/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {isLoading ? (
             <>

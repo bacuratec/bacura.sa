@@ -4,14 +4,14 @@ import { LanguageContext } from "@/context/LanguageContext";
 export default function RequestStatusStepper({ status, providerResponse }) {
   const { lang } = useContext(LanguageContext);
   const rawCode = status?.code || "";
-  const currentCode = rawCode === "accepted" ? "waiting_payment" : rawCode;
+  let currentCode = rawCode === "accepted" ? "waiting_payment" : rawCode;
+  if (currentCode === 'provider_assigned') currentCode = 'pending_delivery';
 
   const steps = [
     { code: "pending", labelAr: "قيد المراجعة", labelEn: "Pending" },
     { code: "priced", labelAr: "تم التسعير", labelEn: "Priced" },
     { code: "waiting_payment", labelAr: "بانتظار الدفع", labelEn: "Waiting Payment" },
     { code: "paid", labelAr: "تم الدفع", labelEn: "Paid" },
-    { code: "provider_assigned", labelAr: "تم تعيين مزود", labelEn: "Provider Assigned" },
     { code: "pending_delivery", labelAr: "بانتظار التسليم", labelEn: "Waiting Delivery" },
     { code: "under_review", labelAr: "تحت المراجعة", labelEn: "Under Review" },
     { code: "completed", labelAr: "مكتمل", labelEn: "Completed" },
@@ -22,7 +22,7 @@ export default function RequestStatusStepper({ status, providerResponse }) {
 
   // Advance index if provider has accepted even if status is still 'paid'
   if (providerResponse === 'accepted' && currentCode === 'paid') {
-    currentIndex = steps.findIndex((s) => s.code === 'provider_assigned');
+    currentIndex = steps.findIndex((s) => s.code === 'pending_delivery');
   }
 
   return (
@@ -33,7 +33,7 @@ export default function RequestStatusStepper({ status, providerResponse }) {
 
         {/* Active Progress Line */}
         <div
-          className="absolute left-8 top-6 h-1 bg-gradient-to-r from-primary to-blue-600 rounded-full -z-10 transition-all duration-1000 ease-in-out"
+          className="absolute left-8 top-6 h-1 bg-gradient-to-r from-[#1967AE] to-[#155490] rounded-full -z-10 transition-all duration-1000 ease-in-out"
           style={{ width: `calc(${((currentIndex) / (steps.length - 1)) * 100}% - 2rem)` }}
         />
 
@@ -48,7 +48,7 @@ export default function RequestStatusStepper({ status, providerResponse }) {
                   w-12 h-12 rounded-full flex items-center justify-center border-4 
                   transition-all duration-500 z-10 
                   ${active
-                    ? "bg-gradient-to-br from-primary to-blue-700 border-white shadow-lg shadow-primary/20 scale-100"
+                    ? "bg-gradient-to-br from-[#1967AE] to-[#155490] border-white shadow-lg shadow-[#1967AE]/20 scale-100"
                     : "bg-white border-gray-100 text-gray-300 scale-90"
                   }
                   ${isCurrent ? "ring-4 ring-primary/10 scale-110" : ""}

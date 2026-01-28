@@ -162,7 +162,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       grow: 1,
       cell: (row: any) => (
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-blue-50 text-blue-500 rounded-lg">
+          <div className="p-1.5 bg-primary/5 text-primary rounded-lg">
             <User className="w-3.5 h-3.5" />
           </div>
           <span className="text-xs font-semibold text-gray-700">
@@ -205,7 +205,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
 
         let colors = "";
         if (code === 'completed' || code === 'ended') colors = "bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-500/10";
-        else if (code === 'processing' || code === 'waiting_start') colors = "bg-blue-50 text-blue-700 border-blue-100 ring-blue-500/10";
+        else if (code === 'processing' || code === 'waiting_start') colors = "bg-primary/5 text-primary border-primary/10 ring-primary/10";
         else if (code === 'rejected' || code === 'expired' || code === 'cancelled') colors = "bg-rose-50 text-rose-700 border-rose-100 ring-rose-500/10";
         else if (code === 'waiting_approval' || code === 'on-hold') colors = "bg-amber-50 text-amber-700 border-amber-100 ring-amber-500/10";
         else colors = "bg-gray-50 text-gray-700 border-gray-100 ring-gray-500/10";
@@ -213,7 +213,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
         return (
           <div className="w-full flex justify-center">
             <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border ring-4 ring-opacity-10 transition-all duration-300 flex items-center gap-2 ${colors}`}>
-              <span className={`w-2 h-2 rounded-full ${code === 'processing' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-current'}`} />
+              <span className={`w-2 h-2 rounded-full ${code === 'processing' ? 'bg-primary shadow-[0_0_8px_rgba(25,103,174,0.5)]' : 'bg-current'}`} />
               {lang === "ar" ? status?.name_ar || "-" : status?.name_en || "-"}
             </div>
           </div>
@@ -227,7 +227,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
         <div className="flex items-center justify-center gap-2">
           <Link
             href={`/admin/projects/${row.id}`}
-            className="group relative p-2.5 bg-white text-blue-600 rounded-xl border border-blue-100 shadow-sm hover:bg-blue-600 hover:text-white transition-all duration-300"
+            className="group relative p-2.5 bg-white text-primary rounded-xl border border-primary/10 shadow-sm hover:bg-primary hover:text-white transition-all duration-300"
             title={t("view")}
           >
             <Eye className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />

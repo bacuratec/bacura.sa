@@ -50,55 +50,68 @@ const RequestDetails = () => {
   }
 
   return (
-    <div className="py-8 bg-gray-50/30 min-h-screen">
+    <div className="py-10 bg-[#f9fafb] min-h-screen">
       <title>{t("requestDetails.title")}</title>
-      <div className="container px-4 md:px-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-            <Link href="/admin/requests" className="inline-flex items-center text-sm text-gray-500 hover:text-primary transition-colors gap-2 group">
-              <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-              {t("requestDetails.back") || "عودة إلى قائمة الطلبات"}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header & Breadcrumbs */}
+        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-4">
+            <Link href="/admin/requests" className="inline-flex items-center text-sm font-bold text-gray-400 hover:text-primary transition-colors gap-2 group">
+              <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+              {t("requestDetails.back") || "العودة للطلبات"}
             </Link>
-            <span className="px-3 py-1.5 rounded-lg text-xs font-mono bg-white border border-gray-200 text-gray-500 shadow-sm">
-              #{data?.id?.split('-')[0]}
-            </span>
+
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-black text-gray-900">{t("requestDetails.title")}</h1>
+              <span className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-sm font-mono text-gray-500 shadow-sm">#{data?.id?.split('-')[0]}</span>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <span>{t("requestDetails.nav1")}</span>
+              <span className="text-gray-300">/</span>
+              <span>{t("requestDetails.nav2")}</span>
+              <span className="text-gray-300">/</span>
+              <span className="text-primary font-bold">{lang === "ar" ? data?.requestStatus?.nameAr : data?.requestStatus?.nameEn}</span>
+            </div>
           </div>
 
           <HeadTitle
-            title={t("requestDetails.title")}
-            nav1={t("requestDetails.nav1")}
-            nav2={t("requestDetails.nav2")}
-            type={lang === "ar" ? data?.requestStatus?.nameAr : data?.requestStatus?.nameEn}
+            title="" // Hidden here as we used custom h1
+            nav1=""
+            nav2=""
+            type=""
             status={data?.requestStatus?.id}
+            hideTitle={true} // Add prop to HeadTitle to hide title if needed, or just let it render status badge
           />
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
 
-          {/* Main Info Columns (2/3 width) */}
-          <div className="xl:col-span-2 space-y-8">
+          {/* Main Info Columns (8 cols) */}
+          <div className="xl:col-span-8 space-y-8">
             <RequestLifecycle request={data} />
             <RequestDetailsInfo data={data} refetch={refetchRequesterDetails} />
             <RequestAttachment request={data} attachments={attachments} requestId={data?.id} onDeleted={() => refetchRequesterDetails()} />
+
             {firstApprove && (
               <AdminAttachmentForm data={data} refetch={refetchRequesterDetails} />
             )}
+
             {finalApprove && (
               <AdminCompleteRequest data={data} refetch={refetchRequesterDetails} />
             )}
           </div>
 
-          {/* Sidebar Actions (1/3 width) */}
-          <div className="xl:col-span-1 space-y-8 sticky top-6">
+          {/* Sidebar Actions (4 cols) */}
+          <div className="xl:col-span-4 space-y-6 sticky top-6">
             {/* Pricing Panel */}
-            <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <div className="transform transition-all duration-300 hover:-translate-y-1">
               <AdminPricingPanel refetch={refetchRequesterDetails} />
             </div>
 
             {/* Provider Assignment */}
-            <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <div className="transform transition-all duration-300 hover:-translate-y-1">
               <AdminAssignProviderPanel data={data} refetch={refetchRequesterDetails} />
             </div>
           </div>
