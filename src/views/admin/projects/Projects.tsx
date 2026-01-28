@@ -25,7 +25,7 @@ const Projects = () => {
 
   const statCards = [
     {
-      title: t("projects.stats.total") || t("projects.all"),
+      title: t("projects.stats.total"),
       value: projectsStats?.totalOrdersCount || 0,
       icon: <Briefcase className="w-6 h-6" />,
       color: "from-blue-500 to-blue-600",
@@ -33,7 +33,7 @@ const Projects = () => {
       textColor: "text-blue-600",
     },
     {
-      title: t("projects.stats.ongoing") || t("projects.processing"),
+      title: t("projects.stats.ongoing"),
       value: projectsStats?.ongoingOrdersCount || 0,
       icon: <Clock className="w-6 h-6" />,
       color: "from-amber-500 to-amber-600",
@@ -41,7 +41,7 @@ const Projects = () => {
       textColor: "text-amber-600",
     },
     {
-      title: t("projects.stats.completed") || t("projects.completed"),
+      title: t("projects.stats.completed"),
       value: projectsStats?.completedOrdersCount || 0,
       icon: <CheckCircle2 className="w-6 h-6" />,
       color: "from-emerald-500 to-emerald-600",
@@ -49,7 +49,7 @@ const Projects = () => {
       textColor: "text-emerald-600",
     },
     {
-      title: t("projects.stats.rejected") || t("projects.rejected"),
+      title: t("projects.stats.rejected"),
       value: projectsStats?.rejectedOrdersCount || 0,
       icon: <XCircle className="w-6 h-6" />,
       color: "from-rose-500 to-rose-600",

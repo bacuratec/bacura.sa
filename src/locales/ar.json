@@ -160,7 +160,13 @@
     "submitting": "جاري الإرسال...",
     "successMessage": "تم تنفيذ العملية بنجاح",
     "errorMessage": "حدث خطأ أثناء تنفيذ العملية",
-    "providerRequired": "يجب اختيار مقدم خدمة"
+    "providerRequired": "يجب اختيار مقدم خدمة",
+    "stats": {
+      "total": "إجمالي المشاريع",
+      "ongoing": "مشاريع جارية",
+      "completed": "مشاريع مكتملة",
+      "rejected": "مشاريع مرفوضة"
+    }
   },
   "providersTable": {
     "tabs": {
@@ -592,6 +598,9 @@
     "service": "الخدمة",
     "date": "التاريخ",
     "status": "الحالة",
+    "client": "العميل",
+    "provider": "المزود",
+    "attachments": "المرفقات",
     "noAttachments": "لا توجد مرفقات",
     "needHelp": "تحتاج مساعدة؟",
     "supportDesc": "فريق الدعم لدينا متاح لمساعدتك في أي وقت.",

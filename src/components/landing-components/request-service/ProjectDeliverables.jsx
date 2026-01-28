@@ -64,91 +64,99 @@ const ProjectDeliverables = ({ orderId, isProvider = false }) => {
                 </div>
             </div>
 
-            <div className="divide-y divide-gray-50">
-                {deliverables.map((item, index) => (
-                    <div key={item.id} className="p-8 transition-all hover:bg-gray-50/30 group">
-                        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-                            <div className="flex-1">
-                                <div className="flex flex-wrap items-center gap-3 mb-3">
+            <div className="overflow-x-auto">
+                <table className="w-full text-right">
+                    <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase font-bold tracking-wider">
+                        <tr>
+                            <th className="px-6 py-4 whitespace-nowrap w-16 text-center">#</th>
+                            <th className="px-6 py-4 whitespace-nowrap">{t("common.title") || "المرحلة / العنوان"}</th>
+                            <th className="px-6 py-4 whitespace-nowrap">{t("common.date") || "التاريخ"}</th>
+                            <th className="px-6 py-4 whitespace-nowrap">{t("common.status") || "الحالة"}</th>
+                            <th className="px-6 py-4 whitespace-nowrap">{t("common.attachments") || "المرفقات"}</th>
+                            <th className="px-6 py-4 whitespace-nowrap">{t("common.actions") || "الإجراءات"}</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                        {deliverables.map((item, index) => (
+                            <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
+                                <td className="px-6 py-5 align-top">
                                     <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200">
                                         {index + 1}
                                     </div>
-                                    <h4 className="font-bold text-gray-900 text-xl">{item.title}</h4>
+                                </td>
+                                <td className="px-6 py-5 align-top">
+                                    <h4 className="font-bold text-gray-900 text-base mb-1">{item.title}</h4>
+                                    {item.description && (
+                                        <p className="text-sm text-gray-500 line-clamp-2 hover:line-clamp-none transition-all duration-300 max-w-xs leading-relaxed">
+                                            {item.description}
+                                        </p>
+                                    )}
+                                    {item.requester_response && (
+                                        <div className={`mt-3 p-3 rounded-xl text-xs w-fit max-w-xs animate-fade-in ${item.status === 'rejected' ? 'bg-rose-50 text-rose-700 border border-rose-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                                            }`}>
+                                            <span className="font-bold block mb-1">{t("common.feedback") || "ملاحظات العميل"}:</span>
+                                            <span className="italic">"{item.requester_response}"</span>
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="px-6 py-5 align-top whitespace-nowrap text-sm text-gray-500 font-medium">
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="w-4 h-4 text-gray-300" />
+                                        <span className="dir-ltr">{dayjs(item.created_at).format("YYYY-MM-DD")}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-400 mt-1 mr-6 dir-ltr">{dayjs(item.created_at).format("HH:mm")}</div>
+                                </td>
+                                <td className="px-6 py-5 align-top">
                                     <StatusBadge status={item.status} t={t} />
-                                </div>
-                                {item.description && (
-                                    <div className="bg-gray-50/50 rounded-2xl p-4 text-gray-600 leading-relaxed border border-gray-100/50 mb-4 max-w-3xl">
-                                        {item.description}
-                                    </div>
-                                )}
-
-                                <div className="flex flex-wrap items-center gap-6 text-xs text-gray-500 mt-6">
-                                    <div className="flex items-center gap-2 group-hover:text-primary transition-colors">
-                                        <div className="p-1.5 bg-gray-100 rounded-lg">
-                                            <Clock className="w-4 h-4" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-gray-400 font-bold uppercase">{t("common.date") || "التاريخ"}</span>
-                                            <span className="font-bold">{dayjs(item.created_at).format("YYYY-MM-DD HH:mm")}</span>
-                                        </div>
-                                    </div>
-
-                                    {item.delivery_file_url && (
+                                </td>
+                                <td className="px-6 py-5 align-top">
+                                    {item.delivery_file_url ? (
                                         <a
                                             href={item.delivery_file_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center gap-3 bg-primary/5 hover:bg-primary/10 text-primary px-4 py-2 rounded-xl font-black transition-all transform hover:-translate-y-0.5"
+                                            className="inline-flex items-center gap-2 bg-primary/5 hover:bg-primary/10 text-primary px-3 py-2 rounded-lg text-xs font-bold transition-all border border-primary/10 hover:border-primary/20"
                                         >
-                                            <Download className="w-4 h-4" />
-                                            {t("common.downloadFile") || "تحميل الملف المرفق"}
+                                            <Download className="w-3.5 h-3.5" />
+                                            {t("common.download") || "تحميل"}
                                         </a>
+                                    ) : (
+                                        <span className="text-gray-300 text-xs italic">--</span>
                                     )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col items-stretch md:items-end gap-3 min-w-[200px] w-full md:w-auto">
-                                {/* Actions for Requester Only */}
-                                {!isProvider && (item.status === 'pending' || item.status === 'under_review') && (
-                                    <div className="flex flex-col gap-3 w-full">
-                                        <button
-                                            disabled={isUpdating}
-                                            onClick={() => handleStatusUpdate(item.id, 'accepted')}
-                                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/20 active:scale-95"
-                                        >
-                                            <CheckCircle className="w-5 h-5" />
-                                            {t("common.accept") || "قبول الإنجاز"}
-                                        </button>
-                                        <button
-                                            disabled={isUpdating}
-                                            onClick={() => {
-                                                const reason = window.prompt(t("deliverables.rejectReason") || "سبب الرفض؟");
-                                                if (reason !== null) {
-                                                    handleStatusUpdate(item.id, 'rejected', reason);
-                                                }
-                                            }}
-                                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-rose-500 font-bold rounded-2xl hover:bg-rose-50 transition border-2 border-rose-50 active:scale-95"
-                                        >
-                                            <XCircle className="w-5 h-5" />
-                                            {t("common.revisions") || "طلب تعديلات"}
-                                        </button>
-                                    </div>
-                                )}
-
-                                {item.requester_response && (
-                                    <div className={`p-4 rounded-2xl text-sm w-full animate-fade-in ${item.status === 'rejected' ? 'bg-rose-50 text-rose-700 border border-rose-100 shadow-sm shadow-rose-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm shadow-emerald-100'
-                                        }`}>
-                                        <div className="flex items-center gap-2 mb-1.5">
-                                            <div className={`w-1.5 h-4 rounded-full ${item.status === 'rejected' ? 'bg-rose-400' : 'bg-emerald-400'}`}></div>
-                                            <span className="font-black uppercase text-[10px] tracking-wider">{t("common.feedback") || "ملاحظات العميل"}</span>
+                                </td>
+                                <td className="px-6 py-5 align-top">
+                                    {!isProvider && (item.status === 'pending' || item.status === 'under_review') ? (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                disabled={isUpdating}
+                                                onClick={() => handleStatusUpdate(item.id, 'accepted')}
+                                                title={t("common.accept") || "قبول"}
+                                                className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition border border-emerald-100"
+                                            >
+                                                <CheckCircle className="w-5 h-5" />
+                                            </button>
+                                            <button
+                                                disabled={isUpdating}
+                                                onClick={() => {
+                                                    const reason = window.prompt(t("deliverables.rejectReason") || "سبب الرفض؟");
+                                                    if (reason !== null) {
+                                                        handleStatusUpdate(item.id, 'rejected', reason);
+                                                    }
+                                                }}
+                                                title={t("common.reject") || "رفض"}
+                                                className="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition border border-rose-100"
+                                            >
+                                                <XCircle className="w-5 h-5" />
+                                            </button>
                                         </div>
-                                        <p className="font-medium leading-relaxed italic">"{item.requester_response}"</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                                    ) : (
+                                        <span className="text-gray-300 text-xs">--</span>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

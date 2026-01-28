@@ -91,7 +91,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
 
   const tabs = [
     {
-      name: t("all"),
+      name: t("projects.stats.total") || t("all"),
       href: "/admin/projects",
       numbers: stats?.totalOrdersCount || 0,
       color: "#637381",
@@ -109,19 +109,19 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       color: "#F59E0B",
     },
     {
-      name: t("projects.processing") || "تحت التنفيذ",
+      name: t("projects.stats.ongoing") || t("projects.processing"),
       href: "/admin/projects?OrderStatusLookupId=processing",
       numbers: stats?.ongoingOrdersCount || 0,
       color: "#b76f21",
     },
     {
-      name: t("projects.completed") || "مكتمل",
+      name: t("projects.stats.completed") || t("projects.completed"),
       href: "/admin/projects?OrderStatusLookupId=completed",
       numbers: stats?.completedOrdersCount || 0,
       color: "#007867",
     },
     {
-      name: t("projects.rejected") || "مرفوض",
+      name: t("projects.stats.rejected") || t("projects.rejected"),
       href: "/admin/projects?OrderStatusLookupId=rejected",
       numbers: stats?.rejectedOrdersCount || 0,
       color: "#B71D18",
@@ -129,6 +129,15 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
   ];
 
   const columns = [
+    {
+      name: "#",
+      width: "80px",
+      cell: (row: any, index: number) => (
+        <span className="font-bold text-gray-400">
+          {index + 1}
+        </span>
+      ),
+    },
     {
       name: t("projects.orderNumber"),
       width: "120px",
@@ -139,7 +148,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       ),
     },
     {
-      name: t("projects.serviceType"),
+      name: t("common.service") || t("projects.serviceType"),
       grow: 1.5,
       cell: (row: any) => (
         <div className="flex items-center gap-3 py-2">
@@ -158,7 +167,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       ),
     },
     {
-      name: t("projects.requester"),
+      name: t("common.client") || t("projects.requester"),
       grow: 1,
       cell: (row: any) => (
         <div className="flex items-center gap-2">
@@ -172,7 +181,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       ),
     },
     {
-      name: t("projects.provider"),
+      name: t("common.provider") || t("projects.provider"),
       grow: 1,
       cell: (row: any) => (
         <div className="flex items-center gap-2">
@@ -186,7 +195,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       ),
     },
     {
-      name: t("projects.startDate"),
+      name: t("common.date") || t("projects.startDate"),
       cell: (row: any) => (
         <div className="flex items-center gap-2 text-gray-500">
           <Calendar className="w-4 h-4 text-gray-400" />
@@ -197,8 +206,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       ),
     },
     {
-      name: t("projects.orderStatus"),
-      // center: true, // Removed to fix console error
+      name: t("common.status") || t("projects.orderStatus"),
       cell: (row: any) => {
         const status = row.status;
         const code = status?.code;
@@ -221,7 +229,7 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
       },
     },
     {
-      name: t("projects.action"),
+      name: t("common.actions") || t("projects.action"),
       width: "150px",
       cell: (row: any) => (
         <div className="flex items-center justify-center gap-2">

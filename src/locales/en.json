@@ -115,7 +115,13 @@
     "submitting": "Submitting...",
     "successMessage": "Operation completed successfully",
     "errorMessage": "An error occurred during the operation",
-    "providerRequired": "Service provider is required"
+    "providerRequired": "Service provider is required",
+    "stats": {
+      "total": "Total Projects",
+      "ongoing": "Ongoing Projects",
+      "completed": "Completed Projects",
+      "rejected": "Rejected Projects"
+    }
   },
   "providersTable": {
     "tabs": {
@@ -1097,6 +1103,25 @@
     "deleting": "Deleting...",
     "uploading": "Uploading...",
     "processing": "Processing..."
+  },
+  "common": {
+    "viewAll": "View All",
+    "service": "Service",
+    "date": "Date",
+    "status": "Status",
+    "client": "Client",
+    "provider": "Provider",
+    "noAttachments": "No Attachments",
+    "needHelp": "Need Help?",
+    "supportDesc": "Our support team is available to help you anytime.",
+    "contactSupport": "Contact Support",
+    "reject": "Reject",
+    "accept": "Accept",
+    "download": "Download",
+    "readyToUpload": "Ready to Upload",
+    "delete": "Delete",
+    "files": "Files",
+    "actions": "Actions"
   },
   "city": "City",
   "all": "All",

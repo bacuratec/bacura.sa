@@ -81,7 +81,8 @@ const RequestDetails = () => {
             nav2=""
             type=""
             status={data?.requestStatus?.id}
-            hideTitle={true} // Add prop to HeadTitle to hide title if needed, or just let it render status badge
+            hideTitle={true}
+            hideBreadcrumbs={true}
           />
         </div>
 
