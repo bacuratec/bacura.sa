@@ -1,108 +1,111 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getMoyasarPublishableKey, getMoyasarCallbackUrl } from "@/utils/env";
+import { getMoyasarCallbackUrl } from "@/utils/env";
 
 export default function MoyasarInlineForm({ amount, requestId }) {
   const { t } = useTranslation();
-  // Use user provided key as hardcoded fallback if env read fails
-  const publishable = (getMoyasarPublishableKey() || "pk_test_V1Lb6Faw9ccLDmDT5brsz3GHQa7r6FDzEHNgptXk").trim();
+  // Using user provided test key as fallback
+  const publishable = "pk_test_V1Lb6Faw9ccLDmDT5brsz3GHQa7r6FDzEHNgptXk";
   const callbackUrl = getMoyasarCallbackUrl();
-  const containerRef = useRef(null);
-  const [status, setStatus] = useState('loading'); // loading, ready, error
+  const [init, setInit] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    let checkInterval;
-
-    const initMoyasar = () => {
-      if (window.Moyasar && containerRef.current && status !== 'ready') {
-        try {
-          // Clear previous contents if any
-          containerRef.current.innerHTML = '';
-
-          const minor = Math.round(Number(amount) * 100);
-          const desc = (t("payment.title") || "الدفع") + (requestId ? ` (#${requestId})` : "");
-
-          console.log("Initializing Moyasar with:", { amount: minor, currency: 'SAR', desc });
-
-          window.Moyasar.init({
-            element: containerRef.current,
-            amount: minor,
-            currency: "SAR",
-            description: desc,
-            publishable_api_key: publishable,
-            callback_url: callbackUrl,
-            methods: ["creditcard", "mada", "applepay"],
-          });
-          setStatus('ready');
-        } catch (e) {
-          console.error("Moyasar init error:", e);
-        }
-      }
-    };
-
-    if (!publishable || !amount) {
-      console.error("Missing Moyasar config", { publishable, amount });
-      setStatus('error');
-      return;
-    }
-
-    const scriptUrl = "https://cdn.moyasar.com/mpf/1.7.1/moyasar.js";
-    const cssUrl = "https://cdn.moyasar.com/mpf/1.7.1/moyasar.css";
-
-    // Load CSS
+    // 1. Load CSS
     if (!document.getElementById("moyasar-css")) {
       const link = document.createElement("link");
       link.id = "moyasar-css";
       link.rel = "stylesheet";
-      link.href = cssUrl;
+      link.href = "https://cdn.moyasar.com/mpf/1.14.0/moyasar.css";
       document.head.appendChild(link);
     }
 
-    // Load JS
+    // 2. Load Script logic
+    const handleScriptLoad = () => {
+      console.log("Moyasar script loaded event");
+      setInit(true);
+    };
+
+    const handleScriptError = () => {
+      console.error("Moyasar script load error");
+      setError("فشل الاتصال ببوابة الدفع. يرجى التحقق من الانترنت وتحديث الصفحة.");
+    };
+
     if (window.Moyasar) {
-      initMoyasar();
+      setInit(true);
     } else {
-      if (!document.getElementById("moyasar-script")) {
-        const script = document.createElement("script");
+      let script = document.getElementById("moyasar-script");
+      if (!script) {
+        script = document.createElement("script");
         script.id = "moyasar-script";
-        script.src = scriptUrl;
+        script.src = "https://cdn.moyasar.com/mpf/1.14.0/moyasar.js";
         script.async = true;
-        script.onload = initMoyasar;
-        script.onerror = () => setStatus('error');
         document.body.appendChild(script);
-      } else {
-        // Script already added but maybe loading
-        checkInterval = setInterval(() => {
-          if (window.Moyasar) {
-            clearInterval(checkInterval);
-            initMoyasar();
-          }
-        }, 200);
+      }
+
+      script.addEventListener("load", handleScriptLoad);
+      script.addEventListener("error", handleScriptError);
+
+      // Polling fallback in case event was missed or script already loading
+      const interval = setInterval(() => {
+        if (window.Moyasar) {
+          setInit(true);
+          clearInterval(interval);
+        }
+      }, 500);
+
+      return () => {
+        script.removeEventListener("load", handleScriptLoad);
+        script.removeEventListener("error", handleScriptError);
+        clearInterval(interval);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (init && window.Moyasar) {
+      const minor = Math.round(Number(amount) * 100);
+      const desc = (t("payment.title") || "الدفع") + (requestId ? ` (#${requestId})` : "");
+
+      try {
+        // Ensure container is empty before init to avoid duplicates
+        const container = document.querySelector('.mysr-form');
+        if (container) container.innerHTML = '';
+
+        console.log("Initializing Moyasar Form...", { amount: minor, desc });
+        window.Moyasar.init({
+          element: '.mysr-form',
+          amount: minor,
+          currency: 'SAR',
+          description: desc,
+          publishable_api_key: publishable,
+          callback_url: callbackUrl,
+          methods: ['creditcard', 'mada']
+        });
+      } catch (e) {
+        console.error("Moyasar Init Exception", e);
+        setError("حدث خطأ أثناء تهيئة نموذج الدفع");
       }
     }
-
-    return () => {
-      if (checkInterval) clearInterval(checkInterval);
-    };
-  }, [publishable, amount, callbackUrl, requestId]);
+  }, [init, amount, requestId, publishable, callbackUrl, t]);
 
   if (!publishable || !amount) {
     return <div className="p-4 text-red-500 bg-red-50 rounded-lg">خطأ في إعدادات الدفع: البيانات ناقصة</div>;
   }
 
+  if (error) {
+    return <div className="p-4 text-red-500 bg-red-50 rounded-lg">{error}</div>;
+  }
+
   return (
-    <div className="w-full relative min-h-[350px]">
-      {status === 'loading' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50/50 rounded-xl z-20">
-          <svg className="animate-spin h-8 w-8 text-primary mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span className="text-sm font-bold text-gray-500">جاري تحميل بوابة الدفع...</span>
+    <div className="w-full relative min-h-[300px]">
+      {!init && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50/50 rounded-xl z-20 pointer-events-none">
+          <span className="text-sm font-bold text-gray-500">جاري تجهيز بوابة الدفع...</span>
         </div>
       )}
-      {/* Use simple div ref for strict init */}
-      <div ref={containerRef} className="mysr-form relative z-10 p-1"></div>
+
+      <div className="mysr-form relative z-10"></div>
     </div>
   );
 }
