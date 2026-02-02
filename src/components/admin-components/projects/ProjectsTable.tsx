@@ -132,9 +132,9 @@ const ProjectsTable = ({ stats, requesterId }: ProjectsTableProps) => {
     {
       name: "#",
       width: "80px",
-      cell: (row: any, index: number) => (
+      cell: (row: any, index?: number) => (
         <span className="font-bold text-gray-400">
-          {index + 1}
+          {index ? index + 1 : "-"}
         </span>
       ),
     },
