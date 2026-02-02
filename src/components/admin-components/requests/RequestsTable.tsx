@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import CustomDataTable from "../../shared/datatable/DataTable";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { Eye, Edit, Trash, Calendar, Tag, User, MapPin, MessageCircle } from "lucide-react";
@@ -131,7 +131,14 @@ const RequestsTable = ({ stats }: RequestsTableProps) => {
         },
     ];
 
-    const columns = [
+    type Column = {
+        name: string;
+        width?: string;
+        grow?: number;
+        cell: (row: any, index?: number) => React.JSX.Element;
+    };
+
+    const columns: Column[] = [
         {
             name: t("orders.columns.orderNumber"),
             width: "120px",
