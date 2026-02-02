@@ -8,7 +8,7 @@ export interface Column {
   name: string
   width?: string
   selector?: (row: any) => any
-  cell?: (row: any) => any
+  cell?: (row: any, index?: number, column?: any, id?: string | number) => any
   wrap?: boolean
   sortable?: boolean
   ignoreRowClick?: boolean
