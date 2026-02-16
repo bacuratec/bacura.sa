@@ -1,5 +1,5 @@
 import { updateSession } from '@/utils/supabase/middleware'
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server.js'
 
 export async function proxy(request) {
     // Update the session and get the user

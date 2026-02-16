@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server.js";
 import { supabaseAdmin } from "@/lib/supabase";
 /**
  * Create Moyasar Invoice and return redirect URL

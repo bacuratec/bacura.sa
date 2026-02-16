@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server.js";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(req) {
@@ -60,11 +60,11 @@ export async function POST(req) {
       },
       requestStatus: reqRow.status
         ? {
-            id: reqRow.status.id,
-            nameAr: reqRow.status.name_ar,
-            nameEn: reqRow.status.name_en,
-            code: reqRow.status.code,
-          }
+          id: reqRow.status.id,
+          nameAr: reqRow.status.name_ar,
+          nameEn: reqRow.status.name_en,
+          code: reqRow.status.code,
+        }
         : null,
       attachments,
     };

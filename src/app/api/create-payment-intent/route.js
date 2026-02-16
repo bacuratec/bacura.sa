@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server.js";
 import Stripe from "stripe";
 
 export async function POST(request) {
