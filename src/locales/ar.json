@@ -125,6 +125,7 @@
   },
   "projects": {
     "pageTitle": "إدارة المشاريع",
+    "title": "المشاريع",
     "pageDescription": "هنا تجد المشاريع الخاصه بطالبين الخدمات",
     "projectDetailsTitle": "تفاصيل المشروع رقم",
     "projectManagement": "إدارة المشاريع",
@@ -910,8 +911,9 @@
     "description": "هنا تجد جميع الأسئلة الشائعة"
   },
   "homeAdmin": {
-    "title": "الصفحه الرئيسية",
+    "title": "الصفحة الرئيسية",
     "description": "مرحبًا بك في باكورة – مسؤول",
+    "performance": "الأداء العام",
     "financialTransactions": "المعاملات المالية",
     "requests": "الطلبات",
     "users": "المستخدمين",
@@ -930,7 +932,13 @@
     "wholesale": "طلب توريد جملة",
     "totalAmount": "إجمالي المبالغ",
     "consultationAmount": "مبالغ الاستشارات",
-    "otherAmount": "غير ذلك"
+    "otherAmount": "غير ذلك",
+    "activity": "آخر النشاطات",
+    "wallet": "المحفظة",
+    "quickActions": "إجراءات سريعة",
+    "quickActionsDesc": "إدارة العمليات اليومية بكفاءة عالية وبنقرة واحدة.",
+    "generateReport": "إنشاء تقرير فوري",
+    "addService": "إضافة خدمة جديدة"
   },
   "ourRates": {
     "title": "تقييماتي",
