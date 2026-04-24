@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const HeadTitle = ({
   title,
@@ -12,6 +13,7 @@ const HeadTitle = ({
   statusProject,
   hideBreadcrumbs = false,
 }) => {
+  const { t } = useTranslation();
   const role = (useSelector((s) => s.auth.role) || "").toLowerCase();
 
   const requestStatusStyles = {
@@ -137,7 +139,7 @@ const HeadTitle = ({
                   <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 </svg>
               </span>
-              <span className="text-xs font-bold">الصفحه الرئيسية</span>
+              <span className="text-xs font-bold">{t("nav.home") || "الصفحة الرئيسية"}</span>
             </Link>
             <span className="text-[#898A8D] text-xs">&gt;</span>
             <span className="text-[#898A8D] text-xs">{nav1}</span>

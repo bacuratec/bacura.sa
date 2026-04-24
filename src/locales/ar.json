@@ -273,7 +273,28 @@
     "block": "حظر",
     "activate": "تفعيل",
     "user_blocked_success": "تم حظر المستخدم بنجاح!",
-    "user_activated_success": "تم تفعيل المستخدم بنجاح!"
+    "user_activated_success": "تم تفعيل المستخدم بنجاح!",
+    "role": "نوع المستخدم (الدور)",
+    "account_status": "حالة الحساب",
+    "user_id": "رقم المعرّف (ID)",
+    "commercial_info": "معلومات السجل التجاري",
+    "specialization": "التخصص المهني",
+    "bio": "النبذة التعريفية"
+  },
+  "userDetails": {
+    "providerDetails": "تفاصيل مزود الخدمة",
+    "requesterDetails": "تفاصيل طالب الخدمة",
+    "manageProviders": "إدارة مزودي الخدمة",
+    "manageRequesters": "إدارة طالبي الخدمة",
+    "providerStats": "إحصائيات المزود",
+    "requesterStats": "إحصائيات طالب الخدمة",
+    "totalOrders": "إجمالي الطلبات",
+    "waitingApproval": "بانتظار الموافقة",
+    "ongoingOrders": "طلبات جارية",
+    "completedOrders": "طلبات مكتملة",
+    "rejectedOrders": "طلبات مرفوضة",
+    "averageRating": "متوسط التقييم",
+    "providerRequests": "سجل طلبات المزود"
   },
   "about": {
     "metaTitle": "من نحن - تعرف على أهدافنا ورؤيتنا",
@@ -611,7 +632,9 @@
     "readyToUpload": "جاهز للرفع",
     "delete": "حذف",
     "files": "ملفات",
-    "actions": "الإجراءات"
+    "actions": "الإجراءات",
+    "noProfilePicture": "لا توجد صورة للملف الشخصي",
+    "loading": "جاري التحميل..."
   },
   "signupForm": {
     "welcome": "اهلا بيك في",
