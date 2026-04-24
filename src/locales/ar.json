@@ -643,6 +643,7 @@
     "specializationPlaceholder": "مثال: أنظمة كاميرات، شبكات، طاقة شمسية...",
     "bio": "نبذة عن الخدمات المقدمة",
     "bioPlaceholder": "اشرح باختصار الخدمات التي تقدمها منشأتك...",
+    "freelanceCertificate": "شهادة العمل الحر",
     "submitProvider": "تسجيل كمزود خدمة",
     "submitRequester": "تسجيل كطالب خدمة",
     "submitting": "جاري التسجيل...",
@@ -664,7 +665,8 @@
       "confirmPasswordMismatch": "كلمة المرور غير متطابقة",
       "agreeRequired": "يجب الموافقة على الشروط والأحكام",
       "specializationRequired": "التخصص مطلوب",
-      "bioRequired": "النبذة مطلوبة"
+      "bioRequired": "النبذة مطلوبة",
+      "freelanceCertificateRequired": "شهادة العمل الحر مطلوبة للأفراد"
     }
   },
   "signupForm.companyName": "اسم المنشأة",

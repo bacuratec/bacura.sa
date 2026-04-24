@@ -134,7 +134,7 @@ const SignupForm = () => {
       const isRequester = !isProvider;
       const shouldRequire =
         (isRequester && code !== "individual") ||
-        (isProvider && code === "company");
+        (isProvider && (code === "company" || code === "establishment"));
       return shouldRequire
         ? schema.required(t("signupForm.validation.commercialRecordRequired"))
         : schema.optional();
@@ -145,7 +145,7 @@ const SignupForm = () => {
       const isRequester = !isProvider;
       const shouldRequire =
         (isRequester && code !== "individual") ||
-        (isProvider && code === "company");
+        (isProvider && (code === "company" || code === "establishment"));
       return shouldRequire
         ? schema.required(t("signupForm.validation.commercialDateRequired"))
         : schema.optional();
@@ -175,6 +175,13 @@ const SignupForm = () => {
     setProfilePicture(file);
   };
   const onSubmit = async (values) => {
+    // التحقق من رفع شهادة العمل الحر للأفراد
+    const selected = types.find((x) => String(x.id) === String(values.entityType));
+    if (isProvider && selected?.code === "individual" && (!selectedFiles || selectedFiles.length === 0)) {
+      toast.error(t("signupForm.validation.freelanceCertificateRequired") || "شهادة العمل الحر مطلوبة للأفراد");
+      return;
+    }
+
     setIsLoading(true);
     try {
       // بيانات الميتاداتا الأساسية للمستخدم
@@ -360,7 +367,7 @@ const SignupForm = () => {
                     const selected = types.find((x) => String(x.id) === String(values.entityType));
                     const code = selected?.code;
                     const isRequester = !isProvider;
-                    const isCompanyContext = (isRequester && code && code !== "individual") || isProvider;
+                    const isCompanyContext = (isRequester && code && code !== "individual") || (isProvider && (code === "company" || code === "establishment"));
                     return isCompanyContext ? (t("signupForm.companyName") || "اسم المنشأة") : t("signupForm.fullName");
                   })()}{" "}
                   <span className="text-red-500">*</span>
@@ -373,7 +380,7 @@ const SignupForm = () => {
                   const selected = types.find((x) => String(x.id) === String(values.entityType));
                   const code = selected?.code;
                   const isRequester = !isProvider;
-                  const isCompanyContext = (isRequester && code && code !== "individual") || isProvider;
+                  const isCompanyContext = (isRequester && code && code !== "individual") || (isProvider && (code === "company" || code === "establishment"));
                   return isCompanyContext
                     ? (t("signupForm.companyNamePlaceholder") || "اسم المنشأة")
                     : t("signupForm.fullNamePlaceholder");
@@ -513,7 +520,7 @@ const SignupForm = () => {
               const isRequester = !isProvider;
               const shouldShow =
                 (isRequester && code && code !== "individual") ||
-                (isProvider && code === "company");
+                (isProvider && (code === "company" || code === "establishment"));
               if (!shouldShow) return null;
               return (
                 <div className="flex flex-col gap-4">
@@ -546,7 +553,7 @@ const SignupForm = () => {
               const isRequester = !isProvider;
               const shouldShow =
                 (isRequester && code && code !== "individual") ||
-                (isProvider && code === "company");
+                (isProvider && (code === "company" || code === "establishment"));
               if (!shouldShow) return null;
               return (
                 <div className="flex flex-col gap-4">
@@ -701,7 +708,16 @@ const SignupForm = () => {
             >
               <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt="upload" loading="lazy" decoding="async" />
               <span className="text-sm font-light">
-                {t("signupForm.uploadAttachments")}
+                {(() => {
+                  const selected = types.find((x) => String(x.id) === String(values.entityType));
+                  if (isProvider && selected?.code === "individual") {
+                    return t("signupForm.freelanceCertificate") || "شهادة العمل الحر";
+                  }
+                  return t("signupForm.uploadAttachments");
+                })()}
+                {isProvider && types.find(x => String(x.id) === String(values.entityType))?.code === "individual" && (
+                  <span className="text-red-500"> *</span>
+                )}
               </span>
               <input
                 type="file"

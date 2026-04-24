@@ -552,8 +552,9 @@
     "terms": "terms and conditions",
     "specialization": "Specialization / Field of Work",
     "specializationPlaceholder": "e.g., Camera Systems, Networking, Solar Energy...",
-    "bio": "Bio / Services Description",
+    "bio": "Bio about provided services",
     "bioPlaceholder": "Briefly describe the services your entity provides...",
+    "freelanceCertificate": "Freelance Certificate",
     "submitProvider": "Register as Provider",
     "submitRequester": "Register as Requester",
     "submitting": "Submitting...",
@@ -573,9 +574,10 @@
       "passwordShort": "Password is too short",
       "confirmPasswordRequired": "Confirm password is required",
       "confirmPasswordMismatch": "Passwords do not match",
-      "agreeRequired": "You must agree to the terms and conditions",
+      "agreeRequired": "Terms and conditions must be agreed upon",
       "specializationRequired": "Specialization is required",
-      "bioRequired": "Bio is required"
+      "bioRequired": "Bio is required",
+      "freelanceCertificateRequired": "Freelance certificate is required for individuals"
     }
   },
   "signupForm.companyName": "Entity Name",
