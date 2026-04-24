@@ -1009,6 +1009,27 @@
     "rejectedOrders": "Rejected Orders",
     "averageRating": "Average Rating"
   },
+  "homeAdmin": {
+    "totalRevenue": "Total Revenue",
+    "activeProjects": "Active Projects",
+    "totalProviders": "Total Providers",
+    "newUsers": "New Users",
+    "performance": "Overall Performance",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions",
+    "wallet": "Financial Wallet",
+    "availableBalance": "Available Balance",
+    "pendingBalance": "Pending Balance",
+    "payouts": "Payouts",
+    "noActivity": "No recent activity found",
+    "payoutSuccess": "Payout request processed",
+    "performanceDesc": "Monitoring platform growth and engagement",
+    "activityDesc": "Real-time updates from the platform",
+    "manageUsers": "Manage Users",
+    "viewRequests": "View Requests",
+    "systemSettings": "System Settings",
+    "reports": "Generate Reports"
+  },
   "explore": {
     "metaTitle": "Explore Requests",
     "metaDescription": "Browse the latest requests."

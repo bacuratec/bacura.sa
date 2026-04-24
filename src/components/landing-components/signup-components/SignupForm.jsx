@@ -130,24 +130,33 @@ const SignupForm = () => {
     region: Yup.string().required(t("signupForm.validation.regionRequired")),
     commercialRecord: Yup.string().when("entityType", (et, schema) => {
       const selected = types.find((x) => String(x.id) === String(et));
-      const code = selected?.code;
+      const code = selected?.code?.toLowerCase();
       const isRequester = !isProvider;
+      
+      // Individual means NO CC record needed
+      const isIndividual = code === "individual" || code === "freelancer" || selected?.nameAr === "فرد";
+      
       const shouldRequire =
-        (isRequester && code !== "individual") ||
+        (isRequester && !isIndividual) ||
         (isProvider && (code === "company" || code === "establishment"));
+
       return shouldRequire
-        ? schema.required(t("signupForm.validation.commercialRecordRequired"))
+        ? schema.required(t("signupForm.validation.commercialRecordRequired") || "رقم السجل التجاري مطلوب")
         : schema.optional();
     }),
     commercialRegistrationDate: Yup.string().when("entityType", (et, schema) => {
       const selected = types.find((x) => String(x.id) === String(et));
-      const code = selected?.code;
+      const code = selected?.code?.toLowerCase();
       const isRequester = !isProvider;
+      
+      const isIndividual = code === "individual" || code === "freelancer" || selected?.nameAr === "فرد";
+
       const shouldRequire =
-        (isRequester && code !== "individual") ||
+        (isRequester && !isIndividual) ||
         (isProvider && (code === "company" || code === "establishment"));
+        
       return shouldRequire
-        ? schema.required(t("signupForm.validation.commercialDateRequired"))
+        ? schema.required(t("signupForm.validation.commercialDateRequired") || "تاريخ انتهاء السجل مطلوب")
         : schema.optional();
     }),
     password: Yup.string()
@@ -177,7 +186,10 @@ const SignupForm = () => {
   const onSubmit = async (values) => {
     // التحقق من رفع شهادة العمل الحر للأفراد
     const selected = types.find((x) => String(x.id) === String(values.entityType));
-    if (isProvider && selected?.code === "individual" && (!selectedFiles || selectedFiles.length === 0)) {
+    const code = selected?.code?.toLowerCase();
+    const isIndividual = code === "individual" || code === "freelancer" || selected?.nameAr === "فرد";
+    
+    if (isProvider && isIndividual && (!selectedFiles || selectedFiles.length === 0)) {
       toast.error(t("signupForm.validation.freelanceCertificateRequired") || "شهادة العمل الحر مطلوبة للأفراد");
       return;
     }
@@ -361,17 +373,15 @@ const SignupForm = () => {
           <Form className="mt-9 flex flex-col gap-4">
             {/* الاسم الكامل */}
             <div className="flex flex-col gap-4">
-              <label>
-                <label>
+              <label className="block mb-2 text-sm font-bold text-gray-700">
                   {(() => {
                     const selected = types.find((x) => String(x.id) === String(values.entityType));
                     const code = selected?.code;
                     const isRequester = !isProvider;
                     const isCompanyContext = (isRequester && code && code !== "individual") || (isProvider && (code === "company" || code === "establishment"));
-                    return isCompanyContext ? (t("signupForm.companyName") || "اسم المنشأة") : t("signupForm.fullName");
+                    return isCompanyContext ? (t("signupForm.companyName") || "اسم المنشأة") : (t("signupForm.fullName") || "الاسم الكامل");
                   })()}{" "}
                   <span className="text-red-500">*</span>
-                </label>
               </label>
               <Field
                 type="text"
@@ -709,13 +719,22 @@ const SignupForm = () => {
               <img src={typeof fileUpload === "string" ? fileUpload : (fileUpload?.src || "")} alt="upload" loading="lazy" decoding="async" />
               <span className="text-sm font-light">
                 {(() => {
-                  const selected = types.find((x) => String(x.id) === String(values.entityType));
-                  if (isProvider && selected?.code === "individual") {
+                  const selectedId = String(values.entityType);
+                  const selected = types.find((x) => String(x.id) === selectedId);
+                  const code = selected?.code?.toLowerCase();
+                  // Robust check for individual/freelancer type
+                  const isIndividual = isProvider && (code === "individual" || code === "freelancer" || selected?.nameAr === "فرد");
+                  
+                  if (isIndividual) {
                     return t("signupForm.freelanceCertificate") || "شهادة العمل الحر";
                   }
-                  return t("signupForm.uploadAttachments");
+                  return t("signupForm.uploadAttachments") || "رفع المرفقات";
                 })()}
-                {isProvider && types.find(x => String(x.id) === String(values.entityType))?.code === "individual" && (
+                {isProvider && (() => {
+                  const selected = types.find((x) => String(x.id) === String(values.entityType));
+                  const code = selected?.code?.toLowerCase();
+                  return (code === "individual" || code === "freelancer" || selected?.nameAr === "فرد");
+                })() && (
                   <span className="text-red-500"> *</span>
                 )}
               </span>
